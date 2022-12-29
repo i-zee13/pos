@@ -1,0 +1,18 @@
+// PURCHASE INVOICES
+
+TRUNCATE `purchase_invoices` ; 
+TRUNCATE `products_purchases` ;
+
+//products
+TRUNCATE products;
+TRUNCATE companies;
+ 
+//Stocks 
+TRUNCATE stocks;
+TRUNCATE vendor_stocks;
+
+//Vendor Ledger
+TRUNCATE customer_ledger;
+ 
+TRUNCATE customers;
+

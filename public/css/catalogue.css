@@ -1,0 +1,404 @@
+.CataAddName {
+  padding: 20px 15px;
+  position: relative;
+  border-bottom: solid 1px #eae9e9
+}
+.CataAddName input {
+  box-shadow: none;
+  font-size: 13px;
+  height: 32px;
+  border-color: #eae9e9
+}
+.CataAddName .col-form-label {
+  font-size: 15px;
+  padding: 6px 0 0 0
+}
+.CataAddName .DateIcon {
+  width: 20px;
+  height: auto;
+  margin-top: 6px;
+  margin-right: 10px;
+  float: left
+}
+.SetDate_ {
+  cursor: pointer
+}
+.DateIcon02 {
+  padding-left: 15px;
+  padding-right: 10px
+}
+.DateIcon02 img {
+  width: 20px;
+  height: auto;
+  margin-top: 6px
+}
+.FT-date {
+  margin: 0
+}
+.FT-date label {
+  font-size: 12px;
+  margin: 0
+}
+.FT-date input {
+  padding: 0;
+  height: 18px;
+  font-size: 14px;
+  letter-spacing: 2px;
+  border: none;
+  margin-top: -3px
+}
+.FT-date .col-4 {
+  margin-top: -7px
+}
+.addPR-head {
+  font-size: 16px;
+  padding: 15px 20px !important
+}
+.PR-tableList {
+  border-bottom: solid 1px #eae9e9;
+  padding: 0px 5px 15px 5px
+}
+.PR-tableList .dataTables_length {
+  display: none
+}
+.PR-tableList .table {
+  margin-top: 0 !important
+}
+.PR-tableList .table img {
+  width: 35px;
+  height: 35px;
+  border: solid 1px #e0e0e0;
+  margin-top: -5px;
+  margin-bottom: -5px;
+  margin-right: 5px
+}
+.PR-tableList .table td, .table th {
+  padding: 8px
+}
+.PR-tableList .custom-select-sm {
+  border-radius: 0;
+  height: 22px;
+  padding: 0px 5px;
+  font-size: 12px;
+  border: none
+}
+.PR-tableList .table thead th {
+  border-bottom: solid 1px #a1c95c !important
+}
+.APS-list {
+  width: 230px;
+  position: relative;
+  float: right;
+  padding-right: 15px;
+}
+.APS-list input {
+  height: 32px;
+  border: solid 1px #eae9e9;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  padding-left: 30px;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.APS-list .fa {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  color: #b5b5b5;
+}
+._PR_filter {
+  width: 150px;
+  float: right;
+  padding-right: 15px;
+}
+._PR_filter .custom-select-sm {
+  border-radius: 0;
+  border: solid 1px #eae9e9;
+}
+.CatalogueAss {
+  padding: 15px 15px
+}
+.CatalogueAss .custom-radio {
+  font-size: 13px;
+  line-height: 25px
+}
+.CatalogueAss .form-s2 .select2-container .select2-selection--single {
+  background-color: #fff;
+  border-color: #eae9e9
+}
+._selectProList {
+  background: #ebebeb;
+  width: 100%;
+  height: 656px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #f6f6f6;
+  border-left: solid 1px #e4e4e4;
+  border-bottom: solid 1px #e4e4e4;
+}
+._selectProList .header {
+  padding: 15px 20px !important;
+}
+._selectProList .APS-list {
+  padding: 0;
+  width: 100%;
+  margin-top: 10px
+}
+.card .header h2:before {
+  top: 0
+}
+.ProListHD {
+  width: inherit;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 10px;
+  padding-top: 15px;
+  border-bottom: solid 1px #e5e5e5;
+  background: linear-gradient(0deg, #f8f8f8 0%, #ffffff 50%);
+}
+.ProList-div {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px
+}
+.Pro-card-Div {
+  border-bottom: solid 1px #e2e2e2;
+  background-color: #f6f6f6;
+  width: 100%;
+  padding: 8px 0px;
+  position: relative;
+  transition: .3s ease;
+}
+.Pro-card-Div:HOVER {
+  background-color: #fff;
+  border-bottom: solid 1px #fff;
+  box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.3);
+  transition: .3s ease;
+}
+.Pro-card-Div:HOVER .Pro-cardDel {
+  display: block
+}
+.Prl-N0, .Prl-N0:HOVER {
+  background-color: #e2e2e2;
+  color: #282828;
+  padding: 5px;
+  font-size: 16px;
+  text-align: center;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  line-height: 20px;
+  font-family: 'Rationale', sans-serif;
+  margin-left: 5px;
+  margin-top: 2px;
+  margin-right: 8px; font-weight: normal
+}
+.ProList-div .Pr_imgV, .dd-list img {
+  width: 35px;
+  height: 35px;
+  margin-right: 8px;
+  border: solid 1px #e0e0e0
+}
+.Pro-IN {
+  padding-right: 0;
+  padding: 0;
+  display: table;
+}
+.CP-name {
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 13px;
+  line-height: 16px
+}
+.ProListAct {
+  padding: 0 0 0 8px;
+  max-width: 125px;
+  font-size: 12px;
+  letter-spacing: normal;
+  margin-top: 9px
+}
+.Pro-cardDel {
+  font-size: 13px;
+  background-color: #f12300;
+  color: #fff;
+  line-height: 1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0px;
+  border-radius: 0;
+  padding: 3px;
+  margin: auto;
+  height: 22px;
+  z-index: 4;
+  display: none
+}
+.dragIcon {
+  background-color: red;
+  height: 49px;
+  margin-top: -7px;
+  margin-bottom: -7px
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 26px;
+  height: 17px;
+  margin-bottom: 0;
+  margin-right: 3px
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0
+}
+.switch .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s
+}
+.switch .slider:before {
+  position: absolute;
+  content: "";
+  height: 11px;
+  width: 11px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  -webkit-transition: .4s;
+  transition: .4s
+}
+.switch input:checked + .slider {
+  background-color: #0c397a
+}
+input:focus + .slider {
+  box-shadow: 0 0 1px #0c397a
+}
+.switch input:checked + .slider:before {
+  -webkit-transform: translateX(10px);
+  -ms-transform: translateX(10px);
+  transform: translateX(10px)
+}
+.switch .slider.round {
+  border-radius: 26px
+}
+.switch .slider.round:before {
+  border-radius: 50%
+}
+.nestable-lists {
+  display: block;
+  clear: both;
+  padding: 30px 0;
+  width: 100%;
+  border: 0;
+  border-top: 2px solid #ddd;
+  border-bottom: 2px solid #ddd;
+}
+#nestable-menu {
+  padding: 0;
+  margin: 20px 0;
+}
+#nestable-output, #nestable2-output {
+  width: 100%;
+  height: 7em;
+  font-size: 0.75em;
+  line-height: 1.333333em;
+  font-family: Consolas, monospace;
+  padding: 5px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+#nestable2 .dd-handle {
+  color: #fff;
+  border: 1px solid #999;
+  background: #bbb;
+  background: -webkit-linear-gradient(top, #bbb 0%, #999 100%);
+  background: -moz-linear-gradient(top, #bbb 0%, #999 100%);
+  background: linear-gradient(top, #bbb 0%, #999 100%);
+}
+#nestable2 .dd-handle:hover {
+  background: #bbb;
+}
+#nestable2 .dd-item > button:before {
+  color: #fff;
+}
+.dd-handle {
+  margin: 0
+}
+@media only screen and (min-width: 700px) {
+  .dd {
+    float: left;
+    width: 100%;
+  }
+  .dd + .dd {
+    margin-left: 2%;
+  }
+}
+.dd-hover > .dd-handle {
+  /*    background: #2ea8e5 !important;*/
+}
+/**
+ * Nestable Draggable Handles
+ */
+.dd3-content {
+  display: block;
+  height: 30px;
+  margin: 5px 0;
+  padding: 5px 10px 5px 40px;
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  background: -webkit-linear-gradient(top, #fafafa 0%, #eee 100%);
+  background: -moz-linear-gradient(top, #fafafa 0%, #eee 100%);
+  background: linear-gradient(top, #fafafa 0%, #eee 100%);
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+.dd3-content:hover {
+  color: #2ea8e5;
+  background: #fff;
+}
+.dd-dragel > .dd3-item > .dd3-content {
+  margin: 0;
+}
+.dd3-item > button {
+  margin-left: 30px;
+}
+.dd3-handle {
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+.dd3-handle:hover {
+  border: none;
+  box-shadow: none;
+}
+.dd-item:HOVER, .dd-empty:HOVER, .dd-placeholder:HOVER {
+  z-index: 20;
+}
+.Pro-card-Div:HOVER .Prl-N0::after {
+	content: '';
+	position: absolute;
+	top: 0px;
+	left: 0px; height: 40px; width: 40px;
+	background-image: url("../images/sort_arrow-drag.svg"); background-repeat:no-repeat; background-position: center center;  
+	
+}
+
+
+
+
