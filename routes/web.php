@@ -33,18 +33,20 @@ Route::get('/get-products'        ,[App\Http\Controllers\ProductController::clas
 Route::get('/get-sub-cat/{catId}' ,[App\Http\Controllers\ProductController::class, 'getSubCatToUpdate'])->name('get-sub-cat');
 Route::post('/product-delete/{id}',[App\Http\Controllers\ProductController::class, 'deleteProduct'])->name('product-delete');
 /** Stock Routes */
-Route::get('/stock-add'           ,[App\Http\Controllers\StockController::class, 'create'])->name('stock-add');
-Route::get('/get-vendors'         ,[App\Http\Controllers\StockController::class, 'getVendors'])->name('get-vendors');
-// Route::post('/get-product'         ,[App\Http\Controllers\StockController::class, 'getProduct'])->name('get-product');
+Route::get('/stock-add'                 ,[App\Http\Controllers\StockController::class, 'create'])->name('stock-add');
+Route::get('/get-vendors'               ,[App\Http\Controllers\StockController::class, 'getVendors'])->name('get-vendors');
+// Route::post('/get-product'           ,[App\Http\Controllers\StockController::class, 'getProduct'])->name('get-product');
 Route::get('/get-customer-balance/{id}' ,[App\Http\Controllers\StockController::class, 'getVendorBalance'])->name('get-customer-balance');
 /** Purchase Routes */
-Route::post('/add-purchase-invoice' ,[App\Http\Controllers\StockController::class, 'purchaseInvoice'])->name('add-purchase-invoice');
-Route::get('/purchases'             ,[App\Http\Controllers\StockController::class, 'purchaseList'])->name('purchases');
-Route::get('/purchase-edit/{id}'    ,[App\Http\Controllers\StockController::class, 'editPurchase'])->name('purchase-edit');
-Route::get('/get-purchase-products/{id}'        ,[App\Http\Controllers\StockController::class, 'getPurchaseProduct'])->name('get-purchase-products');
-Route::get('/purchase-return'                   ,[App\Http\Controllers\StockController::class, 'purchaseReturn'])->name('purchase-return');
+Route::post('/add-purchase-invoice'     ,[App\Http\Controllers\StockController::class, 'purchaseInvoice'])->name('add-purchase-invoice');
+Route::get('/purchases'                 ,[App\Http\Controllers\StockController::class, 'purchaseList'])->name('purchases');
+Route::get('/purchase-edit/{id}'        ,[App\Http\Controllers\StockController::class, 'editPurchase'])->name('purchase-edit');
+Route::get('/get-purchase-products/{id}'     ,[App\Http\Controllers\StockController::class, 'getPurchaseProduct'])->name('get-purchase-products');
 Route::delete('/delete-product-from-invoice' ,[App\Http\Controllers\StockController::class, 'deleteProduct'])->name('delete-product');
-
+// Purchase Returns / 
+Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
+Route::get('/purchase-return'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'purchaseReturn'])->name('purchase-return');
+Route::post('/add-purchase-return'                ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
 
 
 });

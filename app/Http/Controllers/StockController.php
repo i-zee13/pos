@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Auth;
 
-use function Psy\debug;
 
 class StockController extends Controller
 {
@@ -26,10 +25,7 @@ class StockController extends Controller
         $products     =    Product::all();
         return view('purchases.add',compact('customers','current_date','invoice_no','products'));
     }
-    public function destroy(Stock $stock)
-    {
-        //
-    }
+    
     public function getProduct(Request $request)
     {
         if($request->get_result_for == 1){
@@ -274,15 +270,7 @@ class StockController extends Controller
             'customer_balance'  => $customer_balance
         ]);
     }
-    public function purchaseReturn(){
-        $invoice_no   =  'inv-'.Str::random(15);
-        $current_date =   Carbon::today()->toDateString();
-        $customers    =   Customer::where('customer_type',1)
-                                    ->join('vendor_stocks','vendor_stocks.vendor_id','=','customers.id')
-                                    ->select('customers.*')->get();
-        $products     =   Product::all();
-        return view('purchases.return',compact('customers','current_date','invoice_no','products'));
-    }
+ 
     public function deleteProduct(Request $request){
           $prod = VendorStock::where('purchase_invoice_id',$request->purchase_invoice_id)
                         ->where('product_id',$request->product_id)
@@ -316,4 +304,8 @@ class StockController extends Controller
                 }
        
     }
+
+    //Purchase Returns 
+
+     
 }

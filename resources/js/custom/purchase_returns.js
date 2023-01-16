@@ -22,13 +22,12 @@ var deleteRef = '';
 var expiry_date = '';
 let current_client_array  = [];
 var p_price = '';
+let stock_in_hand = '';
+let unit_price = '';
+
 
 $(document).ready(function () {
-
-    if (segments[3] == "stock-add") {
-        //
-        
-    } else if (segments[3] == 'purchase-edit') {
+ if (segments[3] == 'purchase-edit') {
         customer_id    = $('#curren_customer_id').val(); 
         var invoice_id = $('#invoice_id').val(); 
         segment = segments[3];
@@ -66,7 +65,7 @@ $(document).ready(function () {
         })
 
     }
-    getvendors();    
+    // getvendors();    
     getProducts();
     $('.add-more-btn').attr('href', '#');
     $('.new_form_field').addClass('required_client');
@@ -189,18 +188,20 @@ $('#add-product').on('click', function () {
                 <td><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</button></td>
                 </tr>`);
     grandSum(previous_payable);
+    $('#products').children('option[value="' + product_id + '"]').attr('disabled', true);
+    $('#form')[0].reset();
     $('.grand-total').text(sum);
     $('#purchase_price').val('');
     $('#product-name').val('');
     $('#qty').val('');
     $('#amount').val('');
-    $('#bar-code').val('');
-    $('.products').val(0).trigger('change');
+    $('.bar-code').val('');
+    $('.products').val('0').trigger('change');
     $('#new_purchase_price').val('');
     p_name = '';
 
 })
-$(document).on('focusout', '.bar-code', function () {
+$(document).on('focusout input', '.bar-code', function () {
     var data_variable = $(this).val();
     
     $('#purchase_price').val('');
@@ -240,6 +241,15 @@ $('#qty').on('input', function () {
     new_price = $('#new_purchase_price').val();
     old_price = $('#purchase_price').val();
     qty = $(this).val();
+    // if($(this).val() > stock_in_hand){
+        // qty =  $(this).val(stock_in_hand);
+        // $('#notifDiv').fadeIn();
+        // $('#notifDiv').css('background', 'red');
+        // $('#notifDiv').text(`Quantity should be less ${stock_in_hand}`);
+        // setTimeout(() => {
+        //     $('#notifDiv').fadeOut();
+        // }, 3000);
+    // }
     var purchase_price = $('#purchase_price').val();
     if (new_price > 0) {
         amount = qty * new_price;
@@ -248,7 +258,6 @@ $('#qty').on('input', function () {
     }
     $('#amount').val(amount);
 })
-//Saving Intake Client 
 $("#save").on('click', function () {
     let dirty = false;
     $('.required').each(function () {
@@ -279,9 +288,9 @@ $("#save").on('click', function () {
     $('.btn-cancel').attr('disabled', 'disabled');
     $('#save').text('Processing..');
     $('#form').ajaxSubmit({
-        url: '/add-purchase-invoice',
-        type: 'post',
-        data: {
+        url  : '/add-purchase-return',
+        type : 'post',
+        data : {
             'purchased_product_array': purchased_product_array,
             'grand_total': grand_total,
             'purchased_total': purchased_total,
@@ -329,6 +338,16 @@ $("#save").on('click', function () {
 });
 $(document).on('input', '.qty-input', function () {
     var update_qty = $(this).val();
+    
+    // if($(this).val() > stock_in_hand){ 
+        // update_qty =  $(this).val(stock_in_hand);
+        // $('#notifDiv').fadeIn();
+        // $('#notifDiv').css('background', 'red');
+        // $('#notifDiv').text(`Quantity should be less ${stock_in_hand}`);
+        // setTimeout(() => {
+        //     $('#notifDiv').fadeOut();
+        // }, 3000);
+    // }
     var current_product_id = $(this).attr('data-id');
     var product_amount     = $(this).attr('data-value')
     var current_product_price = 0;
@@ -337,15 +356,17 @@ $(document).on('input', '.qty-input', function () {
         if(data.product_id == current_product_id){
             data.qty = update_qty;
         }
-        if (data.new_price != '') {
-            p_price = data.new_price
-        } else {
+        // if (data.new_price != '' || data.new_price != undefined) {
+           
+        //     p_price = data.new_price
+        // } else {
             p_price = data.old_price
-        }
+        // }
         if (data.product_id == current_product_id) {
             current_product_price = p_price;
             new_amount_of_purchase_product = update_qty * current_product_price;
             data.amount = new_amount_of_purchase_product;
+            console.log(new_amount_of_purchase_product)
             $(`.purchase-product-amount${current_product_id}`).empty();
             $(`.purchase-product-amount${current_product_id}`).text(new_amount_of_purchase_product)
         }
@@ -385,11 +406,13 @@ function getvendors() {
     })
 }
 $('.customer_id').change(function () {
+    $("#products").empty();
+    $("#products").append(`<option value="0">Select Product</option>`)
     // $('.current_balance').text('0').trigger('change');
     var selected_index = $(this).val();
     if(selected_index > 0){
     $.ajax({
-        url     : '/get-customer-balance/'+selected_index,
+        url     : '/get-customer-balance-products/'+selected_index,
         type    : 'get',
         data    :   {
             segment:segment
@@ -400,32 +423,54 @@ $('.customer_id').change(function () {
             $('.previous_payable').val(previous_payable);
             grandSum(previous_payable)
             $('.display').css('display','');
+            var products = [];
+           
+            product_list.filter(function(item) {
+                response.product_ids.forEach((x,key) => {
+                    if(x.product_id == item.id){
+                        $("#products").append(`<option value="${item.id}" data-name="${item.product_name}" data-stock="${x.sum}" unit-price="${x.product_unit_price}">${item.product_name}</option>`)
+                        // products.push(item)
+                    }
+                })
+              })
+              
+            //  products.forEach((data) => {
+            //     $("#products").append(`<option value="${data.id}" data-name="${data.product_name}">${data.product_name}</option>`)
+            //  })
+           
         }
     })
     var customer = vendors.filter(x => x.id == selected_index)
 }
 })
 $('.products').change(function () {
-   
-    var selected_product = $(this).val();
     $('#purchase_price').val('');
     $('#product-name').val('');
     $('#qty').val('');
     $('.bar-code').val('');
     $('#amount').val('');
-    var filter_product = product_list.filter(x => x.id == selected_product)
-    $('.retail_price').text(filter_product[0].sale_price);
-    if(filter_product[0].new_purchase_price > 0){
-        $('#purchase_price').val(filter_product[0].new_purchase_price);
-    }else{
-        $('#purchase_price').val(filter_product[0].old_purchase_price);
+    var selected_product = $(this).val();
+    stock_in_hand = $('option:selected', this).attr('data-stock');
+    unit_price    = $('option:selected', this).attr('unit-price');
+    if(selected_product != null){
+        var filter_product = product_list.filter(x => x.id == selected_product)
+        $('.retail_price').text(filter_product[0].sale_price);
+        
+        // if(filter_product[0].new_purchase_price > 0){
+        //     $('#purchase_price').val(filter_product[0].new_purchase_price);
+        // }else{
+        //     $('#purchase_price').val(filter_product[0].old_purchase_price);
+        // }
+        $('#purchase_price').val(unit_price);
+        $('#qty').val(stock_in_hand);
+        $('.stock_balance').text(stock_in_hand);
+        p_name      = filter_product[0].product_name;
+        product_id  = filter_product[0].id;
+        $('.expiry_date').val(filter_product[0].expiry_date)
+        $('.bar-code').val(filter_product[0].barcode);
     }
-    $('.stock_balance').text(filter_product[0].stock_balance);
-    p_name = filter_product[0].product_name;
-    product_id = filter_product[0].id;
-    $('.expiry_date').val(filter_product[0].expiry_date)
-    $('.bar-code').val(filter_product[0].barcode);
-
+   
+   
 });
 function getPurchases() {
     $.ajax({
@@ -472,11 +517,14 @@ function getPurchases() {
 }
 function grandSum(previous_payable){
     var sum = 0;
+    console.log(sum)
     purchased_product_array.forEach(function (data, key) {
         sum += parseFloat(data.amount)
     })
     purchased_total = sum;
     sum += parseFloat(previous_payable)
-
     $('.grand-total').text(sum);
+    // sum += parseFloat(previous_payable-purchased_total)
+    // $('.grand-total').text(parseFloat(previous_payable-purchased_total));
 }
+

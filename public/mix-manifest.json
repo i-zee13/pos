@@ -3,5 +3,6 @@
     "/js/custom/customer.js": "/js/custom/customer.js",
     "/js/custom/product.js": "/js/custom/product.js",
     "/js/custom/stock.js": "/js/custom/stock.js",
+    "/js/custom/purchase_returns.js": "/js/custom/purchase_returns.js",
     "/css/app.css": "/css/app.css"
 }

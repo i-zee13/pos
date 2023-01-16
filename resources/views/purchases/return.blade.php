@@ -425,16 +425,27 @@
                 <div class="form-s2">
                   <select class="form-control formselect customer_id form_clear required" name="customer_id" id="customer_id">
                     <option value="0"> Select Vendor*</option>
-
+                    @foreach($customers as $customer)
+                    <option value="{{$customer->id}}"> {{$customer->customer_name}}</option>
+                    @endforeach
                     </option>
                   </select>
                 </div>
               </div>
-             
+              <!-- <div class="col-md-2  PT-20" id="btns_div">
+                      <button type="button" id="add-product" class="btn btn-primary mr-2">Add</button>
+              </div> -->
+
             </div>
 
           </div>
-          <div class="row">
+          
+          
+          <div class="row display" style="display: none;">
+            <input type="text" id="" class="form-control " value="1" name="form_status" hidden>
+
+            <div class="col-12">
+            <div class="row">
             <div class="col-12">
               <div class="header pt-0">
                 <h2>Stock <span>Definition</span></h2>
@@ -488,20 +499,14 @@
                     </div>
 
                   </div>
-
                 </div>
-               
               </div>
           </div>
-          <div class="row display" style="display: none;">
-            <input type="text" id="" class="form-control " value="1" name="form_status" hidden>
-
-            <div class="col-12">
               <div class="property_info">
                 <div class="row">
                   <div class="col-12 pt-10">
                     <div class="header pt-0">
-                      <h2> Purchase <span>Information</span></h2>
+                      <h2> Returns <span>Information</span></h2>
                     </div>
                   </div>
                 </div>
@@ -535,10 +540,10 @@
                       <label class="control-label mb-5">Current Purchase Price</label>
                       <input type="text" id="purchase_price" class="form-control " placeholder="" name="purchase_price">
                     </div>
-                    <div class="col-md-3 mb-10">
+                    <!-- <div class="col-md-3 mb-10">
                       <label class="control-label mb-5">New Purchase Price</label>
                       <input type="text" id="new_purchase_price" class="form-control" placeholder="" name="new_purchase_price">
-                    </div>
+                    </div> -->
 
                     <div class="col-md-2 mb-10">
 
@@ -575,7 +580,7 @@
                 <div class=" show_existing_div" style="display: none">
                   <div class="col-12">
                     <div class="header pt-0">
-                      <h2>Purchase<span> Products List:</span></h2>
+                      <h2>Returns<span> Products List:</span></h2>
                     </div>
                   </div>
                   <div class=" p-15 show_existing_div" style="display:none">
@@ -604,19 +609,19 @@
                               <th colspan="3" style="text-align:right;">Grand Total</th>
                               <th class="grand-total" colspan="4" style="text-align: center;">0</th>
                             </tr>
-                            <tr rowspan="5">
+                            <!-- <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input" data-id="" data-value="">
                               </th>
-                            </tr>
+                            </tr> -->
 
-                            <tr rowspan="5">
+                            <!-- <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Amount pay</th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class="qty-input add-stock-input" name="amount_paid">
                               </th>
-                            </tr>
+                            </tr> -->
                           </tfoot>
                         </table>
                       </div>
@@ -631,13 +636,14 @@
 
                 <div class="col-md-12 text-right pr-0 PT-10" id="btns_div">
                   <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
-                  <a href="/intake-forms" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                  <a href="#" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                 </div>
 
               </div>
             </div>
 
           </div>
+          
         </div>
       </div>
 
@@ -653,6 +659,6 @@
 <script>
   var clients = JSON.parse('{!! json_encode($customers)  !!}');
 </script>
-<script src="{{asset('js/custom/stock.js')}}"> </script>
+<script src="{{asset('js/custom/purchase_returns.js')}}"> </script>
 
 @endpush
