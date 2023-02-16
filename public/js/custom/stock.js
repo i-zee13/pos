@@ -226,12 +226,13 @@ $(document).on('click', '.remove_btn', function () {
     purchased_product_array = purchased_product_array.filter(function (x) {
       return x.product_id != product_id;
     });
+    $('.products').children('option[value="' + product_id + '"]').attr('disabled', false);
     grandSum(previous_payable);
   }
   // this.parentNode.removeChild(this);
 
   //purchased_product_array.splice(purchased_product_array.indexOf(this),1);
-  // $('#existing_client').children('option[value="' + id + '"]').attr('disabled', false);
+  $('#existing_client').children('option[value="' + id + '"]').attr('disabled', false);
   // $(".existing_client").select2();
 });
 
@@ -255,6 +256,7 @@ $('#add-product').on('click', function () {
     'new_price': "".concat(new_price),
     'old_price': "".concat(old_price)
   });
+  $('.products').children('option[value="' + product_id + '"]').attr('disabled', true);
   $('.show_existing_div').show();
   $('#designationsTable tbody').append("\n            <tr id='tr-".concat(product_id, "'>\n                <td>1</td>\n                <td>").concat(p_name, "</td>\n                <td><input type=\"text\" value=\"").concat(qty, "\"  class=\"qty-input add-stock-input\" data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\"></td>\n                <td class='purchase-product-amount").concat(product_id, " add- S-input '>").concat(amount, "</td>\n                <td><button type=\"button\" id=\"").concat(product_id, "\" class=\"btn smBTN red-bg remove_btn\" data-index=\"\">Remove</button></td>\n                </tr>"));
   grandSum(previous_payable);

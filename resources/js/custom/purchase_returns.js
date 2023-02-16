@@ -173,8 +173,8 @@ $('#add-product').on('click', function () {
     purchased_product_array.push({
         'product_id': `${product_id}`,
         'expiry_date': `${expiry_date}`,
-        'qty': `${qty}`,
-        'amount': `${amount}`,
+        'qty'        : `${qty}`,
+        'amount'     : `${amount}`,
         'new_price': `${new_price}`,
         'old_price': `${old_price}`,
     });
@@ -455,7 +455,7 @@ $('.products').change(function () {
     if(selected_product != null){
         var filter_product = product_list.filter(x => x.id == selected_product)
         $('.retail_price').text(filter_product[0].sale_price);
-        
+        $('.products').children('option[value="' + filter_product[0].id + '"]').attr('disabled', true);
         // if(filter_product[0].new_purchase_price > 0){
         //     $('#purchase_price').val(filter_product[0].new_purchase_price);
         // }else{

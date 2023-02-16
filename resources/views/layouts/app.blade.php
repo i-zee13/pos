@@ -10,7 +10,7 @@
     <meta name="csrf_token" content="{{ csrf_token() }}">
     <!-- Favicon -->
     <link rel="shortcut icon" href="https://dashkit.goodthemes.co/assets/favicon/favicon.ico" type="image/x-icon">
-
+    {{ seo()->render() }}
     <!-- Map CSS -->
     <link rel="stylesheet" href="{{asset('/assets/css/mapbox-gl.css')}}">
 

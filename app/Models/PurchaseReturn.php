@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class PurchaseReturn extends Model
 {
     use HasFactory;
+    protected $table    =   'return_invoices';
+    protected $guarded  =    [];
 }

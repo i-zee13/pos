@@ -149,12 +149,14 @@ $(document).on('click', '.remove_btn', function () {
     }else{
         $("#tr-" + product_id).remove();
         purchased_product_array = purchased_product_array.filter(x => x.product_id != product_id);
+        $('.products').children('option[value="' + product_id + '"]').attr('disabled', false);
+
         grandSum(previous_payable);
     }
     // this.parentNode.removeChild(this);
 
     //purchased_product_array.splice(purchased_product_array.indexOf(this),1);
-    // $('#existing_client').children('option[value="' + id + '"]').attr('disabled', false);
+    $('#existing_client').children('option[value="' + id + '"]').attr('disabled', false);
     // $(".existing_client").select2();
    
 
@@ -179,6 +181,8 @@ $('#add-product').on('click', function () {
         'new_price': `${new_price}`,
         'old_price': `${old_price}`,
     });
+    $('.products').children('option[value="' + product_id + '"]').attr('disabled', true);
+
     $('.show_existing_div').show()
     $('#designationsTable tbody').append(`
             <tr id='tr-${product_id}'>

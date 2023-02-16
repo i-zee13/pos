@@ -522,7 +522,7 @@ $('.products').change(function () {
       return x.id == selected_product;
     });
     $('.retail_price').text(filter_product[0].sale_price);
-
+    $('.products').children('option[value="' + filter_product[0].id + '"]').attr('disabled', true);
     // if(filter_product[0].new_purchase_price > 0){
     //     $('#purchase_price').val(filter_product[0].new_purchase_price);
     // }else{

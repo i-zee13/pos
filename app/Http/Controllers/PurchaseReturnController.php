@@ -8,10 +8,12 @@ use App\Models\Product;
 use App\Models\ProductPurchase;
 use App\Models\ProductReturns;
 use App\Models\ReturnInvoice;
+use App\Models\Stock;
 use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Auth;
 
 
 class PurchaseReturnController extends Controller
@@ -72,15 +74,6 @@ class PurchaseReturnController extends Controller
                     $returns->purchased_total_amount =  $purchase_product['amount'];
                     $returns->created_by      = Auth::id();
                     if($returns->save()){
-                          $product = Product::where('id',$returns->product_id)->first();
-                          $product->expiry_date = $returns->expiry_date;
-                          if($purchase_product['new_price'] != ''){
-                              $product->new_purchase_price = $purchase_product['new_price'];
-                        }else{
-                            $product->old_purchase_price  = $purchase_product['old_price'];
-                        }
-                        $product->updated_by = Auth::id();
-                        $product->save();
                         $check_stock    = VendorStock::where('product_id',$returns->product_id)->orderBy('id', 'DESC')->first();
                         if($check_stock){
                             $balance    =   $check_stock->balance; 
@@ -96,8 +89,8 @@ class PurchaseReturnController extends Controller
                             if($stock){ 
                                 if($returns->qty > $stock->qty){
                                     $in_hand   = $returns->qty-$stock->qty;
-                                    $balance   = $balance+$in_hand;
-                                    $status    = 1;     //in 
+                                    $balance   = $balance-$in_hand;
+                                    $status    = 2;     //out 
                                 }else if($stock->qty > $returns->qty){
                                     $in_hand     = $stock->qty-$returns->qty;
                                     $balance     = $balance-$in_hand;
@@ -133,33 +126,14 @@ class PurchaseReturnController extends Controller
                             $company_stock->vendor_stock_id  = $add_stock->id;
                             $company_stock->product_id  = $add_stock->product_id;
                             $company_stock->amount      = $add_stock->amount;
-                            $company_stock->return_invoice_id   = $add_stock->return_invoice_id ;
-                            $company_stock->product_unit_price   = $add_stock->product_unit_price;
                             $company_stock->qty         = $add_stock->qty;
                             $company_stock->status      =   2; //out
                             $company_stock->balance     = $add_stock->balance-$add_stock->qty;
                             $company_stock->created_by  =  Auth::id();
+                            $company_stock->return_invoice_id   = $add_stock->return_invoice_id ;
+                            $company_stock->product_unit_price  = $add_stock->product_unit_price;
                             $company_stock->save();
-                            // dd($returns_products_array);
-                        //    
-                            // $deleted_product = Stock::where('return_invoice_id ',$request->hidden_invoice_id)
-                            //                 ->whereNotIn('product_id',$returns_products_array)->where('status',1)->orderBy('id', 'DESC')->get();
-                           
-                            // if($deleted_product){
-                            //     foreach($deleted_product as $prod){
-                            //     $out_stock  =   new Stock();
-                            //     $out_stock->product_id  = $prod->product_id;
-                            //     $out_stock->date        = $prod->created_at;
-                            //     $out_stock->amount      = $prod->amount;
-                            //     $out_stock->return_invoice_id   = $prod->return_invoice_id ;
-                            //     $out_stock->product_unit_price   = $prod->product_unit_price;
-                            //     $out_stock->qty         = $prod->qty;
-                            //     $out_stock->status      =   2; //out
-                            //     $out_stock->balance     = $prod->balance-$prod->qty;
-                            //     $out_stock->created_by  =  Auth::id();
-                            //     $out_stock->save();
-                            //      }
-                            //     }
+                          
                             Product::where('id',$add_stock->product_id)->update([
                                 'stock_balance' =>  $add_stock->balance,
                             ]);
@@ -177,18 +151,16 @@ class PurchaseReturnController extends Controller
                     // $previous_cash_in   = 0;
                     $balance        =   0;
                 }
-                if($request->hidden_invoice_id){
-                    $customer_ledger   = CustomerLedger::where('return_invoice_id ',$request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
-                }else{
-                    $customer_ledger   =  new  CustomerLedger();
-                }
-                $customer_ledger->cr         = $request->purchased_total;
+            
+                $customer_ledger   =  new  CustomerLedger();
+               
+                $customer_ledger->dr         = $request->purchased_total;
                 // $customer_ledger->cr         = ($request->grand_total-$request->amount_paid)+$balance;
                 $customer_ledger->date       = $request->invoice_date;
                 $customer_ledger->return_invoice_id = $invoice->id;
                 $customer_ledger->customer_id= $request->customer_id;
-                $customer_ledger->dr         = $request->amount_paid;
-                $customer_ledger->balance    = ($request->grand_total-$request->amount_paid); //+balance
+                // $customer_ledger->dr         = $request->amount_paid;
+                $customer_ledger->balance    = ($balance-$request->purchased_total); //+balance
                 $customer_ledger->created_by = Auth::id();
                 $customer_ledger->save();
                 Customer::where('id',$request->customer_id)->update([
