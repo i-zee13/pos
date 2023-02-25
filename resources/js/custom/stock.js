@@ -24,7 +24,7 @@ let current_client_array  = [];
 var p_price = '';
 
 $(document).ready(function () {
-
+    getProducts();
     if (segments[3] == "stock-add") {
         //
         
@@ -36,7 +36,6 @@ $(document).ready(function () {
             url: '/get-purchase-products/' + invoice_id,
             type: 'get',
             success: function (response) {
-              
                 response.products.forEach(function (product) {
                     p_name = product.product_name;
                     purchased_product_array.push({
@@ -49,13 +48,19 @@ $(document).ready(function () {
                         'p_name'     : `${product.product_name}`,
                         'purchase_invoice_id'     : `${product.purchase_invoice_id  }`,
                        
-                    });
+                    }); 
+                $('.products').children(`option[value="${product.product_id}"]`).attr('disabled', true);
                 })
-                $('.show_existing_div').show()
-                purchased_product_array.forEach(function(product){
+                $(".products").val('0');
+                $(".products").select2();
+               
+                $('.show_existing_div').show();
+                var x=0
+                purchased_product_array.forEach(function(product,key){
+                    x++;
                      $('#designationsTable tbody').append(`
                         <tr id='tr-${product.product_id}'>
-                            <td>1</td>
+                            <td>${key+1}</td>
                             <td>${product.p_name}</td>
                             <td><input type="text" value="${product.qty}"  class="qty-input add-stock-input" data-id="${product.product_id}" data-value="${amount}"></td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount}</td>
@@ -67,7 +72,6 @@ $(document).ready(function () {
 
     }
     getvendors();    
-    getProducts();
     $('.add-more-btn').attr('href', '#');
     $('.new_form_field').addClass('required_client');
     $('#client_type').attr('disabled', true);
@@ -150,18 +154,34 @@ $(document).on('click', '.remove_btn', function () {
         $("#tr-" + product_id).remove();
         purchased_product_array = purchased_product_array.filter(x => x.product_id != product_id);
         $('.products').children('option[value="' + product_id + '"]').attr('disabled', false);
+        $(".products").val('0');
+
+        $(".products").select2();
 
         grandSum(previous_payable);
     }
     // this.parentNode.removeChild(this);
 
     //purchased_product_array.splice(purchased_product_array.indexOf(this),1);
-    $('#existing_client').children('option[value="' + id + '"]').attr('disabled', false);
+    // $('#products').children('option[value="' + id + '"]').attr('disabled', false);
     // $(".existing_client").select2();
    
 
 })
 $('#add-product').on('click', function () {
+    if ($('#qty').val() == '') {
+        $(this).focus();
+        $('#qty').css('border-color', 'red');
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Please Add Qty for Product');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    } else {
+        $('#qty').css('border-color', ''); // Reset the border color
+    }
     if ($('.expiry_date').val() == '') {
         $('#notifDiv').fadeIn();
         $('#notifDiv').css('background', 'red');
@@ -174,35 +194,37 @@ $('#add-product').on('click', function () {
         expiry_date = $('.expiry_date').val();
     }
     purchased_product_array.push({
-        'product_id': `${product_id}`,
+        'product_id' : `${product_id}`,
         'expiry_date': `${expiry_date}`,
-        'qty': `${qty}`,
-        'amount': `${amount}`,
-        'new_price': `${new_price}`,
-        'old_price': `${old_price}`,
+        'qty'        : `${qty}`,
+        'amount'     : `${amount}`,
+        'new_price'  : `${new_price}`,
+        'old_price'  : `${old_price}`,
     });
     $('.products').children('option[value="' + product_id + '"]').attr('disabled', true);
-
+    $(".products").val('0');
+    $(".products").select2();
     $('.show_existing_div').show()
+    let rowCount = $('#designationsTable tbody tr').length + 1;
     $('#designationsTable tbody').append(`
             <tr id='tr-${product_id}'>
-                <td>1</td>
+                <td>${rowCount}</td>
                 <td>${p_name}</td>
                 <td><input type="text" value="${qty}"  class="qty-input add-stock-input" data-id="${product_id}" data-value="${amount}"></td>
                 <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
                 <td><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</button></td>
-                </tr>`);
+                </tr>`
+                );
     grandSum(previous_payable);
-    $('.grand-total').text(sum);
     $('#purchase_price').val('');
-    $('#product-name').val('');
     $('#qty').val('');
     $('#amount').val('');
     $('#bar-code').val('');
     $('.products').val(0).trigger('change');
     $('#new_purchase_price').val('');
+    // $('.new_dob').val('')
     p_name = '';
-
+    // $('#purchse-form')[0].reset();
 })
 $(document).on('focusout', '.bar-code', function () {
     var data_variable = $(this).val();
@@ -211,11 +233,10 @@ $(document).on('focusout', '.bar-code', function () {
     $('#product-name').val('');
     $('#qty').val('');
     $('#amount').val('');
-    if(data_variable ){
+    if(data_variable){
         var filter_product = product_list.filter(x => x.barcode == data_variable)
-        console.log(filter_product);
         $('#products').val(filter_product[0].id).trigger('change');
-        $('.retail_price').text(filter_product[0].sale_price);
+        // $('.retail_price').text(filter_product[0].sale_price);
         $('#purchase_price').val(filter_product[0].old_purchase_price);
         
         $('.stock_balance').text(filter_product[0].stock_balance);
@@ -354,8 +375,6 @@ $(document).on('input', '.qty-input', function () {
             $(`.purchase-product-amount${current_product_id}`).text(new_amount_of_purchase_product)
         }
     })
-    console.log(purchased_product_array)
-
     grandSum(previous_payable);
 
 })
@@ -400,7 +419,8 @@ $('.customer_id').change(function () {
          },
         success : function(response){
             previous_payable = response.customer_balance;
-            $('.previous_payable').text(previous_payable);
+            var previous_payable_text = previous_payable > 0 ? previous_payable + " DR" : previous_payable < 0  ? (-previous_payable) + " CR" : previous_payable;
+            $('.previous_payable').text(previous_payable_text);
             $('.previous_payable').val(previous_payable);
             grandSum(previous_payable)
             $('.display').css('display','');
@@ -410,25 +430,26 @@ $('.customer_id').change(function () {
 }
 })
 $('.products').change(function () {
-   
     var selected_product = $(this).val();
     $('#purchase_price').val('');
     $('#product-name').val('');
     $('#qty').val('');
     $('.bar-code').val('');
     $('#amount').val('');
-    var filter_product = product_list.filter(x => x.id == selected_product)
-    $('.retail_price').text(filter_product[0].sale_price);
-    if(filter_product[0].new_purchase_price > 0){
-        $('#purchase_price').val(filter_product[0].new_purchase_price);
-    }else{
-        $('#purchase_price').val(filter_product[0].old_purchase_price);
+    if(selected_product > 0){
+        var filter_product = product_list.filter(x => x.id == selected_product)
+        $('.retail_price').text(filter_product[0].sale_price);
+        if(filter_product[0].new_purchase_price > 0){
+            $('#purchase_price').val(filter_product[0].new_purchase_price);
+        }else{
+            $('#purchase_price').val(filter_product[0].old_purchase_price);
+        }
+        $('.stock_balance').text(filter_product[0].stock_balance);
+        p_name = filter_product[0].product_name;
+        product_id = filter_product[0].id;
+        $('.expiry_date').val(filter_product[0].expiry_date)
+        $('.bar-code').val(filter_product[0].barcode);
     }
-    $('.stock_balance').text(filter_product[0].stock_balance);
-    p_name = filter_product[0].product_name;
-    product_id = filter_product[0].id;
-    $('.expiry_date').val(filter_product[0].expiry_date)
-    $('.bar-code').val(filter_product[0].barcode);
 
 });
 function getPurchases() {

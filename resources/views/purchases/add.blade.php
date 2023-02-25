@@ -507,8 +507,8 @@
                 </div>
 
                 <div class="infoDiv p-15">
-
-                  <div class="row ">
+                <form id="purchse-form">
+                  <div class="row">
 
                     <div class="col-md-2 mb-10">
 
@@ -563,7 +563,7 @@
                     </div>
 
                   </div>
-
+                  </form>
                 </div>
               </div>
             </div>

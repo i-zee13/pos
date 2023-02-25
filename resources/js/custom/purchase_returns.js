@@ -27,6 +27,8 @@ let unit_price = '';
 
 
 $(document).ready(function () {
+    getProducts();
+
  if (segments[3] == 'purchase-edit') {
         customer_id    = $('#curren_customer_id').val(); 
         var invoice_id = $('#invoice_id').val(); 
@@ -49,7 +51,11 @@ $(document).ready(function () {
                         'purchase_invoice_id'     : `${product.purchase_invoice_id  }`,
                        
                     });
+                $('.products').children(`option[value="${product.product_id}"]`).attr('disabled', true);
+
                 })
+                $(".products").val('0');
+                $(".products").select2();
                 $('.show_existing_div').show()
                 purchased_product_array.forEach(function(product){
                      $('#designationsTable tbody').append(`
@@ -66,7 +72,6 @@ $(document).ready(function () {
 
     }
     // getvendors();    
-    getProducts();
     $('.add-more-btn').attr('href', '#');
     $('.new_form_field').addClass('required_client');
     $('#client_type').attr('disabled', true);
@@ -130,6 +135,8 @@ $(document).on('click', '.remove_btn', function () {
                             }, 3000);
                             $("#tr-" + product_id).remove();
                             purchased_product_array = purchased_product_array.filter(x => x.product_id != product_id);
+                            $('.products').children('option[value="' + product_id + '"]').attr('disabled', false);
+                            $(".products").val('0');
                             grandSum(previous_payable);
                         } else {
                             deleteRef.removeAttr('disabled');
@@ -188,9 +195,10 @@ $('#add-product').on('click', function () {
                 <td><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</button></td>
                 </tr>`);
     grandSum(previous_payable);
-    $('#products').children('option[value="' + product_id + '"]').attr('disabled', true);
-    $('#form')[0].reset();
-    $('.grand-total').text(sum);
+    $('.products').children('option[value="' + product_id + '"]').attr('disabled', true);
+    $(".products").val('0');
+    $(".products").select2();
+    // $('.grand-total').text(sum);
     $('#purchase_price').val('');
     $('#product-name').val('');
     $('#qty').val('');
@@ -199,6 +207,7 @@ $('#add-product').on('click', function () {
     $('.products').val('0').trigger('change');
     $('#new_purchase_price').val('');
     p_name = '';
+    $('#purchse-form')[0].reset();
 
 })
 $(document).on('focusout input', '.bar-code', function () {
@@ -210,6 +219,7 @@ $(document).on('focusout input', '.bar-code', function () {
     $('#amount').val('');
     if(data_variable ){
         var filter_product = product_list.filter(x => x.barcode == data_variable)
+
         console.log(filter_product);
         $('#products').val(filter_product[0].id).trigger('change');
         $('.retail_price').text(filter_product[0].sale_price);
@@ -240,16 +250,17 @@ $(document).on('focusout input', '.bar-code', function () {
 $('#qty').on('input', function () {
     new_price = $('#new_purchase_price').val();
     old_price = $('#purchase_price').val();
-    qty = $(this).val();
-    // if($(this).val() > stock_in_hand){
-        // qty =  $(this).val(stock_in_hand);
-        // $('#notifDiv').fadeIn();
-        // $('#notifDiv').css('background', 'red');
-        // $('#notifDiv').text(`Quantity should be less ${stock_in_hand}`);
-        // setTimeout(() => {
-        //     $('#notifDiv').fadeOut();
-        // }, 3000);
-    // }
+    qty       = $(this).val();
+    if(qty > stock_in_hand){
+        qty = stock_in_hand;
+        $(this).val(stock_in_hand);
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text(`Quantity should be less than or equal to ${stock_in_hand}`);
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+    }
     var purchase_price = $('#purchase_price').val();
     if (new_price > 0) {
         amount = qty * new_price;
@@ -337,17 +348,16 @@ $("#save").on('click', function () {
 
 });
 $(document).on('input', '.qty-input', function () {
-    var update_qty = $(this).val();
-    
-    // if($(this).val() > stock_in_hand){ 
-        // update_qty =  $(this).val(stock_in_hand);
-        // $('#notifDiv').fadeIn();
-        // $('#notifDiv').css('background', 'red');
-        // $('#notifDiv').text(`Quantity should be less ${stock_in_hand}`);
-        // setTimeout(() => {
-        //     $('#notifDiv').fadeOut();
-        // }, 3000);
-    // }
+    var update_qty = $(this).val(); 
+    if($(this).val() > stock_in_hand){ 
+        update_qty =  $(this).val(stock_in_hand);
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text(`Quantity should be less ${stock_in_hand}`);
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+    }
     var current_product_id = $(this).attr('data-id');
     var product_amount     = $(this).attr('data-value')
     var current_product_price = 0;
@@ -418,17 +428,20 @@ $('.customer_id').change(function () {
             segment:segment
          },
         success : function(response){
+            console.log(   response.product_ids)
+
             previous_payable = response.customer_balance;
-            $('.previous_payable').text(previous_payable);
+            var previous_payable_text = previous_payable > 0 ? previous_payable + " DR" : previous_payable < 0  ? (-previous_payable) + " CR" : previous_payable;
+            $('.previous_payable').text(previous_payable_text);
             $('.previous_payable').val(previous_payable);
             grandSum(previous_payable)
             $('.display').css('display','');
             var products = [];
-           
+        
             product_list.filter(function(item) {
                 response.product_ids.forEach((x,key) => {
                     if(x.product_id == item.id){
-                        $("#products").append(`<option value="${item.id}" data-name="${item.product_name}" data-stock="${x.sum}" unit-price="${x.product_unit_price}">${item.product_name}</option>`)
+                        $("#products").append(`<option value="${item.id}" data-name="${item.product_name}" data-stock="${x.balance}" unit-price="${x.product_unit_price}">${item.product_name}</option>`)
                         // products.push(item)
                     }
                 })
@@ -455,12 +468,12 @@ $('.products').change(function () {
     if(selected_product != null){
         var filter_product = product_list.filter(x => x.id == selected_product)
         $('.retail_price').text(filter_product[0].sale_price);
-        $('.products').children('option[value="' + filter_product[0].id + '"]').attr('disabled', true);
         // if(filter_product[0].new_purchase_price > 0){
         //     $('#purchase_price').val(filter_product[0].new_purchase_price);
         // }else{
         //     $('#purchase_price').val(filter_product[0].old_purchase_price);
         // }
+        console.log(filter_product);
         $('#purchase_price').val(unit_price);
         $('#qty').val(stock_in_hand);
         $('.stock_balance').text(stock_in_hand);
@@ -468,6 +481,8 @@ $('.products').change(function () {
         product_id  = filter_product[0].id;
         $('.expiry_date').val(filter_product[0].expiry_date)
         $('.bar-code').val(filter_product[0].barcode);
+        $('#qty').trigger('input');
+
     }
    
    

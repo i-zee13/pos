@@ -7,8 +7,8 @@
     </button>
 
     <!-- Brand -->
-    <a class="navbar-brand" href="https://dashkit.goodthemes.co/index.html">
-      <img src="./assets/images/logo.svg" class="navbar-brand-img mx-auto" alt="...">
+    <a class="navbar-brand" href="{{route('home')}}">
+      <img src="{{asset('assets/images/logo.svg')}}" class="navbar-brand-img mx-auto" alt="...">
     </a>
 
     <!-- User (xs) -->
@@ -20,7 +20,7 @@
         <!-- Toggle -->
         <a href="https://dashkit.goodthemes.co/index.html#" id="sidebarIcon" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <div class="avatar avatar-sm avatar-online">
-            <img src="./assets/images/avatar-1.jpg" class="avatar-img rounded-circle" alt="...">
+            <img src="{{asset('assets/images/avatar-1.jpg')}}" class="avatar-img rounded-circle" alt="...">
           </div>
         </a>
         <!-- Menu -->
@@ -40,7 +40,7 @@
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link " href="https://dashkit.goodthemes.co/widgets.html">
-            <img src="images/home.svg" alt="" height="20px" width="20px" /> Dashboard
+          <i class="fa fa-home" aria-hidden="true"></i> Dashboard
           </a>
         </li>
       </ul>
@@ -53,8 +53,8 @@
       </h6>
       <!-- Navigation -->
       <li class="nav-item">
-        <a class="nav-link " href="{{route('customer.index')}}">
-          <i class="fe fe-grid"></i> Customer
+        <a class="nav-link p-0 customer-class" href="{{route('customer.index')}}">
+        <i class="fa fa-users" aria-hidden="true"></i> Customer
         </a>
       </li>
 
@@ -82,7 +82,7 @@
       <ul class="navbar-nav mb-md-4">
         <li class="nav-item">
           <a class="nav-link collapsed" href="https://dashkit.goodthemes.co/index.html#sidebarStock" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarStock">
-            <i class="fe fe-clipboard"></i> Stocks
+          <i class="fa fa-briefcase" aria-hidden="true"></i> Stocks
           </a>
           <div class="collapse " id="sidebarStock">
             <ul class="nav nav-sm flex-column">
@@ -125,7 +125,7 @@
           <!-- Toggle -->
           <a href="https://dashkit.goodthemes.co/index.html#" id="sidebarIconCopy" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <div class="avatar avatar-sm avatar-online">
-              <img src="./assets/images/avatar-1.jpg" class="avatar-img rounded-circle" alt="...">
+              <img src="{{asset('/assets/images/avatar-1.jpg')}}" class="avatar-img rounded-circle" alt="...">
             </div>
           </a>
           <!-- Menu -->

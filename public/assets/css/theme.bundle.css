@@ -4548,7 +4548,7 @@ fieldset:disabled .btn {
 
 .nav-link:focus,
 .nav-link:hover {
-    color: #1657af
+    color: #ffffff
 }
 
 .nav-link.disabled {
@@ -16513,8 +16513,12 @@ button:focus {
     display: none
 }
 
-.navbar-nav .nav-link>.fe {
+.navbar-nav .nav-link>.fa {
     display: inline-block;
+    min-width: 1.75rem
+}
+.customer-class {
+    color: #6e84a3;
     min-width: 1.75rem
 }
 
@@ -16522,18 +16526,31 @@ button:focus {
     align-items: center;
     display: flex
 }
-
 .navbar-vertical .navbar-nav .nav-link[data-bs-toggle=collapse]:after {
+  content: "\f107";
+  font-family: "FontAwesome";
+  float: right;
+  margin-left: auto;
+  margin-right: -1.25rem;
+  transition: transform .2s ease-in-out;
+}
+
+.navbar-vertical .navbar-nav .nav-link[data-bs-toggle=collapse].collapsed:after {
+    
+  content: "\f106";
+  transform: rotate(-180deg)
+}
+/* .navbar-vertical .navbar-nav .nav-link[data-bs-toggle=collapse]:after {
     content: "\e92e";
     display: block;
-    font-family: Feather;
+    font-family: FontAwesome;
     margin-left: auto;
     transition: transform .2s
 }
 
 .navbar-vertical .navbar-nav .nav-link[data-bs-toggle=collapse][aria-expanded=true]:after {
     transform: rotate(-180deg)
-}
+} */
 
 .navbar-vertical .navbar-nav .nav .nav-link {
     padding-left: 2.75rem
@@ -18690,8 +18707,8 @@ button:focus {
 
 .avatar-offline .avatar-img,
 .avatar-online .avatar-img {
-    -webkit-mask-image: url(../img/masks/avatar-status.svg);
-    mask-image: url(../img/masks/avatar-status.svg);
+    /* -webkit-mask-image: url(../img/masks/avatar-status.svg); */
+    /* mask-image: url(../img/masks/avatar-status.svg); */
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%
 }

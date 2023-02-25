@@ -21,25 +21,38 @@ class PurchaseReturnController extends Controller
     public function getVendorBalance(Request $request,$id){
         // $customer_balance = CustomerLedger::where('customer_id',$id)->where('created_at','!=',Carbon::today()->toDateString())->orderBy('id', 'DESC')->value('balance');
         $customer_balance   =   Customer::where('id',$id)->value('balance');
-        $product_ids        =   VendorStock::selectRaw('product_id,product_unit_price,sum(balance) as sum')
-                                            ->where('vendor_id',$id) 
-                                            ->groupBy('product_id')
-                                            ->get();
+        $product_balances = VendorStock::select('product_id', 'product_unit_price', 'balance')
+                                        ->where('vendor_id', $id)
+                                        ->whereIn('id', function ($query) use ($id) {
+                                            $query->selectRaw('MAX(id)')
+                                                ->from('vendor_stocks')
+                                                ->whereColumn('product_id', 'vendor_stocks.product_id')
+                                                ->where('vendor_id', $id)
+                                                ->groupBy('product_id');
+                                        })
+                                        ->get();
+
+                                // $product_balances        =   VendorStock::selectRaw('product_id,product_unit_price,sum(balance) as sum')
+                                //             ->where('vendor_id',$id) 
+                                //             ->groupBy('product_id')
+                                //             ->get();
          return response()->json([
             'msg'         =>  'Vendor fetched',
             'status'      =>  'success',
-            'product_ids' => $product_ids,
+            'product_ids' => $product_balances,
             'customer_balance'  => $customer_balance
         ]);
     }
     public function purchaseReturn(){
         $invoice_no   =  'inv-'.Str::random(15);
         $current_date =   Carbon::today()->toDateString();
-        $customers    =   Customer::where('customer_type',1)
-                                    ->join('purchase_invoices','purchase_invoices.customer_id','=','customers.id')
-                                    ->select('customers.*')
-                                    // ->groupBy('vendor_stocks.vendor_id')
-                                    ->get();
+        $customers    =   Customer::where('customer_type', 1)
+                            ->whereIn('id', function($query){
+                                $query->select('customer_id')
+                                    ->from('purchase_invoices')
+                                    ->groupBy('customer_id');
+                            })
+                            ->get();
         $products     =   Product::all();
         return view('purchases.return',compact('customers','current_date','invoice_no','products'));
     }
@@ -110,7 +123,7 @@ class PurchaseReturnController extends Controller
                             }
                         }else{
                             $status      = 2 ; //out      
-                            $add_stock->balance     = $returns->qty-$balance;
+                            $add_stock->balance     = $balance-$returns->qty;
                             $add_stock->qty         = $returns->qty;
                             $add_stock->status      =   $status;
                         }
