@@ -228,9 +228,16 @@ class StockController extends Controller
         ]);
     }
     public function purchaseList(){
-        $purchases = PurchaseInvoice::whereDate('purchase_invoices.created_at', Carbon::today())
-                                    ->leftjoin('customers','customers.id','=','purchase_invoices.customer_id')
-                                    ->select('purchase_invoices.*','customers.customer_name')->get();
+        $purchases = PurchaseInvoice::select('purchase_invoices.*', 'customers.customer_name')
+        ->join('customers', 'customers.id', '=', 'purchase_invoices.customer_id')
+        ->whereIn('purchase_invoices.id', function ($query) {
+            $query->selectRaw('MAX(id)')
+                ->from('purchase_invoices')
+                ->whereDate('created_at', Carbon::today())
+                ->groupBy('customer_id');
+        })
+        ->orderBy('id', 'desc')
+        ->get();
         return view('purchases.list',compact('purchases'));
     }
     public function editPurchase($id){
@@ -256,7 +263,9 @@ class StockController extends Controller
         if($request->segment == 'purchase-edit'){
             $customer_count  =  CustomerLedger::where('customer_id',$id)->count();
            if($customer_count > 1){
-               $customer_balance = CustomerLedger::where('customer_id',$id)->where('created_at','!=',Carbon::today()->toDateString())->skip(1)->orderBy('id', 'DESC')->value('balance');
+               $customer_balance = CustomerLedger::where('customer_id',$id)
+                                                ->where('created_at','!=',Carbon::today()->toDateString())
+                                                ->skip(1)->orderBy('id', 'DESC')->value('balance');
            }else{
                 $customer_balance = 0;
            }

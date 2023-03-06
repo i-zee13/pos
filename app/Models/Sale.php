@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CustomerLedger extends Model
+class Sale extends Model
 {
     use HasFactory;
-    protected $table    =   'customer_ledger';
+    protected $table    =   'sale_invoices';
     protected $guarded  =    [];
 }

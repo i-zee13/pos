@@ -16,3 +16,8 @@ TRUNCATE customer_ledger;
  
 TRUNCATE customers;
 
+//Returns 
+TRUNCATE products_returns;
+
+TRUNCATE return_invoices;
+

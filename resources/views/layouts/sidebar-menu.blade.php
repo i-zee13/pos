@@ -79,7 +79,7 @@
           </div>
         </li>
       </ul>
-      <ul class="navbar-nav mb-md-4">
+      <ul class="navbar-nav ">
         <li class="nav-item">
           <a class="nav-link collapsed" href="https://dashkit.goodthemes.co/index.html#sidebarStock" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarStock">
           <i class="fa fa-briefcase" aria-hidden="true"></i> Stocks
@@ -99,6 +99,33 @@
               <li class="nav-item">
                 <a href="{{route('purchase-return')}}" class="nav-link ">
                   Purchase Returns
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ">
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#salesStock" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="salesStock">
+          <i class="fa fa-shopping-bag" aria-hidden="true"></i> Sales
+          </a>
+          <div class="collapse " id="salesStock">
+            <ul class="nav nav-sm flex-column">
+              <li class="nav-item">
+                <a href="{{route('sale-add')}}" class="nav-link ">
+                  Add New
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('purchases')}}" class="nav-link ">
+                  List
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('purchase-return')}}" class="nav-link ">
+                  Sales Returns
                 </a>
               </li>
             </ul>

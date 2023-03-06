@@ -40,7 +40,7 @@
                                                     </div>
                                                     <div class="col">
                                                         <div class="custom-control custom-radio">
-                                                            <input class="custom-control-input customer" type="radio" name="customer_type" id="customer" value="0">
+                                                            <input class="custom-control-input customer" type="radio" name="customer_type" id="customer" value="2">
                                                             <label class="custom-control-label font13" for="customer">Customer</label>
                                                         </div>
                                                     </div>

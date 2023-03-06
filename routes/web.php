@@ -48,5 +48,13 @@ Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\Purchas
 Route::get('/purchase-return'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'purchaseReturn'])->name('purchase-return');
 Route::post('/add-purchase-return'                ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
 
+/** sale Routes */
+Route::get('/sale-add'              ,[App\Http\Controllers\SaleController::class, 'create'])->name('sale-add');
+Route::get('/get-customer'          ,[App\Http\Controllers\SaleController::class, 'getVendors'])->name('get-vendors');
+Route::post('/add-sale-invoice'     ,[App\Http\Controllers\SaleController::class, 'saleInvoice'])->name('add-sale-invoice');
+Route::get('/sales'                 ,[App\Http\Controllers\SaleController::class, 'saleList'])->name('sales');
+Route::get('/sale-edit/{id}'        ,[App\Http\Controllers\SaleController::class, 'editsale'])->name('sale-edit');
+Route::get('/get-sale-products/{id}'     ,[App\Http\Controllers\SaleController::class, 'getsaleProduct'])->name('get-sale-products');
+Route::delete('/delete-product-from-invoice' ,[App\Http\Controllers\SaleController::class, 'deleteProduct'])->name('delete-product');
 
 });
