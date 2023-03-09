@@ -536,7 +536,7 @@
                     </div>
                     <div class="col-md-3 mb-10">
                       <label class="control-label mb-5">Retail Price</label>
-                      <input type="text" id="retail_price" class="form-control" placeholder="" name="retail_price" readonly>
+                      <input type="text" id="retail_price" class="form-control" placeholder="" name="retail_price">
                     </div>
 
                     <div class="col-md-2 mb-10">
@@ -586,6 +586,7 @@
                               <th>#</th>
                               <th>Product </th>
                               <th>Quantity</th>
+                              <th>Price</th>
                               <th>Amount</th>
                               <th>Action</th>
                             </tr>
@@ -613,7 +614,7 @@
                             <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Amount pay</th>
                               <th class="" colspan="4" style="text-align: center;">
-                                <input type="text" value="" class="qty-input add-stock-input" name="amount_paid">
+                                <input type="text" value="" class="qty-input add-stock-input amount_pay_input" name="amount_paid">
                               </th>
                             </tr>
                           </tfoot>

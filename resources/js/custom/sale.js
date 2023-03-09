@@ -202,7 +202,8 @@ $('#add-product').on('click', function () {
             <tr id='tr-${product_id}'>
                 <td>${rowCount}</td>
                 <td>${p_name}</td>
-                <td><input type="number" value="${qty}"  class="qty-input add-stock-input" data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
+                <td><input type="number" value="${qty}"  class="qty-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
+                <td><input type="number" value="${retail_price}"  class="price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
                 <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
                 <td><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</button></td>
                 </tr>`
@@ -292,13 +293,20 @@ $('#qty').on('input', function () {
         }, 3000);
         return;
     }
-    retail_price = $('#retail_price').val();
-    amount       = qty * retail_price;
-    $('#amount').val(amount);
+    productRetailAmount();
+   
 })
 $("#save").on('click', function () {
+    if(purchased_product_array.length == 0){
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Please add at least one Product.');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000)
+        return;
+    }
    purchased_product_array.forEach(data => { 
-    console.log(data)
     if($(`#tr-${data.product_id}`).find('.qty-input').val() == ''){
         $('#notifDiv').fadeIn();
         $('#notifDiv').css('background', 'red');
@@ -309,7 +317,17 @@ $("#save").on('click', function () {
         return;
     }
    });
-    
+    if($('.amount_pay_input').val() == ''){
+        $('.amount_pay_input').focus();
+        $('.amount_pay_input').css('border-color', 'red');
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Amount Pay is required.');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000)
+        return;
+    }
     $('#notifDiv').fadeIn();
     $('#notifDiv').css('background', 'red');
     $('#notifDiv').text('saveh Hit');
@@ -412,7 +430,7 @@ $(document).on('input', '.qty-input', function () {
         }, 3000);
         return;
     }
-   
+    $(`.purchase-product-amount${current_product_id}`).empty();
     purchased_product_array.filter(function (data) {
         if (data.product_id      == current_product_id) {
             p_price               = data.retail_price
@@ -420,24 +438,60 @@ $(document).on('input', '.qty-input', function () {
             current_product_qty   = data.stock_in_hand;
             current_product_price = p_price;
             if(update_qty > current_product_qty){
-                $(`#tr-${current_product_id}`).find('.qty-input').val('')
-                $(`#tr-${current_product_id}`).find('.qty-input').css('border-color', 'red');
-                $(`#tr-${current_product_id}`).find('.qty-input').focus();
+                $(`.td-${current_product_id}`).val('')
+                $(`.td-${current_product_id}`).css('border-color', 'red');
+                $(`.td-${current_product_id}`).focus();
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'red');
                 $('#notifDiv').text('Qty should be less then '+current_product_qty);
                 setTimeout(() => {
                     $('#notifDiv').fadeOut();
-                }, 3000);
+                }, 3000); 
+                $('.grand-total').text('0');
                 return;
+            }else{ 
+                $(`.td-${current_product_id}`).css('border-color', '#dddddd');
+                new_amount_of_purchase_product = update_qty * current_product_price;
+                data.amount = new_amount_of_purchase_product;
+                $(`.purchase-product-amount${current_product_id}`).text(new_amount_of_purchase_product)
+                grandSum(previous_payable);
             }
-            new_amount_of_purchase_product = update_qty * current_product_price;
-            data.amount = new_amount_of_purchase_product;
-            $(`.purchase-product-amount${current_product_id}`).empty();
-            $(`.purchase-product-amount${current_product_id}`).text(new_amount_of_purchase_product)
         }
     })
-    grandSum(previous_payable);
+
+})
+$(document).on('input', '.price-input', function () {
+    var retail_price          = $(this).val();
+    var current_product_id    = $(this).attr('data-id');  
+    var current_product_qty   = $(this).attr('data-quantity')
+    
+    $(`.purchase-product-amount${current_product_id}`).empty();
+    purchased_product_array.filter(function (data) {
+        if (data.product_id      == current_product_id) {
+            p_price               = data.retail_price
+            data.qty              = update_qty;
+            current_product_price = p_price;
+            if(update_qty > current_product_qty){
+                $(`.td-${current_product_id}`).val('')
+                $(`.td-${current_product_id}`).css('border-color', 'red');
+                $(`.td-${current_product_id}`).focus();
+                $('#notifDiv').fadeIn();
+                $('#notifDiv').css('background', 'red');
+                $('#notifDiv').text('Qty should be less then '+current_product_qty);
+                setTimeout(() => {
+                    $('#notifDiv').fadeOut();
+                }, 3000); 
+                $('.grand-total').text('0');
+                return;
+             }else{ 
+                $(`.td-${current_product_id}`).css('border-color', '#dddddd');
+                new_amount_of_purchase_product = update_qty * current_product_price;
+                data.amount = new_amount_of_purchase_product;
+                $(`.purchase-product-amount${current_product_id}`).text(new_amount_of_purchase_product)
+                grandSum(previous_payable);
+            }
+        }
+    })
 
 })
 function getProducts() {
@@ -536,13 +590,17 @@ function getPurchases() {
     })
 
 }
-function grandSum(previous_payable){
+function grandSum(previous_payable){ 
     var sum = 0;
     purchased_product_array.forEach(function (data, key) {
         sum += parseFloat(data.amount)
     })
     purchased_total = sum;
     sum += parseFloat(previous_payable)
-
     $('.grand-total').text(sum);
+}
+function productRetailAmount(){
+    retail_price = $('#retail_price').val();
+    amount       = qty * retail_price;
+    $('#amount').val(amount);
 }
