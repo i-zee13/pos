@@ -536,7 +536,7 @@
                     </div>
                     <div class="col-md-3 mb-10">
                       <label class="control-label mb-5">Retail Price</label>
-                      <input type="text" id="retail_price" class="form-control" placeholder="" name="retail_price">
+                      <input type="text" id="retail_price" class="form-control" placeholder="" name="retail_price" readonly>
                     </div>
 
                     <div class="col-md-2 mb-10">

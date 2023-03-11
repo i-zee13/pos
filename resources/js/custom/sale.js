@@ -202,7 +202,7 @@ $('#add-product').on('click', function () {
             <tr id='tr-${product_id}'>
                 <td>${rowCount}</td>
                 <td>${p_name}</td>
-                <td><input type="number" value="${qty}"  class="qty-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
+                <td><input type="number" value="${qty}"  class="qty-input add-stock-input td-input-qty${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
                 <td><input type="number" value="${retail_price}"  class="price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
                 <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
                 <td><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</button></td>
@@ -215,6 +215,8 @@ $('#add-product').on('click', function () {
     $('#bar-code').val('');
     $('.products').val(0).trigger('change');
     $('#new_purchase_price').val('');
+    $('#retail_price').val('');
+
     // $('.new_dob').val('')
     p_name = '';
     // $('#purchse-form')[0].reset();
@@ -307,7 +309,12 @@ $("#save").on('click', function () {
         return;
     }
    purchased_product_array.forEach(data => { 
-    if($(`#tr-${data.product_id}`).find('.qty-input').val() == ''){
+    const qtyInput = $(`.td-input-qty${product_id}`);
+
+    // Check if the input field is empty
+    if (qtyInput.val().trim() === '') {
+        qtyInput.focus();
+        qtyInput.css('border','red')
         $('#notifDiv').fadeIn();
         $('#notifDiv').css('background', 'red');
         $('#notifDiv').text('Qty Should not be Empty');
@@ -438,9 +445,9 @@ $(document).on('input', '.qty-input', function () {
             current_product_qty   = data.stock_in_hand;
             current_product_price = p_price;
             if(update_qty > current_product_qty){
-                $(`.td-${current_product_id}`).val('')
-                $(`.td-${current_product_id}`).css('border-color', 'red');
-                $(`.td-${current_product_id}`).focus();
+                $(`.td-input-qty${current_product_id}`).val('')
+                $(`.td-input-qty${current_product_id}`).css('border-color', 'red');
+                $(`.td-input-qty${current_product_id}`).focus();
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'red');
                 $('#notifDiv').text('Qty should be less then '+current_product_qty);
@@ -450,7 +457,7 @@ $(document).on('input', '.qty-input', function () {
                 $('.grand-total').text('0');
                 return;
             }else{ 
-                $(`.td-${current_product_id}`).css('border-color', '#dddddd');
+                $(`.td-input-qty${current_product_id}`).css('border-color', '#dddddd');
                 new_amount_of_purchase_product = update_qty * current_product_price;
                 data.amount = new_amount_of_purchase_product;
                 $(`.purchase-product-amount${current_product_id}`).text(new_amount_of_purchase_product)
@@ -463,33 +470,18 @@ $(document).on('input', '.qty-input', function () {
 $(document).on('input', '.price-input', function () {
     var retail_price          = $(this).val();
     var current_product_id    = $(this).attr('data-id');  
-    var current_product_qty   = $(this).attr('data-quantity')
+    var current_product_qty   = $(`#tr-${current_product_id}`).find('.qty-input').val();
+    var new_amount_of_sale_product = 0;
     
     $(`.purchase-product-amount${current_product_id}`).empty();
-    purchased_product_array.filter(function (data) {
+    purchased_product_array.filter(function (data) { 
         if (data.product_id      == current_product_id) {
-            p_price               = data.retail_price
-            data.qty              = update_qty;
-            current_product_price = p_price;
-            if(update_qty > current_product_qty){
-                $(`.td-${current_product_id}`).val('')
-                $(`.td-${current_product_id}`).css('border-color', 'red');
-                $(`.td-${current_product_id}`).focus();
-                $('#notifDiv').fadeIn();
-                $('#notifDiv').css('background', 'red');
-                $('#notifDiv').text('Qty should be less then '+current_product_qty);
-                setTimeout(() => {
-                    $('#notifDiv').fadeOut();
-                }, 3000); 
-                $('.grand-total').text('0');
-                return;
-             }else{ 
-                $(`.td-${current_product_id}`).css('border-color', '#dddddd');
-                new_amount_of_purchase_product = update_qty * current_product_price;
-                data.amount = new_amount_of_purchase_product;
-                $(`.purchase-product-amount${current_product_id}`).text(new_amount_of_purchase_product)
-                grandSum(previous_payable);
-            }
+            data.retail_price    = retail_price;  
+            data.qty = current_product_qty
+                new_amount_of_sale_product = current_product_qty * retail_price;
+                data.amount = new_amount_of_sale_product;
+                $(`.purchase-product-amount${current_product_id}`).text(new_amount_of_sale_product)
+                grandSum(previous_payable); 
         }
     })
 
@@ -546,50 +538,7 @@ $('.customer_id').change(function () {
     var customer = vendors.filter(x => x.id == selected_index)
 }
 })
-
-function getPurchases() {
-    $.ajax({
-        url: 'get-purchase-list',
-        type: 'get',
-        success: function (response) {
-            $('.body').empty();
-            $('.body').append(`
-            <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;">
-                <thead>
-                    <tr>
-                        <th>S.No</th>
-                        <th>Company</th>
-                        <th>Bar Code</th>
-                        <th>Product</th>
-                        <th>Size</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-            <tbody></tbody>
-            </table>`);
-            $('.subCatsListTable tbody').empty();
-            var sNo = 1;
-            response.data.forEach((element, key) => {
-                $('.subCatsListTable tbody').append(`
-                <tr>
-                    <td>${key + 1}</td>
-                    <td> ${element['company_name']}</td>
-                    <td>${element['barcode']} </td>
-                    <td> <img src="${element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png'}"  style="height:25px; width:25px;"> ${element['product_name']}</td>
-                    <td>${element['size']} </td>
-                    <td>
-                        <button id="${element['id']}" class="btn btn-default btn-line openDataSidebarForUpdateProduct">Edit</button>
-                        <button type="button" id="${element['id']}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button>
-                    </td>
-                </tr>`);
-            });
-            $('#tblLoader').hide();
-            $('.body').fadeIn();
-            $('.subCatsListTable').DataTable();
-        }
-    })
-
-}
+ 
 function grandSum(previous_payable){ 
     var sum = 0;
     purchased_product_array.forEach(function (data, key) {

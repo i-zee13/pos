@@ -276,7 +276,7 @@ $('#add-product').on('click', function () {
   $(".products").select2();
   $('.show_existing_div').show();
   var rowCount = $('#designationsTable tbody tr').length + 1;
-  $('#designationsTable tbody').append("\n            <tr id='tr-".concat(product_id, "'>\n                <td>").concat(rowCount, "</td>\n                <td>").concat(p_name, "</td>\n                <td><input type=\"number\" value=\"").concat(qty, "\"  class=\"qty-input add-stock-input td-").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"></td>\n                <td><input type=\"number\" value=\"").concat(retail_price, "\"  class=\"price-input add-stock-input td-").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"></td>\n                <td class='purchase-product-amount").concat(product_id, " add- S-input '>").concat(amount, "</td>\n                <td><button type=\"button\" id=\"").concat(product_id, "\" class=\"btn smBTN red-bg remove_btn\" data-index=\"\">Remove</button></td>\n                </tr>"));
+  $('#designationsTable tbody').append("\n            <tr id='tr-".concat(product_id, "'>\n                <td>").concat(rowCount, "</td>\n                <td>").concat(p_name, "</td>\n                <td><input type=\"number\" value=\"").concat(qty, "\"  class=\"qty-input add-stock-input td-input-qty").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"></td>\n                <td><input type=\"number\" value=\"").concat(retail_price, "\"  class=\"price-input add-stock-input td-").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"></td>\n                <td class='purchase-product-amount").concat(product_id, " add- S-input '>").concat(amount, "</td>\n                <td><button type=\"button\" id=\"").concat(product_id, "\" class=\"btn smBTN red-bg remove_btn\" data-index=\"\">Remove</button></td>\n                </tr>"));
   grandSum(previous_payable);
   $('#purchase_price').val('');
   $('#qty').val('');
@@ -284,6 +284,8 @@ $('#add-product').on('click', function () {
   $('#bar-code').val('');
   $('.products').val(0).trigger('change');
   $('#new_purchase_price').val('');
+  $('#retail_price').val('');
+
   // $('.new_dob').val('')
   p_name = '';
   // $('#purchse-form')[0].reset();
@@ -378,7 +380,12 @@ $("#save").on('click', function () {
     return;
   }
   purchased_product_array.forEach(function (data) {
-    if ($("#tr-".concat(data.product_id)).find('.qty-input').val() == '') {
+    var qtyInput = $(".td-input-qty".concat(product_id));
+
+    // Check if the input field is empty
+    if (qtyInput.val().trim() === '') {
+      qtyInput.focus();
+      qtyInput.css('border', 'red');
       $('#notifDiv').fadeIn();
       $('#notifDiv').css('background', 'red');
       $('#notifDiv').text('Qty Should not be Empty');
@@ -506,9 +513,9 @@ $(document).on('input', '.qty-input', function () {
       current_product_qty = data.stock_in_hand;
       current_product_price = p_price;
       if (update_qty > current_product_qty) {
-        $(".td-".concat(current_product_id)).val('');
-        $(".td-".concat(current_product_id)).css('border-color', 'red');
-        $(".td-".concat(current_product_id)).focus();
+        $(".td-input-qty".concat(current_product_id)).val('');
+        $(".td-input-qty".concat(current_product_id)).css('border-color', 'red');
+        $(".td-input-qty".concat(current_product_id)).focus();
         $('#notifDiv').fadeIn();
         $('#notifDiv').css('background', 'red');
         $('#notifDiv').text('Qty should be less then ' + current_product_qty);
@@ -518,7 +525,7 @@ $(document).on('input', '.qty-input', function () {
         $('.grand-total').text('0');
         return;
       } else {
-        $(".td-".concat(current_product_id)).css('border-color', '#dddddd');
+        $(".td-input-qty".concat(current_product_id)).css('border-color', '#dddddd');
         new_amount_of_purchase_product = update_qty * current_product_price;
         data.amount = new_amount_of_purchase_product;
         $(".purchase-product-amount".concat(current_product_id)).text(new_amount_of_purchase_product);
@@ -530,32 +537,17 @@ $(document).on('input', '.qty-input', function () {
 $(document).on('input', '.price-input', function () {
   var retail_price = $(this).val();
   var current_product_id = $(this).attr('data-id');
-  var current_product_qty = $(this).attr('data-quantity');
+  var current_product_qty = $("#tr-".concat(current_product_id)).find('.qty-input').val();
+  var new_amount_of_sale_product = 0;
   $(".purchase-product-amount".concat(current_product_id)).empty();
   purchased_product_array.filter(function (data) {
     if (data.product_id == current_product_id) {
-      p_price = data.retail_price;
-      data.qty = update_qty;
-      current_product_price = p_price;
-      if (update_qty > current_product_qty) {
-        $(".td-".concat(current_product_id)).val('');
-        $(".td-".concat(current_product_id)).css('border-color', 'red');
-        $(".td-".concat(current_product_id)).focus();
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Qty should be less then ' + current_product_qty);
-        setTimeout(function () {
-          $('#notifDiv').fadeOut();
-        }, 3000);
-        $('.grand-total').text('0');
-        return;
-      } else {
-        $(".td-".concat(current_product_id)).css('border-color', '#dddddd');
-        new_amount_of_purchase_product = update_qty * current_product_price;
-        data.amount = new_amount_of_purchase_product;
-        $(".purchase-product-amount".concat(current_product_id)).text(new_amount_of_purchase_product);
-        grandSum(previous_payable);
-      }
+      data.retail_price = retail_price;
+      data.qty = current_product_qty;
+      new_amount_of_sale_product = current_product_qty * retail_price;
+      data.amount = new_amount_of_sale_product;
+      $(".purchase-product-amount".concat(current_product_id)).text(new_amount_of_sale_product);
+      grandSum(previous_payable);
     }
   });
 });
@@ -613,24 +605,6 @@ $('.customer_id').change(function () {
     });
   }
 });
-function getPurchases() {
-  $.ajax({
-    url: 'get-purchase-list',
-    type: 'get',
-    success: function success(response) {
-      $('.body').empty();
-      $('.body').append("\n            <table class=\"table table-hover dt-responsive nowrap subCatsListTable\" style=\"width:100%;\">\n                <thead>\n                    <tr>\n                        <th>S.No</th>\n                        <th>Company</th>\n                        <th>Bar Code</th>\n                        <th>Product</th>\n                        <th>Size</th>\n                        <th>Action</th>\n                    </tr>\n                </thead>\n            <tbody></tbody>\n            </table>");
-      $('.subCatsListTable tbody').empty();
-      var sNo = 1;
-      response.data.forEach(function (element, key) {
-        $('.subCatsListTable tbody').append("\n                <tr>\n                    <td>".concat(key + 1, "</td>\n                    <td> ").concat(element['company_name'], "</td>\n                    <td>").concat(element['barcode'], " </td>\n                    <td> <img src=\"").concat(element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                    <td>").concat(element['size'], " </td>\n                    <td>\n                        <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                        <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg  delete_product\" name=\"Sub_cat\" title=\"Delete\">Delete</button>\n                    </td>\n                </tr>"));
-      });
-      $('#tblLoader').hide();
-      $('.body').fadeIn();
-      $('.subCatsListTable').DataTable();
-    }
-  });
-}
 function grandSum(previous_payable) {
   var sum = 0;
   purchased_product_array.forEach(function (data, key) {
