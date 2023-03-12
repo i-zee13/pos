@@ -308,22 +308,27 @@ $("#save").on('click', function () {
         }, 3000)
         return;
     }
-   purchased_product_array.forEach(data => { 
-    const qtyInput = $(`.td-input-qty${product_id}`);
+    let hasEmptyQty = false;
 
-    // Check if the input field is empty
-    if (qtyInput.val().trim() === '') {
-        qtyInput.focus();
-        qtyInput.css('border','red')
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Qty Should not be Empty');
-        setTimeout(() => {
-            $('#notifDiv').fadeOut();
-        }, 3000)
-        return;
+    purchased_product_array.forEach(data => { 
+        const qtyInput = $(`.td-input-qty${data.product_id}`);
+    
+        if (qtyInput.val().trim() === '' || qtyInput.val().trim() === '0') {
+          qtyInput.css('border-color','red');
+          qtyInput.focus(); 
+            $('#notifDiv').fadeIn();
+            $('#notifDiv').css('background', 'red');
+            $('#notifDiv').text('Qty Should not be Empty or Zero');
+            setTimeout(() => {
+                $('#notifDiv').fadeOut();
+            }, 3000)
+            hasEmptyQty = true;
+            return false; 
+        }
+    });
+    if (hasEmptyQty) {
+        return; 
     }
-   });
     if($('.amount_pay_input').val() == ''){
         $('.amount_pay_input').focus();
         $('.amount_pay_input').css('border-color', 'red');
@@ -335,13 +340,8 @@ $("#save").on('click', function () {
         }, 3000)
         return;
     }
-    $('#notifDiv').fadeIn();
-    $('#notifDiv').css('background', 'red');
-    $('#notifDiv').text('saveh Hit');
-    setTimeout(() => {
-        $('#notifDiv').fadeOut();
-    }, 3000)
-    return;
+    $('#hidden_btn_to_open_modal').click();
+        return;
     let dirty = false;
     $('.required').each(function () {
         if (!$(this).val() || $(this).val() == 0) {

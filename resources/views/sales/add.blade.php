@@ -2,6 +2,9 @@
 
 @section('content')
 <style>
+  .modal-header .close { 
+      margin: 0px ;  
+}
   .pocPROFILE {
     font-size: 14px;
     padding: 15px 20px;
@@ -326,7 +329,7 @@
   } */
 
   .top-border {
-    border-top: solid 2px #EBB30A;
+    border-top: solid 2px #152e4d ;
   }
 
   .addBTN-act {
@@ -360,6 +363,50 @@
     background-color: #f6f6f6;
   }
 </style>
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content top-border">
+            <div class="modal-header statusMH">
+                <h5 class="modal-title" id="exampleModalLabel">Status: <span class="modal_poc_name"> </span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-20">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="custom-control custom-radio">
+                                <input class="custom-control-input radio_status active" type="radio" value="1" id="active" name="radio_status" checked="checked">
+                                <label class="custom-control-label head-sta" for="active">Net Sale</label>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="custom-control custom-radio">
+                                <input class="custom-control-input radio_status inactive" type="radio" value="2" id="inactive" name="radio_status">
+                                <label class="custom-control-label head-sta" for="inactive">Add to Ledger</label>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="custom-control custom-radio">
+                                <input class="custom-control-input radio_status churrned" type="radio" value="3" id="churnned" name="radio_status">
+                                <label class="custom-control-label head-sta" for="churnned"> Bank Transfer</label>
+                            </div>
+                        </div> 
+                    </div>
+
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary save_status" style="font-size: 12px;">Save & Print</button>
+                <!--<button type="submit" class="btn btn-cancel" data-dismiss="modal" aria-label="Close">Cancel</button>-->
+            </div>
+        </div>
+    </div>
+    <button hidden data-toggle="modal" data-target="#deleteModal" id="hidden_btn_to_open_modal"></button>
+</div>
+ 
 
 <!-- HEADER -->
 <div class="header">
@@ -407,13 +454,11 @@
           <div class="se_cus-type p-20 mb-3">
             <div class="row">
 
-              <div class="col-md-2 mb-10">
-
-                <label class="control-label mb-5">Invoice # *</label>
+              <div class="col-md-3 mb-10">
+                <label class="control-label mb-5">Invoice #</label>
                 <input type="text" id="" class="form-control required" placeholder="" name="invoice_no" value="{{$invoice_no}}">
-
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <label class="control-label mb-5">Date </label>
                 <div>
                   <input autocomplete="off" id="datepicker" type="text" class="form-control new_dob new_form_field " name="invoice_date" value="{{$current_date}}">
@@ -428,6 +473,9 @@
                     </option>
                   </select>
                 </div>
+              </div>
+              <div class="col-md-2">
+                  <a href="/sales" type="submit" class="btn btn-primary mr-2" id="cancel" style="margin-top: 29px;float: right;">Sales</a>
               </div>
              
             </div>
@@ -595,7 +643,7 @@
                           </tbody>
                           <tfoot class="table-footer">
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;">Previous payable</th>
+                              <th colspan="3" style="text-align:right;">Previous Payable</th>
                               <th class="previous_payable" colspan="4" style="text-align: center;">0
                                 <!-- <input type="text" value="" class="qty-input add-stock-input previous_payable" name="previous_payable"> -->
                               </th>

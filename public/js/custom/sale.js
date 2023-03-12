@@ -379,22 +379,25 @@ $("#save").on('click', function () {
     }, 3000);
     return;
   }
+  var hasEmptyQty = false;
   purchased_product_array.forEach(function (data) {
-    var qtyInput = $(".td-input-qty".concat(product_id));
-
-    // Check if the input field is empty
-    if (qtyInput.val().trim() === '') {
+    var qtyInput = $(".td-input-qty".concat(data.product_id));
+    if (qtyInput.val().trim() === '' || qtyInput.val().trim() === '0') {
+      qtyInput.css('border-color', 'red');
       qtyInput.focus();
-      qtyInput.css('border', 'red');
       $('#notifDiv').fadeIn();
       $('#notifDiv').css('background', 'red');
-      $('#notifDiv').text('Qty Should not be Empty');
+      $('#notifDiv').text('Qty Should not be Empty or Zero');
       setTimeout(function () {
         $('#notifDiv').fadeOut();
       }, 3000);
-      return;
+      hasEmptyQty = true;
+      return false;
     }
   });
+  if (hasEmptyQty) {
+    return;
+  }
   if ($('.amount_pay_input').val() == '') {
     $('.amount_pay_input').focus();
     $('.amount_pay_input').css('border-color', 'red');
@@ -406,12 +409,7 @@ $("#save").on('click', function () {
     }, 3000);
     return;
   }
-  $('#notifDiv').fadeIn();
-  $('#notifDiv').css('background', 'red');
-  $('#notifDiv').text('saveh Hit');
-  setTimeout(function () {
-    $('#notifDiv').fadeOut();
-  }, 3000);
+  $('#hidden_btn_to_open_modal').click();
   return;
   var dirty = false;
   $('.required').each(function () {
