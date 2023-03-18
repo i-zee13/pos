@@ -5,7 +5,7 @@ var invalidSave = [];
 var counter = 0;
 var product_list = [];
 var vendors = [];
-var purchased_product_array = [];
+var sales_product_array = [];
 var deleteRef = '';
 var flag = false;
 let previous_payable = 0;
@@ -13,10 +13,9 @@ let amount = 0;
 let p_name = '';
 let qty = '';
 let product_id = '';
-let new_price = '';
-let old_price = '';
+let purchased_price = ''; 
 let customer_id = 0;
-let purchased_total = 0;
+let sale_total_amount = 0;
 let segment = '';
 var deleteRef = '';
 var expiry_date = '';
@@ -39,11 +38,11 @@ $(document).ready(function () {
             success: function (response) {
                 response.products.forEach(function (product) {
                     p_name = product.product_name;
-                    purchased_product_array.push({
+                    sales_product_array.push({
                         'product_id' : `${product.product_id}`,
                         'expiry_date': `${product.expiry_date}`,
                         'qty'        : `${product.qty}`,
-                        'amount'     : `${product.purchased_total_amount}`,
+                        'amount'     : `${product.sale_total_amount_amount}`,
                         'old_price'  : `${product.purchase_price}`,
                         'new_price'  : ``,
                         'p_name'     : `${product.product_name}`,
@@ -57,7 +56,7 @@ $(document).ready(function () {
                
                 $('.show_existing_div').show();
                 var x=0
-                purchased_product_array.forEach(function(product,key){
+                sales_product_array.forEach(function(product,key){
                     x++;
                      $('#designationsTable tbody').append(`
                         <tr id='tr-${product.product_id}'>
@@ -132,7 +131,7 @@ $(document).on('click', '.remove_btn', function () {
                                 $('#notifDiv').fadeOut();
                             }, 3000);
                             $("#tr-" + product_id).remove();
-                            purchased_product_array = purchased_product_array.filter(x => x.product_id != product_id);
+                            sales_product_array = sales_product_array.filter(x => x.product_id != product_id);
                             grandSum(previous_payable);
                         } else {
                             deleteRef.removeAttr('disabled');
@@ -150,7 +149,7 @@ $(document).on('click', '.remove_btn', function () {
         });
     }else{
         $("#tr-" + product_id).remove();
-        purchased_product_array = purchased_product_array.filter(x => x.product_id != product_id);
+        sales_product_array = sales_product_array.filter(x => x.product_id != product_id);
         $('.products').children('option[value="' + product_id + '"]').attr('disabled', false);
         $(".products").val('0');
 
@@ -185,13 +184,15 @@ $('#add-product').on('click', function () {
     } else {
         expiry_date = $('.expiry_date').val();
     }
-    purchased_product_array.push({
+    sales_product_array.push({
         'product_id'    : `${product_id}`,
         'expiry_date'   : `${expiry_date}`,
         'qty'           : `${qty}`,
         'amount'        : `${amount}`,
         'retail_price'  : `${retail_price}`,
         'stock_in_hand' :  stock_in_hand,
+        'purchased_price' :  purchased_price,
+
     });
     $('.products').children('option[value="' + product_id + '"]').attr('disabled', true);
     $(".products").val('0');
@@ -239,9 +240,10 @@ $('.products').change(function () {
         $('#retail_price').val(filter_product[0].sale_price);
 
         $('.stock_balance').text(filter_product[0].stock_balance);
-        p_name        = filter_product[0].product_name;
-        product_id    = filter_product[0].id;
-        stock_in_hand = filter_product[0].stock_balance;
+        p_name          = filter_product[0].product_name;
+        product_id      = filter_product[0].id;
+        stock_in_hand   = filter_product[0].stock_balance;
+        purchased_price = filter_product[0].old_purchase_price;
         $('.expiry_date').val(filter_product[0].expiry_date)
         $('.bar-code').val(filter_product[0].barcode);
     }
@@ -264,22 +266,7 @@ $(document).on('focusout', '.bar-code', function () {
         product_id = filter_product[0].id;
         $('.expiry_date').val(filter_product[0].expiry_date)
     }
-    // $.ajax({
-    //     url   : `/get-product`,
-    //     type  : 'post',
-    //     data : {
-    //         _token: $('meta[name="csrf_token"]').attr('content'),
-    //         get_result_for:get_result_for,
-    //         data_variable :data_variable
-    //     },
-    //     success : function(response) {
-    //      $('#purchase_price').val(response.product.purchase_price);
-    //          $('#product-name').val(response.product.product_name);
-    //         p_name      = response.product.product_name;
-    //         product_id  = response.product.id;
-    //     } 
-
-    // })
+    
 })
 $('#qty').on('input', function () {
     qty          = $(this).val();
@@ -299,7 +286,22 @@ $('#qty').on('input', function () {
    
 })
 $("#save").on('click', function () {
-    if(purchased_product_array.length == 0){
+    let dirty = false;
+    $('.required').each(function () {
+        if (!$(this).val() || $(this).val() == 0) {
+            dirty = true;
+        }
+    });
+    if (dirty) {
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Please provide all the required information (*)');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    }
+    if(sales_product_array.length == 0){
         $('#notifDiv').fadeIn();
         $('#notifDiv').css('background', 'red');
         $('#notifDiv').text('Please add at least one Product.');
@@ -310,9 +312,8 @@ $("#save").on('click', function () {
     }
     let hasEmptyQty = false;
 
-    purchased_product_array.forEach(data => { 
+    sales_product_array.forEach(data => { 
         const qtyInput = $(`.td-input-qty${data.product_id}`);
-    
         if (qtyInput.val().trim() === '' || qtyInput.val().trim() === '0') {
           qtyInput.css('border-color','red');
           qtyInput.focus(); 
@@ -340,24 +341,8 @@ $("#save").on('click', function () {
         }, 3000)
         return;
     }
-    $('#hidden_btn_to_open_modal').click();
-        return;
-    let dirty = false;
-    $('.required').each(function () {
-        if (!$(this).val() || $(this).val() == 0) {
-            dirty = true;
-        }
-    });
-    if (dirty) {
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Please provide all the required information (*)');
-        setTimeout(() => {
-            $('#notifDiv').fadeOut();
-        }, 3000);
-        return;
-    }
-    if (purchased_product_array.length < 1) {
+    
+    if (sales_product_array.length < 1) {
         $('#notifDiv').fadeIn();
         $('#notifDiv').css('background', 'red');
         $('#notifDiv').text('Please Add Minimum 01 Product');
@@ -365,25 +350,29 @@ $("#save").on('click', function () {
             $('#notifDiv').fadeOut();
         }, 3000);
         return;
-    }
-    var grand_total = $('.grand-total').text();
+    } 
     $('#save').attr('disabled', 'disabled');
     $('.btn-cancel').attr('disabled', 'disabled');
-    $('#save').text('Processing..');
+    $('#hidden_btn_to_open_modal').click();  
+});
+$('.save_status').on('click',function(){
+    var grand_total  = $('.grand-total').text(); 
+    var status       = $('input[name="radio_status"]:checked').val();
+    $(this).attr('disabled', 'disabled');
+    $(this).text('Processing..');
     $('#form').ajaxSubmit({
-        url: '/add-purchase-invoice',
-        type: 'post',
-        data: {
-            'purchased_product_array': purchased_product_array,
-            'grand_total': grand_total,
-            'purchased_total': purchased_total,
-        },
+        url  : '/add-sale-invoice',
+        type : 'post',
+        data : {
+                'grand_total'     :  grand_total,
+                'sale_total_amount' :  sale_total_amount,
+                'status'          :  status,
+                'sales_product_array': sales_product_array,
+            },
         success: function (response) {
             vendors = [];
-            current_client_array = [];
             $('#form')[0].reset();
             $('#client_type').val(0).trigger('change');
-
             setTimeout(() => {
                 window.location = "/stock-add";
                 $('#notifDiv').fadeOut();
@@ -415,7 +404,6 @@ $("#save").on('click', function () {
 
         }
     })
-
 });
 $(document).on('input', '.qty-input', function () {
     var update_qty         = $(this).val();
@@ -438,7 +426,7 @@ $(document).on('input', '.qty-input', function () {
         return;
     }
     $(`.purchase-product-amount${current_product_id}`).empty();
-    purchased_product_array.filter(function (data) {
+    sales_product_array.filter(function (data) {
         if (data.product_id      == current_product_id) {
             p_price               = data.retail_price
             data.qty              = update_qty;
@@ -474,7 +462,7 @@ $(document).on('input', '.price-input', function () {
     var new_amount_of_sale_product = 0;
     
     $(`.purchase-product-amount${current_product_id}`).empty();
-    purchased_product_array.filter(function (data) { 
+    sales_product_array.filter(function (data) { 
         if (data.product_id      == current_product_id) {
             data.retail_price    = retail_price;  
             data.qty = current_product_qty
@@ -541,10 +529,10 @@ $('.customer_id').change(function () {
  
 function grandSum(previous_payable){ 
     var sum = 0;
-    purchased_product_array.forEach(function (data, key) {
+    sales_product_array.forEach(function (data, key) {
         sum += parseFloat(data.amount)
     })
-    purchased_total = sum;
+    sale_total_amount = sum;
     sum += parseFloat(previous_payable)
     $('.grand-total').text(sum);
 }

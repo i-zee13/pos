@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use App\Models\CustomerLedger;
+use App\Models\VendorLedger;
 use App\Models\Product;
 use App\Models\ProductPurchase;
 use App\Models\ProductReturns;
@@ -19,7 +19,7 @@ use Auth;
 class PurchaseReturnController extends Controller
 {
     public function getVendorBalance(Request $request,$id){
-        // $customer_balance = CustomerLedger::where('customer_id',$id)->where('created_at','!=',Carbon::today()->toDateString())->orderBy('id', 'DESC')->value('balance');
+        // $customer_balance = VendorLedger::where('customer_id',$id)->where('created_at','!=',Carbon::today()->toDateString())->orderBy('id', 'DESC')->value('balance');
         $customer_balance   =   Customer::where('id',$id)->value('balance');
         $product_balances = VendorStock::select('product_id', 'product_unit_price', 'balance')
                                         ->where('vendor_id', $id)
@@ -154,7 +154,7 @@ class PurchaseReturnController extends Controller
                     }
                 }
                  
-                $customer_ledger = CustomerLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
+                $customer_ledger = VendorLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
                 if($customer_ledger){
                     // $credit  = $customer_ledger->credit;  //Out from System and Paid to Vendor;
                     // $debit   = $customer_ledger->debit;  //Insert to  System and Paid from Vendor/Cusomer;
@@ -165,7 +165,7 @@ class PurchaseReturnController extends Controller
                     $balance        =   0;
                 }
             
-                $customer_ledger   =  new  CustomerLedger();
+                $customer_ledger   =  new  VendorLedger();
                
                 $customer_ledger->dr         = $request->purchased_total;
                 // $customer_ledger->cr         = ($request->grand_total-$request->amount_paid)+$balance;

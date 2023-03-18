@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use App\Models\CustomerLedger;
 use App\Models\Product;
 use App\Models\ProductPurchase;
 use App\Models\PurchaseInvoice;
 use App\Models\Stock;
+use App\Models\VendorLedger;
 use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -176,7 +176,7 @@ class StockController extends Controller
                     }
                 }
                  
-                $customer_ledger = CustomerLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
+                $customer_ledger = VendorLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
                 if($customer_ledger){
                     // $credit  = $customer_ledger->credit;  //Out from System and Paid to Vendor;
                     // $debit   = $customer_ledger->debit;  //Insert to  System and Paid from Vendor/Cusomer;
@@ -187,9 +187,9 @@ class StockController extends Controller
                     $balance        =   0;
                 }
                 if($request->hidden_invoice_id){
-                    $customer_ledger   = CustomerLedger::where('purchase_invoice_id',$request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
+                    $customer_ledger   = VendorLedger::where('purchase_invoice_id',$request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
                 }else{
-                    $customer_ledger   =  new  CustomerLedger();
+                    $customer_ledger   =  new  VendorLedger();
                 }
                 $customer_ledger->cr         = $request->purchased_total;
                 // $customer_ledger->cr         = ($request->grand_total-$request->amount_paid)+$balance;
@@ -261,16 +261,16 @@ class StockController extends Controller
     }
     public function getVendorBalance(Request $request,$id){
         if($request->segment == 'purchase-edit'){
-            $customer_count  =  CustomerLedger::where('customer_id',$id)->count();
+            $customer_count  =  VendorLedger::where('customer_id',$id)->count();
            if($customer_count > 1){
-               $customer_balance = CustomerLedger::where('customer_id',$id)
+               $customer_balance = VendorLedger::where('customer_id',$id)
                                                 ->where('created_at','!=',Carbon::today()->toDateString())
                                                 ->skip(1)->orderBy('id', 'DESC')->value('balance');
            }else{
                 $customer_balance = 0;
            }
         }else{
-            // $customer_balance = CustomerLedger::where('customer_id',$id)->where('created_at','!=',Carbon::today()->toDateString())->orderBy('id', 'DESC')->value('balance');
+            // $customer_balance = VendorLedger::where('customer_id',$id)->where('created_at','!=',Carbon::today()->toDateString())->orderBy('id', 'DESC')->value('balance');
             $customer_balance = Customer::where('id',$id)->value('balance');
         }
          return response()->json([

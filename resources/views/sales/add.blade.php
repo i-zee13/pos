@@ -377,30 +377,30 @@
                     <div class="row">
                         <div class="col-4">
                             <div class="custom-control custom-radio">
-                                <input class="custom-control-input radio_status active" type="radio" value="1" id="active" name="radio_status" checked="checked">
-                                <label class="custom-control-label head-sta" for="active">Net Sale</label>
+                                <input class="custom-control-input radio_status net_sale" type="radio" value="1" id="net_sale" name="radio_status" checked="checked">
+                                <label class="custom-control-label head-sta" for="net_sale">Net Sale</label>
                             </div>
                         </div>
 
                         <div class="col-4">
                             <div class="custom-control custom-radio">
-                                <input class="custom-control-input radio_status inactive" type="radio" value="2" id="inactive" name="radio_status">
-                                <label class="custom-control-label head-sta" for="inactive">Add to Ledger</label>
+                                <input class="custom-control-input radio_status add_to_ledger" type="radio" value="2" id="add_to_ledger" name="radio_status">
+                                <label class="custom-control-label head-sta" for="add_to_ledger">Add to Ledger</label>
                             </div>
                         </div>
 
                         <div class="col-4">
                             <div class="custom-control custom-radio">
-                                <input class="custom-control-input radio_status churrned" type="radio" value="3" id="churnned" name="radio_status">
-                                <label class="custom-control-label head-sta" for="churnned"> Bank Transfer</label>
+                                <input class="custom-control-input radio_status bank_transfer" type="radio" value="3" id="bank_transfer" name="radio_status">
+                                <label class="custom-control-label head-sta" for="bank_transfer"> Bank Transfer</label>
                             </div>
                         </div> 
                     </div>
 
                 </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary save_status" style="font-size: 12px;">Save & Print</button>
-                <!--<button type="submit" class="btn btn-cancel" data-dismiss="modal" aria-label="Close">Cancel</button>-->
+                <button type="button" class="btn btn-primary save_status" style="font-size: 12px;">Save</button>
+                <button type="submit" class="btn btn-primary"  style="font-size: 12px;">Print</button>
             </div>
         </div>
     </div>
