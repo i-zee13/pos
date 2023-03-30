@@ -1,3 +1,5 @@
+jin s leny wo DR  jin ko deny wo CR
+
 // INVOICES
 TRUNCATE `purchase_invoices` ; 
 TRUNCATE `products_purchases` ;
@@ -15,4 +17,5 @@ TRUNCATE customer_ledger;
 TRUNCATE vendor_ledger;
 
 
-
+UPDATE `customers` SET `balance` = '0';
+UPDATE `products` SET `stock_balance` = '0';

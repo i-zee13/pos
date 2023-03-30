@@ -2,9 +2,6 @@
 
 @section('content')
 <style>
-  .modal-header .close { 
-      margin: 0px ;  
-}
   .pocPROFILE {
     font-size: 14px;
     padding: 15px 20px;
@@ -12,7 +9,7 @@
   }
 
   .pocPROFILE h3 {
-    font-size: 25px;
+    font-size: 18px;
     margin: 0
   }
 
@@ -329,7 +326,7 @@
   } */
 
   .top-border {
-    border-top: solid 2px #152e4d ;
+    border-top: solid 2px #EBB30A;
   }
 
   .addBTN-act {
@@ -363,50 +360,6 @@
     background-color: #f6f6f6;
   }
 </style>
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content top-border">
-            <div class="modal-header statusMH">
-                <h5 class="modal-title" id="exampleModalLabel">Status: <span class="modal_poc_name"> </span></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body p-20">
-                    <div class="row">
-                        <div class="col-4">
-                            <div class="custom-control custom-radio">
-                                <input class="custom-control-input radio_status net_sale" type="radio" value="1" id="net_sale" name="radio_status" checked="checked">
-                                <label class="custom-control-label head-sta" for="net_sale">Net Sale</label>
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="custom-control custom-radio">
-                                <input class="custom-control-input radio_status add_to_ledger" type="radio" value="2" id="add_to_ledger" name="radio_status">
-                                <label class="custom-control-label head-sta" for="add_to_ledger">Add to Ledger</label>
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="custom-control custom-radio">
-                                <input class="custom-control-input radio_status bank_transfer" type="radio" value="3" id="bank_transfer" name="radio_status">
-                                <label class="custom-control-label head-sta" for="bank_transfer"> Bank Transfer</label>
-                            </div>
-                        </div> 
-                    </div>
-
-                </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary save_status" style="font-size: 12px;">Save</button>
-                <button type="submit" class="btn btn-primary"  style="font-size: 12px;">Print</button>
-            </div>
-        </div>
-    </div>
-    <button hidden data-toggle="modal" data-target="#deleteModal" id="hidden_btn_to_open_modal"></button>
-</div>
- 
 
 <!-- HEADER -->
 <div class="header">
@@ -426,7 +379,7 @@
       <div class="col-auto">
         <ol class="breadcrumb">
           <li><a href="#"><span>Sale</span></a></li>
-          <li><span>add</span></li>
+          <li><span>edit</span></li>
         </ol>
         <!-- Button -->
         <!-- <a href="https://dashkit.goodthemes.co/index.html#!" class="btn btn-primary lift">
@@ -438,132 +391,151 @@
 </div>
 
 <form id="form" enctype="multipart/form-data" class="">
-
   @csrf
+  <input type="hidden" name="hidden_invoice_id" id="hidden_invoice_id" value="{{$invoice->id}}">
   <div class="row">
     <div class="col-md-12">
       <div class="card">
         <div class="body pocPROFILE">
           <div class="row">
+
+
             <div class="col-12">
               <div class="header pt-0">
-                <h2>Sale <span>Definition</span>
-              </h2>
-              <a href="{{route('sales')}}" type="submit" class="btn btn-primary mr-2" id="cancel" style="    margin-top: -10px;float: right;">Sales</a>
+                <h2>Sale <span>Definition</span></h2>
               </div>
-
             </div>
-             
           </div>
           <div class="se_cus-type p-20 mb-3">
             <div class="row">
 
-              <div class="col-md-3 mb-10">
-                <label class="control-label mb-5">Invoice #</label>
-                <input type="text" id="" class="form-control required" placeholder="" name="invoice_no" value="{{$invoice_no}}">
+              <div class="col-md-2 mb-10">
+
+                <label class="control-label mb-5">Invoice # *</label>
+                <input type="text" id="" class="form-control required" placeholder="" name="invoice_no" value="{{$invoice->invoice_no}}">
+
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <label class="control-label mb-5">Date </label>
                 <div>
-                  <input autocomplete="off" id="datepicker" type="text" class="form-control new_dob new_form_field " name="invoice_date" value="{{$current_date}}">
+                  <input autocomplete="off" id="datepicker" type="text" class="form-control new_dob new_form_field " name="invoice_date" value="{{$invoice->created_at->format('Y-d-m')}}">
                 </div>
 
               </div>
               <div class="col-md-4 client">
-                <h2 class="_head04 border-0">Select <span>Cusotmer</span>*</h2>
+              <label class="control-label mb-5">Customers *</label>
                 <div class="form-s2">
-                  <select class="form-control formselect customer_id form_clear required" name="customer_id" id="customer_id">
-                    <option value="0"> Select Cusotmer*</option>
-                    </option>
+                  <select class="form-control formselect customer_id form_clear required" name="customer_id" id="customer_id" {{$invoice->customer_id ? 'disabled' : ''}}>
+                    <option value="0"> Select Customer*</option>
+                    @foreach($customers as $customer) 
+                    <option value="{{$customer->id}}" {{$customer->id == $invoice->customer_id ? 'seleced' : ''}} >{{$customer->customer_name}}</option>
+                    @endforeach
+                     
                   </select>
                 </div>
               </div>
-             
-             
+              <div class="col-md-3">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                      <div class="col">
+                        <h6 class="text-uppercase text-muted mb-2">
+                          Previous Balance
+                        </h6>
+                        <!-- Heading -->
+                        <span class="h2 mb-0 previous_payable" style="float: right;">
+                          0
+                          <!-- Cr Dr -->
+                        </span>
+
+                      </div>
+                      <div class="col-auto">
+
+                        <!-- Icon -->
+                        <!-- <span class="h2 fe fe-dollar-sign text-muted mb-0"></span> -->
+
+                      </div>
+                    </div> <!-- / .row -->
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                      <div class="col">
+                        <h6 class="text-uppercase text-muted mb-2">
+                          Stock Balance
+                        </h6>
+                        <!-- Heading -->
+                        <span class="h2 mb-0 stock_balance" style="float: right;">
+                          0
+                          <!-- Cr Dr -->
+                        </span>
+
+                      </div>
+                      <div class="col-auto">
+
+                        <!-- Icon -->
+                        <!-- <span class="h2 fe fe-dollar-sign text-muted mb-0"></span> -->
+
+                      </div>
+                    </div> <!-- / .row -->
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row align-items-center gx-0">
+                      <div class="col">
+                        <h6 class="text-uppercase text-muted mb-2">
+                          Retail Price
+                        </h6>
+                        <!-- Heading -->
+                        <span class="h2 mb-0 retail_price" style="float: right;">
+                          0
+                          <!-- Cr Dr -->
+                        </span>
+
+                      </div>
+                      <div class="col-auto">
+
+                        <!-- Icon -->
+                        <!-- <span class="h2 fe fe-dollar-sign text-muted mb-0"></span> -->
+
+                      </div>
+                    </div> <!-- / .row -->
+                  </div>
+                </div>
+              </div>
             </div>
 
           </div>
           <div class="row">
-            <div class="col-12">
-              <div class="header pt-0">
-                <h2>Stock <span>Definition</span></h2>
-              </div>
-            </div>
-          </div>
-          <div class="se_cus-type p-20 mb-3">
-              <div class="row">
-                <div class=" col-12">
-                  <div class="row">
-                    <!-- <div class="col-md-3 mb-30">
-                      <div class="card cp-stats">
-                        <div class="cp-stats-icon"><img src="/images/totalreveneue.svg" alt="" /></div>
-                        <h5 class="text-muted">Total Reveneue</h5>
-                        <h3 class="cp-stats-value dashboard_avg_rev">Loading...</h3>
-                        <p class="mb-0"></p>
-                      </div>
-                    </div> -->
+            <input type="text" id="" class="form-control " value="1" name="form_status" hidden>
+            <input type="hidden" id="invoice_id" class="form-control " value="{{$invoice->id}}" name="invoice_id" >
+            <input type="hidden" id="curren_customer_id" class="form-control " value="{{$invoice->customer_id}}" name="customer_id" >
 
-                    <div class="col-md-3 mb-30">
-
-                      <div class="card cp-stats">
-                        <div class="cp-stats-icon"><img src="/images/totalbookings.svg" alt="" /></div>
-                        <h5 class="text-muted">Stock Balance</h5>
-                        <h3 class="cp-stats-value dashboard_ttl_orders stock_balance">0</h3>
-                        <p class="mb-0"></p>
-                      </div>
-
-                    </div>
-
-                    <div class="col-md-3 mb-30">
-
-                      <div class="card cp-stats">
-                        <div class="cp-stats-icon"><img src="/images/active-cust.svg" alt="" /></div>
-                        <h5 class="text-muted">Retail Price</h5>
-                        <h3 class="cp-stats-value dashboard_active_cust retail_price">0</h3>
-                        <p class="mb-0"></p>
-                      </div>
-
-                    </div>
-
-                    <div class="col-md-3 mb-30">
-
-                      <div class="card cp-stats">
-                        <div class="cp-stats-icon"><img src="/images/avg-rv-cust.svg" alt="" /></div>
-                        <h5 class="text-muted">Previous Receivable</h5>
-                        <h3 class="cp-stats-value dashboard_avg_rev_perCust previous_payable">0</h3>
-                        <p class="mb-0"></p>
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </div>
-               
-              </div>
-          </div>
-          <div class="row display" style="display: none;">
-            <input type="hidden" id=""   value="1" name="form_status" >
-            <input type="hidden" id="stock_products"  name="stock_products" value="{{json_encode($products)}}">
 
             <div class="col-12">
               <div class="property_info">
                 <div class="row">
                   <div class="col-12 pt-10">
                     <div class="header pt-0">
-                      <h2> Sale <span>Information</span></h2>
+                      <h2> Purchase <span>Information</span></h2>
                     </div>
                   </div>
                 </div>
 
                 <div class="infoDiv p-15">
-                <form id="purchse-form">
-                  <div class="row">
+
+                  <div class="row ">
 
                     <div class="col-md-2 mb-10">
 
                       <label class="control-label mb-5">Bar Code</label>
-                      <input type="text" id="bar-code" class="form-control bar-code" placeholder="" name="bar_code" data-attr='bar_code'>
+                      <input type="text" id="" class="form-control   bar-code " placeholder="" name="bar_code" data-attr='bar_code'>
 
                     </div>
                     <div class="col-md-3 mb-10">
@@ -582,12 +554,12 @@
                     </div>
 
                     <div class="col-md-3 mb-10">
-                      <label class="control-label mb-5">Purchase Price</label>
+                      <label class="control-label mb-5">Current Purchase Price</label>
                       <input type="text" id="purchase_price" class="form-control " placeholder="" name="purchase_price" readonly>
                     </div>
                     <div class="col-md-3 mb-10">
-                      <label class="control-label mb-5">Retail Price</label>
-                      <input type="text" id="retail_price" class="form-control" placeholder="" name="retail_price" readonly>
+                      <label class="control-label mb-5">New Purchase Price</label>
+                      <input type="text" id="new_purchase_price" class="form-control" placeholder="" name="new_purchase_price">
                     </div>
 
                     <div class="col-md-2 mb-10">
@@ -613,7 +585,7 @@
                     </div>
 
                   </div>
-                  </form>
+
                 </div>
               </div>
             </div>
@@ -625,7 +597,7 @@
                 <div class=" show_existing_div" style="display: none">
                   <div class="col-12">
                     <div class="header pt-0">
-                      <h2>Sale<span> Products List:</span></h2>
+                      <h2>Purchase<span> Products List:</span></h2>
                     </div>
                   </div>
                   <div class=" p-15 show_existing_div" style="display:none">
@@ -637,7 +609,6 @@
                               <th>#</th>
                               <th>Product </th>
                               <th>Quantity</th>
-                              <th>Price</th>
                               <th>Amount</th>
                               <th>Action</th>
                             </tr>
@@ -646,7 +617,7 @@
                           </tbody>
                           <tfoot class="table-footer">
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;">Previous Payable</th>
+                              <th colspan="3" style="text-align:right;">Previous payable</th>
                               <th class="previous_payable" colspan="4" style="text-align: center;">0
                                 <!-- <input type="text" value="" class="qty-input add-stock-input previous_payable" name="previous_payable"> -->
                               </th>
@@ -665,7 +636,7 @@
                             <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Amount pay</th>
                               <th class="" colspan="4" style="text-align: center;">
-                                <input type="text" value="" class="qty-input add-stock-input amount_pay_input" name="amount_paid">
+                                <input type="text" value="" class="qty-input add-stock-input" name="amount_paid">
                               </th>
                             </tr>
                           </tfoot>
@@ -693,6 +664,11 @@
       </div>
 
     </div>
+
+
+
+
+
   </div>
 </form>
 
@@ -704,6 +680,6 @@
 <script>
   var clients = JSON.parse('{!! json_encode($customers)  !!}');
 </script>
-<script src="{{mix('js/custom/sale.js')}}"> </script>
+<script src="{{asset('js/custom/stock.js')}}"> </script>
 
 @endpush

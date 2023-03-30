@@ -82,7 +82,7 @@
       <ul class="navbar-nav ">
         <li class="nav-item">
           <a class="nav-link collapsed" href="https://dashkit.goodthemes.co/index.html#sidebarStock" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarStock">
-          <i class="fa fa-briefcase" aria-hidden="true"></i> Stocks
+          <i class="fa fa-briefcase" aria-hidden="true"></i> Purchases
           </a>
           <div class="collapse " id="sidebarStock">
             <ul class="nav nav-sm flex-column">
@@ -119,7 +119,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('purchases')}}" class="nav-link ">
+                <a href="{{route('sales')}}" class="nav-link ">
                   List
                 </a>
               </li>
@@ -128,6 +128,30 @@
                   Sales Returns
                 </a>
               </li>
+            </ul>
+          </div>
+        </li>
+
+
+      </ul>
+      <ul class="navbar-nav ">
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#transactions" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="transactions">
+          <i class="fa fa-money" aria-hidden="true"></i> Transactions
+          </a>
+          <div class="collapse " id="transactions">
+            <ul class="nav nav-sm flex-column">
+              <li class="nav-item">
+                <a href="{{route('sale-add')}}" class="nav-link ">
+                 Customers
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('purchases')}}" class="nav-link ">
+                  Vendors
+                </a>
+              </li>
+               
             </ul>
           </div>
         </li>

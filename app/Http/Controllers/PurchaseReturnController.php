@@ -125,24 +125,25 @@ class PurchaseReturnController extends Controller
                             $status      = 2 ; //out      
                             $add_stock->balance     = $balance-$returns->qty;
                             $add_stock->qty         = $returns->qty;
-                            $add_stock->status      =   $status;
+                            $add_stock->status      = $status;
                         }
-                        $add_stock->return_invoice_id   = $returns->return_invoice_id ;
+                        $add_stock->transaction_type     =  3; //Returns
+                        $add_stock->return_invoice_id    = $returns->return_invoice_id ;
                         $add_stock->product_unit_price   = $returns->purchase_price;
-                        $add_stock->product_id  = $returns->product_id;
-                        $add_stock->vendor_id   = $invoice->customer_id;
-                        $add_stock->date        = $returns->created_at;
-                        $add_stock->amount      = $returns->purchased_total_amount;
-                        $add_stock->created_by  =  Auth::id();
+                        $add_stock->product_id           = $returns->product_id;
+                        $add_stock->vendor_id            = $invoice->customer_id;
+                        $add_stock->date                 = $returns->created_at;
+                        $add_stock->amount               = $returns->purchased_total_amount;
+                        $add_stock->created_by           =  Auth::id();
                         if($add_stock->save()){
                             $company_stock  =   new Stock();
-                            $company_stock->vendor_stock_id  = $add_stock->id;
-                            $company_stock->product_id  = $add_stock->product_id;
-                            $company_stock->amount      = $add_stock->amount;
-                            $company_stock->qty         = $add_stock->qty;
-                            $company_stock->status      =   2; //out
-                            $company_stock->balance     = $add_stock->balance-$add_stock->qty;
-                            $company_stock->created_by  =  Auth::id();
+                            $company_stock->vendor_stock_id  =  $add_stock->id;
+                            $company_stock->product_id       =  $add_stock->product_id;
+                            $company_stock->amount           =  $add_stock->amount;
+                            $company_stock->qty              =  $add_stock->qty;
+                            $company_stock->status           =  2; //out
+                            $company_stock->balance          =  $add_stock->balance-$add_stock->qty;
+                            $company_stock->created_by       =  Auth::id();
                             $company_stock->return_invoice_id   = $add_stock->return_invoice_id ;
                             $company_stock->product_unit_price  = $add_stock->product_unit_price;
                             $company_stock->save();

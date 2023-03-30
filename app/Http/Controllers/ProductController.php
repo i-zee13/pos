@@ -31,14 +31,14 @@ class ProductController extends Controller
                 }else{
                    $product     =   new Product(); 
                 }
-                   $product->barcode        =  $request->barcode;
-                   $product->product_name   =  $request->product_name;
-                   $product->size           =  $request->size;
+                   $product->barcode            =  $request->barcode;
+                   $product->product_name       =  $request->product_name;
+                   $product->size               =  $request->size;
                    $product->old_purchase_price =  $request->purchase_price;
-                   $product->sale_price     =  $request->sale_price;
-                   $product->company_id     =  $request->company_id;
-                   $product->product_icon   =  $product_icon;
-                   $product->created_by     =  Auth::user()->id;
+                   $product->sale_price         =  $request->sale_price;
+                   $product->company_id         =  $request->company_id;
+                   $product->product_icon       =  $product_icon;
+                   $product->created_by         =  Auth::user()->id;
             if($product->save()){
                 return response()->json([
                     'msg'   => 'Product Added',
@@ -55,9 +55,7 @@ class ProductController extends Controller
     }
     public function getProducts()
     {
-        $data =  Product::leftjoin('companies', 'companies.id', '=', 'products.company_id')
-                        ->select('products.*', 'companies.company_name as company_name')
-                        ->get();
+        $data =  Product::selectRaw('products.* , (SELECT company_name FROM companies WHERE id = products.company_id) as company_name')->get();
         return response()->json([
             'msg'       =>  'Products Fetched',
             'status'    =>  'success',
@@ -68,10 +66,8 @@ class ProductController extends Controller
     {
         $query    =  Product::where('products.id', $id)
                         ->leftjoin('companies', 'companies.id','=','products.company_id')
-                        ->select(
-                            'products.*',
-                            'companies.company_name as company_name',
-                        )->first();
+                        ->selectRaw( 'products.* , (SELECT company_name FROM companies WHERE id = products.company_id) as company_name')
+                        ->first();
                         return response()->json([
                             'msg'       =>  'Product Fetched for update',
                             'status'    =>  'success',
@@ -90,5 +86,5 @@ class ProductController extends Controller
             'status' => 'failed'
         ]);
     }
-
+    
 }

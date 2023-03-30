@@ -425,12 +425,11 @@
               <div class="col-md-4 client">
                 <h2 class="_head04 border-0">Select <span>Vendor</span>*</h2>
                 <div class="form-s2">
-                  <select class="form-control formselect customer_id form_clear required" name="customer_id" id="customer_id">
+                  <select class="form-control formselect customer_id form_clear required" name="customer_id" id="customer_id" {{$invoice->customer_id ? 'disabled' : ''}}>
                     <option value="0"> Select Vendor*</option>
-                    @foreach($customers as $customer) 
-                    <option value="{{$customer->id}}" {{$customer->id == $invoice->customer_id ? 'seleced' : ''}} >{{$customer->customer_name}}</option>
+                    @foreach($customers as $customer)
+                    <option value="{{$customer->id}}" {{$customer->id == $invoice->customer_id ? 'selected' : ''}}>{{$customer->customer_name}}</option>
                     @endforeach
-                     
                   </select>
                 </div>
               </div>
@@ -514,8 +513,8 @@
           </div>
           <div class="row">
             <input type="text" id="" class="form-control " value="1" name="form_status" hidden>
-            <input type="hidden" id="invoice_id" class="form-control " value="{{$invoice->id}}" name="invoice_id" >
-            <input type="hidden" id="curren_customer_id" class="form-control " value="{{$invoice->customer_id}}" name="customer_id" >
+            <input type="hidden" id="invoice_id" class="form-control " value="{{$invoice->id}}" name="invoice_id">
+            <input type="hidden" id="curren_customer_id" class="form-control " value="{{$invoice->customer_id}}" name="customer_id">
 
 
             <div class="col-12">
@@ -648,12 +647,12 @@
                   </div>
                 </div>
                 <div class="col-md-12 mt-25 p-0 detail_form">
-
+                  
                 </div>
 
                 <div class="col-md-12 text-right pr-0 PT-10" id="btns_div">
                   <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
-                  <a href="/intake-forms" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                  <a href="{{route('purchases')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                 </div>
 
               </div>

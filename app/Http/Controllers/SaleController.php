@@ -6,7 +6,7 @@ use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Product;
 use App\Models\ProductSale;
-use App\Models\Sale;
+use App\Models\Sale as SaleInvoice;
 use App\Models\Stock;
 use App\Models\VendorStock;
 use Carbon\Carbon;
@@ -22,7 +22,7 @@ class SaleController extends Controller
     {   $invoice_no   =  'inv-'.Str::uuid()->toString();
         $current_date =   Carbon::today()->toDateString();
         $customers    =   Customer::where('customer_type',2)->select('id','customer_name', 'balance')->get();
-        $products     =    Product::all();
+        $products     =   Product::where('stock_balance','>','0')->get();
         return view('sales.add',compact('customers','current_date','invoice_no','products'));
     }
     public function getVendors(){
@@ -36,7 +36,6 @@ class SaleController extends Controller
     Public function saleInvoice(Request $request){
         // dd($request->all());
         if($request->hidden_invoice_id){
-            Sale::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             $invoice = Sale::where('id',$request->hidden_invoice_id)->first();
         }else{
@@ -60,12 +59,13 @@ class SaleController extends Controller
                     $sale->created_by          = Auth::id();
                     if($sale->save()){
                         $sale_products_array[] = $sale->product_id;
-                        $check_stock           = VendorStock::where('product_id',$sale->product_id)->orderBy('id', 'DESC')->first();
+                        $check_stock           =  VendorStock::where('product_id',$sale->product_id)->orderBy('id', 'DESC')->first();
+                        $vendor_id             =    $check_stock->vendor_id;
                         if($check_stock){
                             $balance           =  $check_stock->balance; 
                         } 
                         $status = 0;    
-                        $add_stock   =  new VendorStock();
+                        $v_stock   =  new VendorStock();
                         if($request->hidden_invoice_id){
                             $stock   = VendorStock::where('purchase_invoice_id',$request->hidden_invoice_id)
                                             ->where('product_id',$sale->product_id)->orderBy('id', 'DESC')->first();
@@ -84,47 +84,48 @@ class SaleController extends Controller
                                     $balance     = $stock->balance;
                                     $status      = 1;     //in 
                                 }
-                                $add_stock->qty         = $in_hand;
-                                $add_stock->status      = $status;      
-                                $add_stock->balance     = $balance;
+                                $v_stock->qty         = $in_hand;
+                                $v_stock->status      = $status;      
+                                $v_stock->balance     = $balance;
                             }else{
-                                $add_stock->status      = 1;  //in    
-                                $add_stock->balance     = $sale->qty+$balance;
-                                $add_stock->qty         = $sale->qty;
+                                $v_stock->status      = 1;  //in    
+                                $v_stock->balance     = $sale->qty+$balance;
+                                $v_stock->qty         = $sale->qty;
                             }
                         }else{
-                            $status                  =  2; //Out      
-                            $add_stock->balance      =  $balance-$sale->qty;
-                            $add_stock->qty          =  $sale->qty;
-                            $add_stock->status       =  2; //Out
+                            $status                =  2; //Out      
+                            $v_stock->balance      =  $balance-$sale->qty;
+                            $v_stock->qty          =  $sale->qty;
+                            $v_stock->status       =  2; //Out
                         }
-                        $add_stock->sale_invoice_id      =  $sale->sale_invoice_id;
-                        $add_stock->product_unit_price   =   $sale_product['purchased_price'];
-                        $add_stock->product_id           =  $sale->product_id;
-                        $add_stock->vendor_id            =  $invoice->customer_id;
-                        $add_stock->date                 =  $sale->created_at;
-                        $add_stock->amount               =  $sale->sale_total_amount;
-                        $add_stock->created_by           =  Auth::id();
-                        if($add_stock->save()){
+                        $v_stock->transaction_type     =  2; //sale
+                        $v_stock->sale_invoice_id      =  $sale->sale_invoice_id;
+                        $v_stock->product_unit_price   =  $sale_product['purchased_price'];
+                        $v_stock->product_id           =  $sale->product_id;
+                        $v_stock->vendor_id            =  $vendor_id;
+                        $v_stock->date                 =  $sale->created_at;
+                        $v_stock->amount               =  $sale->sale_total_amount;
+                        $v_stock->created_by           =  Auth::id();
+                        if($v_stock->save()){
                             $company_stock               =  new Stock();
-                            $company_stock->product_id   =  $add_stock->product_id;
-                            $company_stock->amount       =  $add_stock->amount;
-                            $company_stock->qty          =  $add_stock->qty;
+                            $company_stock->product_id   =  $v_stock->product_id;
+                            $company_stock->amount       =  $v_stock->amount;
+                            $company_stock->qty          =  $v_stock->qty;
                             $company_stock->status       =  2;    //out
-                            $company_stock->balance      =  $add_stock->balance-$add_stock->qty;
+                            $company_stock->balance      =  $v_stock->balance;
                             $company_stock->created_by   =  Auth::id();
-                            $company_stock->vendor_stock_id      = $add_stock->id;
-                            $company_stock->product_unit_price   = $add_stock->product_unit_price;
-                            $company_stock->sale_invoice_id  = $add_stock->sale_invoice_id;
+                            $company_stock->vendor_stock_id      = $v_stock->id;
+                            $company_stock->product_unit_price   = $v_stock->product_unit_price;
+                            $company_stock->sale_invoice_id      = $v_stock->sale_invoice_id;
                             $company_stock->save();
-                            Product::where('id',$add_stock->product_id)->update([
-                                'stock_balance' =>  $add_stock->balance,
+                            Product::where('id',$v_stock->product_id)->update([
+                                'stock_balance' =>  $v_stock->balance,
                             ]);
                         }
                     }
                 }
                  
-                $customer_ledger = CustomerLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
+                $customer_ledger        =  CustomerLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
                 if($customer_ledger){
                     $balance           =   $customer_ledger->balance;
                 }else{
@@ -152,5 +153,29 @@ class SaleController extends Controller
                 'status'    =>  'success',
             ]);
         }
+    }
+    public function saleList(){
+      $sales     =   SaleInvoice::selectRaw('sale_invoices.* ,(SELECT customer_name FROM customers WHERE id=sale_invoices.customer_id) as customer_name')
+                                    ->whereIn('sale_invoices.id', function ($query) {
+                                        $query->selectRaw('MAX(id)')
+                                            ->from('sale_invoices')
+                                            ->whereDate('created_at', Carbon::today())
+                                            ->groupBy('customer_id');
+                                    })
+                                    ->orderBy('id', 'desc')
+                                    ->get();
+
+        return view('sales.list',compact('sales'));
+
+    }
+    public function editSale($id){
+        $customers         =     Customer::where('customer_type',2)->select('id','customer_name','balance')->get();
+        $products          =     Product::where('stock','>',0)->get();
+        $invoice           =     SaleInvoice::where('id',$id)->first();
+        $purchasd_products =     ProductSale::where('sale_invoice_id',$id)
+                                 ->selectRaw('
+                                 products_sales.*')
+                                 ->get();
+        return view('sales.edit',compact('invoice','customers','products','customers'));
     }
 }

@@ -204,10 +204,10 @@ $('#add-product').on('click', function () {
     $('#qty').val('');
     $('#amount').val('');
     $('.bar-code').val('');
-    $('.products').val('0').trigger('change');
+    // $('.products').val('0').trigger('change');
     $('#new_purchase_price').val('');
     p_name = '';
-    $('#purchse-form')[0].reset();
+    // $('#purchse-form')[0].reset();
 
 })
 $(document).on('focusout input', '.bar-code', function () {
@@ -431,7 +431,7 @@ $('.customer_id').change(function () {
             console.log(   response.product_ids)
 
             previous_payable = response.customer_balance;
-            var previous_payable_text = previous_payable > 0 ? previous_payable + " DR" : previous_payable < 0  ? (-previous_payable) + " CR" : previous_payable;
+            var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0  ? (-previous_payable) + " DR" : previous_payable;
             $('.previous_payable').text(previous_payable_text);
             $('.previous_payable').val(previous_payable);
             grandSum(previous_payable)
@@ -466,7 +466,9 @@ $('.products').change(function () {
     stock_in_hand = $('option:selected', this).attr('data-stock');
     unit_price    = $('option:selected', this).attr('unit-price');
     if(selected_product != null){
+        
         var filter_product = product_list.filter(x => x.id == selected_product)
+        console.log(filter_product);
         $('.retail_price').text(filter_product[0].sale_price);
         // if(filter_product[0].new_purchase_price > 0){
         //     $('#purchase_price').val(filter_product[0].new_purchase_price);
@@ -532,14 +534,14 @@ function getPurchases() {
 }
 function grandSum(previous_payable){
     var sum = 0;
-    console.log(sum)
+    console.log(sum,previous_payable)
     purchased_product_array.forEach(function (data, key) {
+        console.log(data.amount)
         sum += parseFloat(data.amount)
-    })
+    }) 
     purchased_total = sum;
-    sum += parseFloat(previous_payable)
+    sum = Math.abs(previous_payable - purchased_total);
     $('.grand-total').text(sum);
-    // sum += parseFloat(previous_payable-purchased_total)
-    // $('.grand-total').text(parseFloat(previous_payable-purchased_total));
+   
 }
 

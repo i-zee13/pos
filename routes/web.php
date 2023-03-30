@@ -55,6 +55,5 @@ Route::post('/add-sale-invoice'     ,[App\Http\Controllers\SaleController::class
 Route::get('/sales'                 ,[App\Http\Controllers\SaleController::class, 'saleList'])->name('sales');
 Route::get('/sale-edit/{id}'        ,[App\Http\Controllers\SaleController::class, 'editsale'])->name('sale-edit');
 Route::get('/get-sale-products/{id}',[App\Http\Controllers\SaleController::class, 'getsaleProduct'])->name('get-sale-products');
-Route::delete('/delete-product-from-invoice' ,[App\Http\Controllers\SaleController::class, 'deleteProduct'])->name('delete-product');
 
 });

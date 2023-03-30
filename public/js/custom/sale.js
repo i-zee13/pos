@@ -112,7 +112,9 @@ var expiry_date = '';
 var retail_price = '';
 var p_price = '';
 var stock_in_hand = '';
+var stock_products = '';
 $(document).ready(function () {
+  stock_products = JSON.parse($('#stock_products').val());
   getProducts();
   if (segments[3] == "stock-add") {
     //
@@ -440,7 +442,7 @@ $('.save_status').on('click', function () {
       $('#form')[0].reset();
       $('#client_type').val(0).trigger('change');
       setTimeout(function () {
-        window.location = "/stock-add";
+        window.location = "/sale-add";
         $('#notifDiv').fadeOut();
       }, 1500);
       $('.formselect').select2();
@@ -538,17 +540,10 @@ $(document).on('input', '.price-input', function () {
 });
 function getProducts() {
   $("#products").empty();
-  $.ajax({
-    url: "/get-products",
-    type: 'get',
-    success: function success(response) {
-      $("#products").append("<option value=\"0\">Select Product</option>");
-      response.data.forEach(function (data) {
-        console.log(data);
-        $("#products").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.product_name, "\" data-qty=\"").concat(data.qty, "\">").concat(data.product_name, "</option>"));
-        product_list.push(data);
-      });
-    }
+  $("#products").append("<option value=\"0\">Select Product</option>");
+  stock_products.forEach(function (data) {
+    $("#products").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.product_name, "\" data-qty=\"").concat(data.qty, "\">").concat(data.product_name, "</option>"));
+    product_list.push(data);
   });
 }
 function getvendors() {
@@ -578,7 +573,7 @@ $('.customer_id').change(function () {
       },
       success: function success(response) {
         previous_payable = response.customer_balance;
-        var previous_payable_text = previous_payable > 0 ? previous_payable + " DR" : previous_payable < 0 ? -previous_payable + " CR" : previous_payable;
+        var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0 ? -previous_payable + " DR" : previous_payable;
         $('.previous_payable').text(previous_payable_text);
         $('.previous_payable').val(previous_payable);
         grandSum(previous_payable);

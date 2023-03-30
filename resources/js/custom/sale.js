@@ -22,8 +22,11 @@ var expiry_date = '';
 let retail_price  = '';
 var p_price = '';
 let stock_in_hand = '';
+let stock_products = '' ;
 
 $(document).ready(function () {
+    stock_products  = JSON.parse($('#stock_products').val());
+       
     getProducts();
     if (segments[3] == "stock-add") {
         //
@@ -364,9 +367,9 @@ $('.save_status').on('click',function(){
         url  : '/add-sale-invoice',
         type : 'post',
         data : {
-                'grand_total'     :  grand_total,
-                'sale_total_amount' :  sale_total_amount,
-                'status'          :  status,
+                'grand_total'        :  grand_total,
+                'sale_total_amount'  :  sale_total_amount,
+                'status'             :  status,
                 'sales_product_array': sales_product_array,
             },
         success: function (response) {
@@ -374,7 +377,7 @@ $('.save_status').on('click',function(){
             $('#form')[0].reset();
             $('#client_type').val(0).trigger('change');
             setTimeout(() => {
-                window.location = "/stock-add";
+                window.location = "/sale-add";
                 $('#notifDiv').fadeOut();
             }, 1500);
             $('.formselect').select2();
@@ -475,19 +478,12 @@ $(document).on('input', '.price-input', function () {
 
 })
 function getProducts() {
-    $("#products").empty();
-    $.ajax({
-        url: `/get-products`,
-        type: 'get',
-        success: function (response) {
-            $("#products").append(`<option value="0">Select Product</option>`)
-            response.data.forEach(data => {
-                console.log(data)
-                $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.product_name}</option>`)
-                product_list.push(data);
-            });
-        }
-    })
+        $("#products").empty();  
+        $("#products").append(`<option value="0">Select Product</option>`)
+        stock_products.forEach(data => { 
+            $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.product_name}</option>`)
+            product_list.push(data);
+        }); 
 }
 function getvendors() {
     $("#customer_id").empty();
@@ -516,7 +512,7 @@ $('.customer_id').change(function () {
          },
         success : function(response){
             previous_payable = response.customer_balance;
-            var previous_payable_text = previous_payable > 0 ? previous_payable + " DR" : previous_payable < 0  ? (-previous_payable) + " CR" : previous_payable;
+            var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0  ? (-previous_payable) + " DR" : previous_payable;
             $('.previous_payable').text(previous_payable_text);
             $('.previous_payable').val(previous_payable);
             grandSum(previous_payable)

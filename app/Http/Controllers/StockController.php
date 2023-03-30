@@ -74,6 +74,8 @@ class StockController extends Controller
                     }
                     $purchased->purchase_invoice_id = $invoice->id;
                     $purchased->product_id      = $purchase_product['product_id'];
+                    $purchased->vendor_id       = $request->customer_id;
+
                     $purchased_products_array[] = $purchased->product_id;
 
                     $purchased->expiry_date     = $purchase_product['expiry_date'];
@@ -130,6 +132,7 @@ class StockController extends Controller
                                 $add_stock->qty         = $purchased->qty;
                                 $add_stock->status      =   $status;
                         }
+                        $add_stock->transaction_type     = 1; //Purchase
                         $add_stock->purchase_invoice_id  = $purchased->purchase_invoice_id;
                         $add_stock->product_unit_price   = $purchased->purchase_price;
                         $add_stock->product_id  = $purchased->product_id;
@@ -139,15 +142,16 @@ class StockController extends Controller
                         $add_stock->created_by  =  Auth::id();
                         if($add_stock->save()){
                             $company_stock  =   new Stock();
-                            $company_stock->vendor_stock_id  = $add_stock->id;
-                            $company_stock->product_id  = $add_stock->product_id;
-                            $company_stock->amount      = $add_stock->amount;
-                            $company_stock->purchase_invoice_id  = $add_stock->purchase_invoice_id;
-                            $company_stock->product_unit_price   = $add_stock->product_unit_price;
-                            $company_stock->qty         = $add_stock->qty;
-                            $company_stock->status      =   2; //out
-                            $company_stock->balance     = $add_stock->balance-$add_stock->qty;
-                            $company_stock->created_by  =  Auth::id();
+                            $company_stock->vendor_stock_id      =  $add_stock->id;
+                            $company_stock->product_id           =  $add_stock->product_id;
+                            $company_stock->amount               =  $add_stock->amount;
+                            $company_stock->purchase_invoice_id  =  $add_stock->purchase_invoice_id;
+                            $company_stock->product_unit_price   =  $add_stock->product_unit_price;
+                            $company_stock->qty                  =  $add_stock->qty;
+                            $company_stock->status               =  1; //out
+                            $company_stock->date                 =  $purchased->created_at;
+                            $company_stock->balance              =  $add_stock->balance; 
+                            $company_stock->created_by           =  Auth::id();
                             $company_stock->save();
                             // dd($purchased_products_array);
                         //    
@@ -228,24 +232,23 @@ class StockController extends Controller
         ]);
     }
     public function purchaseList(){
-        $purchases = PurchaseInvoice::select('purchase_invoices.*', 'customers.customer_name')
-        ->join('customers', 'customers.id', '=', 'purchase_invoices.customer_id')
-        ->whereIn('purchase_invoices.id', function ($query) {
-            $query->selectRaw('MAX(id)')
-                ->from('purchase_invoices')
-                ->whereDate('created_at', Carbon::today())
-                ->groupBy('customer_id');
-        })
-        ->orderBy('id', 'desc')
-        ->get();
+        $purchases = PurchaseInvoice::selectRaw('purchase_invoices.*,(SELECT customer_name FROM customers WHERE id=purchase_invoices.customer_id) as customer_name')
+                                    ->whereIn('purchase_invoices.id', function ($query) {
+                                        $query->selectRaw('MAX(id)')
+                                            ->from('purchase_invoices')
+                                            ->whereDate('created_at', Carbon::today())
+                                            ->groupBy('customer_id');
+                                    })
+                                    ->orderBy('id', 'desc')
+                                    ->get();
         return view('purchases.list',compact('purchases'));
     }
     public function editPurchase($id){
-        $customers    =     Customer::all();
-        $products     =     Product::all();
-        $invoice      =     PurchaseInvoice::where('id',$id)->first();
-        $purchasd_products =    ProductPurchase::where('purchase_invoice_id',$id)->get();
-   
+        $customers         =     Customer::all();
+        $products          =     Product::all();
+        $invoice           =     PurchaseInvoice::where('id',$id)->first();
+        $purchasd_products =     ProductPurchase::where('purchase_invoice_id',$id)
+        ->selectRaw('(SELECT balance FROM vendor_stocks  WHERE vendor_id = products_purchases.vendor_id ORDER BY id DESC LIMIT 1) as balance ,products_purchases.* ')->get();
         return view('purchases.edit',compact('invoice','customers','products','customers'));
     }
     public function getPurchaseProduct($id){
@@ -285,21 +288,35 @@ class StockController extends Controller
                         ->where('product_id',$request->product_id)
                         ->where('status',1)->orderBy('id', 'DESC')->first();
             if($prod){
-                    $out_stock  =   new VendorStock();
-                    $out_stock->vendor_id  = $prod->vendor_id;
+                    $out_stock              =   new VendorStock();
+                    $out_stock->vendor_id   = $prod->vendor_id;
                     $out_stock->product_id  = $prod->product_id;
                     $out_stock->date        = $prod->created_at;
                     $out_stock->amount      = $prod->amount;
                     $out_stock->qty         = $prod->qty;
-                    $out_stock->status      =   2; //out
-                    $out_stock->balance     = $prod->balance-$prod->qty;
+                    $out_stock->status      =  2; //out
+                    $out_stock->balance     =  $prod->balance-$prod->qty;
                     $out_stock->created_by  =  Auth::id();
                     $out_stock->purchase_invoice_id  = $prod->purchase_invoice_id;
                     $out_stock->product_unit_price   = $prod->product_unit_price;
                     if($out_stock->save()){
+                        $company_stock                       =  new Stock();
+                        $company_stock->vendor_stock_id      =  $out_stock->id;
+                        $company_stock->product_id           =  $out_stock->product_id;
+                        $company_stock->amount               =  $out_stock->amount;
+                        $company_stock->purchase_invoice_id  =  $out_stock->purchase_invoice_id;
+                        $company_stock->product_unit_price   =  $out_stock->product_unit_price;
+                        $company_stock->qty                  =  $out_stock->qty;
+                        $company_stock->status               =  2; //out
+                        $company_stock->date                 =  Carbon::now();
+                        $company_stock->balance              =  $out_stock->balance; 
+                        $company_stock->created_by           =  Auth::id();
+                        $company_stock->save();
                         Product::where('id',$out_stock->product_id)->update([
                             'stock_balance' =>  $out_stock->balance,
                         ]);
+                        ProductPurchase::where('purchase_invoice_id',$request->purchase_invoice_id)
+                                         ->where('product_id',$request->product_id)->delete();
                         return response()->json([
                             'msg'       => 'product removed',
                             'status'    => 'success',

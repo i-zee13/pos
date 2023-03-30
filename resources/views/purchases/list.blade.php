@@ -56,7 +56,7 @@
                     <td>{{$purchase->total_invoice_amount}} </td>
                     <td>
                         <a id="{{$purchase->id}}" class="btn btn-default btn-line" href="{{route('purchase-edit' ,['id'=>$purchase->id])}}">Edit</a>
-                        <button type="button" id="{{$purchase->id}}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button>
+                        <!-- <button type="button" id="{{$purchase->id}}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button> -->
                     </td>
                 </tr>
                 @endforeach
