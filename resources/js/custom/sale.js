@@ -359,6 +359,7 @@ $("#save").on('click', function () {
     $('#hidden_btn_to_open_modal').click();  
 });
 $('.save_status').on('click',function(){
+    var if_print     = $(this).attr('btn-val');
     var grand_total  = $('.grand-total').text(); 
     var status       = $('input[name="radio_status"]:checked').val();
     $(this).attr('disabled', 'disabled');

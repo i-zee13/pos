@@ -34,17 +34,17 @@ class SaleController extends Controller
         ]);
     }
     Public function saleInvoice(Request $request){
-        // dd($request->all());
         if($request->hidden_invoice_id){
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
-            $invoice = Sale::where('id',$request->hidden_invoice_id)->first();
+            $invoice = SaleInvoice::where('id',$request->hidden_invoice_id)->first();
         }else{
-            $invoice = new Sale();
+            $invoice = new SaleInvoice();
         }
         $invoice->date                 = $request->invoice_date;
         $invoice->invoice_no           = $request->invoice_no;
         $invoice->customer_id          = $request->customer_id;
         $invoice->total_invoice_amount = $request->grand_total;
+        $invoice->status               = $request->status;
         $invoice->created_by           = Auth::id();
         if($invoice->save()){
             if(count($request->sales_product_array) > 0){
@@ -68,7 +68,7 @@ class SaleController extends Controller
                         $v_stock   =  new VendorStock();
                         if($request->hidden_invoice_id){
                             $stock   = VendorStock::where('purchase_invoice_id',$request->hidden_invoice_id)
-                                            ->where('product_id',$sale->product_id)->orderBy('id', 'DESC')->first();
+                                                   ->where('product_id',$sale->product_id)->orderBy('id', 'DESC')->first();
                             $in_hand = 0;
                             if($stock){ 
                                 if($sale->qty > $stock->qty){
@@ -172,7 +172,7 @@ class SaleController extends Controller
         $customers         =     Customer::where('customer_type',2)->select('id','customer_name','balance')->get();
         $products          =     Product::where('stock','>',0)->get();
         $invoice           =     SaleInvoice::where('id',$id)->first();
-        $purchasd_products =     ProductSale::where('sale_invoice_id',$id)
+        $purchasd_products =     ProductSaleInvoice::where('sale_invoice_id',$id)
                                  ->selectRaw('
                                  products_sales.*')
                                  ->get();

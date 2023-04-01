@@ -399,8 +399,8 @@
 
                 </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary save_status" style="font-size: 12px;">Save</button>
-                <button type="submit" class="btn btn-primary"  style="font-size: 12px;">Print</button>
+                <button type="button" class="btn btn-primary save_status"  style="font-size: 12px;" btn-value='0'>Save</button>
+                <button type="submit" class="btn btn-primary save_status"  style="font-size: 12px;" btn-value='1'>Print</button>
             </div>
         </div>
     </div>
