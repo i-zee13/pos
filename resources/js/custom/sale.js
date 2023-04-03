@@ -31,12 +31,12 @@ $(document).ready(function () {
     if (segments[3] == "stock-add") {
         //
         
-    } else if (segments[3] == 'purchase-edit') {
+    } else if (segments[3] == 'sale-edit') {
         customer_id    = $('#curren_customer_id').val(); 
         var invoice_id = $('#invoice_id').val(); 
         segment = segments[3];
         $.ajax({
-            url: '/get-purchase-products/' + invoice_id,
+            url: '/get-sale-products/' + invoice_id,
             type: 'get',
             success: function (response) {
                 response.products.forEach(function (product) {
@@ -49,16 +49,17 @@ $(document).ready(function () {
                         'old_price'  : `${product.purchase_price}`,
                         'new_price'  : ``,
                         'p_name'     : `${product.product_name}`,
-                        'purchase_invoice_id'     : `${product.purchase_invoice_id  }`,
+                        'sale_invoice_id'     : `${product.sale_invoice_id  }`,
                        
                     }); 
                 $('.products').children(`option[value="${product.product_id}"]`).attr('disabled', true);
                 })
                 $(".products").val('0');
                 $(".products").select2();
-               
+                $('.display').show();
                 $('.show_existing_div').show();
                 var x=0
+                console.log(sales_product_array);
                 sales_product_array.forEach(function(product,key){
                     x++;
                      $('#designationsTable tbody').append(`
@@ -67,7 +68,7 @@ $(document).ready(function () {
                             <td>${product.p_name}</td>
                             <td><input type="text" value="${product.qty}"  class="qty-input add-stock-input" data-id="${product.product_id}" data-value="${amount}"></td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount}</td>
-                            <td><a type="button" id="${product.product_id}" data-id="${product.purchase_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</a></td>
+                            <td><a type="button" id="${product.product_id}" data-id="${product.sale_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</a></td>
                         </tr>`);
                 })
             }
@@ -104,7 +105,7 @@ $('.close').on('click', function () {
 $(document).on('click', '.remove_btn', function () {
     deleteRef = $(this);
     var product_id          =  $(this).attr('id');
-    var purchase_invoice_id =  $(this).attr('data-id');
+    var sale_invoice_id =  $(this).attr('data-id');
     if(segments[3] == 'purchase-edit'){
         swal({
             title   : "Are you sure?",
@@ -123,7 +124,7 @@ $(document).on('click', '.remove_btn', function () {
                     data: {
                         _token: $('meta[name="csrf_token"]').attr('content'),
                         product_id: product_id,
-                        purchase_invoice_id: purchase_invoice_id,   
+                        sale_invoice_id: sale_invoice_id,   
                     },
                     success: function (response) {
                         if (response.status == 'success') {
@@ -359,7 +360,8 @@ $("#save").on('click', function () {
     $('#hidden_btn_to_open_modal').click();  
 });
 $('.save_status').on('click',function(){
-    var if_print     = $(this).attr('btn-val');
+    var if_print     = $(this).attr('btn-value');
+    var ser_chargses = $('.service_charges_input').val();
     var grand_total  = $('.grand-total').text(); 
     var status       = $('input[name="radio_status"]:checked').val();
     $(this).attr('disabled', 'disabled');
@@ -368,30 +370,36 @@ $('.save_status').on('click',function(){
         url  : '/add-sale-invoice',
         type : 'post',
         data : {
+                'service_charges'    :  ser_chargses,
                 'grand_total'        :  grand_total,
                 'sale_total_amount'  :  sale_total_amount,
                 'status'             :  status,
-                'sales_product_array': sales_product_array,
+                'sales_product_array':  sales_product_array,
             },
         success: function (response) {
-            vendors = [];
-            $('#form')[0].reset();
-            $('#client_type').val(0).trigger('change');
-            setTimeout(() => {
-                window.location = "/sale-add";
-                $('#notifDiv').fadeOut();
-            }, 1500);
-            $('.formselect').select2();
+            $('#save').removeAttr('disabled'); 
+            $('.btn-cancel').removeAttr('disabled');
+            $('#save').text('Save');
             if ("success") {
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'green');
                 $('#notifDiv').text('Added successfully');
                 setTimeout(() => {
                     $('#notifDiv').fadeOut();
-                }, 3000);
-                $('#save').removeAttr('disabled');;
-                $('.btn-cancel').removeAttr('disabled');
-                $('#save').text('Save');
+                    if(if_print==1){
+                        var invoiceWindow    = window.open(`/invoice/?invoice_id=${response.invoice_id}&customer_id=${response.customer_id}`, 'invoiceWindow');
+                        invoiceWindow.onload = function() {
+                          invoiceWindow.print();
+                        }
+                    }else{
+                        window.location = "/sale-add";
+                    }
+                }, 1500);
+                vendors = [];
+                $('#form')[0].reset();
+                $('#client_type').val(0).trigger('change'); 
+                $('.formselect').select2();
+                
             }
         },
         error: function (e) {

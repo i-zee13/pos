@@ -393,6 +393,8 @@
 <form id="form" enctype="multipart/form-data" class="">
   @csrf
   <input type="hidden" name="hidden_invoice_id" id="hidden_invoice_id" value="{{$invoice->id}}">
+  <input type="hidden" name="hidden_paid_amount" id="hidden_paid_amount" value="{{$invoice->paid_amount}}">
+  <input type="hidden" name="vendor_ledger" id="vendor_ledger" value="{{json_encode($get_vendor_ledger)}}">
   <div class="row">
     <div class="col-md-12">
       <div class="card">

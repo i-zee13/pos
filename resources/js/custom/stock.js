@@ -22,6 +22,11 @@ var deleteRef = '';
 var expiry_date = '';
 let current_client_array  = [];
 var p_price = '';
+let total_return_qty = 0;
+let paid_amount = 0;
+let purchase_total_amount = 0;
+let total_invoice_amount_after_paid = 0;
+let vendor_ledger = 0;
 
 $(document).ready(function () {
     getProducts();
@@ -29,24 +34,29 @@ $(document).ready(function () {
         //
         
     } else if (segments[3] == 'purchase-edit') {
-        customer_id    = $('#curren_customer_id').val(); 
-        var invoice_id = $('#invoice_id').val(); 
+        paid_amount             = $('#hidden_paid_amount').val();
+        customer_id             = $('#curren_customer_id').val(); 
+        var invoice_id          = $('#invoice_id').val(); 
+        vendor_ledger           = JSON.parse($('#vendor_ledger').val());
+        console.log(vendor_ledger)
         segment = segments[3];
         $.ajax({
             url: '/get-purchase-products/' + invoice_id,
             type: 'get',
             success: function (response) {
                 response.products.forEach(function (product) {
+                    total_return_qty += product.return_qty*product.purchase_price;
                     p_name = product.product_name;
+                    purchase_total_amount += product.purchased_total_amount;
                     purchased_product_array.push({
-                        'product_id' : `${product.product_id}`,
-                        'expiry_date': `${product.expiry_date}`,
-                        'qty'        : `${product.qty}`,
-                        'amount'     : `${product.purchased_total_amount}`,
-                        'old_price'  : `${product.purchase_price}`,
-                        'new_price'  : ``,
-                        'p_name'     : `${product.product_name}`,
-                        'purchase_invoice_id'     : `${product.purchase_invoice_id  }`,
+                        'product_id'            : `${product.product_id}`,
+                        'expiry_date'           : `${product.expiry_date}`,
+                        'qty'                   : `${product.qty_after_return > 0 ? product.qty_after_return : product.qty}`,
+                        'amount'                : `${product.purchased_total_amount}`,
+                        'old_price'             : `${product.purchase_price}`,
+                        'new_price'             : ``,
+                        'p_name'                : `${product.product_name}`,
+                        'purchase_invoice_id'   : `${product.purchase_invoice_id  }`,
                        
                     }); 
                 $('.products').children(`option[value="${product.product_id}"]`).attr('disabled', true);
@@ -67,6 +77,7 @@ $(document).ready(function () {
                             <td><a type="button" id="${product.product_id}" data-id="${product.purchase_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</a></td>
                         </tr>`);
                 })
+                // $(`#tr-${product.product_id} .qty-input`).trigger('input');
             }
         })
 
@@ -418,7 +429,20 @@ $('.customer_id').change(function () {
             segment:segment
          },
         success : function(response){
+           // total_invoice_amount_after_paid = purchase_total_amount - paid_amount;
+        //   
+        //        previous_payable =  previous_payable_balance
+        //    }else{
+        // }
+        if(segments[3] == 'purchase-edit'){
+            if(vendor_ledger['return_invoice_id'] > 0){
+                previous_payable =  vendor_ledger['balance']+vendor_ledger['dr']-purchase_total_amount
+            }else{
+                previous_payable =  vendor_ledger['balance']+vendor_ledger['dr']-vendor_ledger['cr'];
+            }
+        }else{
             previous_payable = response.customer_balance;
+        }
             var previous_payable_text = previous_payable > 0 ? previous_payable + " DR" : previous_payable < 0  ? (-previous_payable) + " CR" : previous_payable;
             $('.previous_payable').text(previous_payable_text);
             $('.previous_payable').val(previous_payable);
@@ -500,8 +524,9 @@ function grandSum(previous_payable){
     purchased_product_array.forEach(function (data, key) {
         sum += parseFloat(data.amount)
     })
-    purchased_total = sum;
-    sum += parseFloat(previous_payable)
+        purchased_total = sum;
+    
+        sum += parseFloat(previous_payable) 
 
     $('.grand-total').text(sum);
-}
+} 

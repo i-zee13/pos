@@ -438,8 +438,10 @@
 </div>
 
 <form id="form" enctype="multipart/form-data" class="">
-
   @csrf
+  <input type="hidden" id="invoice_id" class="form-control " value="{{@$invoice->id}}" name="invoice_id">
+  <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
+
   <div class="row">
     <div class="col-md-12">
       <div class="card">
@@ -460,21 +462,23 @@
 
               <div class="col-md-3 mb-10">
                 <label class="control-label mb-5">Invoice #</label>
-                <input type="text" id="" class="form-control required" placeholder="" name="invoice_no" value="{{$invoice_no}}">
+                <input type="text" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
               </div>
               <div class="col-md-3">
                 <label class="control-label mb-5">Date </label>
                 <div>
-                  <input autocomplete="off" id="datepicker" type="text" class="form-control new_dob new_form_field " name="invoice_date" value="{{$current_date}}">
+                  <input autocomplete="off" id="datepicker" type="text" class="form-control new_dob new_form_field " name="invoice_date" value="{{@$invoice ? $invoice->created_at->format('Y-d-m') : $current_date}}">
                 </div>
 
               </div>
               <div class="col-md-4 client">
                 <h2 class="_head04 border-0">Select <span>Cusotmer</span>*</h2>
                 <div class="form-s2">
-                  <select class="form-control formselect customer_id form_clear required" name="customer_id" id="customer_id">
-                    <option value="0"> Select Cusotmer*</option>
-                    </option>
+                <select class="form-control formselect custom er_id form_clear required" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                    <option value="0"> Select Customer*</option>
+                    @foreach($customers as $customer)
+                    <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->customer_name}}</option>
+                    @endforeach
                   </select>
                 </div>
               </div>
@@ -659,6 +663,11 @@
                               <th colspan="3" style="text-align:right;">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input" data-id="" data-value="">
+                              </th>
+                            </tr><tr rowspan="5">
+                              <th colspan="3" style="text-align:right;">Service charges </th>
+                              <th class="" colspan="4" style="text-align: center;">
+                                <input type="text" value="" class=" qty-input add-stock-input service_charges_input" data-id="" data-value="">
                               </th>
                             </tr>
 

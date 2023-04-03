@@ -232,7 +232,9 @@ class StockController extends Controller
         ]);
     }
     public function purchaseList(){
-        $purchases = PurchaseInvoice::selectRaw('purchase_invoices.*,(SELECT customer_name FROM customers WHERE id=purchase_invoices.customer_id) as customer_name')
+        $purchases = PurchaseInvoice::selectRaw('purchase_invoices.*,
+                                    (SELECT dr FROM vendor_ledger WHERE purchase_invoice_id = purchase_invoices.id) as paid_amount,
+                                    (SELECT customer_name FROM customers WHERE id=purchase_invoices.customer_id) as customer_name')
                                     ->whereIn('purchase_invoices.id', function ($query) {
                                         $query->selectRaw('MAX(id)')
                                             ->from('purchase_invoices')
@@ -244,17 +246,19 @@ class StockController extends Controller
         return view('purchases.list',compact('purchases'));
     }
     public function editPurchase($id){
-        $customers         =     Customer::all();
-        $products          =     Product::all();
-        $invoice           =     PurchaseInvoice::where('id',$id)->first();
-        $purchasd_products =     ProductPurchase::where('purchase_invoice_id',$id)
-        ->selectRaw('(SELECT balance FROM vendor_stocks  WHERE vendor_id = products_purchases.vendor_id ORDER BY id DESC LIMIT 1) as balance ,products_purchases.* ')->get();
-        return view('purchases.edit',compact('invoice','customers','products','customers'));
+        $customers          =   Customer::all();
+        $products           =   Product::all();
+        $invoice            =   PurchaseInvoice::where('id',$id)->first();
+        $purchasd_products  =  ProductPurchase::where('purchase_invoice_id', $id)
+                                                ->selectRaw('(SELECT balance FROM vendor_stocks WHERE vendor_id = products_purchases.vendor_id ORDER BY id DESC LIMIT 1) as balance, products_purchases.*')
+                                                ->from('products_purchases')
+                                                ->get();
+        $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)->orderBy('id', 'DESC')->first();
+        return view('purchases.edit',compact('invoice','customers','products','customers','get_vendor_ledger'));
     }
     public function getPurchaseProduct($id){
-        $products= ProductPurchase::where('products_purchases.purchase_invoice_id',$id)
-                                    ->join('products','products.id','=','products_purchases.product_id')
-                                    ->select('products_purchases.*','products.product_name')->get();
+        $products   =   ProductPurchase::where('products_purchases.purchase_invoice_id',$id)
+                                    ->selectRaw('products_purchases.*, (SELECT product_name FROM products WHERE id=products_purchases.product_id) as product_name')->get();
                                    
         return response()->json([
             'msg'       => 'Vendor Fetched',
@@ -264,11 +268,11 @@ class StockController extends Controller
     }
     public function getVendorBalance(Request $request,$id){
         if($request->segment == 'purchase-edit'){
-            $customer_count  =  VendorLedger::where('customer_id',$id)->count();
+            $customer_count     =  VendorLedger::where('customer_id',$id)->count();
            if($customer_count > 1){
                $customer_balance = VendorLedger::where('customer_id',$id)
                                                 ->where('created_at','!=',Carbon::today()->toDateString())
-                                                ->skip(1)->orderBy('id', 'DESC')->value('balance');
+                                                ->orderBy('id', 'DESC')->value('balance');
            }else{
                 $customer_balance = 0;
            }

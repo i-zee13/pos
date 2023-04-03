@@ -147,10 +147,14 @@ class PurchaseReturnController extends Controller
                             $company_stock->return_invoice_id   = $add_stock->return_invoice_id ;
                             $company_stock->product_unit_price  = $add_stock->product_unit_price;
                             $company_stock->save();
-                          
                             Product::where('id',$add_stock->product_id)->update([
                                 'stock_balance' =>  $add_stock->balance,
                             ]);
+                            // ProductPurchase::where('vendor_id',$invoice->customer_id)->where('product_id',$add_stock->product_id)->update([
+                            //     'return_qty' =>  $add_stock->qty,
+                            //     'qty_after_return' =>  ,
+                                
+                            // ])
                         }
                     }
                 }

@@ -13,7 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Auth;
-
+use Laravel\Ui\Presets\React;
 
 class SaleController extends Controller
 {
@@ -43,7 +43,8 @@ class SaleController extends Controller
         $invoice->date                 = $request->invoice_date;
         $invoice->invoice_no           = $request->invoice_no;
         $invoice->customer_id          = $request->customer_id;
-        $invoice->total_invoice_amount = $request->grand_total;
+        $invoice->total_invoice_amount = $request->grand_total+$request->service_charges;
+        $invoice->service_charges      = $request->service_charges;
         $invoice->status               = $request->status;
         $invoice->created_by           = Auth::id();
         if($invoice->save()){
@@ -136,11 +137,11 @@ class SaleController extends Controller
                 }else{
                     $customer_ledger   =   new  CustomerLedger();
                 }
-                $customer_ledger->cr          = $request->sale_total_amount;
+                $customer_ledger->cr          = $invoice->total_invoice_amount;
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
                 $customer_ledger->dr          = $request->amount_paid;
-                $customer_ledger->balance     = ($request->grand_total-$request->amount_paid); //balance
+                $customer_ledger->balance     = ($invoice->total_invoice_amount-$request->amount_paid); //balance
                 $customer_ledger->created_by  = Auth::id();
                 $customer_ledger->sale_invoice_id= $invoice->id;
                 $customer_ledger->save();
@@ -148,14 +149,20 @@ class SaleController extends Controller
                     'balance' => $customer_ledger->balance,
                 ]);
             }
+            // $pdf = PDF::loadView('invoice', compact('invoice'));
+            // return $pdf->download('invoice.pdf');
             return response()->json([
-                'msg'       =>  'Product Invoice has generated.',
-                'status'    =>  'success',
+                'msg'        =>  'Product Invoice has generated.',
+                'status'     =>  'success',
+                'invoice_id' =>  $invoice->id,
+                'customer_id'=>  $invoice->customer_id, 
             ]);
         }
     }
     public function saleList(){
-      $sales     =   SaleInvoice::selectRaw('sale_invoices.* ,(SELECT customer_name FROM customers WHERE id=sale_invoices.customer_id) as customer_name')
+      $sales     =   SaleInvoice::selectRaw('sale_invoices.* ,
+                                        (SELECT dr FROM customer_ledger WHERE sale_invoice_id = sale_invoices.id) as paid_amount,
+                                        (SELECT customer_name FROM customers WHERE id=sale_invoices.customer_id) as customer_name')
                                     ->whereIn('sale_invoices.id', function ($query) {
                                         $query->selectRaw('MAX(id)')
                                             ->from('sale_invoices')
@@ -170,12 +177,31 @@ class SaleController extends Controller
     }
     public function editSale($id){
         $customers         =     Customer::where('customer_type',2)->select('id','customer_name','balance')->get();
-        $products          =     Product::where('stock','>',0)->get();
+        $products          =     Product::where('stock_balance','>',0)->get();
         $invoice           =     SaleInvoice::where('id',$id)->first();
-        $purchasd_products =     ProductSaleInvoice::where('sale_invoice_id',$id)
-                                 ->selectRaw('
-                                 products_sales.*')
+        $purchasd_products =     ProductSale::where('sale_invoice_id',$id)
+                                 ->selectRaw('products_sales.*')
                                  ->get();
-        return view('sales.edit',compact('invoice','customers','products','customers'));
+        return view('sales.add',compact('invoice','customers','products','customers'));
+    }
+    public function printInvoice(Request $request){
+        $invoiceId = $request->input('invoice_id');
+        $customerId = $request->input('customer_id');
+    
+        $invoice = SaleInvoice::where('id',$invoiceId)->where('customer_id',$customerId)
+                         ->selectRaw('sale_invoices.*,(SELECT customer_name FROM customers WHERE id ='.$customerId.') as customer_name')->first(); 
+    
+        return view('sales.invoice', compact('invoice'));
+    }
+    public function getSaleProduct($id){
+        $products   =   ProductSale::where('sale_invoice_id',$id)
+                                    ->selectRaw('products_sales.*, (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name')->get();
+                                   
+        return response()->json([
+            'msg'       => 'Sale Product Fetched',
+            'status'    => 'success',
+            'products'  => $products
+        ]);
+
     }
 }

@@ -8,7 +8,7 @@
 
     <!-- Brand -->
     <a class="navbar-brand" href="{{route('home')}}">
-      <img src="{{asset('assets/images/logo.svg')}}" class="navbar-brand-img mx-auto" alt="...">
+      <img src="{{asset('images/Shama-logo.png')}}" class="navbar-brand-img mx-auto" alt="..." style="height: 35px;">
     </a>
 
     <!-- User (xs) -->
@@ -39,7 +39,7 @@
       <!-- Navigation -->
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link " href="https://dashkit.goodthemes.co/widgets.html">
+          <a class="nav-link " href="{{route('home')}}">
           <i class="fa fa-home" aria-hidden="true"></i> Dashboard
           </a>
         </li>

@@ -401,6 +401,8 @@
             <div class="col-12">
               <div class="header pt-0">
                 <h2>Purchase <span>Definition</span></h2>
+              <a href="{{route('purchases')}}" type="submit" class="btn btn-primary mr-2" id="cancel" style="    margin-top: -10px;float: right;">Purchases</a>
+
               </div>
             </div>
           </div>
