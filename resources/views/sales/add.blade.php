@@ -691,7 +691,7 @@
 
                 <div class="col-md-12 text-right pr-0 PT-10" id="btns_div">
                   <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
-                  <a href="/intake-forms" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                  <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                 </div>
 
               </div>

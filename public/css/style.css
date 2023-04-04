@@ -348,7 +348,7 @@ footer.sticky-footer .copyright {
 	background: linear-gradient(90deg, #152e4d 0%, #152e4d 100%);
 }
 .btn-primary:HOVER, .btn-primary:focus, .lgray-btn:HOVER, .btn-outline:HOVER {
-	color: #152e4d;
+	color: #ffffff;
 	border: solid 1px #152e4d !important;
 	background: linear-gradient(90deg, #152e4d 0%, #152e4d 100%);
 }

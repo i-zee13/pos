@@ -618,14 +618,18 @@
                           </tbody>
                           <tfoot class="table-footer">
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;">Previous payable</th>
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Previous payable</th>
                               <th class="previous_payable" colspan="4" style="text-align: center;">0
                                 <!-- <input type="text" value="" class="qty-input add-stock-input previous_payable" name="previous_payable"> -->
                               </th>
                             </tr>
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;">Grand Total</th>
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Grand Total</th>
                               <th class="grand-total" colspan="4" style="text-align: center;">0</th>
+                            </tr>
+                            <tr rowspan="5">
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Paid</th>
+                              <th class="paid_amount" colspan="4" style="text-align: center;">0</th>
                             </tr>
                             <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Disscount </th>
@@ -635,9 +639,9 @@
                             </tr>
 
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;">Amount pay</th>
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Amount pay</th>
                               <th class="" colspan="4" style="text-align: center;">
-                                <input type="text" value="" class="qty-input add-stock-input" name="amount_paid">
+                                <input type="text" value="" class="qty-input add-stock-input remaning_amount" name="amount_paid">
                               </th>
                             </tr>
                           </tfoot>

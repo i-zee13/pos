@@ -509,7 +509,7 @@ function getvendors() {
         }
     })
 }
-$('.customer_id').change(function () {
+$('#customer_id').change(function () {
     // $('.current_balance').text('0').trigger('change');
     var selected_index = $(this).val();
     if(selected_index > 0){

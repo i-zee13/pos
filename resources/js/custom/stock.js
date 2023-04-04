@@ -446,6 +446,8 @@ $('.customer_id').change(function () {
             var previous_payable_text = previous_payable > 0 ? previous_payable + " DR" : previous_payable < 0  ? (-previous_payable) + " CR" : previous_payable;
             $('.previous_payable').text(previous_payable_text);
             $('.previous_payable').val(previous_payable);
+            $('.paid_amount').text(vendor_ledger['dr']);
+            $('.remaning_amount').val(vendor_ledger['balance'])
             grandSum(previous_payable)
             $('.display').css('display','');
         }
