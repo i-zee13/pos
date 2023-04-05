@@ -441,6 +441,8 @@
   @csrf
   <input type="hidden" id="invoice_id" class="form-control " value="{{@$invoice->id}}" name="invoice_id">
   <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
+  <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode($get_customer_ledger)}}">
+
 
   <div class="row">
     <div class="col-md-12">
@@ -650,38 +652,39 @@
                           </tbody>
                           <tfoot class="table-footer">
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;">Previous Payable</th>
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Previous Payable</th>
                               <th class="previous_payable" colspan="4" style="text-align: center;">0
                                 <!-- <input type="text" value="" class="qty-input add-stock-input previous_payable" name="previous_payable"> -->
                               </th>
                             </tr>
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;">Grand Total</th>
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Grand Total</th>
                               <th class="grand-total" colspan="4" style="text-align: center;">0</th>
                             </tr>
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;">Disscount </th>
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Paid</th>
+                              <th class="paid_amount" colspan="4" style="text-align: center;">0</th>
+                            </tr>
+                            <tr rowspan="5">
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input" data-id="" data-value="">
                               </th>
                             </tr><tr rowspan="5">
-                              <th colspan="3" style="text-align:right;">Service charges </th>
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Service charges </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input service_charges_input" data-id="" data-value="">
                               </th>
                             </tr>
-
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;">Amount pay</th>
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Amount pay</th>
                               <th class="" colspan="4" style="text-align: center;">
-                                <input type="text" value="" class="qty-input add-stock-input amount_pay_input" name="amount_paid">
+                                <input type="text" value="" class="qty-input add-stock-input amount_pay_input remaning_amount" name="amount_paid">
                               </th>
                             </tr>
                           </tfoot>
                         </table>
                       </div>
-
-
                     </div>
                   </div>
                 </div>

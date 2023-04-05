@@ -292,7 +292,7 @@ class StockController extends Controller
                         ->where('product_id',$request->product_id)
                         ->where('status',1)->orderBy('id', 'DESC')->first();
             if($prod){
-                    $out_stock              =   new VendorStock();
+                    $out_stock              = new VendorStock();
                     $out_stock->vendor_id   = $prod->vendor_id;
                     $out_stock->product_id  = $prod->product_id;
                     $out_stock->date        = $prod->created_at;

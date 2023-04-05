@@ -36,7 +36,7 @@ Route::post('/product-delete/{id}',[App\Http\Controllers\ProductController::clas
 Route::get('/stock-add'                 ,[App\Http\Controllers\StockController::class, 'create'])->name('stock-add');
 Route::get('/get-vendors'               ,[App\Http\Controllers\StockController::class, 'getVendors'])->name('get-vendors');
 // Route::post('/get-product'           ,[App\Http\Controllers\StockController::class, 'getProduct'])->name('get-product');
-Route::get('/get-customer-balance/{id}' ,[App\Http\Controllers\StockController::class, 'getVendorBalance'])->name('get-customer-balance');
+Route::get('/get-vendor-balance/{id}' ,[App\Http\Controllers\StockController::class, 'getVendorBalance'])->name('get-vendor-balance');
 /** Purchase Routes */
 Route::post('/add-purchase-invoice'     ,[App\Http\Controllers\StockController::class, 'purchaseInvoice'])->name('add-purchase-invoice');
 Route::get('/purchases'                 ,[App\Http\Controllers\StockController::class, 'purchaseList'])->name('purchases');
@@ -55,6 +55,8 @@ Route::post('/add-sale-invoice'     ,[App\Http\Controllers\SaleController::class
 Route::get('/sales'                 ,[App\Http\Controllers\SaleController::class, 'saleList'])->name('sales');
 Route::get('/sale-edit/{id}'        ,[App\Http\Controllers\SaleController::class, 'editsale'])->name('sale-edit');
 Route::get('/get-sale-products/{id}',[App\Http\Controllers\SaleController::class, 'getSaleProduct'])->name('get-sale-products');
+Route::get('/get-customer-balance/{id}' ,[App\Http\Controllers\SaleController::class, 'getCustomerBalance'])->name('get-customer-balance');
+
 //Genrate invoice
 Route::get('/invoice'               ,[App\Http\Controllers\SaleController::class, 'printInvoice'])->name('print-invoice');
 

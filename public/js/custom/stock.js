@@ -182,9 +182,6 @@ $('.close').on('click', function () {
   $(".add-more-btn").removeClass("save_client");
   $('.add-more-btn').text('Add More');
   $('.new_form_field').val('');
-  $('#new_marital_status').val(0).trigger('change');
-  $('#new_employment_status').val(0).trigger('change');
-  $('#new_residence_status').val(0).trigger('change');
 });
 $(document).on('click', '.remove_btn', function () {
   var _this = this;
@@ -489,7 +486,7 @@ $('.customer_id').change(function () {
   var selected_index = $(this).val();
   if (selected_index > 0) {
     $.ajax({
-      url: '/get-customer-balance/' + selected_index,
+      url: '/get-vendor-balance/' + selected_index,
       type: 'get',
       data: {
         segment: segment

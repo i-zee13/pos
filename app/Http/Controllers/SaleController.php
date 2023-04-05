@@ -34,6 +34,7 @@ class SaleController extends Controller
         ]);
     }
     Public function saleInvoice(Request $request){
+        dd($request->all());
         if($request->hidden_invoice_id){
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             $invoice = SaleInvoice::where('id',$request->hidden_invoice_id)->first();
@@ -182,7 +183,9 @@ class SaleController extends Controller
         $purchasd_products =     ProductSale::where('sale_invoice_id',$id)
                                  ->selectRaw('products_sales.*')
                                  ->get();
-        return view('sales.add',compact('invoice','customers','products','customers'));
+        $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)->orderBy('id', 'DESC')->first();
+
+        return view('sales.add',compact('invoice','customers','products','customers','get_customer_ledger'));
     }
     public function printInvoice(Request $request){
         $invoiceId = $request->input('invoice_id');
@@ -195,13 +198,34 @@ class SaleController extends Controller
     }
     public function getSaleProduct($id){
         $products   =   ProductSale::where('sale_invoice_id',$id)
-                                    ->selectRaw('products_sales.*, (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name')->get();
-                                   
+                                    ->selectRaw('products_sales.*,
+                                     (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name,
+                                     (SELECT stock_balance FROM products WHERE id=products_sales.product_id) as stock_in_hand')->get();
         return response()->json([
             'msg'       => 'Sale Product Fetched',
             'status'    => 'success',
             'products'  => $products
         ]);
 
+    }
+    public function getCustomerBalance(Request $request,$id){
+        if($request->segment == 'sale-edit'){
+            $customer_count     =  CustomerLedger::where('customer_id',$id)->count();
+           if($customer_count > 1){
+               $customer_balance = CustomerLedger::where('customer_id',$id)->where('customer_type',2)
+                                                ->where('created_at','!=',Carbon::today()->toDateString())
+                                                ->orderBy('id', 'DESC')->value('balance');
+           }else{
+                $customer_balance = 0;
+           }
+        }else{
+            // $customer_balance = VendorLedger::where('customer_id',$id)->where('created_at','!=',Carbon::today()->toDateString())->orderBy('id', 'DESC')->value('balance');
+            $customer_balance = Customer::where('id',$id)->value('balance');
+        }
+         return response()->json([
+            'msg'       =>  'Vendor fetched',
+            'status'    =>  'success',
+            'customer_balance'  => $customer_balance
+        ]);
     }
 }

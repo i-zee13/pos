@@ -1,3 +1,4 @@
+import { update } from 'lodash';
 import swal from 'sweetalert';
 
 var segments = location.href.split('/');
@@ -23,9 +24,12 @@ let retail_price  = '';
 var p_price = '';
 let stock_in_hand = '';
 let stock_products = '' ;
+let customer_ledger = '' ;
+
 
 $(document).ready(function () {
     stock_products  = JSON.parse($('#stock_products').val());
+    customer_ledger   = JSON.parse($('#customer_ledger').val());
        
     getProducts();
     if (segments[3] == "stock-add") {
@@ -42,16 +46,16 @@ $(document).ready(function () {
                 response.products.forEach(function (product) {
                     p_name = product.product_name;
                     sales_product_array.push({
-                        'product_id' : `${product.product_id}`,
-                        'expiry_date': `${product.expiry_date}`,
-                        'qty'        : `${product.qty}`,
-                        'amount'     : `${product.sale_total_amount_amount}`,
-                        'old_price'  : `${product.purchase_price}`,
-                        'new_price'  : ``,
-                        'p_name'     : `${product.product_name}`,
-                        'sale_invoice_id'     : `${product.sale_invoice_id  }`,
-                       
-                    }); 
+                        'product_id'         : `${product.product_id}`,
+                        'expiry_date'        : `${product.expiry_date}`,
+                        'qty'                : `${product.qty}`,
+                        'amount'             : `${product.sale_total_amount}`,
+                        'retail_price'       : `${product.sale_price}`,
+                        'stock_in_hand'      :  `${product.stock_in_hand}`,
+                        'purchased_price'    :  '',
+                        'p_name'             : `${product.product_name}`,
+                        'sale_invoice_id'    : `${product.sale_invoice_id}`,
+                    });
                 $('.products').children(`option[value="${product.product_id}"]`).attr('disabled', true);
                 })
                 $(".products").val('0');
@@ -66,10 +70,12 @@ $(document).ready(function () {
                         <tr id='tr-${product.product_id}'>
                             <td>${key+1}</td>
                             <td>${product.p_name}</td>
-                            <td><input type="text" value="${product.qty}"  class="qty-input add-stock-input" data-id="${product.product_id}" data-value="${amount}"></td>
+                            <td><input type="number" value="${product.qty}"  class="qty-input add-stock-input td-input-qty${product.product_id}" data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"></td>
+                            <td><input type="number" value="${product.retail_price}"  class="price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"></td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount}</td>
                             <td><a type="button" id="${product.product_id}" data-id="${product.sale_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</a></td>
-                        </tr>`);
+                        </tr>
+                        `);
                 })
             }
         })
@@ -79,7 +85,69 @@ $(document).ready(function () {
     $('.new_form_field').addClass('required_client');
     $('#client_type').attr('disabled', true);
 })
+$('#add-product').on('click', function () {
+    if ($('#qty').val() == '') {
+        $(this).focus();
+        $('#qty').css('border-color', 'red');
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Please Add Qty for Product');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    } else {
+        $('#qty').css('border-color', ''); // Reset the border color
+    }
+    if ($('.expiry_date').val() == '') {
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Please Add Expiry Date of Product');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    } else {
+        expiry_date = $('.expiry_date').val();
+    }
+    sales_product_array.push({
+        'product_id'    : `${product_id}`,
+        'expiry_date'   : `${expiry_date}`,
+        'qty'           : `${qty}`,
+        'amount'        : `${amount}`,
+        'retail_price'  : `${retail_price}`,
+        'stock_in_hand' :  stock_in_hand,
+        'purchased_price' :  purchased_price,
 
+    });
+    $('.products').children('option[value="' + product_id + '"]').attr('disabled', true);
+    $(".products").val('0');
+    $(".products").select2();
+    $('.show_existing_div').show()
+    let rowCount = $('#designationsTable tbody tr').length + 1;
+    $('#designationsTable tbody').append(`
+            <tr id='tr-${product_id}'>
+                <td>${rowCount}</td>
+                <td>${p_name}</td>
+                <td><input type="number" value="${qty}"  class="qty-input add-stock-input td-input-qty${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
+                <td><input type="number" value="${retail_price}"  class="price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
+                <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
+                <td><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</button></td>
+                </tr>`
+                );
+    grandSum(previous_payable);
+    $('#purchase_price').val('');
+    $('#qty').val('');
+    $('#amount').val('');
+    $('#bar-code').val('');
+    $('.products').val(0).trigger('change');
+    $('#new_purchase_price').val('');
+    $('#retail_price').val('');
+
+    // $('.new_dob').val('')
+    p_name = '';
+    // $('#purchse-form')[0].reset();
+})
 $('#datepicker , #datepicker2').datepicker({
     autoclose: true,
     todayHighlight: true,
@@ -163,69 +231,7 @@ $(document).on('click', '.remove_btn', function () {
     }
    
 })
-$('#add-product').on('click', function () {
-    if ($('#qty').val() == '') {
-        $(this).focus();
-        $('#qty').css('border-color', 'red');
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Please Add Qty for Product');
-        setTimeout(() => {
-            $('#notifDiv').fadeOut();
-        }, 3000);
-        return;
-    } else {
-        $('#qty').css('border-color', ''); // Reset the border color
-    }
-    if ($('.expiry_date').val() == '') {
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Please Add Expiry Date of Product');
-        setTimeout(() => {
-            $('#notifDiv').fadeOut();
-        }, 3000);
-        return;
-    } else {
-        expiry_date = $('.expiry_date').val();
-    }
-    sales_product_array.push({
-        'product_id'    : `${product_id}`,
-        'expiry_date'   : `${expiry_date}`,
-        'qty'           : `${qty}`,
-        'amount'        : `${amount}`,
-        'retail_price'  : `${retail_price}`,
-        'stock_in_hand' :  stock_in_hand,
-        'purchased_price' :  purchased_price,
 
-    });
-    $('.products').children('option[value="' + product_id + '"]').attr('disabled', true);
-    $(".products").val('0');
-    $(".products").select2();
-    $('.show_existing_div').show()
-    let rowCount = $('#designationsTable tbody tr').length + 1;
-    $('#designationsTable tbody').append(`
-            <tr id='tr-${product_id}'>
-                <td>${rowCount}</td>
-                <td>${p_name}</td>
-                <td><input type="number" value="${qty}"  class="qty-input add-stock-input td-input-qty${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
-                <td><input type="number" value="${retail_price}"  class="price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
-                <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
-                <td><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</button></td>
-                </tr>`
-                );
-    grandSum(previous_payable);
-    $('#purchase_price').val('');
-    $('#qty').val('');
-    $('#amount').val('');
-    $('#bar-code').val('');
-    $('.products').val(0).trigger('change');
-    $('#new_purchase_price').val('');
-    $('#retail_price').val('');
-
-    // $('.new_dob').val('')
-    p_name = '';
-    // $('#purchse-form')[0].reset();
-})
 $('.products').change(function () {
     var selected_product = $(this).val();
     $('#purchase_price').val('');
@@ -417,7 +423,7 @@ $('.save_status').on('click',function(){
         }
     })
 });
-$(document).on('input', '.qty-input', function () {
+$(document).on('keyup', '.qty-input', function () {
     var update_qty         = $(this).val();
     var current_product_id = $(this).attr('data-id');
     var current_product_qty = '';
@@ -425,6 +431,9 @@ $(document).on('input', '.qty-input', function () {
     var current_product_price = 0;
     var new_amount_of_purchase_product = 0;
   
+    console.log(update_qty)
+   
+
     if(update_qty < 0){
         $(this).val('')
         $(this).css('border-color', 'red');
@@ -439,13 +448,17 @@ $(document).on('input', '.qty-input', function () {
     }
     $(`.purchase-product-amount${current_product_id}`).empty();
     sales_product_array.filter(function (data) {
+        
         if (data.product_id      == current_product_id) {
             p_price               = data.retail_price
             data.qty              = update_qty;
             current_product_qty   = data.stock_in_hand;
             current_product_price = p_price;
-            if(update_qty > current_product_qty){
-                $(`.td-input-qty${current_product_id}`).val('')
+            
+            console.log(current_product_qty)
+            if(parseInt(update_qty) > parseInt(current_product_qty)){
+                // update_qty      = update_qty.replace(update_qty, current_product_qty)
+                $(`.td-input-qty${current_product_id}`).val(current_product_qty)
                 $(`.td-input-qty${current_product_id}`).css('border-color', 'red');
                 $(`.td-input-qty${current_product_id}`).focus();
                 $('#notifDiv').fadeIn();
@@ -520,10 +533,12 @@ $('#customer_id').change(function () {
             segment:segment
          },
         success : function(response){
-            previous_payable = response.customer_balance;
+            previous_payable          = response.customer_balance;
             var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0  ? (-previous_payable) + " DR" : previous_payable;
             $('.previous_payable').text(previous_payable_text);
             $('.previous_payable').val(previous_payable);
+             $('.paid_amount').text(customer_ledger['dr']);
+            $('.remaning_amount').val(customer_ledger['balance'])
             grandSum(previous_payable)
             $('.display').css('display','');
         }
