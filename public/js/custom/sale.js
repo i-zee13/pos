@@ -17353,6 +17353,7 @@ var p_price = '';
 var stock_in_hand = '';
 var stock_products = '';
 var customer_ledger = '';
+var existing_product_ids = [];
 $(document).ready(function () {
   stock_products = JSON.parse($('#stock_products').val());
   customer_ledger = JSON.parse($('#customer_ledger').val());
@@ -17361,13 +17362,14 @@ $(document).ready(function () {
     //
   } else if (segments[3] == 'sale-edit') {
     customer_id = $('#curren_customer_id').val();
-    var invoice_id = $('#invoice_id').val();
+    var invoice_id = $('#hidden_invoice_id').val();
     segment = segments[3];
     $.ajax({
       url: '/get-sale-products/' + invoice_id,
       type: 'get',
       success: function success(response) {
         response.products.forEach(function (product) {
+          existing_product_ids.push(product.id);
           p_name = product.product_name;
           sales_product_array.push({
             'product_id': "".concat(product.product_id),
@@ -17376,7 +17378,7 @@ $(document).ready(function () {
             'amount': "".concat(product.sale_total_amount),
             'retail_price': "".concat(product.sale_price),
             'stock_in_hand': "".concat(product.stock_in_hand),
-            'purchased_price': '',
+            'purchased_price': "".concat(product.purchase_price),
             'p_name': "".concat(product.product_name),
             'sale_invoice_id': "".concat(product.sale_invoice_id)
           });
@@ -17682,7 +17684,8 @@ $('.save_status').on('click', function () {
       'grand_total': grand_total,
       'sale_total_amount': sale_total_amount,
       'status': status,
-      'sales_product_array': sales_product_array
+      'sales_product_array': sales_product_array,
+      'existing_product_ids': existing_product_ids
     },
     success: function success(response) {
       $('#save').removeAttr('disabled');
@@ -17829,8 +17832,10 @@ $('#customer_id').change(function () {
         var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0 ? -previous_payable + " DR" : previous_payable;
         $('.previous_payable').text(previous_payable_text);
         $('.previous_payable').val(previous_payable);
-        $('.paid_amount').text(customer_ledger['dr']);
-        $('.remaning_amount').val(customer_ledger['balance']);
+        if (segments[3] == "sale-edit") {
+          $('.paid_amount').text(customer_ledger['dr']);
+          $('.remaning_amount').val(customer_ledger['balance']);
+        }
         grandSum(previous_payable);
         $('.display').css('display', '');
       }

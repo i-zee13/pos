@@ -439,9 +439,9 @@
 
 <form id="form" enctype="multipart/form-data" class="">
   @csrf
-  <input type="hidden" id="invoice_id" class="form-control " value="{{@$invoice->id}}" name="invoice_id">
+  <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
   <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
-  <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode($get_customer_ledger)}}">
+  <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
 
 
   <div class="row">
@@ -661,10 +661,14 @@
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Grand Total</th>
                               <th class="grand-total" colspan="4" style="text-align: center;">0</th>
                             </tr>
-                            <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Paid</th>
-                              <th class="paid_amount" colspan="4" style="text-align: center;">0</th>
-                            </tr>
+
+                            @if (Route::currentRouteName() == 'sale-edit')
+                              <tr rowspan="5">
+                                  <th colspan="3" style="text-align:right;font-family:sans-serif">Paid</th>
+                                  <th class="paid_amount" colspan="4" style="text-align: center;">0</th>
+                              </tr>
+                          @endif
+
                             <tr rowspan="5">
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">

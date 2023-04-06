@@ -34,7 +34,6 @@ class SaleController extends Controller
         ]);
     }
     Public function saleInvoice(Request $request){
-        dd($request->all());
         if($request->hidden_invoice_id){
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             $invoice = SaleInvoice::where('id',$request->hidden_invoice_id)->first();
@@ -50,9 +49,13 @@ class SaleController extends Controller
         $invoice->created_by           = Auth::id();
         if($invoice->save()){
             if(count($request->sales_product_array) > 0){
-                foreach($request->sales_product_array as $sale_product){
-                    // dd($sale_product['new_price']);
-                    $sale                      = new ProductSale();
+                $ids = $request->existing_product_ids;
+                foreach($request->sales_product_array as $key=>$sale_product){
+                    if($ids){
+                        $sale          =  ProductSale::where('id', $ids[$key])->first();
+                    }else{
+                        $sale          =  new ProductSale();
+                    }
                     $sale->sale_price          = $sale_product['retail_price'];
                     $sale->sale_invoice_id     = $invoice->id;
                     $sale->product_id          = $sale_product['product_id'];
@@ -62,7 +65,7 @@ class SaleController extends Controller
                     if($sale->save()){
                         $sale_products_array[] = $sale->product_id;
                         $check_stock           =  VendorStock::where('product_id',$sale->product_id)->orderBy('id', 'DESC')->first();
-                        $vendor_id             =    $check_stock->vendor_id;
+                        $vendor_id             =  $check_stock->vendor_id;
                         if($check_stock){
                             $balance           =  $check_stock->balance; 
                         } 
@@ -200,6 +203,7 @@ class SaleController extends Controller
         $products   =   ProductSale::where('sale_invoice_id',$id)
                                     ->selectRaw('products_sales.*,
                                      (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name,
+                                     (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=products_sales.product_id) as purchase_price,
                                      (SELECT stock_balance FROM products WHERE id=products_sales.product_id) as stock_in_hand')->get();
         return response()->json([
             'msg'       => 'Sale Product Fetched',
@@ -212,8 +216,8 @@ class SaleController extends Controller
         if($request->segment == 'sale-edit'){
             $customer_count     =  CustomerLedger::where('customer_id',$id)->count();
            if($customer_count > 1){
-               $customer_balance = CustomerLedger::where('customer_id',$id)->where('customer_type',2)
-                                                ->where('created_at','!=',Carbon::today()->toDateString())
+               $customer_balance = CustomerLedger::where('customer_id',$id)
+                                                ->whereDate('created_at','!=',Carbon::today()->toDateString())
                                                 ->orderBy('id', 'DESC')->value('balance');
            }else{
                 $customer_balance = 0;

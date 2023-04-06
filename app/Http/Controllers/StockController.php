@@ -25,7 +25,6 @@ class StockController extends Controller
         $products     =    Product::all();
         return view('purchases.add',compact('customers','current_date','invoice_no','products'));
     }
-    
     public function getProduct(Request $request)
     {
         if($request->get_result_for == 1){
@@ -49,7 +48,7 @@ class StockController extends Controller
                 'products'  =>   $products
             ]);
     }
-     Public function purchaseInvoice(Request $request){
+     Public function purchaseInvoice(Request $request){dd($request->all());
         if($request->hidden_invoice_id){
             ProductPurchase::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
@@ -286,7 +285,6 @@ class StockController extends Controller
             'customer_balance'  => $customer_balance
         ]);
     }
- 
     public function deleteProduct(Request $request){
           $prod = VendorStock::where('purchase_invoice_id',$request->purchase_invoice_id)
                         ->where('product_id',$request->product_id)

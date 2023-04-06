@@ -25,25 +25,27 @@ var p_price = '';
 let stock_in_hand = '';
 let stock_products = '' ;
 let customer_ledger = '' ;
+let existing_product_ids = [] ;
+
 
 
 $(document).ready(function () {
-    stock_products  = JSON.parse($('#stock_products').val());
+    stock_products    = JSON.parse($('#stock_products').val());
     customer_ledger   = JSON.parse($('#customer_ledger').val());
-       
     getProducts();
     if (segments[3] == "stock-add") {
         //
         
     } else if (segments[3] == 'sale-edit') {
         customer_id    = $('#curren_customer_id').val(); 
-        var invoice_id = $('#invoice_id').val(); 
+        var invoice_id = $('#hidden_invoice_id').val(); 
         segment = segments[3];
         $.ajax({
             url: '/get-sale-products/' + invoice_id,
             type: 'get',
             success: function (response) {
                 response.products.forEach(function (product) {
+                    existing_product_ids.push(product.id);
                     p_name = product.product_name;
                     sales_product_array.push({
                         'product_id'         : `${product.product_id}`,
@@ -51,8 +53,8 @@ $(document).ready(function () {
                         'qty'                : `${product.qty}`,
                         'amount'             : `${product.sale_total_amount}`,
                         'retail_price'       : `${product.sale_price}`,
-                        'stock_in_hand'      :  `${product.stock_in_hand}`,
-                        'purchased_price'    :  '',
+                        'stock_in_hand'      : `${product.stock_in_hand}`,
+                        'purchased_price'    : `${product.purchase_price}`,
                         'p_name'             : `${product.product_name}`,
                         'sale_invoice_id'    : `${product.sale_invoice_id}`,
                     });
@@ -381,6 +383,7 @@ $('.save_status').on('click',function(){
                 'sale_total_amount'  :  sale_total_amount,
                 'status'             :  status,
                 'sales_product_array':  sales_product_array,
+                'existing_product_ids':existing_product_ids
             },
         success: function (response) {
             $('#save').removeAttr('disabled'); 
@@ -537,8 +540,11 @@ $('#customer_id').change(function () {
             var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0  ? (-previous_payable) + " DR" : previous_payable;
             $('.previous_payable').text(previous_payable_text);
             $('.previous_payable').val(previous_payable);
-             $('.paid_amount').text(customer_ledger['dr']);
-            $('.remaning_amount').val(customer_ledger['balance'])
+             if (segments[3] == "sale-edit") {
+                $('.paid_amount').text(customer_ledger['dr']);
+                $('.remaning_amount').val(customer_ledger['balance'])                
+            }
+            
             grandSum(previous_payable)
             $('.display').css('display','');
         }
