@@ -50,11 +50,14 @@ class SaleController extends Controller
         if($invoice->save()){
             if(count($request->sales_product_array) > 0){
                 $ids = $request->existing_product_ids;
+                
                 foreach($request->sales_product_array as $key=>$sale_product){
                     if($ids){
                         $sale          =  ProductSale::where('id', $ids[$key])->first();
                     }else{
                         $sale          =  new ProductSale();
+
+                        
                     }
                     $sale->sale_price          = $sale_product['retail_price'];
                     $sale->sale_invoice_id     = $invoice->id;
