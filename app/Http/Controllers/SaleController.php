@@ -55,6 +55,7 @@ class SaleController extends Controller
                     if($ids){
                         $sale          =  ProductSale::where('id', $ids[$key])->first();
                     }else{
+                        
                         $sale          =  new ProductSale();
 
                         
