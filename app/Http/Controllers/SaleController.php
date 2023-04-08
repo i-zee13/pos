@@ -54,11 +54,8 @@ class SaleController extends Controller
                 foreach($request->sales_product_array as $key=>$sale_product){
                     if($ids){
                         $sale          =  ProductSale::where('id', $ids[$key])->first();
-                    }else{
-                        
-                        $sale          =  new ProductSale();
-
-                        
+                    }else{                        
+                        $sale          =  new ProductSale();                        
                     }
                     $sale->sale_price          = $sale_product['retail_price'];
                     $sale->sale_invoice_id     = $invoice->id;
@@ -145,10 +142,10 @@ class SaleController extends Controller
                 }else{
                     $customer_ledger   =   new  CustomerLedger();
                 }
-                $customer_ledger->cr          = $invoice->total_invoice_amount;
+                $customer_ledger->cr          = $request->amount_paid;
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
-                $customer_ledger->dr          = $request->amount_paid;
+                $customer_ledger->dr          = $invoice->total_invoice_amount;
                 $customer_ledger->balance     = ($invoice->total_invoice_amount-$request->amount_paid); //balance
                 $customer_ledger->created_by  = Auth::id();
                 $customer_ledger->sale_invoice_id= $invoice->id;
@@ -169,7 +166,7 @@ class SaleController extends Controller
     }
     public function saleList(){
       $sales     =   SaleInvoice::selectRaw('sale_invoices.* ,
-                                        (SELECT dr FROM customer_ledger WHERE sale_invoice_id = sale_invoices.id) as paid_amount,
+                                        (SELECT cr FROM customer_ledger WHERE sale_invoice_id = sale_invoices.id) as paid_amount,
                                         (SELECT customer_name FROM customers WHERE id=sale_invoices.customer_id) as customer_name')
                                     ->whereIn('sale_invoices.id', function ($query) {
                                         $query->selectRaw('MAX(id)')

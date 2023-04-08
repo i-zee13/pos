@@ -53,7 +53,7 @@
 @endsection
 @section('content')
 <!-- HEADER -->
-<div class="header ">
+<div class="header">
     <!-- Body -->
     <div class="header-body">
         <div class="row  ">
@@ -83,7 +83,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div class="header mb-0">
+            <div class="header">
                 <a class="btn add_button openDataSidebarForAddingCompany"><i class="fa fa-plus"></i> New Company</a>
                 <h2>Companies</h2>
             </div>

@@ -28,7 +28,7 @@
           <a href="https://dashkit.goodthemes.co/profile-posts.html" class="dropdown-item">Profile</a>
           <a href="https://dashkit.goodthemes.co/account-general.html" class="dropdown-item">Settings</a>
           <hr class="dropdown-divider">
-          <a href="https://dashkit.goodthemes.co/sign-in.html" class="dropdown-item">Logout</a>
+          <a href="{{ route('logout') }}" class="dropdown-item">Logout</a>
         </div>
       </div>
 
@@ -142,7 +142,7 @@
           <div class="collapse " id="transactions">
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
-                <a href="{{route('sale-add')}}" class="nav-link ">
+                <a href="{{route('customer-ledger')}}" class="nav-link ">
                  Customers
                 </a>
               </li>
@@ -184,7 +184,8 @@
             <a href="https://dashkit.goodthemes.co/profile-posts.html" class="dropdown-item">Profile</a>
             <a href="https://dashkit.goodthemes.co/account-general.html" class="dropdown-item">Settings</a>
             <hr class="dropdown-divider">
-            <a href="https://dashkit.goodthemes.co/sign-in.html" class="dropdown-item">Logout</a>
+            <a href="{{ route('logout') }}" class="dropdown-item">Logout</a>
+
           </div>
 
         </div>

@@ -121,7 +121,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div class="header">
+            <div class="header mb-0">
                 <a class="btn add_button openDataSidebarForAddingProduct"><i class="fa fa-plus"></i> New  Product</a>
                 <h2>Product Areas</h2>
             </div>

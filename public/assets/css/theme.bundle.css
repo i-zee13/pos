@@ -18669,7 +18669,7 @@ button:focus {
 }
 
 .avatar:after {
-    background-image: url(../img/masks/avatar-status.svg), url(../img/masks/avatar-group.svg), url(../img/masks/avatar-group-hover.svg), url(../img/masks/avatar-group-hover-last.svg);
+    background-image: url(../images/avatar-status.svg), url(../images/avatar-group.svg), url(../images/avatar-group-hover.svg), url(../images/avatar-group-hover-last.svg);
     content: "";
     height: 0;
     position: absolute;
@@ -18707,8 +18707,8 @@ button:focus {
 
 .avatar-offline .avatar-img,
 .avatar-online .avatar-img {
-    /* -webkit-mask-image: url(../img/masks/avatar-status.svg); */
-    /* mask-image: url(../img/masks/avatar-status.svg); */
+    /* -webkit-mask-image: url(../images/avatar-status.svg); */
+    /* mask-image: url(../images/avatar-status.svg); */
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%
 }
@@ -18807,8 +18807,8 @@ button:focus {
 }
 
 .avatar-group .avatar:not(:last-child) {
-    -webkit-mask-image: url(../img/masks/avatar-group.svg);
-    mask-image: url(../img/masks/avatar-group.svg);
+    -webkit-mask-image: url(../images/avatar-group.svg);
+    mask-image: url(../images/avatar-group.svg);
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%
 }
@@ -18820,15 +18820,15 @@ button:focus {
 }
 
 .avatar-group .avatar:hover+.avatar {
-    -webkit-mask-image: url(../img/masks/avatar-group-hover.svg);
-    mask-image: url(../img/masks/avatar-group-hover.svg);
+    -webkit-mask-image: url(../images/avatar-group-hover.svg);
+    mask-image: url(../images/avatar-group-hover.svg);
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%
 }
 
 .avatar-group .avatar:hover+.avatar:last-child {
-    -webkit-mask-image: url(../img/masks/avatar-group-hover-last.svg);
-    mask-image: url(../img/masks/avatar-group-hover-last.svg)
+    -webkit-mask-image: url(../images/avatar-group-hover-last.svg);
+    mask-image: url(../images/avatar-group-hover-last.svg)
 }
 
 .chart {
@@ -19014,8 +19014,8 @@ button:focus {
 }
 
 .icon.active>.fe {
-    -webkit-mask-image: url(../img/masks/icon-status.svg);
-    mask-image: url(../img/masks/icon-status.svg);
+    -webkit-mask-image: url(../images/icon-status.svg);
+    mask-image: url(../images/icon-status.svg);
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%
 }

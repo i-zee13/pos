@@ -1,73 +1,142 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<!-- saved from url=(0048)https://dashkit.goodthemes.co/sign-up-cover.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://dashkit.goodthemes.co/assets/favicon/favicon.ico" type="image/x-icon">
+    
+    <!-- Map CSS -->
+    <link rel="stylesheet" href="{{asset('/assets/css/mapbox-gl.css')}}">
 
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
+    
+    <!-- Libs CSS -->
+    <link rel="stylesheet" href="{{asset('/assets/css/libs.bundle.css')}}">
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
+    
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="{{asset('/assets/css/theme.bundle.css')}}" id="stylesheetLight">
+    <link rel="stylesheet" href="{{asset('/assets/css/theme-dark.bundle.css')}}" id="stylesheetDark" disabled="">
+   
+    <style>body { display: none; }</style>
+    
+    <!-- Title -->
+    <title>POS</title>
+<body class="d-flex align-items-center bg-auth border-top border-top-2 border-primary" style="display: block;">
 
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+    <!-- CONTENT
+    ================================================== -->
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-5 col-lg-6 col-xl-4 px-lg-6 my-5 align-self-center">
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+          <!-- Heading -->
+          <img src="{{asset('images/Shama-logo.png')}}" class="navbar-brand-img mx-auto" alt="..." style="height: 35px;">
 
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+          <!-- Subheading -->
+          <p class="text-muted text-center mb-5">
+            Welcome to POS.
+          </p>
 
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
+          <!-- Form -->
+          <form method="POST" action="{{ route('login') }}">
+            @csrf
 
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+            <!-- Email address -->
+            <div class="form-group">
+
+              <!-- Label -->
+              <label class="form-label">
+                Email Address
+              </label>
+
+              <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+
+              @error('email')
+                  <span class="invalid-feedback" role="alert">
+                      <strong>{{ $message }}</strong>
+                  </span>
+              @enderror
+
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+
+            <div class="row">
+                <div class="col">
+
+                  <!-- Label -->
+                  <label class="form-label">
+                    Password
+                  </label>
+
+                </div>
+                <div class="col-auto">
+                  @if (Route::has('password.request'))
+                                <a  href="{{ route('password.request') }}" class="form-text small text-muted">
+                                    {{ __('Forgot Your Password?') }}
+                                </a>
+                            @endif
+                  </div>
+              </div>
+              <!-- Input group -->
+              <div class="input-group input-group-merge">
+
+                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
 
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
-                            </div>
-                        </div>
+                <!-- Icon -->
+                <span class="input-group-text">
+                  <i class="fe fe-eye"></i>
+                </span>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6 offset-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
-                                    <label class="form-check-label" for="remember">
-                                        {{ __('Remember Me') }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
-                                </button>
-
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </form>
-                </div>
+              </div>
             </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-lg w-100 btn-primary mb-3" fdprocessedid="nxu92">
+              {{ __('Login') }}
+          </button>
+            
+             <!-- Link -->
+             <div class="text-center">
+              <small class="text-muted text-center">
+              Don't have an account yet? <a href="{{ route('password.request') }}">Sign up</a>.
+              </small>
+            </div>
+
+          </form>
+
         </div>
+        <div class="col-12 col-md-7 col-lg-6 col-xl-8 d-none d-lg-block">
+
+          <!-- Image -->
+          <div class="bg-cover h-100 min-vh-100 mt-n1 me-n3" style="background-image: url(assets/images/auth-side-cover.jpg);"></div>
+
+        </div>
+      </div> <!-- / .row -->
     </div>
-</div>
-@endsection
+
+    <!-- JAVASCRIPT -->
+    <!-- Map JS -->
+    <script src="{{asset('/assets/js/mapbox-gl.js')}}"></script>
+
+    
+    <!-- Vendor JS -->
+    <script src="{{asset('/assets/js/vendor.bundle.js')}}"></script>
+
+    
+    <!-- Theme JS -->
+    <script src="{{asset('/assets/js/theme.bundle.js')}}"></script>
+
+
+  
+
+<div id="draggable-live-region" aria-relevant="additions" aria-atomic="true" aria-live="assertive" role="log" style="position: fixed; width: 1px; height: 1px; top: -1px; overflow: hidden;"></div></body></html>

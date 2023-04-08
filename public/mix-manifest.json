@@ -5,5 +5,6 @@
     "/js/custom/stock.js": "/js/custom/stock.js",
     "/js/custom/purchase_returns.js": "/js/custom/purchase_returns.js",
     "/js/custom/sale.js": "/js/custom/sale.js",
+    "/js/custom/transaction.js": "/js/custom/transaction.js",
     "/css/app.css": "/css/app.css"
 }

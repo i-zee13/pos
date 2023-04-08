@@ -36,7 +36,7 @@ Route::post('/product-delete/{id}',[App\Http\Controllers\ProductController::clas
 Route::get('/stock-add'                 ,[App\Http\Controllers\StockController::class, 'create'])->name('stock-add');
 Route::get('/get-vendors'               ,[App\Http\Controllers\StockController::class, 'getVendors'])->name('get-vendors');
 // Route::post('/get-product'           ,[App\Http\Controllers\StockController::class, 'getProduct'])->name('get-product');
-Route::get('/get-vendor-balance/{id}' ,[App\Http\Controllers\StockController::class, 'getVendorBalance'])->name('get-vendor-balance');
+Route::get('/get-vendor-balance/{id}'   ,[App\Http\Controllers\StockController::class, 'getVendorBalance'])->name('get-vendor-balance');
 /** Purchase Routes */
 Route::post('/add-purchase-invoice'     ,[App\Http\Controllers\StockController::class, 'purchaseInvoice'])->name('add-purchase-invoice');
 Route::get('/purchases'                 ,[App\Http\Controllers\StockController::class, 'purchaseList'])->name('purchases');
@@ -60,5 +60,9 @@ Route::get('/get-customer-balance/{id}' ,[App\Http\Controllers\SaleController::c
 //Genrate invoice
 Route::get('/invoice'               ,[App\Http\Controllers\SaleController::class, 'printInvoice'])->name('print-invoice');
 
+//Transactions
+Route::get('/customer-ledgers'          ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledger');
+Route::get('/get-customer-ledgers-list' ,[App\Http\Controllers\TransactionController::class, 'getCustomerLedgers'])->name('get-customer-ledger-list');
+Route::post('/transaction-store'        ,[App\Http\Controllers\TransactionController::class, 'store'])->name('transaction-store');
 
 });

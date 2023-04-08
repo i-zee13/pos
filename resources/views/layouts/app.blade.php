@@ -106,8 +106,9 @@
     <link rel="stylesheet" type="text/css" href="{{asset('/css/product.css?v=8.1')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('/css/jquery.mCustomScrollbar.css')}}" />
     <link rel="stylesheet" href="{{asset('/css/animate.css')}}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
     <!-- Title -->
-    <title>Dashkit</title>
+    <title>Store</title>
 </head>
 
 <body style="display: block;">
@@ -241,6 +242,15 @@
             $(".sticky-footer").addClass("blur-div");
             $(".overlay-for-sidebar").css("display", "block");
         }
+        $('#datepicker , #datepicker2').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            toggleActive: true,
+            format: dateFormat
+        })
+            .on('changeDate', function (ev) {
+                $(this).datepicker('hide');
+            });
     </script>
     <!-- Vendor JS -->
     <script src="{{asset('/assets/js/vendor.bundle.js')}}"></script>

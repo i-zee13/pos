@@ -48,7 +48,7 @@ class StockController extends Controller
                 'products'  =>   $products
             ]);
     }
-     Public function purchaseInvoice(Request $request){dd($request->all());
+     Public function purchaseInvoice(Request $request){
         if($request->hidden_invoice_id){
             ProductPurchase::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
@@ -232,16 +232,16 @@ class StockController extends Controller
     }
     public function purchaseList(){
         $purchases = PurchaseInvoice::selectRaw('purchase_invoices.*,
-                                    (SELECT dr FROM vendor_ledger WHERE purchase_invoice_id = purchase_invoices.id) as paid_amount,
-                                    (SELECT customer_name FROM customers WHERE id=purchase_invoices.customer_id) as customer_name')
-                                    ->whereIn('purchase_invoices.id', function ($query) {
-                                        $query->selectRaw('MAX(id)')
-                                            ->from('purchase_invoices')
-                                            ->whereDate('created_at', Carbon::today())
-                                            ->groupBy('customer_id');
-                                    })
-                                    ->orderBy('id', 'desc')
-                                    ->get();
+                        (SELECT dr FROM vendor_ledger WHERE purchase_invoice_id = purchase_invoices.id) as paid_amount,
+                        (SELECT customer_name FROM customers WHERE id=purchase_invoices.customer_id) as customer_name')
+                        ->whereIn('purchase_invoices.id', function ($query) {
+                            $query->selectRaw('MAX(id)')
+                                ->from('purchase_invoices')
+                                ->whereDate('created_at', Carbon::today())
+                                ->groupBy('customer_id');
+                        })
+                        ->orderBy('id', 'desc')
+                        ->get();
         return view('purchases.list',compact('purchases'));
     }
     public function editPurchase($id){
