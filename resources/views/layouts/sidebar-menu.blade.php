@@ -54,7 +54,7 @@
       <!-- Navigation -->
       <li class="nav-item">
         <a class="nav-link p-0 customer-class" href="{{route('customer.index')}}">
-        <i class="fa fa-users" aria-hidden="true"></i> Customer
+        <i class="fa fa-users mr-5" aria-hidden="true"></i> Customer
         </a>
       </li>
 
@@ -123,11 +123,11 @@
                   List
                 </a>
               </li>
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <a href="{{route('purchase-return')}}" class="nav-link ">
                   Sales Returns
                 </a>
-              </li>
+              </li> -->
             </ul>
           </div>
         </li>
@@ -142,12 +142,36 @@
           <div class="collapse " id="transactions">
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
-                <a href="{{route('customer-ledger')}}" class="nav-link ">
+                <a href="{{route('customer-ledgers')}}" class="nav-link ">
                  Customers
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('purchases')}}" class="nav-link ">
+                <a href="{{route('vendor-ledgers')}}" class="nav-link ">
+                  Vendors
+                </a>
+              </li>
+               
+            </ul>
+          </div>
+        </li>
+
+
+      </ul> 
+      <ul class="navbar-nav ">
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#transactions" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="transactions">
+          <i class="fa fa-bar-chart" aria-hidden="true"></i> Reporting
+          </a>
+          <div class="collapse " id="transactions">
+            <ul class="nav nav-sm flex-column">
+              <li class="nav-item">
+                <a href="{{route('customer-ledgers')}}" class="nav-link ">
+                 Customers
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('vendor-ledgers')}}" class="nav-link ">
                   Vendors
                 </a>
               </li>
@@ -184,7 +208,14 @@
             <a href="https://dashkit.goodthemes.co/profile-posts.html" class="dropdown-item">Profile</a>
             <a href="https://dashkit.goodthemes.co/account-general.html" class="dropdown-item">Settings</a>
             <hr class="dropdown-divider">
-            <a href="{{ route('logout') }}" class="dropdown-item">Logout</a>
+            <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                                        {{ __('Logout') }}
+              </a>
+              <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                  @csrf
+              </form>
 
           </div>
 

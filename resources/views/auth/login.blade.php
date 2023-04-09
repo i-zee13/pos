@@ -24,7 +24,7 @@
     
     <!-- Title -->
     <title>POS</title>
-<body class="d-flex align-items-center bg-auth border-top border-top-2 border-primary" style="display: block;">
+<body class="d-flex align-items-center bg-auth border-top border-top-2 border-primary" style="display: block; background:#152e4d !important; border-top:none !important">
 
     <!-- CONTENT
     ================================================== -->
@@ -33,7 +33,7 @@
         <div class="col-12 col-md-5 col-lg-6 col-xl-4 px-lg-6 my-5 align-self-center">
 
           <!-- Heading -->
-          <img src="{{asset('images/Shama-logo.png')}}" class="navbar-brand-img mx-auto" alt="..." style="height: 35px;">
+          <img src="{{asset('images/Shama-logo.png')}}" class="mb-3" alt="..." style="height: 45px;margin-left:85px;">
 
           <!-- Subheading -->
           <p class="text-muted text-center mb-5">
@@ -118,7 +118,7 @@
         <div class="col-12 col-md-7 col-lg-6 col-xl-8 d-none d-lg-block">
 
           <!-- Image -->
-          <div class="bg-cover h-100 min-vh-100 mt-n1 me-n3" style="background-image: url(assets/images/auth-side-cover.jpg);"></div>
+          <div class="bg-cover h-100 min-vh-100 mt-n1 me-n3" style="background-image: url(assets/images/auth-side-cover.avif); z-index = 1;opacity: 0.5;"></div>
 
         </div>
       </div> <!-- / .row -->

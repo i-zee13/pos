@@ -16,10 +16,11 @@
                                 <form style="display: flex;" id="saveTransactionForm">
                                     @csrf
                                     <input type="text" id="operation" hidden>
-                                    <input type="text" id="customer_id" hidden name="hidden_customer_id">
+                                    <input type="text" id="customer_id" hidden name="hidden_vendor_id">
                                     <input type="text" id="hidden_balance" hidden name="hidden_balance">
+
                                     <div id="floating-label" class="card p-20 top_border mb-3" style="width: 100%">
-                                        <h2 class="_head03 customer_name">Customer <span>Details</span></h2>
+                                        <h2 class="_head03 customer_name">Vendor <span>Details</span></h2>
                                         <div class="form-wrap p-0">
                                             <div class="row">
                                             <div class="col-md-6 PB-10">
@@ -31,7 +32,7 @@
                                                 </div>
                                                 <div class="col-md-6 PB-10">
                                                     <div class="form-group">
-                                                        <label class="control-label mb-10">Receivable Balance</label>
+                                                        <label class="control-label mb-10">Payable Balance</label>
                                                         <input type="text" name="balance" class="form-control" readonly>
                                                     </div>
                                                 </div>
@@ -61,13 +62,13 @@
                                                 <div class="row">
                                                     <div class="col-auto pl-0">
                                                         <div class="custom-control custom-radio">
-                                                            <input class="custom-control-input cr" type="radio" name="amount_to" id="cr" value="1" checked>
+                                                            <input class="custom-control-input cr" type="radio" name="amount_to" id="cr" value="1" >
                                                             <label class="custom-control-label font13" for="cr">Cr</label>
                                                         </div>
                                                     </div>
                                                     <div class="col">
                                                         <div class="custom-control custom-radio">
-                                                            <input class="custom-control-input dr" type="radio" name="amount_to" id="dr" value="0">
+                                                            <input class="custom-control-input dr" type="radio" name="amount_to" id="dr" value="0" checked>
                                                             <label class="custom-control-label font13" for="dr">Dr</label>
                                                         </div>
                                                     </div>
@@ -109,7 +110,7 @@
             </div>
             <div class="col-auto">
                 <ol class="breadcrumb">
-                    <li><a href="#"><span>Customers</span></a></li>
+                    <li><a href="#"><span>Vendors</span></a></li>
                     <li><span>Active</span></li>
                 </ol>
             </div>
@@ -123,7 +124,7 @@
         <div class="card">
             <div class="header mb-0">
                 <!-- <a class="btn add_button openDataSidebarForAddingProduct"><i class="fa fa-plus"></i> Add New</a> -->
-                <h2>Customer Areas</h2>
+                <h2>Vendors Areas</h2>
             </div>
             <div style="min-height: 400px" id="tblLoader">
                 <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">

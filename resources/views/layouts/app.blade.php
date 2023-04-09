@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="{{asset('/assets/css/libs.bundle.css')}}">
     <!-- SC-CSS -->
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,600,700,800" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{{asset('/css/bootstrap.min.css?v=1.0')}}">
+    <!-- <link rel="stylesheet" type="text/css" href="{{asset('/css/bootstrap.min.css?v=1.0')}}"> -->
     <link rel="stylesheet" type="text/css" href="{{asset('/css/datatables.min.css')}}" />
     <link href="{{asset('/vendor/fontawesome-free/css/all.min.css')}}" rel="stylesheet" type="text/css">
 
@@ -28,7 +28,7 @@
     <link rel="stylesheet" type="text/css" href="{{asset('/css/dropify.min.css')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('/css/dropzone.css')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('/css/datepicker.css?v=1.1')}}" />
-    <link rel="stylesheet" type="text/css" href="{{asset('/css/timepicker.css?v=1.1')}}" />
+    <!-- <link rel="stylesheet" type="text/css" href="{{asset('/css/timepicker.css?v=1.1')}}" /> -->
     <!-- Theme CSS -->
     <link rel="stylesheet" href="{{asset('/assets/css/theme.bundle.css')}}" id="stylesheetLight">
     <link rel="stylesheet" href="{{asset('/assets/css/theme-dark.bundle.css')}}" id="stylesheetDark" disabled="">
@@ -123,10 +123,10 @@
             <div class="overlay-for-sidebar" style="display: none"></div>
 
             <div class="container  ">
-                <div class="md-header-fixed">
-                    <div class="MD__Logo"><img src="images/Sourcecode-Academia-BE-l.jpg" alt="" /></div>
+                <!-- <div class="md-header-fixed">
+                    <div class="MD__Logo"><img src="{{asset('images/Shama-logo.png')}}" alt="" /></div>
                     <button class="mobile__toggler" id="modalShow"><span></span></button>
-                </div>
+                </div> -->
                 @yield('data-sidebar')
                 <div id="contentContainerDiv" class="blur-div">
                     @yield('content')

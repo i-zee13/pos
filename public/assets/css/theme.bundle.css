@@ -4103,7 +4103,7 @@ fieldset:disabled .btn {
     list-style: none;
     margin: 0;
     min-width: 10rem;
-    padding: .5rem 0;
+    /* padding: .5rem 0; */
     position: absolute;
     text-align: left;
     z-index: 1000
