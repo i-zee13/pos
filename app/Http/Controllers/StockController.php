@@ -19,11 +19,11 @@ class StockController extends Controller
 {
   
     public function create()
-    {   $invoice_no   =  'inv-'.Str::random(15);
+    {   
         $current_date =   Carbon::today()->toDateString();
         $customers    =   Customer::all();
-        $products     =    Product::all();
-        return view('purchases.add',compact('customers','current_date','invoice_no','products'));
+        $products     =   Product::all();
+        return view('purchases.add',compact('customers','current_date','products'));
     }
     public function getProduct(Request $request)
     {
@@ -59,6 +59,7 @@ class StockController extends Controller
         $invoice->date           = $request->invoice_date;
         $invoice->invoice_no     = $request->invoice_no;
         $invoice->customer_id    = $request->customer_id;
+        $invoice->paid_amount    = $request->amount_paid;
         $invoice->total_invoice_amount = $request->grand_total;
         $invoice->created_by     = Auth::id();
         if($invoice->save()){
@@ -252,7 +253,7 @@ class StockController extends Controller
                                                 ->selectRaw('(SELECT balance FROM vendor_stocks WHERE vendor_id = products_purchases.vendor_id ORDER BY id DESC LIMIT 1) as balance, products_purchases.*')
                                                 ->from('products_purchases')
                                                 ->get();
-        $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)->orderBy('id', 'DESC')->first();
+        $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)->where('trx_type','!=',1)->orderBy('id', 'DESC')->first();
         return view('purchases.edit',compact('invoice','customers','products','customers','get_vendor_ledger'));
     }
     public function getPurchaseProduct($id){

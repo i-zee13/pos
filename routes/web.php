@@ -65,4 +65,8 @@ Route::get('/customer-ledgers'          ,[App\Http\Controllers\TransactionContro
 Route::post('/get-ledgers-list'          ,[App\Http\Controllers\TransactionController::class, 'getCustomerLedgers'])->name('get-customer-ledger-list');
 Route::post('/transaction-store'        ,[App\Http\Controllers\TransactionController::class, 'store'])->name('transaction-store');
 Route::get('/vendor-ledgers'            ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('vendor-ledgers');
+
+//Reports 
+Route::get('/vendor-reports'            ,[App\Http\Controllers\ReportsController::class, 'vendorReport'])->name('vendor-reports');
+
 });

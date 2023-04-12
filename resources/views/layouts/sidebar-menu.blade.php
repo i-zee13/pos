@@ -156,14 +156,13 @@
           </div>
         </li>
 
-
       </ul> 
       <ul class="navbar-nav ">
         <li class="nav-item">
-          <a class="nav-link collapsed" href="#transactions" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="transactions">
+          <a class="nav-link collapsed" href="#reporting" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="reporting">
           <i class="fa fa-bar-chart" aria-hidden="true"></i> Reporting
           </a>
-          <div class="collapse " id="transactions">
+          <div class="collapse " id="reporting">
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
                 <a href="{{route('customer-ledgers')}}" class="nav-link ">
@@ -171,7 +170,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('vendor-ledgers')}}" class="nav-link ">
+                <a href="{{route('vendor-reports')}}" class="nav-link ">
                   Vendors
                 </a>
               </li>

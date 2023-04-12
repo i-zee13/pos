@@ -486,8 +486,8 @@ function fetchproducts() {
                         <thead>
                             <tr>
                                 <th>S.No</th>
+                                <th>ID</th>
                                 <th>Company</th>
-                                <th>Bar Code</th>
                                 <th>Product</th>
                                 <th>Size</th>
                                 <th>Action</th>
@@ -502,8 +502,8 @@ function fetchproducts() {
                         $('.subCatsListTable tbody').append(`
                         <tr>
                             <td>${key + 1}</td>
-                            <td> ${element['company_name']}</td>
                             <td>${element['barcode']} </td>
+                            <td> ${element['company_name']}</td>
                             <td> <img src="${element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png'}"  style="height:25px; width:25px;"> ${element['product_name']}</td>
                             <td>${element['size']} </td>
                             <td>

@@ -568,7 +568,7 @@
 
                     <div class="col-md-2 mb-10">
 
-                      <label class="control-label mb-5">Bar Code</label>
+                      <label class="control-label mb-5">ID</label>
                       <input type="text" id="bar-code" class="form-control bar-code" placeholder="" name="bar_code" data-attr='bar_code'>
 
                     </div>

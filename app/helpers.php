@@ -4,11 +4,9 @@ use App\Models\City;
 use App\Models\Country;
 use App\Models\PostalCode;
 use App\Models\State;
-use App\Models\Student;
-use Firebase\JWT\JWT;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Models\Sale as SaleInvoice; 
+use App\Models\Student; 
+use Firebase\JWT\JWT; 
 use Stevebauman\Location\Facades\Location;
 
 if(!function_exists('isStudentActive'))
@@ -132,5 +130,23 @@ if(!function_exists('getZoomAccessToken'))
             'exp' => time() + 3600,
         );
         return JWT::encode($payload, $key);
+    }
+}
+
+if(!function_exists('getInvoice'))
+{
+    function getInvoice()
+    {
+        $year        = date('y');
+        $invoice_no  = 1;
+        $lastinvoice = SaleInvoice::latest()->value('invoice_no');
+        if(isset($lastinvoice)){
+            $invoice_no = $lastinvoice.'-'.$year;
+           return $invoice_no;
+        }else{
+            $invoice_no = $invoice_no.'-'.$year;
+            return $invoice_no;
+
+        }
     }
 }

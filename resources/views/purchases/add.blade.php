@@ -412,7 +412,7 @@
               <div class="col-md-2 mb-10">
 
                 <label class="control-label mb-5">Invoice # *</label>
-                <input type="text" id="" class="form-control required" placeholder="" name="invoice_no" value="{{$invoice_no}}">
+                <input type="text" id="" class="form-control required new_form_field" placeholder="" name="invoice_no" value="">
 
               </div>
               <div class="col-md-4">
@@ -514,7 +514,7 @@
 
                     <div class="col-md-2 mb-10">
 
-                      <label class="control-label mb-5">Bar Code</label>
+                      <label class="control-label mb-5">ID*</label>
                       <input type="text" id="bar-code" class="form-control bar-code" placeholder="" name="bar_code" data-attr='bar_code'>
 
                     </div>

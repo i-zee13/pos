@@ -17576,13 +17576,18 @@ $(document).on('focusout', '.bar-code', function () {
     var filter_product = product_list.filter(function (x) {
       return x.barcode == data_variable;
     });
-    $('#products').val(filter_product[0].id).trigger('change');
-    // $('.retail_price').text(filter_product[0].sale_price);
-    $('#purchase_price').val(filter_product[0].old_purchase_price);
-    $('.stock_balance').text(filter_product[0].stock_balance);
-    p_name = filter_product[0].product_name;
-    product_id = filter_product[0].id;
-    $('.expiry_date').val(filter_product[0].expiry_date);
+    if (filter_product.length > 0) {
+      $('#products').val(filter_product[0].id).trigger('change');
+      // $('.retail_price').text(filter_product[0].sale_price);
+      $('#purchase_price').val(filter_product[0].old_purchase_price);
+      $('.stock_balance').text(filter_product[0].stock_balance);
+      p_name = filter_product[0].product_name;
+      product_id = filter_product[0].id;
+    } else {
+      $('#products').val('0').trigger('change');
+      $('#retail_price').val('');
+      $('.expiry_date ').val('');
+    }
   }
 });
 $('#qty').on('input', function () {
@@ -17833,7 +17838,7 @@ $('#customer_id').change(function () {
         $('.previous_payable').text(previous_payable_text);
         $('.previous_payable').val(previous_payable);
         if (segments[3] == "sale-edit") {
-          $('.paid_amount').text(customer_ledger['dr']);
+          $('.paid_amount').text(customer_ledger['cr']);
           $('.remaning_amount').val(customer_ledger['balance']);
         }
         grandSum(previous_payable);
