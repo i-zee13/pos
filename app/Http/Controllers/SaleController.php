@@ -146,6 +146,7 @@ class SaleController extends Controller
                 $customer_ledger->cr          = $request->amount_paid;
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
+                $customer_ledger->trx_type    = 1; 
                 $customer_ledger->dr          = $invoice->total_invoice_amount;
                 $customer_ledger->balance     = ($invoice->total_invoice_amount-$request->amount_paid); //balance
                 $customer_ledger->created_by  = Auth::id();
@@ -192,14 +193,21 @@ class SaleController extends Controller
 
         return view('sales.add',compact('invoice','customers','products','customers','get_customer_ledger'));
     }
-    public function printInvoice(Request $request){
-        $invoiceId = $request->input('invoice_id');
-        $customerId = $request->input('customer_id');
-    
-        $invoice = SaleInvoice::where('id',$invoiceId)->where('customer_id',$customerId)
-                         ->selectRaw('sale_invoices.*,(SELECT customer_name FROM customers WHERE id ='.$customerId.') as customer_name')->first(); 
-    
-        return view('sales.invoice', compact('invoice'));
+    public function printInvoice($invoice_id,$customer_id,$received_amount){
+        $invoiceId                  =   $invoice_id;
+        $customerId                 =   $customer_id;
+        $invoice                    =   SaleInvoice::where('id',$invoiceId)->where('customer_id',$customerId)
+                                        ->selectRaw("sale_invoices.*,
+                                            (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
+                                            (SELECT cr FROM customer_ledger WHERE sale_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
+                                        ")
+                                        ->first();
+        $invoice->received_amount   =   $received_amount;
+        $products                   =   ProductSale::where('sale_invoice_id',$invoice_id)
+                                        ->selectRaw("products_sales.*,
+                                            (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name")
+                                        ->get();
+        return view('sales.sale-invoice', compact('invoice','products'));
     }
     public function getSaleProduct($id){
         $products   =   ProductSale::where('sale_invoice_id',$id)

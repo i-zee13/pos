@@ -145,22 +145,11 @@ $('#add-product').on('click', function () {
     $('.products').val(0).trigger('change');
     $('#new_purchase_price').val('');
     $('#retail_price').val('');
- var invoice_type = $('#invoice_type').val();
-    $('#invoice_type').val(invoice_type).trigger('change');
+
     // $('.new_dob').val('')
     p_name = '';
     // $('#purchse-form')[0].reset();
-});
-
-$('#invoice_type').change(function(){
-    var total_paid_for_net_sale = 0;
-    if($(this).val() == '1'){
-        sales_product_array.forEach(function (data, key) {
-            total_paid_for_net_sale += parseFloat(data.amount)
-        });
-    }
-    $('.amount_pay_input').val(total_paid_for_net_sale);
-});
+})
 $('#datepicker , #datepicker2').datepicker({
     autoclose: true,
     todayHighlight: true,
@@ -312,27 +301,8 @@ $('#qty').on('input', function () {
     }
     productRetailAmount();
    
-});
-$("#save").on('click', function () {
-    var current_action = $(this);
-    saleSave(current_action,'save');
-    current_action.text('Save')
-    // $('#hidden_btn_to_open_modal').click(); 
-});
-$('.save_status').on('click',function(){
-    var if_print     = $(this).attr('btn-value');
-    var ser_chargses = $('.service_charges_input').val();
-    var grand_total  = $('.grand-total').text(); 
-    var status       = $('input[name="radio_status"]:checked').val();
-    $(this).attr('disabled', 'disabled');
-    $(this).text('Processing..');
-});
-$("#print-invoice").on('click',function(){
-    var current_action = $(this);
-    saleSave(current_action,'print');
-    current_action.text('Print')
 })
-function saleSave(current_action,type){
+$("#save").on('click', function () {
     let dirty = false;
     $('.required').each(function () {
         if (!$(this).val() || $(this).val() == 0) {
@@ -397,75 +367,11 @@ function saleSave(current_action,type){
             $('#notifDiv').fadeOut();
         }, 3000);
         return;
-    }
-    if($('#invoice_type').val() == '1' && ($('.amount_received').val() == '' || parseInt($('.amount_received').val()) < parseInt($('.amount_pay_input').val()))){
-        $('.amount_received').focus();
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Received amount can not less then total invoice amount');
-        setTimeout(() => {
-            $('#notifDiv').fadeOut();
-        }, 3000);
-        return;
-    }
-    current_action.attr('disabled', 'disabled');
+    } 
+    $('#save').attr('disabled', 'disabled');
     $('.btn-cancel').attr('disabled', 'disabled');
-    $('#form').ajaxSubmit({
-        url  : '/add-sale-invoice',
-        type : 'post',
-        data : {
-                'service_charges'    :  $('.service_charges_input').val(),
-                'grand_total'        :  $('.grand-total').text(),
-                'sale_total_amount'  :  sale_total_amount,
-                'status'             :  1, //status
-                'sales_product_array':  sales_product_array,
-                'existing_product_ids': existing_product_ids
-            },
-        success: function (response) {
-            current_action.removeAttr('disabled');
-            $('.btn-cancel').removeAttr('disabled');
-            if ("success") {
-                $('#notifDiv').fadeIn();
-                $('#notifDiv').css('background', 'green');
-                $('#notifDiv').text('Added successfully');
-                var received_amount = $('.amount_received').val().trim();
-                if(type == 'print'){
-                    window.open("/print-sale-invoice/"+response.invoice_id+'/'+response.customer_id+'/'+received_amount).print();
-                }
-                setTimeout(() => {
-                    $('#notifDiv').fadeOut();
-                    if(type == 'print'){
-                    // var printContent        = $('.printdiv').html();
-                        // var originalContent     = document.body.innerHTML;
-                        // document.body.innerHTML = printContent;
-                        // window.print();
-                        // document.body.innerHTML = originalContent;
-                        // console.log(received_amount);
-                        // window.location     = "/print-sale-invoice/"+response.invoice_id+'/'+response.customer_id+'/'+received_amount;
-                    }else{
-                        window.location     = "/sale-add";
-                    }
-                }, 1500);
-                vendors = [];
-                $('#form')[0].reset();
-                $('#client_type').val(0).trigger('change'); 
-                $('.formselect').select2();
-                
-            }
-        },
-        error: function (e) {
-            $('#notifDiv').fadeIn();
-            $('#notifDiv').css('background', 'red');
-            $('#notifDiv').text('Failed to save at the moment');
-            setTimeout(() => {
-                $('#notifDiv').fadeOut();
-            }, 3000);
-
-            current_action.removeAttr('disabled');;
-            $('.btn-cancel').removeAttr('disabled');
-        }
-    })
-}
+    $('#hidden_btn_to_open_modal').click();  
+});
 $('.save_status').on('click',function(){
     var if_print     = $(this).attr('btn-value');
     var ser_chargses = $('.service_charges_input').val();
@@ -477,36 +383,30 @@ $('.save_status').on('click',function(){
         url  : '/add-sale-invoice',
         type : 'post',
         data : {
-                    'service_charges'    :  $('.service_charges_input').val(),
-                'grand_total'        :  $('.grand-total').text(),
+                'service_charges'    :  ser_chargses,
+                'grand_total'        :  grand_total,
                 'sale_total_amount'  :  sale_total_amount,
-                'status'             :  1, //status
+                'status'             :  status,
                 'sales_product_array':  sales_product_array,
-                'existing_product_ids': existing_product_ids
+                'existing_product_ids':existing_product_ids
             },
         success: function (response) {
-            current_action.removeAttr('disabled');
+            $('#save').removeAttr('disabled'); 
             $('.btn-cancel').removeAttr('disabled');
+            $('#save').text('Save');
             if ("success") {
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'green');
                 $('#notifDiv').text('Added successfully');
-                 var received_amount = $('.amount_received').val().trim();
-                if(type == 'print'){
-                    window.open("/print-sale-invoice/"+response.invoice_id+'/'+response.customer_id+'/'+received_amount).print();
-                }
                 setTimeout(() => {
                     $('#notifDiv').fadeOut();
-                   if(type == 'print'){
-                    // var printContent        = $('.printdiv').html();
-                        // var originalContent     = document.body.innerHTML;
-                        // document.body.innerHTML = printContent;
-                        // window.print();
-                        // document.body.innerHTML = originalContent;
-                        // console.log(received_amount);
-                        // window.location     = "/print-sale-invoice/"+response.invoice_id+'/'+response.customer_id+'/'+received_amount;
+                    if(if_print==1){
+                        var invoiceWindow    = window.open(`/invoice/?invoice_id=${response.invoice_id}&customer_id=${response.customer_id}`, 'invoiceWindow');
+                        invoiceWindow.onload = function() {
+                          invoiceWindow.print();
+                        }
                     }else{
-                        window.location     = "/sale-add";
+                        window.location = "/sale-add";
                     }
                 }, 1500);
                 vendors = [];
@@ -524,13 +424,13 @@ $('.save_status').on('click',function(){
                 $('#notifDiv').fadeOut();
             }, 3000);
 
-            current_action.removeAttr('disabled');;
+            $('#save').removeAttr('disabled');;
             $('.btn-cancel').removeAttr('disabled');
             $('#save').text('Save');
 
         }
     })
-})
+});
 $(document).on('keyup', '.qty-input', function () {
     var update_qty         = $(this).val();
     var current_product_id = $(this).attr('data-id');
@@ -581,9 +481,8 @@ $(document).on('keyup', '.qty-input', function () {
                 $(`.td-input-qty${current_product_id}`).css('border-color', '#dddddd');
                 new_amount_of_purchase_product = update_qty * current_product_price;
                 data.amount = new_amount_of_purchase_product;
-                var invoice_type = $('#invoice_type').val();
-                $('#invoice_type').val(invoice_type).trigger('change');
-                               grandSum(previous_payable);
+                $(`.purchase-product-amount${current_product_id}`).text(new_amount_of_purchase_product)
+                grandSum(previous_payable);
             }
         }
     })
@@ -635,28 +534,28 @@ $('#customer_id').change(function () {
     // $('.current_balance').text('0').trigger('change');
     var selected_index = $(this).val();
     if(selected_index > 0){
-        $.ajax({
-            url     : '/get-customer-balance/'+selected_index,
-            type    : 'get',
-            data    :   {
-                segment:segment
-            },
-            success : function(response){
-                previous_payable          = response.customer_balance;
-                var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0  ? (-previous_payable) + " DR" : previous_payable;
-                $('.previous_payable').text(previous_payable_text);
-                $('.previous_payable').val(previous_payable);
-                if (segments[3] == "sale-edit") {
-                    $('.paid_amount').text(customer_ledger['cr']);
-                    $('.remaning_amount').val(customer_ledger['balance'])                
-                }
-                
-                grandSum(previous_payable)
-                $('.display').css('display','');
+    $.ajax({
+        url     : '/get-customer-balance/'+selected_index,
+        type    : 'get',
+        data    :   {
+            segment:segment
+         },
+        success : function(response){
+            previous_payable          = response.customer_balance;
+            var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0  ? (-previous_payable) + " DR" : previous_payable;
+            $('.previous_payable').text(previous_payable_text);
+            $('.previous_payable').val(previous_payable);
+             if (segments[3] == "sale-edit") {
+                $('.paid_amount').text(customer_ledger['cr']);
+                $('.remaning_amount').val(customer_ledger['balance'])                
             }
-        })
+            
+            grandSum(previous_payable)
+            $('.display').css('display','');
+        }
+    })
     var customer = vendors.filter(x => x.id == selected_index)
-    }
+}
 })
 function grandSum(previous_payable){ 
     var sum = 0;

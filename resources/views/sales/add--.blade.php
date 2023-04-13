@@ -484,7 +484,7 @@
                   </select>
                 </div>
               </div>
-               <div class="col-md-3 client">
+              <div class="col-md-3 client">
                 <h2 class="_head04 border-0">Invoice<span> Type</span>*</h2>
                 <div class="form-s2">
                 <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type">
@@ -577,7 +577,7 @@
 
                     <div class="col-md-2 mb-10">
 
-                      <label class="control-label mb-5">ID</label>
+                      <label class="control-label mb-5">Bar Code</label>
                       <input type="text" id="bar-code" class="form-control bar-code" placeholder="" name="bar_code" data-attr='bar_code'>
 
                     </div>
@@ -713,8 +713,8 @@
 
                 <div class="col-md-12 text-right pr-0 PT-10" id="btns_div">
                   <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
- <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>               
-    <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                  <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>
+                  <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                 </div>
 
               </div>
@@ -730,7 +730,7 @@
 
 
 
-
+<div class="printdiv" style="display:none">asdaddasasdddsd</div>
 @endsection
 @push('js')
 <script>

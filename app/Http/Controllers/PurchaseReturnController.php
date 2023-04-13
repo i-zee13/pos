@@ -177,6 +177,8 @@ class PurchaseReturnController extends Controller
                 $customer_ledger->date       = $request->invoice_date;
                 $customer_ledger->return_invoice_id = $invoice->id;
                 $customer_ledger->customer_id= $request->customer_id;
+                $customer_ledger->trx_type   = 2 ; //Purchase inc
+
                 // $customer_ledger->dr         = $request->amount_paid;
                 $customer_ledger->balance    = ($balance-$request->purchased_total); //+balance
                 $customer_ledger->created_by = Auth::id();

@@ -58,8 +58,7 @@ Route::get('/get-sale-products/{id}'    ,[App\Http\Controllers\SaleController::c
 Route::get('/get-customer-balance/{id}' ,[App\Http\Controllers\SaleController::class, 'getCustomerBalance'])->name('get-customer-balance');
 
 //Genrate invoice
-Route::get('/invoice'                   ,[App\Http\Controllers\SaleController::class, 'printInvoice'])->name('print-invoice');
-
+Route::get('/print-sale-invoice/{invoice_id}/{customer_id}/{received_amount}'       ,[App\Http\Controllers\SaleController::class, 'printInvoice'])->name('print-sale-invoice');
 //Transactions
 Route::get('/customer-ledgers'          ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledgers');
 Route::post('/get-ledgers-list'          ,[App\Http\Controllers\TransactionController::class, 'getCustomerLedgers'])->name('get-customer-ledger-list');
@@ -67,6 +66,8 @@ Route::post('/transaction-store'        ,[App\Http\Controllers\TransactionContro
 Route::get('/vendor-ledgers'            ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('vendor-ledgers');
 
 //Reports 
+Route::get('/customer-reports'          ,[App\Http\Controllers\ReportsController::class, 'customerReport'])->name('customer-reports');
 Route::get('/vendor-reports'            ,[App\Http\Controllers\ReportsController::class, 'vendorReport'])->name('vendor-reports');
+Route::post('/report-list'              ,[App\Http\Controllers\ReportsController::class, 'reportList'])->name('report-list');
 
 });

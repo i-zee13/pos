@@ -473,7 +473,7 @@
                 </div>
 
               </div>
-              <div class="col-md-3 client">
+              <div class="col-md-4 client">
                 <h2 class="_head04 border-0">Select <span>Cusotmer</span>*</h2>
                 <div class="form-s2">
                 <select class="form-control formselect custom er_id form_clear required" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
@@ -482,15 +482,6 @@
                     <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->customer_name}}</option>
                     @endforeach
                   </select>
-                </div>
-              </div>
-               <div class="col-md-3 client">
-                <h2 class="_head04 border-0">Invoice<span> Type</span>*</h2>
-                <div class="form-s2">
-                <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type">
-                    <option value="1" selected>Net Sale</option>
-                    <option value="2">Add To Ledger</option>
-                </select>
                 </div>
               </div>
              
@@ -695,12 +686,6 @@
                                 <input type="text" value="" class="qty-input add-stock-input amount_pay_input remaning_amount" name="amount_paid">
                               </th>
                             </tr>
-                            <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Received Amount</th>
-                              <th class="" colspan="4" style="text-align: center;">
-                                <input type="number" class="add-stock-input amount_received">
-                              </th>
-                            </tr>
                           </tfoot>
                         </table>
                       </div>
@@ -713,8 +698,7 @@
 
                 <div class="col-md-12 text-right pr-0 PT-10" id="btns_div">
                   <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
- <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>               
-    <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                  <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                 </div>
 
               </div>

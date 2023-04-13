@@ -145,7 +145,7 @@ $('#add-product').on('click', function () {
     $('.products').val(0).trigger('change');
     $('#new_purchase_price').val('');
     $('#retail_price').val('');
- var invoice_type = $('#invoice_type').val();
+    var invoice_type = $('#invoice_type').val();
     $('#invoice_type').val(invoice_type).trigger('change');
     // $('.new_dob').val('')
     p_name = '';
@@ -279,23 +279,18 @@ $(document).on('focusout', '.bar-code', function () {
     $('#qty').val('');
     $('#amount').val('');
     if(data_variable){
-        var filter_product = product_list.filter(x => x.barcode == data_variable);
-            if(filter_product.length > 0){
-                $('#products').val(filter_product[0].id).trigger('change');
-                // $('.retail_price').text(filter_product[0].sale_price);
-                $('#purchase_price').val(filter_product[0].old_purchase_price);
-                $('.stock_balance').text(filter_product[0].stock_balance);
-                p_name      = filter_product[0].product_name;
-                product_id  = filter_product[0].id;
-            }else{
-                $('#products').val('0').trigger('change');
-                $('#retail_price').val('');
-                $('.expiry_date ').val('');
-
-            }
+        var filter_product = product_list.filter(x => x.barcode == data_variable)
+        $('#products').val(filter_product[0].id).trigger('change');
+        // $('.retail_price').text(filter_product[0].sale_price);
+        $('#purchase_price').val(filter_product[0].old_purchase_price);
+        
+        $('.stock_balance').text(filter_product[0].stock_balance);
+        p_name = filter_product[0].product_name;
+        product_id = filter_product[0].id;
+        $('.expiry_date').val(filter_product[0].expiry_date)
     }
-});
     
+})
 $('#qty').on('input', function () {
     qty          = $(this).val();
     if(qty > stock_in_hand){
@@ -312,7 +307,7 @@ $('#qty').on('input', function () {
     }
     productRetailAmount();
    
-});
+})
 $("#save").on('click', function () {
     var current_action = $(this);
     saleSave(current_action,'save');
@@ -466,71 +461,6 @@ function saleSave(current_action,type){
         }
     })
 }
-$('.save_status').on('click',function(){
-    var if_print     = $(this).attr('btn-value');
-    var ser_chargses = $('.service_charges_input').val();
-    var grand_total  = $('.grand-total').text(); 
-    var status       = $('input[name="radio_status"]:checked').val();
-    $(this).attr('disabled', 'disabled');
-    $(this).text('Processing..');
-    $('#form').ajaxSubmit({
-        url  : '/add-sale-invoice',
-        type : 'post',
-        data : {
-                    'service_charges'    :  $('.service_charges_input').val(),
-                'grand_total'        :  $('.grand-total').text(),
-                'sale_total_amount'  :  sale_total_amount,
-                'status'             :  1, //status
-                'sales_product_array':  sales_product_array,
-                'existing_product_ids': existing_product_ids
-            },
-        success: function (response) {
-            current_action.removeAttr('disabled');
-            $('.btn-cancel').removeAttr('disabled');
-            if ("success") {
-                $('#notifDiv').fadeIn();
-                $('#notifDiv').css('background', 'green');
-                $('#notifDiv').text('Added successfully');
-                 var received_amount = $('.amount_received').val().trim();
-                if(type == 'print'){
-                    window.open("/print-sale-invoice/"+response.invoice_id+'/'+response.customer_id+'/'+received_amount).print();
-                }
-                setTimeout(() => {
-                    $('#notifDiv').fadeOut();
-                   if(type == 'print'){
-                    // var printContent        = $('.printdiv').html();
-                        // var originalContent     = document.body.innerHTML;
-                        // document.body.innerHTML = printContent;
-                        // window.print();
-                        // document.body.innerHTML = originalContent;
-                        // console.log(received_amount);
-                        // window.location     = "/print-sale-invoice/"+response.invoice_id+'/'+response.customer_id+'/'+received_amount;
-                    }else{
-                        window.location     = "/sale-add";
-                    }
-                }, 1500);
-                vendors = [];
-                $('#form')[0].reset();
-                $('#client_type').val(0).trigger('change'); 
-                $('.formselect').select2();
-                
-            }
-        },
-        error: function (e) {
-            $('#notifDiv').fadeIn();
-            $('#notifDiv').css('background', 'red');
-            $('#notifDiv').text('Failed to save at the moment');
-            setTimeout(() => {
-                $('#notifDiv').fadeOut();
-            }, 3000);
-
-            current_action.removeAttr('disabled');;
-            $('.btn-cancel').removeAttr('disabled');
-            $('#save').text('Save');
-
-        }
-    })
-})
 $(document).on('keyup', '.qty-input', function () {
     var update_qty         = $(this).val();
     var current_product_id = $(this).attr('data-id');
@@ -581,9 +511,10 @@ $(document).on('keyup', '.qty-input', function () {
                 $(`.td-input-qty${current_product_id}`).css('border-color', '#dddddd');
                 new_amount_of_purchase_product = update_qty * current_product_price;
                 data.amount = new_amount_of_purchase_product;
+                $(`.purchase-product-amount${current_product_id}`).text(new_amount_of_purchase_product);
                 var invoice_type = $('#invoice_type').val();
                 $('#invoice_type').val(invoice_type).trigger('change');
-                               grandSum(previous_payable);
+                grandSum(previous_payable);
             }
         }
     })
@@ -635,29 +566,30 @@ $('#customer_id').change(function () {
     // $('.current_balance').text('0').trigger('change');
     var selected_index = $(this).val();
     if(selected_index > 0){
-        $.ajax({
-            url     : '/get-customer-balance/'+selected_index,
-            type    : 'get',
-            data    :   {
-                segment:segment
-            },
-            success : function(response){
-                previous_payable          = response.customer_balance;
-                var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0  ? (-previous_payable) + " DR" : previous_payable;
-                $('.previous_payable').text(previous_payable_text);
-                $('.previous_payable').val(previous_payable);
-                if (segments[3] == "sale-edit") {
-                    $('.paid_amount').text(customer_ledger['cr']);
-                    $('.remaning_amount').val(customer_ledger['balance'])                
-                }
-                
-                grandSum(previous_payable)
-                $('.display').css('display','');
+    $.ajax({
+        url     : '/get-customer-balance/'+selected_index,
+        type    : 'get',
+        data    :   {
+            segment:segment
+         },
+        success : function(response){
+            previous_payable          = response.customer_balance;
+            var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0  ? (-previous_payable) + " DR" : previous_payable;
+            $('.previous_payable').text(previous_payable_text);
+            $('.previous_payable').val(previous_payable);
+             if (segments[3] == "sale-edit") {
+                $('.paid_amount').text(customer_ledger['dr']);
+                $('.remaning_amount').val(customer_ledger['balance'])                
             }
-        })
+            
+            grandSum(previous_payable)
+            $('.display').css('display','');
+        }
+    })
     var customer = vendors.filter(x => x.id == selected_index)
-    }
+}
 })
+ 
 function grandSum(previous_payable){ 
     var sum = 0;
     sales_product_array.forEach(function (data, key) {

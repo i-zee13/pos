@@ -149,6 +149,15 @@
     <script src="{{asset('/js/jquery.form.min.js')}}"></script>
     <script src="{{asset('/js/selectize.min.js')}}"></script>
     <script src="{{asset('/js/bootstrap-datepicker.js?v=1.1')}}"></script>
+    <script src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.33/pdfmake.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.colVis.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
 
     <script>
         let dateFormat = "yyyy-mm-dd";
@@ -242,7 +251,7 @@
             $(".sticky-footer").addClass("blur-div");
             $(".overlay-for-sidebar").css("display", "block");
         }
-        $('#datepicker , #datepicker2').datepicker({
+        $('#datepicker,.datepicker , #datepicker2').datepicker({
             autoclose: true,
             todayHighlight: true,
             toggleActive: true,

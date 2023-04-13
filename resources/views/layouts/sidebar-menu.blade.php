@@ -165,7 +165,7 @@
           <div class="collapse " id="reporting">
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
-                <a href="{{route('customer-ledgers')}}" class="nav-link ">
+                <a href="{{route('customer-reports')}}" class="nav-link ">
                  Customers
                 </a>
               </li>
