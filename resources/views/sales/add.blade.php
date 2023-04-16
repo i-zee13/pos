@@ -436,13 +436,11 @@
     </div>
   </div>
 </div>
-
 <form id="form" enctype="multipart/form-data" class="">
   @csrf
   <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
   <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
   <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
-
 
   <div class="row">
     <div class="col-md-12">
@@ -661,14 +659,15 @@
                           </tbody>
                           <tfoot class="table-footer">
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Previous Payable</th>
-                              <th class="previous_payable" colspan="4" style="text-align: center;">0
+                              <th colspan="" style="text-align:right;font-family:sans-serif">Previous Payable</th>
+                              <th class="previous_payable" colspan="" style="text-align: center;">0
                                 <!-- <input type="text" value="" class="qty-input add-stock-input previous_payable" name="previous_payable"> -->
                               </th>
+                              <th colspan="" style="text-align:right;font-family:sans-serif">Grand Total</th>
+                              <th class="grand-total" colspan="4" style="text-align: center;">0</th>
                             </tr>
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Grand Total</th>
-                              <th class="grand-total" colspan="4" style="text-align: center;">0</th>
+                              
                             </tr>
 
                             @if (Route::currentRouteName() == 'sale-edit')
@@ -679,10 +678,10 @@
                           @endif
 
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Disscount </th>
+                              <!-- <th colspan="3" style="text-align:right;font-family:sans-serif">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input" data-id="" data-value="">
-                              </th>
+                              </th> -->
                             </tr><tr rowspan="5">
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Service charges </th>
                               <th class="" colspan="4" style="text-align: center;">
@@ -690,15 +689,21 @@
                               </th>
                             </tr>
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Amount pay</th>
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">{{Route::currentRouteName() == 'sale-edit' ? 'Remaining Amount' : 'Net Amount'}}</th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class="qty-input add-stock-input amount_pay_input remaning_amount" name="amount_paid">
                               </th>
                             </tr>
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Received Amount</th>
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Cash Recived</th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="number" class="add-stock-input amount_received">
+                              </th>
+                            </tr> 
+                            <tr rowspan="5">
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Cash Return</th>
+                              <th class="cash_return" colspan="4" style="text-align: center;">
+                               0 
                               </th>
                             </tr>
                           </tfoot>
@@ -713,8 +718,8 @@
 
                 <div class="col-md-12 text-right pr-0 PT-10" id="btns_div">
                   <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
- <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>               
-    <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                  <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>               
+                  <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                 </div>
 
               </div>

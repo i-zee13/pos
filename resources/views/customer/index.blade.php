@@ -28,6 +28,14 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label class="control-label mb-10">Phone# *</label>
+                                                        <input type="text" name="phone_no" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <h2 class="_head03 mt-10">Choose Type<span></span></h2>
                                             <div class="col-md-12">

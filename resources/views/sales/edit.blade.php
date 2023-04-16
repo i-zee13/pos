@@ -389,10 +389,11 @@
     </div>
   </div>
 </div>
-
 <form id="form" enctype="multipart/form-data" class="">
   @csrf
   <input type="hidden" name="hidden_invoice_id" id="hidden_invoice_id" value="{{$invoice->id}}">
+  <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
+
   <div class="row">
     <div class="col-md-12">
       <div class="card">
@@ -626,12 +627,12 @@
                               <th colspan="3" style="text-align:right;">Grand Total</th>
                               <th class="grand-total" colspan="4" style="text-align: center;">0</th>
                             </tr>
-                            <tr rowspan="5">
+                            <!-- <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input" data-id="" data-value="">
                               </th>
-                            </tr>
+                            </tr> -->
 
                             <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Amount pay</th>

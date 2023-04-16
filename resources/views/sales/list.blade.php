@@ -60,6 +60,7 @@
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td>
                     <td>
                         <a id="{{$sale->id}}" class="btn btn-default btn-line" href="{{route('sale-edit' ,['id'=>$sale->id])}}">Edit</a>
+                        <button id="{{$sale->id}}" data-invoice="{{$sale->invoice_id}}" data-customer-id="{{$sale->customer_id}}" paid-amount="{{$sale->paid_amount}}" class="btn btn-default print-invoice">Print</button>
                         <!-- <button type="button" id="{{$sale->id}}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button> -->
                     </td>
                 </tr>
@@ -72,5 +73,13 @@
 </div>
 @endsection
 @push('js')
-<!-- <script src="{{asset('js/custom/product.js')}}"> </script> -->
+<script >
+    $('.print-invoice').on('click',function(){
+        var invoice_id  = $(this).attr('data-invoice');
+        var customer_id = $(this).attr('data-customer-id');
+        var invoice_id  = $(this).attr('data-invoice');
+        var paid_amount = $(this).attr('paid-amount');
+        window.open("/print-sale-invoice/"+invoice_id+'/'+customer_id+'/'+paid_amount).print();
+    })
+</script>
 @endpush

@@ -17935,7 +17935,6 @@ $('#customer_id').change(function () {
         segment: segment
       },
       success: function success(response) {
-        console.log(customer_ledger);
         previous_payable = response.customer_balance;
         var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0 ? -previous_payable + " DR" : previous_payable;
         $('.previous_payable').text(previous_payable_text);
@@ -17967,14 +17966,6 @@ function productRetailAmount() {
   amount = qty * retail_price;
   $('#amount').val(amount);
 }
-$(document).on('focusout', '.amount_received', function () {
-  var result = $(this).val() - $('.amount_pay_input ').val();
-  if (result > 0) {
-    $('.cash_return').text(result);
-  } else {
-    $('.cash_return').text(0);
-  }
-});
 })();
 
 /******/ })()

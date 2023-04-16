@@ -39,7 +39,7 @@ $(document).ready(function () {
     } else if (segments[3] == 'sale-edit') {
         customer_id    = $('#curren_customer_id').val(); 
         var invoice_id = $('#hidden_invoice_id').val(); 
-        segment = segments[3];
+        segment        = segments[3];
         $.ajax({
             url: '/get-sale-products/' + invoice_id,
             type: 'get',
@@ -145,7 +145,7 @@ $('#add-product').on('click', function () {
     $('.products').val(0).trigger('change');
     $('#new_purchase_price').val('');
     $('#retail_price').val('');
- var invoice_type = $('#invoice_type').val();
+    var invoice_type = $('#invoice_type').val();
     $('#invoice_type').val(invoice_type).trigger('change');
     // $('.new_dob').val('')
     p_name = '';
@@ -477,7 +477,7 @@ $('.save_status').on('click',function(){
         url  : '/add-sale-invoice',
         type : 'post',
         data : {
-                    'service_charges'    :  $('.service_charges_input').val(),
+                'service_charges'    :  $('.service_charges_input').val(),
                 'grand_total'        :  $('.grand-total').text(),
                 'sale_total_amount'  :  sale_total_amount,
                 'status'             :  1, //status
@@ -642,6 +642,7 @@ $('#customer_id').change(function () {
                 segment:segment
             },
             success : function(response){
+                console.log(customer_ledger)
                 previous_payable          = response.customer_balance;
                 var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0  ? (-previous_payable) + " DR" : previous_payable;
                 $('.previous_payable').text(previous_payable_text);
@@ -672,3 +673,12 @@ function productRetailAmount(){
     amount       = qty * retail_price;
     $('#amount').val(amount);
 }
+$(document).on('focusout','.amount_received',function(){ 
+    var result = $(this).val() - $('.amount_pay_input ').val(); 
+    if(result > 0){
+        $('.cash_return').text(result)                
+    }else{
+        $('.cash_return').text(0)                
+
+    }
+})

@@ -255,7 +255,7 @@ class StockController extends Controller
                                                 ->selectRaw('(SELECT balance FROM vendor_stocks WHERE vendor_id = products_purchases.vendor_id ORDER BY id DESC LIMIT 1) as balance, products_purchases.*')
                                                 ->from('products_purchases')
                                                 ->get();
-        $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)->where('trx_type','!=',1)->orderBy('id', 'DESC')->first();
+        $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)->where('trx_type','=',2)->orderBy('id', 'DESC')->first();
         return view('purchases.edit',compact('invoice','customers','products','customers','get_vendor_ledger'));
     }
     public function getPurchaseProduct($id){

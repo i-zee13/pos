@@ -192,13 +192,13 @@ $('#add-product').on('click', function () {
         $('#qty').css('border-color', ''); // Reset the border color
     }
     if ($('.expiry_date').val() == '') {
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Please Add Expiry Date of Product');
-        setTimeout(() => {
-            $('#notifDiv').fadeOut();
-        }, 3000);
-        return;
+        // $('#notifDiv').fadeIn();
+        // $('#notifDiv').css('background', 'red');
+        // $('#notifDiv').text('Please Add Expiry Date of Product');
+        // setTimeout(() => {
+        //     $('#notifDiv').fadeOut();
+        // }, 3000);
+        // return;
     } else {
         expiry_date = $('.expiry_date').val();
     }

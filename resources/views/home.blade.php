@@ -1,935 +1,351 @@
 @extends('layouts.app')
+ 
+@section('data-sidebar')
+<style>
+    .close-btn-pl {
+        top: 0px;
+        right: 0px;
+        background-color: #101010
+    }
+
+    .close-btn-pl:after,
+    .close-btn-pl:before {
+        background-color: #fff;
+        height: 20px;
+        top: 5px
+    }
+
+    #product-cl-sec {
+        right: -700px;
+        opacity: 1;
+        box-shadow: 0 1px 5px 0 rgba(45, 62, 80, .12);
+        width: 735px
+    }
+
+    #product-cl-sec.active {
+        right: 0px;
+        opacity: 1;
+        box-shadow: 0px 0px 100px 0px rgba(0, 0, 0, 0.5)
+    }
+
+    .R-Heading {
+        -webkit-transform: rotate(90deg);
+        -moz-transform: rotate(90deg);
+        -ms-transform: rotate(90deg);
+        -o-transform: rotate(90deg);
+        font-size: 22px;
+        letter-spacing: 5px;
+        padding-left: 10px;
+        line-height: 1;
+        width: 347px;
+        position: absolute;
+        left: -155px;
+        top: 200px
+    }
+
+    .open-Report,
+    .open-ReportHOVER {
+        font-size: 18px;
+        text-align: center;
+        color: #fff !important;
+        padding: 10px 8px 18px 8px;
+        display: block
+    }
+
+    .RB_bar {
+        color: #fff;
+        height: 100vh;
+        width: 40px;
+        background:linear-gradient(90deg, #161616 0%, #101010 100%);
+        position: absolute
+    }
+
+    ._left-filter {
+        padding-top: 0
+    }
+
+    .FU-history {
+        margin-top: 0
+    }
+
+</style>
+ 
+@endsection
+ 
 
 @section('content')
- <!-- CARDS -->
- <div class="container-fluid">
-        <div class="row">
-          <div class="col-12 col-lg-6 col-xl">
+<style>
+   .sell360report {
+        padding-bottom: 15px
+      }
 
-            <!-- Value  -->
-            <div class="card">
-              <div class="card-body">
-                <div class="row align-items-center gx-0">
-                  <div class="col">
+      .sell360report .card {
+        background-color: #fff;
+        border: none;
+        padding: 10px 15px;
+        margin: 15px 0px;
+        border-radius: 0px;
+        position: relative;
+        box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.2);
+        background-image: url(images/distributor-bg.jpg);
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: 100%;
+        height: 100px
+      }
 
-                    <!-- Title -->
-                    <h6 class="text-uppercase text-muted mb-2">
-                      Value
-                    </h6>
+      .sell360report h2 {
+        font-size: 18px;
+        padding-top: 15px;
+        margin-bottom: 15px;
+        display: block
+      }
 
-                    <!-- Heading -->
-                    <span class="h2 mb-0">
-                      $24,500
-                    </span>
+      .sell360report h4 {
+        font-size: 18px;
+        padding: 0;
+        margin: 0;
+        color: #282828
+      }
 
-                    <!-- Badge -->
-                    <span class="badge bg-success-soft mt-n1">
-                      +3.5%
-                    </span>
-                  </div>
-                  <div class="col-auto">
+      .sell360report h4 span {
+        color: #282828;
+        font-family: 'proximanova-regular', sans-serif !important;
+        position: relative;
+      }
 
-                    <!-- Icon -->
-                    <span class="h2 fe fe-dollar-sign text-muted mb-0"></span>
+      .sell360report .digit {
+        font-size: 30px;
+        font-weight: normal;
+        line-height: normal;
+        color: #282828;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        line-height: 1;
+        font-family: 'Rationale', sans-serif !important;
+        position: absolute;
+        bottom: 10px;
+        left: 15px
+      }
 
-                  </div>
-                </div> <!-- / .row -->
-              </div>
+      .sell360report .head-font {
+        font-size: 16px
+      }
+
+      .sell360report .card .cardicon {
+        width: 60px;
+        height: 60px;
+        position: absolute;
+        top: 20px;
+        right: 15px;
+        filter: drop-shadow(0px 0px 12px rgba(0, 0, 0, 0.2));
+      }
+
+      .action-btns {
+        padding: 30px 30px 0px 30px
+      }
+
+      .action-btns .btn-primary {
+        width: 100%;
+        letter-spacing: 1px;
+        font-size: 16px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+        background: linear-gradient(90deg, #fff 0%, #fff 100%);
+        border-color: #e3e3e3;
+        color: #282828;
+      }
+
+      .action-btns .btn-primary:hover,
+      .action-btns .btn-primary:focus {
+        background: linear-gradient(90deg, #031a50 0%, #06205e 100%);
+        color: #fff;
+      }
+
+      .action-btns .btn-primary i {
+        position: absolute;
+        right: 40px;
+        top: 25px;
+      }
+
+      .add_button {
+        letter-spacing: 1px;
+        font-size: 14px;
+        padding: 6px 12px;
+        top: 48px;
+        right: 15px;
+      }
+
+      #widget-meter {
+        width: 90px;
+        margin: 0 auto;
+        position: absolute;
+        top: -6px;
+        right: 15px;
+      }
+
+      #widget-meter .needle,
+      #widget-meter .needle-center {
+        fill: #a6a6a6;
+      }
+
+      .label-percent {
+        font-size: 22px;
+        fill: #06205e;
+        padding-top: 25px;
+        font-family: 'Rationale', sans-serif !important;
+      }
+
+      .h_dash {
+        position: relative;
+        padding: 0;
+      }
+
+      .h_dash a {
+        display: block;
+        -webkit-box-shadow: 0px 0px 12px 0px rgba(79, 79, 79, 0.3);
+        -moz-box-shadow: 0px 0px 12px 0px rgba(79, 79, 79, 0.3);
+        box-shadow: 0px 0px 12px 0px rgba(79, 79, 79, 0.3);
+        border-radius: 0px;
+        height: 150px;
+        width: 100%;
+        position: relative;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 30px;
+        background-image: url(images/dash-card-bg.png);
+        background-position: left bottom;
+        background-size: 30%;
+        background-repeat: no-repeat;
+        background-color: #fff;
+        -webkit-transition: all 0.15s;
+        -moz-transition: all 0.15s;
+        transition: all 0.15s;
+        s
+      }
+
+      .h_dash a::before {
+        content: '';
+        display: inline-block;
+        width: 2px;
+        height: 33px;
+        background-color: #424242;
+        position: absolute;
+        bottom: 22px;
+        left: 0;
+      }
+
+      .HD-title {
+        color: #282828;
+        font-size: 18px;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-align: left;
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+        margin: 0;
+        font-weight: 600;
+        padding: 0;
+        padding-bottom: 5px;
+        letter-spacing: 1px
+      }
+
+      .f-light {
+        font-weight: normal;
+        font-size: 14px;
+        display: block;
+        font-family: 'proximanova-light', sans-serif !important;
+        color: #787878
+      }
+
+      .h_dash a img {
+        width: 55px;
+        height: auto;
+        display: inline-block;
+        padding-top: 10px;
+        padding-right: 10px;
+        float: right;
+      }
+
+      .h_dash a:hover {
+        -webkit-box-shadow: 0px 0px 15px 0px rgba(79, 79, 79, 0.5);
+        -moz-box-shadow: 0px 0px 15px 0px rgba(79, 79, 79, 0.5);
+        box-shadow: 0px 0px 15px 0px rgba(79, 79, 79, 0.5);
+        background-size: 150%;
+        -webkit-transition: all 0.2s;
+        -moz-transition: all 0.2s;
+        transition: all 0.2s;
+      }
+
+      .h_dash a:hover .HD-title {
+        color: #06205e;
+      }
+
+</style>
+<div class="row _user-TS" style="margin-top:15px">
+            <div class="col-md-12 _dashTOP"> <img class="_user_Pimage" src="images/avatar.svg" alt="">
+              <h2 class="_head01">{{$message}}, Mr.{{Auth::user()->name}}</h2>
+              <p>Here’s what’s happening today.</p>
             </div>
-
           </div>
-          <div class="col-12 col-lg-6 col-xl">
-
-            <!-- Hours -->
-            <div class="card">
-              <div class="card-body">
-                <div class="row align-items-center gx-0">
-                  <div class="col">
-
-                    <!-- Title -->
-                    <h6 class="text-uppercase text-muted mb-2">
-                      Total hours
-                    </h6>
-
-                    <!-- Heading -->
-                    <span class="h2 mb-0">
-                      763.5
-                    </span>
-
-                  </div>
-                  <div class="col-auto">
-
-                    <!-- Icon -->
-                    <span class="h2 fe fe-briefcase text-muted mb-0"></span>
-
-                  </div>
-                </div> <!-- / .row -->
-              </div>
-            </div>
-
-          </div>
-          <div class="col-12 col-lg-6 col-xl">
-
-            <!-- Exit -->
-            <div class="card">
-              <div class="card-body">
-                <div class="row align-items-center gx-0">
-                  <div class="col">
-
-                    <!-- Title -->
-                    <h6 class="text-uppercase text-muted mb-2">
-                      Exit %
-                    </h6>
-
-                    <!-- Heading -->
-                    <span class="h2 mb-0">
-                      35.5%
-                    </span>
-
-                  </div>
-                  <div class="col-auto">
-
-                    <!-- Chart -->
-                    <div class="chart chart-sparkline">
-                      <canvas class="chart-canvas" id="sparklineChart" width="75" height="35" style="display: block; box-sizing: border-box; height: 35px; width: 75px;"></canvas>
-                    </div>
-
-                  </div>
-                </div> <!-- / .row -->
-              </div>
-            </div>
-
-          </div>
-          <div class="col-12 col-lg-6 col-xl">
-
-            <!-- Time -->
-            <div class="card">
-              <div class="card-body">
-                <div class="row align-items-center gx-0">
-                  <div class="col">
-
-                    <!-- Title -->
-                    <h6 class="text-uppercase text-muted mb-2">
-                      Avg. Time
-                    </h6>
-
-                    <!-- Heading -->
-                    <span class="h2 mb-0">
-                      2:37
-                    </span>
-
-                  </div>
-                  <div class="col-auto">
-
-                    <!-- Icon -->
-                    <span class="h2 fe fe-clock text-muted mb-0"></span>
-
-                  </div>
-                </div> <!-- / .row -->
-              </div>
-            </div>
-
-          </div>
-        </div> <!-- / .row -->
-        <div class="row">
-          <div class="col-12 col-xl-8">
-
-            <!-- Convertions -->
-            <div class="card">
-              <div class="card-header">
-
-                <!-- Title -->
-                <h4 class="card-header-title">
-                  Conversions
-                </h4>
-
-                <!-- Caption -->
-                <span class="text-muted me-3">
-                  Last year comparision:
-                </span>
-
-                <!-- Switch -->
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" id="cardToggle" data-toggle="chart" data-target="#conversionsChart" data-trigger="change" data-action="add" data-dataset="1">
-                  <label class="form-check-label" for="cardToggle"></label>
+          <div class="sell360report">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card mt-0"> 
+                  <!-- <img class="cardicon" src="images/today-order.svg" alt=""> -->
+                  <h4>Total <span>Sale</span></h4>
+                  <h2 class="digit"> 00 </h2>
                 </div>
+              </div> 
+              <div class="col-md-4">
+                <div class="card mt-0"> 
+                  <!-- <img class="cardicon" src="images/today-order.svg" alt=""> -->
+                  <h4>Total<span> Purchase</span></h4>
+                  <h2 class="digit">00</h2>
 
-              </div>
-              <div class="card-body">
-
-                <!-- Chart -->
-                <div class="chart">
-                  <canvas id="conversionsChart" class="chart-canvas" width="626" height="300" style="display: block; box-sizing: border-box; height: 300px; width: 626px;"></canvas>
-                <div id="chart-tooltip" role="tooltip" class="popover bs-popover-top" style="visibility: hidden; left: 209.211px; top: 119.77px; transform: translateX(-50%) translateY(-100%) translateY(-1rem);"><div class="popover-arrow translate-middle-x"></div><div class="popover-content"><div><h3 class="popover-header text-center text-nowrap">Oct 4</h3></div><div><div class="popover-body d-flex align-items-center text-nowrap justify-content-center"><span class="popover-body-indicator" style="background-color: rgb(44, 123, 229);"></span> 22%</div></div></div></div></div>
-
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-xl-4">
-
-            <!-- Traffic -->
-            <div class="card">
-              <div class="card-header">
-
-                <!-- Title -->
-                <h4 class="card-header-title">
-                  Traffic Channels
-                </h4>
-
-                <!-- Tabs -->
-                <ul class="nav nav-tabs nav-tabs-sm card-header-tabs">
-                  <li class="nav-item" data-toggle="chart" data-target="#trafficChart" data-trigger="click" data-action="toggle" data-dataset="0">
-                    <a href="https://dashkit.goodthemes.co/index.html#" class="nav-link active" data-bs-toggle="tab">
-                      All
-                    </a>
-                  </li>
-                  <li class="nav-item" data-toggle="chart" data-target="#trafficChart" data-trigger="click" data-action="toggle" data-dataset="1">
-                    <a href="https://dashkit.goodthemes.co/index.html#" class="nav-link" data-bs-toggle="tab">
-                      Direct
-                    </a>
-                  </li>
-                </ul>
-
-              </div>
-              <div class="card-body">
-
-                <!-- Chart -->
-                <div class="chart chart-appended">
-                  <canvas id="trafficChart" class="chart-canvas" data-toggle="legend" data-target="#trafficChartLegend" width="276" height="240" style="display: block; box-sizing: border-box; height: 240px; width: 276px;"></canvas>
                 </div>
-
-                <!-- Legend -->
-                <div id="trafficChartLegend" class="chart-legend"><div><span class="chart-legend-item"><span class="chart-legend-indicator" style="background-color: #2C7BE5"></span>Direct</span><span class="chart-legend-item"><span class="chart-legend-indicator" style="background-color: #A6C5F7"></span>Organic</span><span class="chart-legend-item"><span class="chart-legend-indicator" style="background-color: #D2DDEC"></span>Referral</span></div></div>
-
-              </div>
-            </div>
-          </div>
-        </div> <!-- / .row -->
-        <div class="row">
-          <div class="col-12 col-xl-4">
-
-            <!-- Projects -->
-            <div class="card card-fill">
-              <div class="card-header">
-
-                <!-- Title -->
-                <h4 class="card-header-title">
-                  Projects
-                </h4>
-
-                <!-- Link -->
-                <a href="https://dashkit.goodthemes.co/project-overview.html" class="small">View all</a>
-
-              </div>
-              <div class="card-body">
-
-                <!-- List group -->
-                <div class="list-group list-group-flush my-n3">
-                  <div class="list-group-item">
-                    <div class="row align-items-center">
-                      <div class="col-auto">
-
-                        <!-- Avatar -->
-                        <a href="https://dashkit.goodthemes.co/project-overview.html" class="avatar avatar-4by3">
-                          <img src="./assets/images/project-1.jpg" alt="..." class="avatar-img rounded">
-                        </a>
-
-                      </div>
-                      <div class="col ms-n2">
-
-                        <!-- Title -->
-                        <h4 class="mb-1">
-                          <a href="https://dashkit.goodthemes.co/project-overview.html">Homepage Redesign</a>
-                        </h4>
-
-                        <!-- Time -->
-                        <p class="card-text small text-muted">
-                          <time datetime="2018-05-24">Updated 4hr ago</time>
-                        </p>
-
-                      </div>
-                      <div class="col-auto">
-
-                        <!-- Dropdown -->
-                        <div class="dropdown">
-                          <a href="https://dashkit.goodthemes.co/index.html#" class="dropdown-ellipses dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fe fe-more-vertical"></i>
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-end">
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Another action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Something else here
-                            </a>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div> <!-- / .row -->
-                  </div>
-                  <div class="list-group-item">
-                    <div class="row align-items-center">
-                      <div class="col-auto">
-
-                        <!-- Avatar -->
-                        <a href="https://dashkit.goodthemes.co/project-overview.html" class="avatar avatar-4by3">
-                          <img src="./assets/images/project-2.jpg" alt="..." class="avatar-img rounded">
-                        </a>
-
-                      </div>
-                      <div class="col ms-n2">
-
-                        <!-- Title -->
-                        <h4 class="mb-1">
-                          <a href="https://dashkit.goodthemes.co/project-overview.html">Travels &amp; Time</a>
-                        </h4>
-
-                        <!-- Time -->
-                        <p class="card-text small text-muted">
-                          <time datetime="2018-05-24">Updated 4hr ago</time>
-                        </p>
-
-                      </div>
-                      <div class="col-auto">
-
-                        <!-- Dropdown -->
-                        <div class="dropdown">
-                          <a href="https://dashkit.goodthemes.co/index.html#" class="dropdown-ellipses dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fe fe-more-vertical"></i>
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-end">
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Another action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Something else here
-                            </a>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div> <!-- / .row -->
-                  </div>
-                  <div class="list-group-item">
-                    <div class="row align-items-center">
-                      <div class="col-auto">
-
-                        <!-- Avatar -->
-                        <a href="https://dashkit.goodthemes.co/project-overview.html" class="avatar avatar-4by3">
-                          <img src="./assets/images/project-3.jpg" alt="..." class="avatar-img rounded">
-                        </a>
-
-                      </div>
-                      <div class="col ms-n2">
-
-                        <!-- Title -->
-                        <h4 class="mb-1">
-                          <a href="https://dashkit.goodthemes.co/project-overview.html">Safari Exploration</a>
-                        </h4>
-
-                        <!-- Time -->
-                        <p class="card-text small text-muted">
-                          <time datetime="2018-05-24">Updated 4hr ago</time>
-                        </p>
-
-                      </div>
-                      <div class="col-auto">
-
-                        <!-- Dropdown -->
-                        <div class="dropdown">
-                          <a href="https://dashkit.goodthemes.co/index.html#" class="dropdown-ellipses dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fe fe-more-vertical"></i>
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-end">
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Another action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Something else here
-                            </a>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div> <!-- / .row -->
-                  </div>
-                  <div class="list-group-item">
-                    <div class="row align-items-center">
-                      <div class="col-auto">
-
-                        <!-- Avatar -->
-                        <a href="https://dashkit.goodthemes.co/project-overview.html" class="avatar avatar-4by3">
-                          <img src="./assets/images/project-5.jpg" alt="..." class="avatar-img rounded">
-                        </a>
-
-                      </div>
-                      <div class="col ms-n2">
-
-                        <!-- Title -->
-                        <h4 class="mb-1">
-                          <a href="https://dashkit.goodthemes.co/project-overview.html">Personal Site</a>
-                        </h4>
-
-                        <!-- Time -->
-                        <p class="card-text small text-muted">
-                          <time datetime="2018-05-24">Updated 4hr ago</time>
-                        </p>
-
-                      </div>
-                      <div class="col-auto">
-
-                        <!-- Dropdown -->
-                        <div class="dropdown">
-                          <a href="https://dashkit.goodthemes.co/index.html#" class="dropdown-ellipses dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fe fe-more-vertical"></i>
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-end">
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Another action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Something else here
-                            </a>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div> <!-- / .row -->
-                  </div>
+              </div> 
+              <div class="col-md-4">
+                <div class="card mt-0"> 
+                  <!-- <img class="cardicon" src="images/target-monthly-icon.svg" alt=""> -->
+                  <h4>Total <span>Expense</span></h4>
+                  <h2 class="digit"><small></small> 00</h2>
                 </div>
-
-              </div> <!-- / .card-body -->
-            </div> <!-- / .card -->
-          </div>
-          <div class="col-12 col-xl-8">
-
-            <!-- Sales -->
-            <div class="card">
-              <div class="card-header">
-
-                <!-- Title -->
-                <h4 class="card-header-title">
-                  Sales
-                </h4>
-
-                <!-- Nav -->
-                <ul class="nav nav-tabs nav-tabs-sm card-header-tabs">
-                  <li class="nav-item" data-toggle="chart" data-target="#salesChart" data-trigger="click" data-action="toggle" data-dataset="0">
-                    <a class="nav-link active" href="https://dashkit.goodthemes.co/index.html#" data-bs-toggle="tab">
-                      All
-                    </a>
-                  </li>
-                  <li class="nav-item" data-toggle="chart" data-target="#salesChart" data-trigger="click" data-action="toggle" data-dataset="1">
-                    <a class="nav-link" href="https://dashkit.goodthemes.co/index.html#" data-bs-toggle="tab">
-                      Direct
-                    </a>
-                  </li>
-                  <li class="nav-item" data-toggle="chart" data-target="#salesChart" data-trigger="click" data-action="toggle" data-dataset="2">
-                    <a class="nav-link" href="https://dashkit.goodthemes.co/index.html#" data-bs-toggle="tab">
-                      Organic
-                    </a>
-                  </li>
-                </ul>
-
-              </div>
-              <div class="card-body">
-
-                <!-- Chart -->
-                <div class="chart">
-                  <canvas id="salesChart" class="chart-canvas" width="626" height="300" style="display: block; box-sizing: border-box; height: 300px; width: 626px;"></canvas>
-                <div id="chart-tooltip" role="tooltip" class="popover bs-popover-top" style="visibility: hidden; left: 103.509px; top: 168.867px; transform: translateX(-50%) translateY(-100%) translateY(-1rem);"><div class="popover-arrow translate-middle-x"></div><div class="popover-content"><div><h3 class="popover-header text-center text-nowrap">Oct 3</h3></div><div><div class="popover-body d-flex align-items-center text-nowrap justify-content-center"><span class="popover-body-indicator" style="background-color: rgb(44, 123, 229);"></span> $10k</div></div></div></div></div>
-
               </div>
             </div>
-
           </div>
-        </div> <!-- / .row -->
-        <div class="row">
-          <div class="col-12">
+          <div class="col-12 h_dash">
+            <div class="row">
+              <div class="col-3"><a href="{{route('sale-add')}}"><img src="{{asset('images/add-course.svg')}}" alt="" />
+                  <h2 class="HD-title">Sale <span class="f-light">Incvoice</span></h2>
+                </a> </div>
+              <div class="col-3"><a href="{{route('stock-add')}}"><img src="{{asset('images/add-teacher.svg')}}" alt="" />
+                  <h2 class="HD-title">Purchase <span class="f-light">Invoice</span></h2>
+                </a> </div>
+              <div class="col-3"><a href="{{route('purchase-return')}}"><img src="{{asset('images/add-students.svg')}}" alt="" />
+                  <h2 class="HD-title">Replacement <span class="f-light">Purchases</span></h2>
+                </a> </div>
+                <div class="col-3"><a href="{{route('vendor-ledgers')}}"><img src="{{asset('images/enrollments-add.svg')}}" alt="" />
+                  <h2 class="HD-title"> Vendor<span class="f-light">Payments</span></h2>
+                </a> </div>
+                <div class="col-3"><a href="{{route('customer-ledgers')}}"><img src="{{asset('images/quiz-list.svg')}}" alt="" />
+                  <h2 class="HD-title">Customer <span class="f-light">Payments</span></h2>
+                </a> </div>
+              
+              <div class="col-3"><a href="{{route('customer-reports')}}"><img src="{{asset('images/campaign-list.svg')}}" alt="" />
+                  <h2 class="HD-title">Customer <span class="f-light">Reports </span></h2>
+                </a> </div>
+              <div class="col-3"><a href="{{route('customer-reports')}}"><img src="{{asset('images/complaint-list.svg')}}" alt="" />
+                  <h2 class="HD-title">Vendor <span class="f-light">Reports</span></h2>
+                </a> </div>                
+              <!-- <div class="col-3"><a href="{{route('customer-reports')}}"><img src="{{asset('images/payment-manage.svg')}}" alt=""/>
+                <h2 class="HD-title">Manage  <span class="f-light">Payments</span></h2>
+              </a> </div> -->
 
-            <!-- Goals -->
-            <div class="card">
-              <div class="card-header">
-                <div class="row align-items-center">
-                  <div class="col">
-
-                    <!-- Title -->
-                    <h4 class="card-header-title">
-                      Goals
-                    </h4>
-
-                  </div>
-                  <div class="col-auto">
-
-                    <!-- Button -->
-                    <a href="https://dashkit.goodthemes.co/index.html#!" class="btn btn-sm btn-white">
-                      Export
-                    </a>
-
-                  </div>
-                </div> <!-- / .row -->
-              </div>
-              <div class="table-responsive mb-0" data-list="{&quot;valueNames&quot;: [&quot;goal-project&quot;, &quot;goal-status&quot;, &quot;goal-progress&quot;, &quot;goal-date&quot;]}">
-                <table class="table table-sm table-nowrap card-table">
-                  <thead>
-                    <tr>
-                      <th>
-                        <a href="https://dashkit.goodthemes.co/index.html#" class="text-muted list-sort" data-sort="goal-project">
-                          Goal
-                        </a>
-                      </th>
-                      <th>
-                        <a href="https://dashkit.goodthemes.co/index.html#" class="text-muted list-sort" data-sort="goal-status">
-                          Status
-                        </a>
-                      </th>
-                      <th>
-                        <a href="https://dashkit.goodthemes.co/index.html#" class="text-muted list-sort" data-sort="goal-progress">
-                          Progress
-                        </a>
-                      </th>
-                      <th>
-                        <a href="https://dashkit.goodthemes.co/index.html#" class="text-muted list-sort" data-sort="goal-date">
-                          Due date
-                        </a>
-                      </th>
-                      <th class="text-end">
-                        Team
-                      </th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody class="list"><tr>
-                      <td class="goal-project">
-                        Update the API
-                      </td>
-                      <td class="goal-status">
-                        <span class="text-warning">●</span> In progress
-                      </td>
-                      <td class="goal-progress">
-                        55%
-                      </td>
-                      <td class="goal-date">
-                        <time datetime="2018-10-24">07/24/18</time>
-                      </td>
-                      <td class="text-end">
-                        <div class="avatar-group">
-                          <a href="https://dashkit.goodthemes.co/profile-posts.html" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Dianna Smiley">
-                            <img src="./assets/images/avatar-1.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/profile-posts.html" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Ab Hadley">
-                            <img src="./assets/images/avatar-2.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/profile-posts.html" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Adolfo Hess">
-                            <img src="./assets/images/avatar-3.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/profile-posts.html" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Daniela Dewitt">
-                            <img src="./assets/images/avatar-4.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="text-end">
-                        <div class="dropdown">
-                          <a href="https://dashkit.goodthemes.co/index.html#" class="dropdown-ellipses dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fe fe-more-vertical"></i>
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-end">
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Another action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Something else here
-                            </a>
-                          </div>
-                        </div>
-                      </td>
-                    </tr><tr>
-                      <td class="goal-project">
-                        Release v1.2-Beta
-                      </td>
-                      <td class="goal-status">
-                        <span class="text-warning">●</span> In progress
-                      </td>
-                      <td class="goal-progress">
-                        25%
-                      </td>
-                      <td class="goal-date">
-                        <time datetime="2018-10-24">08/26/18</time>
-                      </td>
-                      <td class="text-end">
-                        <div class="avatar-group justify-content-end">
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Dianna Smiley">
-                            <img src="./assets/images/avatar-1.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Ab Hadley">
-                            <img src="./assets/images/avatar-2.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Adolfo Hess">
-                            <img src="./assets/images/avatar-3.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="text-end">
-                        <div class="dropdown">
-                          <a href="https://dashkit.goodthemes.co/index.html#" class="dropdown-ellipses dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fe fe-more-vertical"></i>
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-end">
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Another action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Something else here
-                            </a>
-                          </div>
-                        </div>
-                      </td>
-                    </tr><tr>
-                      <td class="goal-project">
-                        GDPR Compliance
-                      </td>
-                      <td class="goal-status">
-                        <span class="text-success">●</span> Completed
-                      </td>
-                      <td class="goal-progress">
-                        100%
-                      </td>
-                      <td class="goal-date">
-                        <time datetime="2018-10-24">06/19/18</time>
-                      </td>
-                      <td class="text-end">
-                        <div class="avatar-group justify-content-end">
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Dianna Smiley">
-                            <img src="./assets/images/avatar-1.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Ab Hadley">
-                            <img src="./assets/images/avatar-2.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Adolfo Hess">
-                            <img src="./assets/images/avatar-3.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="text-end">
-                        <div class="dropdown">
-                          <a href="https://dashkit.goodthemes.co/index.html#" class="dropdown-ellipses dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fe fe-more-vertical"></i>
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-end">
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Another action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Something else here
-                            </a>
-                          </div>
-                        </div>
-                      </td>
-                    </tr><tr>
-                      <td class="goal-project">
-                        v1.2 Documentation
-                      </td>
-                      <td class="goal-status">
-                        <span class="text-danger">●</span> Cancelled
-                      </td>
-                      <td class="goal-progress">
-                        0%
-                      </td>
-                      <td class="goal-date">
-                        <time datetime="2018-10-24">06/25/18</time>
-                      </td>
-                      <td class="text-end">
-                        <div class="avatar-group justify-content-end">
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Dianna Smiley">
-                            <img src="./assets/images/avatar-1.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Ab Hadley">
-                            <img src="./assets/images/avatar-2.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="text-end">
-                        <div class="dropdown">
-                          <a href="https://dashkit.goodthemes.co/index.html#" class="dropdown-ellipses dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="fe fe-more-vertical"></span>
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-end">
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Another action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Something else here
-                            </a>
-                          </div>
-                        </div>
-                      </td>
-                    </tr><tr>
-                      <td class="goal-project">
-                        Plan design offsite
-                      </td>
-                      <td class="goal-status">
-                        <span class="text-success">●</span> Completed
-                      </td>
-                      <td class="goal-progress">
-                        100%
-                      </td>
-                      <td class="goal-date">
-                        <time datetime="2018-10-24">06/30/18</time>
-                      </td>
-                      <td class="text-end">
-                        <div class="avatar-group justify-content-end">
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Dianna Smiley">
-                            <img src="./assets/images/avatar-1.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Ab Hadley">
-                            <img src="./assets/images/avatar-2.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Adolfo Hess">
-                            <img src="./assets/images/avatar-3.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                          <a href="https://dashkit.goodthemes.co/index.html#!" class="avatar avatar-xs" data-bs-toggle="tooltip" title="" data-bs-original-title="Daniela Dewitt">
-                            <img src="./assets/images/avatar-4.jpg" class="avatar-img rounded-circle" alt="...">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="text-end">
-                        <div class="dropdown">
-                          <a href="https://dashkit.goodthemes.co/index.html#" class="dropdown-ellipses dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fe fe-more-vertical"></i>
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-end">
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Another action
-                            </a>
-                            <a href="https://dashkit.goodthemes.co/index.html#!" class="dropdown-item">
-                              Something else here
-                            </a>
-                          </div>
-                        </div>
-                      </td>
-                    </tr></tbody>
-                </table>
-              </div>
             </div>
-
           </div>
-        </div> <!-- / .row -->
-        <div class="row">
-          <div class="col-12 col-xl-5">
-
-            <!-- Activity -->
-            <div class="card card-fill">
-              <div class="card-header">
-
-                <!-- Title -->
-                <h4 class="card-header-title">
-                  Recent Activity
-                </h4>
-
-                <!-- Button -->
-                <a class="small" href="https://dashkit.goodthemes.co/index.html#!">View all</a>
-
-              </div>
-              <div class="card-body">
-
-                <!-- List group -->
-                <div class="list-group list-group-flush list-group-activity my-n3">
-                  <div class="list-group-item">
-                    <div class="row">
-                      <div class="col-auto">
-
-                        <!-- Avatar -->
-                        <div class="avatar avatar-sm avatar-online">
-                          <img class="avatar-img rounded-circle" src="./assets/images/avatar-1.jpg" alt="...">
-                        </div>
-
-                      </div>
-                      <div class="col ms-n2">
-
-                        <!-- Heading -->
-                        <h5 class="mb-1">
-                          Dianna Smiley
-                        </h5>
-
-                        <!-- Text -->
-                        <p class="small text-gray-700 mb-0">
-                          Uploaded the files "Launchday Logo" and "New Design".
-                        </p>
-
-                        <!-- Time -->
-                        <small class="text-muted">
-                          2m ago
-                        </small>
-
-                      </div>
-                    </div> <!-- / .row -->
-                  </div>
-                  <div class="list-group-item">
-                    <div class="row">
-                      <div class="col-auto">
-
-                        <!-- Avatar -->
-                        <div class="avatar avatar-sm avatar-online">
-                          <img class="avatar-img rounded-circle" src="./assets/images/avatar-2.jpg" alt="...">
-                        </div>
-
-                      </div>
-                      <div class="col ms-n2">
-
-                        <!-- Heading -->
-                        <h5 class="mb-1">
-                          Ab Hadley
-                        </h5>
-
-                        <!-- Text -->
-                        <p class="small text-gray-700 mb-0">
-                          Shared the "Why Dashkit?" post with 124 subscribers.
-                        </p>
-
-                        <!-- Time -->
-                        <small class="text-muted">
-                          1h ago
-                        </small>
-
-                      </div>
-                    </div> <!-- / .row -->
-                  </div>
-                  <div class="list-group-item">
-                    <div class="row">
-                      <div class="col-auto">
-
-                        <!-- Avatar -->
-                        <div class="avatar avatar-sm avatar-offline">
-                          <img class="avatar-img rounded-circle" src="./assets/images/avatar-3.jpg" alt="...">
-                        </div>
-
-                      </div>
-                      <div class="col ms-n2">
-
-                        <!-- Heading -->
-                        <h5 class="mb-1">
-                          Adolfo Hess
-                        </h5>
-
-                        <!-- Text -->
-                        <p class="small text-gray-700 mb-0">
-                          Exported sales data from Launchday's subscriber data.
-                        </p>
-
-                        <!-- Time -->
-                        <small class="text-muted">
-                          3h ago
-                        </small>
-
-                      </div>
-                    </div>
-                    <!-- / .row -->
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-          <div class="col-12 col-xl-7">
-
-            <!-- Checklist -->
-            <div class="card">
-              <div class="card-header">
-
-                <!-- Title -->
-                <h4 class="card-header-title">
-                  Scratchpad Checklist
-                </h4>
-
-                <!-- Badge -->
-                <span class="badge bg-secondary-soft">
-                  23 Archived
-                </span>
-
-              </div>
-              <div class="card-body">
-
-                <!-- Checklist -->
-                <div class="checklist" tabindex="0">
-                  <div class="form-check" tabindex="0">
-                    <input class="form-check-input" type="checkbox" id="checklistOne">
-                    <label class="form-check-label">Delete the old mess in functions files.</label>
-                  </div>
-                  <div class="form-check" tabindex="0">
-                    <input class="form-check-input" type="checkbox" id="checklistTwo">
-                    <label class="form-check-label">Refactor the core social sharing modules.</label>
-                  </div>
-                  <div class="form-check" tabindex="0">
-                    <input class="form-check-input" type="checkbox" id="checklistThree">
-                    <label class="form-check-label">Create the release notes for the new pages so customers get psyched.</label>
-                  </div>
-                  <div class="form-check" tabindex="0">
-                    <input class="form-check-input" type="checkbox" id="checklistFour">
-                    <label class="form-check-label">Send Dianna those meeting notes.</label>
-                  </div>
-                  <div class="form-check" tabindex="0">
-                    <input class="form-check-input" type="checkbox" id="checklistFive">
-                    <label class="form-check-label">Share the documentation for the new unified API.</label>
-                  </div>
-                  <div class="form-check" tabindex="0">
-                    <input class="form-check-input" type="checkbox" id="checklistSix" checked="">
-                    <label class="form-check-label">Clean up the Figma file with all of the avatars, buttons, and other
-                      components.</label>
-                  </div>
-                </div>
-
-              </div>
-              <div class="card-footer">
-                <div class="row align-items-center">
-                  <div class="col">
-
-                    <!-- Input -->
-                    <textarea class="form-control form-control-flush form-control-auto" data-autosize="" rows="1" placeholder="Create a task" style="overflow: hidden; overflow-wrap: break-word; height: 25px;"></textarea>
-
-                  </div>
-                  <div class="col-auto">
-
-                    <!-- Button -->
-                    <button class="btn btn-sm btn-primary">
-                      Add
-                    </button>
-
-                  </div>
-                </div> <!-- / .row -->
-              </div>
-            </div>
-
-          </div>
-        </div> <!-- / .row -->
-      </div>
-
+  
 @endsection

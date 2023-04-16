@@ -189,7 +189,7 @@ class SaleController extends Controller
         $purchasd_products =     ProductSale::where('sale_invoice_id',$id)
                                  ->selectRaw('products_sales.*')
                                  ->get();
-        $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)->where('trx_type','!=',1)->orderBy('id', 'DESC')->first();
+        $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)->where('trx_type','=',1)->orderBy('id', 'DESC')->first();
 
         return view('sales.add',compact('invoice','customers','products','customers','get_customer_ledger'));
     }
