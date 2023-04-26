@@ -46,7 +46,7 @@
                     <tr>
                         <th>Invoice #</th>
                         <th>Customer Name</th>
-                        <th>Paid</th>
+                        <th>Received</th>
                         <th>Amount</th>
                         <th>Action</th>
                     </tr>
@@ -60,7 +60,7 @@
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td>
                     <td>
                         <a id="{{$sale->id}}" class="btn btn-default btn-line" href="{{route('sale-edit' ,['id'=>$sale->id])}}">Edit</a>
-                        <button id="{{$sale->id}}" data-invoice="{{$sale->invoice_id}}" data-customer-id="{{$sale->customer_id}}" paid-amount="{{$sale->paid_amount}}" class="btn btn-default print-invoice">Print</button>
+                        <button id="{{$sale->id}}" data-invoice="{{$sale->id}}" data-customer-id="{{$sale->customer_id}}" paid-amount="{{$sale->paid_amount}}" class="btn btn-default print-invoice">Print</button>
                         <!-- <button type="button" id="{{$sale->id}}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button> -->
                     </td>
                 </tr>

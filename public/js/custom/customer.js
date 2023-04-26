@@ -93,10 +93,13 @@ var lastOp = "";
 var glob_type = '';
 
 var deleteRef = '';
+var action = '';
 $(document).ready(function () {
   var segments = location.href.split('/');
-  var action = segments[3];
+  action = segments[3];
   if (action == "customer") {
+    fetchcustomers();
+  } else {
     fetchcustomers();
   }
   $(document).on('click', '.openDataSidebarForAddingCustomer', function () {
@@ -267,22 +270,29 @@ $(document).ready(function () {
 });
 function fetchcustomers() {
   $.ajax({
-    type: 'GET',
+    type: 'post',
     url: '/get-customers',
+    data: {
+      _token: $('meta[name="csrf_token"]').attr('content'),
+      route: action
+    },
     success: function success(response) {
-      $('.body').empty();
-      $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Type</th><th>Action</th></tr></thead><tbody></tbody></table>');
-      $('.mainCatsListTable tbody').empty();
-      // var response = JSON.parse(response);
-      var sNo = 1;
-      response.customers.forEach(function (element, key) {
-        $('.mainCatsListTable tbody').append("\n                        <tr>\n                            <td>".concat(key + 1, "</td>\n                            <td>").concat(element['customer_name'], "</td>\n                            <td> ").concat(element['customer_type'] == 1 ? 'Vendor' : 'Customer', "</td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdatecustomer\">Edit</button>\n                                <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg deleteMaincustomer delete_cat\" name=\"main_cat\" title=\"Delete\">Delete</button>\n                                \n                            </td>\n                        </tr>"));
-      });
-      $('#tblLoader').hide();
-      $('.body').fadeIn();
-      $('.mainCatsListTable').DataTable();
+      table(response.customers);
     }
   });
+  function table(data) {
+    $('.body').empty();
+    $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Type</th><th>Action</th></tr></thead><tbody></tbody></table>');
+    $('.mainCatsListTable tbody').empty();
+    // var response = JSON.parse(response);
+    var sNo = 1;
+    data.forEach(function (element, key) {
+      $('.mainCatsListTable tbody').append("\n            <tr>\n                <td>".concat(key + 1, "</td>\n                <td>").concat(element['customer_name'], "</td>\n                <td> ").concat(element['customer_type'] == 1 ? 'Vendor' : 'Customer', "</td>\n                <td>\n                    <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdatecustomer\">Edit</button>\n                    <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg deleteMaincustomer delete_cat\" name=\"main_cat\" title=\"Delete\">Delete</button>\n                    \n                </td>\n            </tr>"));
+    });
+    $('#tblLoader').hide();
+    $('.body').fadeIn();
+    $('.mainCatsListTable').DataTable();
+  }
 }
 })();
 

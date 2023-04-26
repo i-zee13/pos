@@ -8,11 +8,11 @@ TRUNCATE `sale_invoices` ;
 TRUNCATE `products_sales` ;
 
 TRUNCATE products_returns;
-TRUNCATE return_invoices;
- // Stock
+TRUNCATE return_invoices; 
+
 TRUNCATE stocks;
-TRUNCATE vendor_stocks;
- // Ledgers
+TRUNCATE vendor_stocks; 
+
 TRUNCATE customer_ledger;
 TRUNCATE vendor_ledger;
 

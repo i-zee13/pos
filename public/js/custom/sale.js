@@ -17358,7 +17358,9 @@ $(document).ready(function () {
   stock_products = JSON.parse($('#stock_products').val());
   customer_ledger = JSON.parse($('#customer_ledger').val());
   getProducts();
+  $('.display').show();
   if (segments[3] == "stock-add") {
+    $('#customer_id').val('8').trigger('change');
     //
   } else if (segments[3] == 'sale-edit') {
     customer_id = $('#curren_customer_id').val();
@@ -17372,6 +17374,7 @@ $(document).ready(function () {
           existing_product_ids.push(product.id);
           p_name = product.product_name;
           sales_product_array.push({
+            'sale_prod_id': "".concat(product.id),
             'product_id': "".concat(product.product_id),
             'expiry_date': "".concat(product.expiry_date),
             'qty': "".concat(product.qty),
@@ -17400,7 +17403,6 @@ $(document).ready(function () {
   getvendors();
   $('.add-more-btn').attr('href', '#');
   $('.new_form_field').addClass('required_client');
-  $('#client_type').attr('disabled', true);
 });
 $('#add-product').on('click', function () {
   if ($('#qty').val() == '') {
@@ -17429,6 +17431,7 @@ $('#add-product').on('click', function () {
     expiry_date = $('.expiry_date').val();
   }
   sales_product_array.push({
+    'sale_prod_id': '',
     'product_id': "".concat(product_id),
     'expiry_date': "".concat(expiry_date),
     'qty': "".concat(qty),
@@ -17459,6 +17462,13 @@ $('#add-product').on('click', function () {
 });
 
 $('#invoice_type').change(function () {
+  if ($(this).val() == 1) {
+    $('#customer_id').removeClass('required');
+    $('#customer_id').val('8').trigger('change');
+  } else {
+    $('#customer_id').addClass('required');
+    $('#customer_id').val('0').trigger('change');
+  }
   var total_paid_for_net_sale = 0;
   if ($(this).val() == '1') {
     sales_product_array.forEach(function (data, key) {
@@ -17937,7 +17947,7 @@ $('#customer_id').change(function () {
       success: function success(response) {
         console.log(customer_ledger);
         previous_payable = response.customer_balance;
-        var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0 ? -previous_payable + " DR" : previous_payable;
+        var previous_payable_text = previous_payable >= 0 ? previous_payable + " CR" : previous_payable < 0 ? -previous_payable + " DR" : previous_payable;
         $('.previous_payable').text(previous_payable_text);
         $('.previous_payable').val(previous_payable);
         if (segments[3] == "sale-edit") {
@@ -17951,16 +17961,26 @@ $('#customer_id').change(function () {
     var customer = vendors.filter(function (x) {
       return x.id == selected_index;
     });
+    // $('#invoice_type').val('2').trigger('change');
   }
 });
+
 function grandSum(previous_payable) {
   var sum = 0;
   sales_product_array.forEach(function (data, key) {
     sum += parseFloat(data.amount);
   });
+  console.log('sales :'.sales_product_array);
   sale_total_amount = sum;
-  sum += parseFloat(previous_payable);
+  sum += parseFloat(previous_payable ? previous_payable : 0);
   $('.grand-total').text(sum);
+  $('.amount_pay_input').val(sum - $('.paid_amount').text());
+  if ($('.grand-total').text() == $('.paid_amount').text()) {
+    $('.th-to-hide').hide();
+    $('.amount_received').val($('.amount_pay_input').val());
+  } else {
+    $('.th-to-hide').show();
+  }
 }
 function productRetailAmount() {
   retail_price = $('#retail_price').val();
@@ -17968,12 +17988,11 @@ function productRetailAmount() {
   $('#amount').val(amount);
 }
 $(document).on('focusout', '.amount_received', function () {
-  var result = $(this).val() - $('.amount_pay_input ').val();
-  if (result > 0) {
-    $('.cash_return').text(result);
-  } else {
-    $('.cash_return').text(0);
-  }
+  var result = $(this).val() - $('.amount_pay_input').val();
+  $('.cash_return').text(result);
+});
+$('.service_charges_input').on('focusout', function () {
+  grandSum($(this).val());
 });
 })();
 

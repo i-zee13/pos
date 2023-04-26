@@ -441,7 +441,6 @@
   <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
   <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
   <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
-
   <div class="row">
     <div class="col-md-12">
       <div class="card">
@@ -485,9 +484,9 @@
                <div class="col-md-3 client">
                 <h2 class="_head04 border-0">Invoice<span> Type</span>*</h2>
                 <div class="form-s2">
-                <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type">
-                    <option value="1" selected>Net Sale</option>
-                    <option value="2">Add To Ledger</option>
+                <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                    <option value="1" {{@$invoice->invoice_type ==1 ? 'selected' : ''}}>Net Sale</option>
+                    <option value="2" {{@$invoice->invoice_type ==2 ? 'selected' : ''}}>Add To Ledger</option>
                 </select>
                 </div>
               </div>
@@ -669,43 +668,43 @@
                             <tr rowspan="5">
                               
                             </tr>
-
                             @if (Route::currentRouteName() == 'sale-edit')
                               <tr rowspan="5">
                                   <th colspan="3" style="text-align:right;font-family:sans-serif">Paid</th>
                                   <th class="paid_amount" colspan="4" style="text-align: center;">0</th>
                               </tr>
                           @endif
-
-                            <tr rowspan="5">
+                            
+                            <tr rowspan="5"  class="th-to-hide">
                               <!-- <th colspan="3" style="text-align:right;font-family:sans-serif">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input" data-id="" data-value="">
                               </th> -->
-                            </tr><tr rowspan="5">
+                            </tr><tr rowspan="5"  class="th-to-hide">
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Service charges </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input service_charges_input" data-id="" data-value="">
                               </th>
                             </tr>
-                            <tr rowspan="5">
+                            <tr rowspan="5"  class="th-to-hide">
                               <th colspan="3" style="text-align:right;font-family:sans-serif">{{Route::currentRouteName() == 'sale-edit' ? 'Remaining Amount' : 'Net Amount'}}</th>
                               <th class="" colspan="4" style="text-align: center;">
-                                <input type="text" value="" class="qty-input add-stock-input amount_pay_input remaning_amount" name="amount_paid">
+                                <input type="text" value="" class="qty-input add-stock-input amount_pay_input remaning_amount" name="amount_paid" readonly>
                               </th>
                             </tr>
-                            <tr rowspan="5">
+                            <tr rowspan="5"  class="th-to-hide">
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Cash Recived</th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="number" class="add-stock-input amount_received">
                               </th>
                             </tr> 
-                            <tr rowspan="5">
+                            <tr rowspan="5"  class="th-to-hide">
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Cash Return</th>
                               <th class="cash_return" colspan="4" style="text-align: center;">
                                0 
                               </th>
                             </tr>
+                            
                           </tfoot>
                         </table>
                       </div>

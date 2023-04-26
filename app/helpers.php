@@ -139,9 +139,9 @@ if(!function_exists('getInvoice'))
     {
         $year        = date('y');
         $invoice_no  = 1;
-        $lastinvoice = SaleInvoice::latest()->value('invoice_no');
+        $lastinvoice = SaleInvoice::latest()->value('id');
         if(isset($lastinvoice)){
-            $invoice_no = $lastinvoice.'-'.$year;
+            $invoice_no = ($lastinvoice+1).'-'.$year;
            return $invoice_no;
         }else{
             $invoice_no = $invoice_no.'-'.$year;

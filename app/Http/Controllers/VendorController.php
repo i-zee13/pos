@@ -5,27 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Auth;
-use Illuminate\Routing\Route;
-use Illuminate\Support\Facades\Route as FacadesRoute;
 
-class CustomerController extends Controller
+class VendorController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    
-
     public function index()
     {
-        $route  = FacadesRoute::currentRouteName();
-        if($route == 'vendors.index'){
-            $name = 'Vendor';
-        }else{
-            $name = 'Customer';
-        }
-        return view('customer.index',compact('name'));
+        dd(34);
+        return view('customer.index');
     }
 
     /**
@@ -101,14 +92,9 @@ class CustomerController extends Controller
             'status' => 'failed'
         ]);
     }
-    public function getCustomers(Request $request)
+    public function getCustomers()
     {
-    
-        if($request->route == 'vendors'){
-            $customers = Customer::where('customer_type',1)->get();
-        }else{
-            $customers = Customer::where('customer_type',2)->get();
-        }
+        $customers = Customer::all();
         return response()->json([
             'msg' => 'Customer Fetched',
             'status' => 'success',

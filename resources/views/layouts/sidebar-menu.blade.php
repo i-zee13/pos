@@ -18,15 +18,15 @@
       <div class="dropdown">
 
         <!-- Toggle -->
-        <a href="https://dashkit.goodthemes.co/index.html#" id="sidebarIcon" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a href="#" id="sidebarIcon" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <div class="avatar avatar-sm avatar-online">
             <img src="{{asset('assets/images/avatar-1.jpg')}}" class="avatar-img rounded-circle" alt="...">
           </div>
         </a>
         <!-- Menu -->
         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sidebarIcon">
-          <a href="https://dashkit.goodthemes.co/profile-posts.html" class="dropdown-item">Profile</a>
-          <a href="https://dashkit.goodthemes.co/account-general.html" class="dropdown-item">Settings</a>
+          <a href="#" class="dropdown-item">Profile</a>
+          <a href="#" class="dropdown-item">Settings</a>
           <hr class="dropdown-divider">
           <a href="{{ route('logout') }}" class="dropdown-item">Logout</a>
         </div>
@@ -52,15 +52,38 @@
         Documentation
       </h6>
       <!-- Navigation -->
-      <li class="nav-item">
-        <a class="nav-link p-0 customer-class" href="{{route('customer.index')}}">
-        <i class="fa fa-users mr-5" aria-hidden="true"></i> Customer
-        </a>
-      </li>
 
       <ul class="navbar-nav ">
         <li class="nav-item">
-          <a class="nav-link collapsed" href="https://dashkit.goodthemes.co/index.html#sidebarproducts" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarproducts">
+          <a class="nav-link collapsed" href="#sidebarclient" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarclient">
+          <i class="fa fa-briefcase" aria-hidden="true"></i> Clients
+          </a>
+          <div class="collapse" id="sidebarclient">
+            <ul class="nav nav-sm flex-column">
+               <li class="nav-item">
+                <a href="{{route('vendors.index')}}" class="nav-link ">
+                  Vendors
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('customer.index')}}" class="nav-link ">
+                  Customers
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+
+      <!-- <li class="nav-item">
+        <a class="nav-link p-0 customer-class" href="{{route('customer.index')}}">
+        <i class="fa fa-users mr-5" aria-hidden="true"></i> Customer
+        </a>
+      </li> -->
+
+      <ul class="navbar-nav ">
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#sidebarproducts" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarproducts">
             <i class="fa fa-clipboard"></i> Products
           </a>
           <div class="collapse " id="sidebarproducts">
@@ -81,7 +104,7 @@
       </ul>
       <ul class="navbar-nav ">
         <li class="nav-item">
-          <a class="nav-link collapsed" href="https://dashkit.goodthemes.co/index.html#sidebarStock" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarStock">
+          <a class="nav-link collapsed" href="#sidebarStock" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarStock">
           <i class="fa fa-briefcase" aria-hidden="true"></i> Purchases
           </a>
           <div class="collapse " id="sidebarStock">
@@ -187,7 +210,7 @@
       <div class="navbar-user d-none d-md-flex" id="sidebarUser">
 
         <!-- Icon -->
-        <a class="navbar-user-link" data-bs-toggle="offcanvas" href="https://dashkit.goodthemes.co/index.html#sidebarOffcanvasActivity" aria-controls="sidebarOffcanvasActivity">
+        <a class="navbar-user-link" data-bs-toggle="offcanvas" href="#" aria-controls="sidebarOffcanvasActivity">
           <span class="icon">
             <i class="fe fe-bell"></i>
           </span>
@@ -197,15 +220,15 @@
         <div class="dropup">
 
           <!-- Toggle -->
-          <a href="https://dashkit.goodthemes.co/index.html#" id="sidebarIconCopy" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a href="#" id="sidebarIconCopy" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <div class="avatar avatar-sm avatar-online">
               <img src="{{asset('/assets/images/avatar-1.jpg')}}" class="avatar-img rounded-circle" alt="...">
             </div>
           </a>
           <!-- Menu -->
           <div class="dropdown-menu" aria-labelledby="sidebarIconCopy">
-            <a href="https://dashkit.goodthemes.co/profile-posts.html" class="dropdown-item">Profile</a>
-            <a href="https://dashkit.goodthemes.co/account-general.html" class="dropdown-item">Settings</a>
+            <a href="#" class="dropdown-item">Profile</a>
+            <a href="#" class="dropdown-item">Settings</a>
             <hr class="dropdown-divider">
             <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
@@ -221,7 +244,7 @@
         </div>
 
         <!-- Icon -->
-        <a class="navbar-user-link" data-bs-toggle="offcanvas" href="https://dashkit.goodthemes.co/index.html#sidebarOffcanvasSearch" aria-controls="sidebarOffcanvasSearch">
+        <a class="navbar-user-link" data-bs-toggle="offcanvas" href="#" aria-controls="sidebarOffcanvasSearch">
           <span class="icon">
             <i class="fe fe-search"></i>
           </span>

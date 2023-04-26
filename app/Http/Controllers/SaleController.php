@@ -10,8 +10,7 @@ use App\Models\Sale as SaleInvoice;
 use App\Models\Stock;
 use App\Models\VendorStock;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Http\Request; 
 use Auth;
 use Laravel\Ui\Presets\React;
 
@@ -34,8 +33,8 @@ class SaleController extends Controller
         ]);
     }
     Public function saleInvoice(Request $request){
-        if($request->hidden_invoice_id){
-            // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
+ 
+        if($request->hidden_invoice_id){ 
             $invoice = SaleInvoice::where('id',$request->hidden_invoice_id)->first();
         }else{
             $invoice = new SaleInvoice();
@@ -43,7 +42,11 @@ class SaleController extends Controller
         $invoice->date                 = $request->invoice_date;
         $invoice->invoice_no           = $request->invoice_no;
         $invoice->customer_id          = $request->customer_id;
-        $invoice->total_invoice_amount = $request->grand_total+$request->service_charges;
+        if($request->invoice_type == 1){
+            $invoice->total_invoice_amount = $request->grand_total;
+        }else{
+            $invoice->total_invoice_amount = $request->grand_total+$request->service_charges;
+        }
         $invoice->service_charges      = $request->service_charges;
         $invoice->paid_amount          = $request->amount_paid;
         $invoice->status               = $request->status;
@@ -52,9 +55,9 @@ class SaleController extends Controller
             if(count($request->sales_product_array) > 0){
                 $ids = $request->existing_product_ids;
                 
-                foreach($request->sales_product_array as $key=>$sale_product){
-                    if($ids){
-                        $sale          =  ProductSale::where('id', $ids[$key])->first();
+                foreach($request->sales_product_array as $key=>$sale_product){ 
+                    if($sale_product['sale_prod_id'] > 0){
+                        $sale          =  ProductSale::where('id', $sale_product['sale_prod_id'])->first();
                     }else{                        
                         $sale          =  new ProductSale();                        
                     }
@@ -65,7 +68,9 @@ class SaleController extends Controller
                     $sale->sale_total_amount   = $sale_product['amount'];
                     $sale->created_by          = Auth::id();
                     if($sale->save()){
-                        $sale_products_array[] = $sale->product_id;
+                        $sale_products_array[] = $sale->id;
+                       
+                           
                         $check_stock           =  VendorStock::where('product_id',$sale->product_id)->orderBy('id', 'DESC')->first();
                         $vendor_id             =  $check_stock->vendor_id;
                         if($check_stock){
@@ -74,16 +79,16 @@ class SaleController extends Controller
                         $status = 0;    
                         $v_stock   =  new VendorStock();
                         if($request->hidden_invoice_id){
-                            $stock   = VendorStock::where('purchase_invoice_id',$request->hidden_invoice_id)
+                            $stock   = VendorStock::where('sale_invoice_id',$request->hidden_invoice_id)
                                                    ->where('product_id',$sale->product_id)->orderBy('id', 'DESC')->first();
                             $in_hand = 0;
                             if($stock){ 
-                                if($sale->qty > $stock->qty){
-                                    $in_hand   = $sale->qty-$stock->qty;
+                                if($stock->qty > $sale->qty){
+                                    $in_hand   = $stock->qty-$sale->qty;
                                     $balance   = $balance+$in_hand;
                                     $status    = 1;     //in 
-                                }else if($stock->qty > $sale->qty){
-                                    $in_hand = $stock->qty-$sale->qty;
+                                }else if($sale->qty > $stock->qty){
+                                    $in_hand     = $sale->qty-$stock->qty;
                                     $balance     = $balance-$in_hand;
                                     $status      = 2;     //out 
                                 }else if($sale->qty == $stock->qty){
@@ -95,8 +100,8 @@ class SaleController extends Controller
                                 $v_stock->status      = $status;      
                                 $v_stock->balance     = $balance;
                             }else{
-                                $v_stock->status      = 1;  //in    
-                                $v_stock->balance     = $sale->qty+$balance;
+                                $v_stock->status      = 2;  //Out    
+                                $v_stock->balance     = $balance-$sale->qty;
                                 $v_stock->qty         = $sale->qty;
                             }
                         }else{
@@ -115,6 +120,41 @@ class SaleController extends Controller
                         $v_stock->created_by           =  Auth::id();
                         if($v_stock->save()){
                             $company_stock               =  new Stock();
+
+                            if($request->hidden_invoice_id){
+                                $stock   = Stock::where('sale_invoice_id',$request->hidden_invoice_id)
+                                                       ->where('product_id',$sale->product_id)->orderBy('id', 'DESC')->first();
+                                $in_hand = 0;
+                                if($stock){ 
+                                    if($stock->qty > $sale->qty){
+                                        $in_hand   = $stock->qty-$sale->qty;
+                                        $balance   = $balance+$in_hand;
+                                        $status    = 1;     //in 
+                                    }else if($sale->qty > $stock->qty){
+                                        $in_hand     = $sale->qty-$stock->qty;
+                                        $balance     = $balance-$in_hand;
+                                        $status      = 2;     //out 
+                                    }else if($sale->qty == $stock->qty){
+                                        $in_hand     = $stock->qty;
+                                        $balance     = $stock->balance;
+                                        $status      = 1;     //in 
+                                    }
+                                    $v_stock->qty         = $in_hand;
+                                    $v_stock->status      = $status;      
+                                    $v_stock->balance     = $balance;
+                                }else{
+                                    $v_stock->status      = 2;  //Out    
+                                    $v_stock->balance     = $balance-$sale->qty;
+                                    $v_stock->qty         = $sale->qty;
+                                }
+                            }else{
+                                $status                =  2; //Out      
+                                $v_stock->balance      =  $balance-$sale->qty;
+                                $v_stock->qty          =  $sale->qty;
+                                $v_stock->status       =  2; //Out
+                            }
+
+
                             $company_stock->product_id   =  $v_stock->product_id;
                             $company_stock->amount       =  $v_stock->amount;
                             $company_stock->qty          =  $v_stock->qty;
@@ -131,8 +171,13 @@ class SaleController extends Controller
                         }
                     }
                 }
+                if($request->hidden_invoice_id){
+                     ProductSale::where('sale_invoice_id',$request->hidden_invoice_id)
+                                ->whereNotIn('id',$sale_products_array)
+                                ->delete();
+                }
                  
-                $customer_ledger        =  CustomerLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
+                $customer_ledger       =  CustomerLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
                 if($customer_ledger){
                     $balance           =   $customer_ledger->balance;
                 }else{
@@ -140,15 +185,17 @@ class SaleController extends Controller
                 }
                 if($request->hidden_invoice_id){
                     $customer_ledger   =   CustomerLedger::where('sale_invoice_id',$request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
+                    $previous_recived  =   $customer_ledger->cr;               
                 }else{
                     $customer_ledger   =   new  CustomerLedger();
+                    $previous_recived  =   0;
                 }
-                $customer_ledger->cr          = $request->amount_paid;
+                $customer_ledger->cr          = $previous_recived+$request->amount_paid;
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
-                $customer_ledger->trx_type    = 1; 
+                $customer_ledger->trx_type    = 1;  //Sale
                 $customer_ledger->dr          = $invoice->total_invoice_amount;
-                $customer_ledger->balance     = ($invoice->total_invoice_amount-$request->amount_paid); //balance
+                $customer_ledger->balance     = ($invoice->total_invoice_amount-$customer_ledger->cr); //balance
                 $customer_ledger->created_by  = Auth::id();
                 $customer_ledger->sale_invoice_id= $invoice->id;
                 $customer_ledger->save();
@@ -170,12 +217,13 @@ class SaleController extends Controller
       $sales     =   SaleInvoice::selectRaw('sale_invoices.* ,
                                         (SELECT cr FROM customer_ledger WHERE sale_invoice_id = sale_invoices.id) as paid_amount,
                                         (SELECT customer_name FROM customers WHERE id=sale_invoices.customer_id) as customer_name')
-                                    ->whereIn('sale_invoices.id', function ($query) {
-                                        $query->selectRaw('MAX(id)')
-                                            ->from('sale_invoices')
-                                            ->whereDate('created_at', Carbon::today())
-                                            ->groupBy('customer_id');
-                                    })
+                                        ->whereDate('created_at', Carbon::today())
+                                    // ->whereIn('sale_invoices.id', function ($query) {
+                                    //     $query->selectRaw('MAX(id)')
+                                    //         ->from('sale_invoices')
+                                    //         ->whereDate('created_at', Carbon::today())
+                                    //         ->groupBy('customer_id');
+                                    // })
                                     ->orderBy('id', 'desc')
                                     ->get();
 

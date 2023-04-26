@@ -21,11 +21,12 @@ Auth::routes();
 Route::group(['middleware' => ['auth']], function () { 
 Route::Resource('/company'   ,App\Http\Controllers\CompanyController::class);
 Route::Resource('/customer'  ,App\Http\Controllers\CustomerController::class);
+Route::Resource('/vendors'       ,App\Http\Controllers\CustomerController::class);
 
 Route::get('/'                    ,[App\Http\Controllers\HomeController::class,   'index'])->name('home');
 Route::get('/home'                ,[App\Http\Controllers\HomeController::class,   'index'])->name('home');
 Route::get('/get-companies'       ,[App\Http\Controllers\CompanyController::class, 'getCompanies'])->name('get-companies');
-Route::get('/get-customers'       ,[App\Http\Controllers\CustomerController::class, 'getCustomers'])->name('get-customers');
+Route::post('/get-customers'      ,[App\Http\Controllers\CustomerController::class, 'getCustomers'])->name('get-customers');
 /** Product Routes */
 Route::get('/products'            ,[App\Http\Controllers\ProductController::class, 'index'])->name('products');
 Route::post('/product-store'      ,[App\Http\Controllers\ProductController::class, 'store'])->name('product-store');

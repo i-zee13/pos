@@ -2,11 +2,14 @@ var lastOp = "";
 var glob_type = '';
 import swal from 'sweetalert';
 var deleteRef = '';
+let action = '';
 $(document).ready(function() {
  
     var segments = location.href.split('/');
-    var action = segments[3];
+    action = segments[3];
     if (action == "customer") {
+        fetchcustomers();
+    }else{
         fetchcustomers();
     }
   
@@ -194,30 +197,37 @@ $(document).ready(function() {
 });
 function fetchcustomers() {
     $.ajax({
-        type    :     'GET',
+        type    :     'post',
         url     :     '/get-customers',
+        data    : {
+            _token: $('meta[name="csrf_token"]').attr('content'),
+            route:action
+        },
         success :     function(response) {
-                    $('.body').empty();
-                    $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Type</th><th>Action</th></tr></thead><tbody></tbody></table>');
-                    $('.mainCatsListTable tbody').empty();
-                    // var response = JSON.parse(response);
-                    var sNo = 1;
-                    response.customers.forEach((element, key) => {
-                        $('.mainCatsListTable tbody').append(`
-                        <tr>
-                            <td>${key + 1}</td>
-                            <td>${element['customer_name']}</td>
-                            <td> ${element['customer_type'] == 1 ?'Vendor' : 'Customer'}</td>
-                            <td>
-                                <button id="${element['id']}" class="btn btn-default btn-line openDataSidebarForUpdatecustomer">Edit</button>
-                                <button type="button" id="${element['id']}" class="btn btn-default red-bg deleteMaincustomer delete_cat" name="main_cat" title="Delete">Delete</button>
-                                
-                            </td>
-                        </tr>`);
-                    });
-                    $('#tblLoader').hide();
-                    $('.body').fadeIn();
-                    $('.mainCatsListTable').DataTable();
+                  table(response.customers);
                 }
     });
+    function table(data){
+        $('.body').empty();
+        $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Type</th><th>Action</th></tr></thead><tbody></tbody></table>');
+        $('.mainCatsListTable tbody').empty();
+        // var response = JSON.parse(response);
+        var sNo = 1;
+        data.forEach((element, key) => {
+            $('.mainCatsListTable tbody').append(`
+            <tr>
+                <td>${key + 1}</td>
+                <td>${element['customer_name']}</td>
+                <td> ${element['customer_type'] == 1 ?'Vendor' : 'Customer'}</td>
+                <td>
+                    <button id="${element['id']}" class="btn btn-default btn-line openDataSidebarForUpdatecustomer">Edit</button>
+                    <button type="button" id="${element['id']}" class="btn btn-default red-bg deleteMaincustomer delete_cat" name="main_cat" title="Delete">Delete</button>
+                    
+                </td>
+            </tr>`);
+        });
+        $('#tblLoader').hide();
+        $('.body').fadeIn();
+        $('.mainCatsListTable').DataTable();
+    }
 }
