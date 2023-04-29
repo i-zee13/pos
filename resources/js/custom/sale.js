@@ -26,6 +26,7 @@ let stock_in_hand = '';
 let stock_products = '' ;
 let customer_ledger = '' ;
 let existing_product_ids = [] ;
+let service_charges = '';
 
 
 
@@ -41,6 +42,8 @@ $(document).ready(function () {
     } else if (segments[3] == 'sale-edit') {
         customer_id    = $('#curren_customer_id').val(); 
         var invoice_id = $('#hidden_invoice_id').val(); 
+         service_charges = $('#service_charges').val(); 
+
         segment        = segments[3];
         $.ajax({
             url: '/get-sale-products/' + invoice_id,
@@ -115,20 +118,19 @@ $('#add-product').on('click', function () {
         expiry_date = $('.expiry_date').val();
     }
     sales_product_array.push({
-        'sale_prod_id'  : '',
-        'product_id'    : `${product_id}`,
-        'expiry_date'   : `${expiry_date}`,
-        'qty'           : `${qty}`,
-        'amount'        : `${amount}`,
-        'retail_price'  : `${retail_price}`,
-        'stock_in_hand' :  stock_in_hand,
-        'purchased_price' :  purchased_price,
+        'sale_prod_id'    :  '',
+        'product_id'      :  `${product_id}`,
+        'expiry_date'     :  `${expiry_date}`,
+        'qty'             :  `${qty}`,
+        'amount'          :  `${amount}`,
+        'retail_price'    :  `${retail_price}`,
+        'stock_in_hand'   :   stock_in_hand,
+        'purchased_price' :   purchased_price,
 
     });
     $('.products').children('option[value="' + product_id + '"]').attr('disabled', true);
     $(".products").val('0');
     $(".products").select2();
-    $('.show_existing_div').show()
     let rowCount = $('#designationsTable tbody tr').length + 1;
     $('#designationsTable tbody').append(`
             <tr id='tr-${product_id}'>
@@ -141,6 +143,8 @@ $('#add-product').on('click', function () {
                 </tr>`
                 );
     grandSum(previous_payable);
+    $('.show_existing_div').show()
+
     $('#purchase_price').val('');
     $('#qty').val('');
     $('#amount').val('');
@@ -148,11 +152,9 @@ $('#add-product').on('click', function () {
     $('.products').val(0).trigger('change');
     $('#new_purchase_price').val('');
     $('#retail_price').val('');
-    var invoice_type = $('#invoice_type').val();
-    $('#invoice_type').val(invoice_type).trigger('change');
-    // $('.new_dob').val('')
-    p_name = '';
-    // $('#purchse-form')[0].reset();
+    // var invoice_type = $('#invoice_type').val();
+    // $('#invoice_type').val(invoice_type).trigger('change'); 
+    p_name = ''; 
 });
 
 $('#invoice_type').change(function(){
@@ -161,8 +163,7 @@ $('#invoice_type').change(function(){
         $('#customer_id').val('8').trigger('change');
     }else{
         $('#customer_id').addClass('required')
-        $('#customer_id').val('0').trigger('change');
-
+        $('#customer_id').val('0').trigger('change'); 
     }
     var total_paid_for_net_sale = 0;
     if($(this).val() == '1'){
@@ -543,10 +544,10 @@ $('.save_status').on('click',function(){
     })
 })
 $(document).on('keyup', '.qty-input', function () {
-    var update_qty         = $(this).val();
-    var current_product_id = $(this).attr('data-id');
-    var current_product_qty = '';
-    var product_amount     = $(this).attr('data-value')
+    var update_qty            = $(this).val();
+    var current_product_id    = $(this).attr('data-id');
+    var current_product_qty   = '';
+    var product_amount        = $(this).attr('data-value')
     var current_product_price = 0;
     var new_amount_of_purchase_product = 0;
   
@@ -567,7 +568,6 @@ $(document).on('keyup', '.qty-input', function () {
     }
     $(`.purchase-product-amount${current_product_id}`).empty();
     sales_product_array.filter(function (data) {
-        
         if (data.product_id      == current_product_id) {
             p_price               = data.retail_price
             data.qty              = update_qty;
@@ -577,12 +577,8 @@ $(document).on('keyup', '.qty-input', function () {
             console.log(current_product_qty)
             if(parseInt(update_qty) > parseInt(current_product_qty)){
                 // update_qty      = update_qty.replace(update_qty, current_product_qty)
-                $(`.td-input-qty${current_product_id}`).val(current_product_qty)
-                $(`.td-input-qty${current_product_id}`).css('border-color', 'red');
-                $(`.td-input-qty${current_product_id}`).focus();
-                $('#notifDiv').fadeIn();
-                $('#notifDiv').css('background', 'red');
-                $('#notifDiv').text('Qty should be less then '+current_product_qty);
+                $(`.td-input-qty${current_product_id}`).val(current_product_qty).css('border-color', 'red').focus();
+                $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then '+current_product_qty);
                 setTimeout(() => {
                     $('#notifDiv').fadeOut();
                 }, 3000); 
@@ -593,7 +589,8 @@ $(document).on('keyup', '.qty-input', function () {
                 new_amount_of_purchase_product = update_qty * current_product_price;
                 data.amount = new_amount_of_purchase_product;
                 var invoice_type = $('#invoice_type').val();
-                $('#invoice_type').val(invoice_type).trigger('change');
+                // $('#invoice_type').val(invoice_type).trigger('change');
+                $(`.purchase-product-amount${current_product_id}`).text(data.amount)
                                grandSum(previous_payable);
             }
         }
@@ -671,14 +668,14 @@ $('#customer_id').change(function () {
 
     }
 })
-function grandSum(previous_payable){ 
+function grandSum(previous_payable=0,service_charges=0){ 
     var sum = 0;
     sales_product_array.forEach(function (data, key) {
         sum += parseFloat(data.amount)
     })
-    console.log('sales :' .sales_product_array)
     sale_total_amount = sum;
     sum += parseFloat(previous_payable ? previous_payable : 0); 
+    sum += parseFloat(service_charges ? service_charges : 0); 
     $('.grand-total').text(sum); 
     $('.amount_pay_input').val(sum -  $('.paid_amount').text()); 
     if( $('.grand-total').text() == $('.paid_amount').text()){
@@ -699,5 +696,5 @@ $(document).on('focusout','.amount_received',function(){
     $('.cash_return').text(result)   
 })
 $('.service_charges_input').on('focusout',function(){
-  grandSum($(this).val());
+  grandSum(previous_payable,$(this).val());
 })

@@ -18,4 +18,5 @@ TRUNCATE vendor_ledger;
 
 
 UPDATE `customers` SET `balance` = '0';
+UPDATE `customers` SET `balance` = '0' where customer_type = 2; 
 UPDATE `products` SET `stock_balance` = '0';
