@@ -99,8 +99,6 @@ class SaleController extends Controller
                     $sale->created_by          = Auth::id();
                     if ($sale->save()) {
                         $sale_products_array[] = $sale->id;
-
-
                         $check_stock           =  VendorStock::where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
                         $vendor_id             =  $check_stock->vendor_id;
                         if ($check_stock) {
@@ -128,7 +126,7 @@ class SaleController extends Controller
                         $v_stock->amount               =  $sale->sale_total_amount;
                         $v_stock->created_by           =  Auth::id();
                         if ($v_stock->save()) {
-                            $company_stock               =  new Stock();
+                            $company_stock             =  new Stock();
 
                             if ($request->hidden_invoice_id) {
                                 $stock   = Stock::where('sale_invoice_id', $request->hidden_invoice_id)
@@ -234,26 +232,31 @@ class SaleController extends Controller
     {
         $invoiceId                  =   $invoice_id;
         $customerId                 =   $customer_id;
+        $customer_balance           =   0;
         $invoice                    =   SaleInvoice::where('id', $invoiceId)->where('customer_id', $customerId)
-            ->selectRaw("sale_invoices.*,
-                                            (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
-                                            (SELECT cr FROM customer_ledger WHERE sale_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
-                                        ")
-            ->first();
-        $invoice->received_amount   =   $received_amount;
+                                                ->selectRaw("sale_invoices.*,
+                                                            (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
+                                                            (SELECT cr FROM customer_ledger WHERE sale_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
+                                                          ")
+                                                ->first();
+        $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
         $products                   =   ProductSale::where('sale_invoice_id', $invoice_id)
-            ->selectRaw("products_sales.*,
-                                            (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name")
-            ->get();
-        return view('sales.sale-invoice', compact('invoice', 'products'));
+                                                    ->selectRaw("products_sales.*,
+                                                                (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name")
+                                                    ->get();
+                                                   
+        $customer_balance = CustomerLedger::where('customer_id', $customerId)
+                                            ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+                                            ->orderBy('id', 'DESC')->value('balance'); 
+        return view('sales.sale-invoice', compact('invoice', 'products','customer_balance'));
     }
     public function getSaleProduct($id)
     {
         $products   =   ProductSale::where('sale_invoice_id', $id)
             ->selectRaw('products_sales.*,
-                                     (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name,
-                                     (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=products_sales.product_id) as purchase_price,
-                                     (SELECT stock_balance FROM products WHERE id=products_sales.product_id) as stock_in_hand')->get();
+                                    (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name,
+                                    (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=products_sales.product_id) as purchase_price,
+                                    (SELECT stock_balance FROM products WHERE id=products_sales.product_id) as stock_in_hand')->get();
         return response()->json([
             'msg'       => 'Sale Product Fetched',
             'status'    => 'success',

@@ -17354,7 +17354,7 @@ var stock_in_hand = '';
 var stock_products = '';
 var customer_ledger = '';
 var existing_product_ids = [];
-var service_charges = '';
+var service_charges = 0;
 $(document).ready(function () {
   stock_products = JSON.parse($('#stock_products').val());
   customer_ledger = JSON.parse($('#customer_ledger').val());
@@ -17367,6 +17367,7 @@ $(document).ready(function () {
     customer_id = $('#curren_customer_id').val();
     var invoice_id = $('#hidden_invoice_id').val();
     service_charges = $('#service_charges').val();
+    alert(service_charges);
     segment = segments[3];
     $.ajax({
       url: '/get-sale-products/' + invoice_id,
@@ -17447,7 +17448,7 @@ $('#add-product').on('click', function () {
   $(".products").select2();
   var rowCount = $('#designationsTable tbody tr').length + 1;
   $('#designationsTable tbody').append("\n            <tr id='tr-".concat(product_id, "'>\n                <td>").concat(rowCount, "</td>\n                <td>").concat(p_name, "</td>\n                <td><input type=\"number\" value=\"").concat(qty, "\"  class=\"qty-input add-stock-input td-input-qty").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"></td>\n                <td><input type=\"number\" value=\"").concat(retail_price, "\"  class=\"price-input add-stock-input td-").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"></td>\n                <td class='purchase-product-amount").concat(product_id, " add- S-input '>").concat(amount, "</td>\n                <td><button type=\"button\" id=\"").concat(product_id, "\" class=\"btn smBTN red-bg remove_btn\" data-index=\"\">Remove</button></td>\n                </tr>"));
-  grandSum(previous_payable);
+  grandSum(previous_payable, service_charges);
   $('.show_existing_div').show();
   $('#purchase_price').val('');
   $('#qty').val('');
@@ -17532,7 +17533,7 @@ $(document).on('click', '.remove_btn', function () {
               sales_product_array = sales_product_array.filter(function (x) {
                 return x.product_id != product_id;
               });
-              grandSum(previous_payable);
+              grandSum(previous_payable, service_charges);
             } else {
               deleteRef.removeAttr('disabled');
               deleteRef.text('Delete');
@@ -17555,7 +17556,7 @@ $(document).on('click', '.remove_btn', function () {
     $('.products').children('option[value="' + product_id + '"]').attr('disabled', false);
     $(".products").val('0');
     $(".products").select2();
-    grandSum(previous_payable);
+    grandSum(previous_payable, service_charges);
   }
 });
 $('.products').change(function () {
@@ -17885,7 +17886,7 @@ $(document).on('keyup', '.qty-input', function () {
         var invoice_type = $('#invoice_type').val();
         // $('#invoice_type').val(invoice_type).trigger('change');
         $(".purchase-product-amount".concat(current_product_id)).text(data.amount);
-        grandSum(previous_payable);
+        grandSum(previous_payable, service_charges);
       }
     }
   });
@@ -17903,7 +17904,7 @@ $(document).on('input', '.price-input', function () {
       new_amount_of_sale_product = current_product_qty * retail_price;
       data.amount = new_amount_of_sale_product;
       $(".purchase-product-amount".concat(current_product_id)).text(new_amount_of_sale_product);
-      grandSum(previous_payable);
+      grandSum(previous_payable, service_charges);
     }
   });
 });
@@ -17950,7 +17951,7 @@ $('#customer_id').change(function () {
           $('.paid_amount').text(customer_ledger['cr']);
           $('.remaning_amount').val(customer_ledger['balance']);
         }
-        grandSum(previous_payable);
+        grandSum(previous_payable, service_charges);
         $('.display').css('display', '');
       }
     });
@@ -17985,11 +17986,13 @@ function productRetailAmount() {
   amount = qty * retail_price;
   $('#amount').val(amount);
 }
-$(document).on('focusout', '.amount_received', function () {
-  var result = $(this).val() - $('.amount_pay_input').val();
-  $('.cash_return').text(result);
+$(document).on('input', '.amount_received', function () {
+  if ($(this).val()) {
+    var result = $(this).val() - $('.amount_pay_input').val();
+    $('.cash_return').text(result);
+  }
 });
-$('.service_charges_input').on('focusout', function () {
+$('.service_charges_input').on('input', function () {
   grandSum(previous_payable, $(this).val());
 });
 })();

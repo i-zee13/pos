@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>{{$invoice->customer_name}} {{date('d-m-Y',strtotime($invoice->date))}} Sale Invoice</title>
@@ -10,10 +11,12 @@
                 page-break-before: always;
             }
         }
-        body{
+
+        body {
             margin: 0;
             padding: 0;
         }
+
         #invoice-POS {
             /* box-shadow: 0 0 1in -0.25in rgba(0, 0, 0, 0.5); */
             padding: 0;
@@ -23,10 +26,12 @@
             background: #FFF;
             font-family: Tahoma, "Trebuchet MS", sans-serif;
         }
+
         #invoice-POS ::selection {
             background: #f31544;
             color: #FFF;
         }
+
         #invoice-POS ::moz-selection {
             background: #f31544;
             color: #FFF;
@@ -58,19 +63,23 @@
             border-bottom: 1px solid #EEE;
             width: 74mm;
         }
-        #invoice-POS #mid .info{
+
+        #invoice-POS #mid .info {
             width: 76mm;
             background-color: black;
             color: white;
             text-align: center;
-            padding: 0.3em;   
+            padding: 0.3em;
             margin-bottom: 0.4000em;
         }
-        #invoice-POS .bot-1-table,#invoice-POS .bot-2-table{
+
+        #invoice-POS .bot-1-table,
+        #invoice-POS .bot-2-table {
             width: 74mm;
             font-size: 12px;
             margin-bottom: 0.2em;
         }
+
         /* #invoice-POS .   bot-1-table .bot-1-table-td{
             width: 30px !important;
         } */
@@ -78,12 +87,15 @@
             display: block;
             margin-left: 0;
         }
+
         #invoice-POS .title {
             float: right;
         }
+
         #invoice-POS .title p {
             text-align: right;
         }
+
         #invoice-POS table {
             width: 74mm;
             border-collapse: collapse;
@@ -96,34 +108,41 @@
             border-bottom: 1.5px solid black;
             text-align: left;
         }
-        #invoice-POS .bot-3-table .body-description-tr{
+
+        #invoice-POS .bot-3-table .body-description-tr {
             border-bottom: 1px solid #444444;
             border-bottom-style: dashed;
             color: #000000;
         }
-        #invoice-POS .bot-3-table .body-description-tr .tableitem{
+
+        #invoice-POS .bot-3-table .body-description-tr .tableitem {
             text-transform: uppercase;
             width: 30mm;
         }
-        #invoice-POS .bot-3-table .body-description-tr .other-des-td{
+
+        #invoice-POS .bot-3-table .body-description-tr .other-des-td {
             vertical-align: text-top;
         }
-        #invoice-POS .bot-4-table .net-total{
+
+        #invoice-POS .bot-4-table .net-total {
             font-weight: bolder;
             width: 38mm;
             font-size: 12px;
             border-bottom: 1.5px solid black;
         }
-        #invoice-POS .bot-5-table{
+
+        #invoice-POS .bot-5-table {
             margin-top: 2mm;
             font-weight: bolder;
             font-size: 12px;
             text-align: center;
         }
-        #invoice-POS .bot-5-table td{
+
+        #invoice-POS .bot-5-table td {
             text-align: left;
         }
-        #invoice-POS .bot-5-table .payable-heading{
+
+        #invoice-POS .bot-5-table .payable-heading {
             text-align: right;
         }
 
@@ -132,18 +151,22 @@
             margin-top: 3mm;
             width: 76mm;
         }
-        #invoice-POS .footer tr{
+
+        #invoice-POS .footer tr {
             border-bottom: 1px solid #1b1b1b;
         }
+
         #invoice-POS .footer-copyright {
             width: 76mm;
         }
-        #invoice-POS .footer-copyright .copyright{
+
+        #invoice-POS .footer-copyright .copyright {
             font-size: 10px;
             color: #232323;
         }
     </style>
 </head>
+
 <body translate="no">
     <div id="invoice-POS">
         <center id="top">
@@ -180,13 +203,13 @@
                     <th>Total</th>
                 </tr>
                 @foreach ($products as $key=>$item)
-                    <tr class="body-description-tr">
-                        <td class="other-des-td">{{$key+1}}</td>
-                        <td class="tableitem">{{$item->product_name}}</td>
-                        <td class="other-des-td">{{$item->qty}}</td>
-                        <td class="other-des-td">{{$item->sale_price}}</td>
-                        <td class="other-des-td">{{$item->sale_total_amount}}</td>
-                    </tr> 
+                <tr class="body-description-tr">
+                    <td class="other-des-td">{{$key+1}}</td>
+                    <td class="tableitem">{{$item->product_name}}</td>
+                    <td class="other-des-td">{{$item->qty}}</td>
+                    <td class="other-des-td">{{$item->sale_price}}</td>
+                    <td class="other-des-td">{{$item->sale_total_amount}}</td>
+                </tr>
                 @endforeach
             </table>
             <table class="bot-4-table">
@@ -197,6 +220,29 @@
                 </tr>
             </table>
             <table class="bot-5-table">
+            <tr>
+                    <td class="payable-heading">Service Charges :</td>
+                    <td>{{number_format($invoice->service_charges)}}</td>
+                </tr>
+                @if($invoice->invoice_type == 2)
+                <tr>
+                    <td class="payable-heading">Previous Receivable :</td>
+                    <td>{{number_format($customer_balance)}}</td>
+                </tr>
+
+                <tr>
+                    <td class="payable-heading">Total Receivable :</td>
+                    <td>{{number_format($invoice->total_invoice_amount)}}</td>
+                </tr>
+                <tr>
+                    <td class="payable-heading">Cash Received :</td>
+                    <td>{{number_format($invoice->received_amount)}}</td>
+                </tr>
+                <tr>
+                    <td class="payable-heading">Remaining Receivable :</td>
+                    <td>{{number_format($invoice->total_invoice_amount - $invoice->received_amount)}}</td>
+                </tr>
+                @else
                 <tr>
                     <td class="payable-heading">Cash Received :</td>
                     <td>{{number_format($invoice->received_amount)}}</td>
@@ -205,11 +251,12 @@
                     <td class="payable-heading">Cash Return :</td>
                     <td>{{number_format($invoice->received_amount - collect($products)->sum('sale_total_amount'))}}</td>
                 </tr>
+                @endif
             </table>
             <table class="footer">
                 <tr class="thankyou">
                     <td>Thank for your kind visit </td>
-                    <td>Abc(user)</td>
+                    <td>{{Auth::user()->name}}(user)</td>
                 </tr>
             </table>
             <table class="footer-copyright">
@@ -221,10 +268,11 @@
         </div><!--End InvoiceBot-->
     </div><!--End Invoice-->
     <script src="{{asset('/js/jquery-3.3.1.min.js')}}"></script>
-<script>
-    window.onafterprint = function() {
-   window.close();
-};
-</script>
+    <script>
+        window.onafterprint = function() {
+            window.close();
+        };
+    </script>
 </body>
+
 </html
