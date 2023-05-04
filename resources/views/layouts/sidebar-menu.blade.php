@@ -146,11 +146,11 @@
                   List
                 </a>
               </li>
-              <!-- <li class="nav-item">
+              <li class="nav-item">
                 <a href="{{route('purchase-return')}}" class="nav-link ">
                   Sales Returns
                 </a>
-              </li> -->
+              </li>
             </ul>
           </div>
         </li>
@@ -195,6 +195,11 @@
               <li class="nav-item">
                 <a href="{{route('vendor-reports')}}" class="nav-link ">
                   Vendors
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('stock-reports')}}" class="nav-link ">
+                  Stock
                 </a>
               </li>
                

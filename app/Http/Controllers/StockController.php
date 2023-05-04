@@ -49,6 +49,7 @@ class StockController extends Controller
             ]);
     }
      Public function purchaseInvoice(Request $request){
+         
         if($request->hidden_invoice_id){
             ProductPurchase::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
@@ -74,16 +75,15 @@ class StockController extends Controller
                     }
                     $purchased->purchase_invoice_id = $invoice->id;
                     $purchased->product_id      = $purchase_product['product_id'];
-                    $purchased->vendor_id       = $request->customer_id;
-
-                    $purchased_products_array[] = $purchased->product_id;
-
+                    $purchased->vendor_id       = $request->customer_id; 
+                    $purchased_products_array[] = $purchased->product_id; 
                     $purchased->expiry_date     = $purchase_product['expiry_date'];
                     $purchased->qty             = $purchase_product['qty'];
                     $purchased->purchased_total_amount =  $purchase_product['amount'];
                     $purchased->created_by      = Auth::id();
                     if($purchased->save()){
                           $product = Product::where('id',$purchased->product_id)->first();
+                          $company_id = $product->company_id;
                           $product->expiry_date = $purchased->expiry_date;
                           if($purchase_product['new_price'] != ''){
                               $product->new_purchase_price = $purchase_product['new_price'];
@@ -98,7 +98,7 @@ class StockController extends Controller
                         }else{
                             $balance = 0;
                         } 
-                        $status = 0;    
+                        $status      =  0;    
                         $add_stock   =  new VendorStock();
                         if($request->hidden_invoice_id){
                             $stock   = VendorStock::where('purchase_invoice_id',$request->hidden_invoice_id)
@@ -135,14 +135,18 @@ class StockController extends Controller
                         $add_stock->transaction_type     = 1; //Purchase
                         $add_stock->purchase_invoice_id  = $purchased->purchase_invoice_id;
                         $add_stock->product_unit_price   = $purchased->purchase_price;
-                        $add_stock->product_id  = $purchased->product_id;
-                        $add_stock->vendor_id   = $invoice->customer_id;
-                        $add_stock->date        = $purchased->created_at;
-                        $add_stock->amount      = $purchased->purchased_total_amount;
-                        $add_stock->created_by  =  Auth::id();
+                        $add_stock->product_id           = $purchased->product_id;
+                        $add_stock->company_id           = $company_id; 
+                        $add_stock->expiry_date           = $$purchase_product['expiry_date']; 
+
+                        $add_stock->vendor_id            = $invoice->customer_id;
+                        $add_stock->date                 = $purchased->created_at;
+                        $add_stock->amount               = $purchased->purchased_total_amount;
+                        $add_stock->created_by           =  Auth::id();
                         if($add_stock->save()){
                             $company_stock  =   new Stock();
                             $company_stock->vendor_stock_id      =  $add_stock->id;
+                            $company_stock->company_id           =  $company_id;
                             $company_stock->product_id           =  $add_stock->product_id;
                             $company_stock->amount               =  $add_stock->amount;
                             $company_stock->purchase_invoice_id  =  $add_stock->purchase_invoice_id;
@@ -154,7 +158,7 @@ class StockController extends Controller
                             $company_stock->created_by           =  Auth::id();
                             $company_stock->save();
                             // dd($purchased_products_array);
-                        //    
+                                //    
                             // $deleted_product = Stock::where('purchase_invoice_id',$request->hidden_invoice_id)
                             //                 ->whereNotIn('product_id',$purchased_products_array)->where('status',1)->orderBy('id', 'DESC')->get();
                            
@@ -335,7 +339,6 @@ class StockController extends Controller
                 }
        
     }
-
     //Purchase Returns 
 
      

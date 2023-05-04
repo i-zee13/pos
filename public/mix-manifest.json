@@ -6,6 +6,7 @@
     "/js/custom/purchase_returns.js": "/js/custom/purchase_returns.js",
     "/js/custom/sale.js": "/js/custom/sale.js",
     "/js/custom/transaction.js": "/js/custom/transaction.js",
-    "/js/custom/reports.js": "/js/custom/reports.js",
+    "/js/custom/vendor_customer_report.js": "/js/custom/vendor_customer_report.js",
+    "/js/custom/stock_report.js": "/js/custom/stock_report.js",
     "/css/app.css": "/css/app.css"
 }

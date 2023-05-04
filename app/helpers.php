@@ -150,3 +150,20 @@ if(!function_exists('getInvoice'))
         }
     }
 }
+if(!function_exists('getInvoice'))
+{
+    function getSaleReturnNo()
+    {
+        $year        = date('y');
+        $invoice_no  = 1;
+        $lastinvoice = SaleInvoice::latest()->value('id');
+        if(isset($lastinvoice)){
+            $invoice_no = ($lastinvoice+1).'-'.$year;
+           return $invoice_no;
+        }else{
+            $invoice_no = $invoice_no.'-'.$year;
+            return $invoice_no;
+
+        }
+    }
+}

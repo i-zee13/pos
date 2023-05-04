@@ -19,9 +19,9 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () { 
-Route::Resource('/company'   ,App\Http\Controllers\CompanyController::class);
-Route::Resource('/customer'  ,App\Http\Controllers\CustomerController::class);
-Route::Resource('/vendors'       ,App\Http\Controllers\CustomerController::class);
+Route::Resource('/company'        ,App\Http\Controllers\CompanyController::class);
+Route::Resource('/customer'       ,App\Http\Controllers\CustomerController::class);
+Route::Resource('/vendors'        ,App\Http\Controllers\CustomerController::class);
 
 Route::get('/'                    ,[App\Http\Controllers\HomeController::class,   'index'])->name('home');
 Route::get('/home'                ,[App\Http\Controllers\HomeController::class,   'index'])->name('home');
@@ -39,9 +39,9 @@ Route::get('/get-vendors'               ,[App\Http\Controllers\StockController::
 // Route::post('/get-product'           ,[App\Http\Controllers\StockController::class, 'getProduct'])->name('get-product');
 Route::get('/get-vendor-balance/{id}'   ,[App\Http\Controllers\StockController::class, 'getVendorBalance'])->name('get-vendor-balance');
 /** Purchase Routes */
-Route::post('/add-purchase-invoice'     ,[App\Http\Controllers\StockController::class, 'purchaseInvoice'])->name('add-purchase-invoice');
-Route::get('/purchases'                 ,[App\Http\Controllers\StockController::class, 'purchaseList'])->name('purchases');
-Route::get('/purchase-edit/{id}'        ,[App\Http\Controllers\StockController::class, 'editPurchase'])->name('purchase-edit');
+Route::post('/add-purchase-invoice'          ,[App\Http\Controllers\StockController::class, 'purchaseInvoice'])->name('add-purchase-invoice');
+Route::get('/purchases'                      ,[App\Http\Controllers\StockController::class, 'purchaseList'])->name('purchases');
+Route::get('/purchase-edit/{id}'             ,[App\Http\Controllers\StockController::class, 'editPurchase'])->name('purchase-edit');
 Route::get('/get-purchase-products/{id}'     ,[App\Http\Controllers\StockController::class, 'getPurchaseProduct'])->name('get-purchase-products');
 Route::delete('/delete-product-from-invoice' ,[App\Http\Controllers\StockController::class, 'deleteProduct'])->name('delete-product');
 // Purchase Returns / 
@@ -57,6 +57,10 @@ Route::get('/sales'                     ,[App\Http\Controllers\SaleController::c
 Route::get('/sale-edit/{id}'            ,[App\Http\Controllers\SaleController::class, 'editsale'])->name('sale-edit');
 Route::get('/get-sale-products/{id}'    ,[App\Http\Controllers\SaleController::class, 'getSaleProduct'])->name('get-sale-products');
 Route::get('/get-customer-balance/{id}' ,[App\Http\Controllers\SaleController::class, 'getCustomerBalance'])->name('get-customer-balance');
+// Sales Returns / 
+// Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
+Route::get('/sale-return'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'purchaseReturn'])->name('purchase-return');
+// Route::post('/add-purchase-return'                ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
 
 //Genrate invoice
 Route::get('/print-sale-invoice/{invoice_id}/{customer_id}/{received_amount}'       ,[App\Http\Controllers\SaleController::class, 'printInvoice'])->name('print-sale-invoice');
@@ -70,5 +74,8 @@ Route::get('/vendor-ledgers'            ,[App\Http\Controllers\TransactionContro
 Route::get('/customer-reports'          ,[App\Http\Controllers\ReportsController::class, 'customerReport'])->name('customer-reports');
 Route::get('/vendor-reports'            ,[App\Http\Controllers\ReportsController::class, 'vendorReport'])->name('vendor-reports');
 Route::post('/report-list'              ,[App\Http\Controllers\ReportsController::class, 'reportList'])->name('report-list');
+
+Route::get('/stock-reports'             ,[App\Http\Controllers\ReportsController::class, 'stockReport'])->name('stock-reports');
+Route::post('/stocks'                   ,[App\Http\Controllers\ReportsController::class, 'stockReportList'])->name('stock-report-list');
 
 });
