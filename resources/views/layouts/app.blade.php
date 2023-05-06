@@ -114,8 +114,12 @@
 <body style="display: block;">
     <div id="notifDiv">
     </div>
+   
+    @if(request()->segment(1) != 'sale-add')
+            @include('layouts.sidebar-menu')
+    @endif
 
-    @include('layouts.sidebar-menu')
+    
     <!-- MAIN CONTENT -->
     <div class="main-content">
         <div id="content-wrapper">

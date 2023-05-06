@@ -24,7 +24,7 @@ class SaleController extends Controller
         $current_date =   Carbon::today()->toDateString();
         $customers    =   Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
         $products     =   Product::where('stock_balance', '>', '0')->get();
-        return view('sales.add', compact('customers', 'current_date', 'invoice_no', 'products'));
+        return view('sales.test', compact('customers', 'current_date', 'invoice_no', 'products'));
     }
     public function getVendors()
     {
