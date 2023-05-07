@@ -135,9 +135,9 @@ $('#add-product').on('click', function () {
     $('#designationsTable tbody').append(`
             <tr id='tr-${product_id}'>
                 <td>${rowCount}</td>
-                <td>${p_name}</td>
-                <td><input type="number" value="${qty}"  class="qty-input add-stock-input td-input-qty${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
-                <td><input type="number" value="${retail_price}"  class="price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"></td>
+                <td>${p_name}</td> 
+                <td><input type="number" value="${qty}"  class="inputvalue qty-input add-stock-input td-input-qty${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px"></td>
+                <td><input type="number" value="${retail_price}"  class="inputvalue price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px"></td>
                 <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
                 <td><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</button></td>
                 </tr>`

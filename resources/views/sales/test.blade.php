@@ -549,72 +549,94 @@
         }
 
     }
+
+    .form-s2 .select2-container .select2-selection--single {
+        height: 30px !important;
+        border: solid 1px #dbdbdb;
+        background-color: #ffffff;
+    }
+
+    .form-s2 .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 30px !important;
+        font-size: 13px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        top: 0px !important;
+    }
 </style>
 <div class="container-fluid">
-    <div class="row">
+    <form id="form" enctype="multipart/form-data" class="">
+        @csrf
+        <div class="row">
 
-        <div class="col-md-4 left-sidebox">
-
-            <div class="sidebox-content">
-                <div class="CT_sec">
-                    <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
-                    <!-- <div class="col-md-12 PB-10">
-                        <label class="font13 mb-5">Invoice Type</label>
-                        <div class="form-s2">
-                            <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
-                                <option value="1" {{@$invoice->invoice_type == 1 ? 'selected' : ''}}>Net Sale</option>
-                                <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
-                            </select>
-                            @if (@$invoice->customer_id)
-                            <input type="hidden" name="invoice_type" value="{{ @$invoice->invoice_type }}">
-                            @endif
-                        </div>
-                    </div> -->
-                    <!-- <div class="col-md-12 PB-10">
-                        <label class="font13 mb-5">Invoice #</label>
-                        <div class="form-s2">
-                            <input type="text" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
-
-                        </div>
-                    </div> -->
-                    <!-- <div class="col-md-12 PB-10">
-                        <label class="font13 mb-5">Date</label>
-                        <div class="form-s2">
-                            <input type="Date" name="invoice_date" class="form-control new_dob new_form_field " value="{{@$invoice ? $invoice->created_at->format('Y-d-m') : $current_date}}">
-                        </div>
-                    </div> -->
-                    <div class="form-wrap p-0">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <label class="font13 mb-5">Select Customer</label>
-                                <div class="form-s2">
-                                    <select class="form-control formselect form_clear required" placeholder="Select Customer" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
-                                        <option value="0">Select Customer</option>
-                                        @foreach($customers as $customer)
-                                        <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->customer_name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+            <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
+            <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
+            <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
+            <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
+            <input type="hidden" id="" value="1" name="form_status">
+            <input type="hidden" id="stock_products" name="stock_products" value="{{json_encode($products)}}">
+            <div class="col-md-4 left-sidebox">
+                <div class="sidebox-content">
+                    <div class="CT_sec">
+                        <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
+                        <div class="col-md-12 PB-10">
+                            <label class="font13 mb-5">Invoice Type</label>
+                            <div class="form-s2">
+                                <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                                    <option value="1" {{@$invoice->invoice_type == 1 ? 'selected' : ''}}>Net Sale</option>
+                                    <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
+                                </select>
+                                @if (@$invoice->customer_id)
+                                <input type="hidden" name="invoice_type" value="{{ @$invoice->invoice_type }}">
+                                @endif
                             </div>
-
                         </div>
-                    </div>
+                        <div class="col-md-12 PB-10">
+                            <label class="font13 mb-5">Invoice #</label>
+                            <div class="form-s2">
+                                <input type="text" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
 
-                    <h2 class="title border-bottom">Company <span>Details</span></h2>
-                    <div class="row CompanyInfo">
-                        <div class="col-md-5 pr-0"><strong>Stock Balance:</strong> </div>
-                        <div class="col-md-7"><span class="stock_balance">0</span></div>
-                        <div class="col-md-5 pr-0"><strong>Retail Price:</strong></div>
-                        <div class="col-md-7"><span class="retail_price">0</span></div>
-                        <div class="col-md-5 pr-0"><strong>Previous Receivable :</strong> </div>
-                        <div class="col-md-7"><span class="dashboard_avg_rev_perCust previous_payable">0</span></div>
-                        <!-- <div class="col-md-5 pr-0"><strong>Country:</strong></div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 PB-10">
+                            <label class="font13 mb-5">Date</label>
+                            <div class="form-s2">
+                                <input type="Date" name="invoice_date" class="form-control new_dob new_form_field " value="{{@$invoice ? $invoice->created_at->format('Y-d-m') : $current_date}}">
+                            </div>
+                        </div>
+                        <div class="form-wrap p-0">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label class="font13 mb-5">Select Customer</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect form_clear required" placeholder="Select Customer" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                                            <option value="0">Select Customer</option>
+                                            @foreach($customers as $customer)
+                                            <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->customer_name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <h2 class="title border-bottom">Company <span>Details</span></h2>
+                        <div class="row CompanyInfo">
+                            <div class="col-md-5 pr-0"><strong>Stock Balance:</strong> </div>
+                            <div class="col-md-7"><span class="stock_balance">0</span></div>
+                            <div class="col-md-5 pr-0"><strong>Retail Price:</strong></div>
+                            <div class="col-md-7"><span class="retail_price">0</span></div>
+                            <div class="col-md-5 pr-0"><strong>Previous Receivable :</strong> </div>
+                            <div class="col-md-7"><span class="dashboard_avg_rev_perCust previous_payable">0</span></div>
+                            <!-- <div class="col-md-5 pr-0"><strong>Country:</strong></div>
                         <div class="col-md-7"><span id="country"></span></div> -->
+                        </div>
+                        <!-- <h2 class="title m-0 pb-0">Shipping <span>Details</span></h2> -->
                     </div>
-                    <!-- <h2 class="title m-0 pb-0">Shipping <span>Details</span></h2> -->
-                </div>
 
-                <!-- <div class="left_Info_">
+                    <!-- <div class="left_Info_">
 
                     <div class="row" style="margin-right:-5px; padding-bottom: 20px;">
                         <div class="col-md-12 PB-10">
@@ -684,16 +706,15 @@
                 </div> -->
 
 
-            </div>
-        </div>
-
-        <div class="col-md-8 right-sid ebox">
-
-            <div class="row">
-                <div class="col-6">
-                    <h2 class="title font22 PT-10 mb-10">New <span>Order</span></h2>
                 </div>
-                <div class="col p-0 text-right">
+            </div>
+            <div class="col-md-8 right-sid ebox">
+
+                <div class="row">
+                    <div class="col-6">
+                        <h2 class="title font22 PT-10 mb-10">New <span>Order</span></h2>
+                    </div>
+                    <!-- <div class="col p-0 text-right">
                     <select class="custom-select custom-select-sm custom-select-cs" id="currencySelector">
                         <option sign="$" value="USD" selected>USD - United States Dollar
                         </option>
@@ -704,25 +725,25 @@
                         <option sign="HK$" value="HKD">HKD — Hong Kong dollar</option>
                         <option sign="AFN" value="AFN">AFN — Afghani</option>
                     </select>
-                </div>
-                <div class="col-auto PL-10">
-                    <div class="total-amt-top">
-                        <div class="TAM-div"><small>Amount Dues</small><span id="amount_due">0</span></div>
+                </div> -->
+                    <div class="col-6 PL-10">
+                        <div class="total-amt-top">
+                            <div class="TAM-div"><small>Amount Dues</small><span id="amount_due">0</span></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="right_Info">
-                <div class="row inputfileds-top">
-                    <div class="col-auto pr-0">Invoice #
+                <div class="right_Info">
+                    <div class="row inputfileds-top">
+                        <!-- <div class="col-auto pr-0">Invoice #
                         <input type="text" id="" class="inputfileds required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
-                    </div>
-                    <div class="col-auto pr-0">Date
+                    </div> -->
+                        <!-- <div class="col-auto pr-0">Date
                         <input type="Date" name="invoice_date" class="inputfileds datefileds new_dob new_form_field " value="{{@$invoice ? $invoice->created_at->format('Y-d-m') : $current_date}}">
-                    </div>
-                    <!-- <div class="col-auto pr-0">DOD <input type="Date" name="expected_delivery_date" class="inputfileds datefileds"> </div> -->
-                    <!-- <div class="col-auto pr-0">PO.NO. <input type="text" class="inputfileds" id="poNumForm"></div> -->
-                    <div class="col-auto pr-0">Invoice Type
+                    </div> -->
+                        <!-- <div class="col-auto pr-0">DOD <input type="Date" name="expected_delivery_date" class="inputfileds datefileds"> </div> -->
+                        <!-- <div class="col-auto pr-0">PO.NO. <input type="text" class="inputfileds" id="poNumForm"></div> -->
+                        <!-- <div class="col-auto pr-0">Invoice Type
                         <select class="custom-select custom-select-sm form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
                             <option value="1" {{@$invoice->invoice_type == 1 ? 'selected' : ''}}>Net Sale</option>
                             <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
@@ -730,106 +751,140 @@
                         @if (@$invoice->customer_id)
                         <input type="hidden" name="invoice_type" value="{{ @$invoice->invoice_type }}">
                         @endif
-                    </div>
-                </div>
+                    </div> -->
 
-                <div class="row">
-                    <div class="col-12">
-                        <table class="ProductTable" width="100%" border="0" cellspacing="0" cellpadding="0">
-                            <thead>
-                                <tr>
-                                    <th class="td-pn">Product Name</th>
-                                    <th class="td-bp">Packing</th>
-                                    <th style="width:95px">NET WT (GMS)</th>
-                                    <th style="width:70px">Total CTNs</th>
-                                    <th style="width:90px">NET WT/CTN</th>
-                                    <th style="width:90px">GR. WT/CTN</th>
-                                    <th style="width:70px">QTY.</th>
-                                    <th style="width:70px">Unit Price</th>
-                                    <th class="td-pr">Total</th>
-                                    <th style="width:28px;"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="productGrid">
+                        <div class="infoDiv p-15">
+                            <form id="purchse-form">
+                                <div class="row">
+                                    <div class="col-2 pr-0">ID
+                                        <input type="text" id="bar-code" class="inputfileds bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1">
+                                    </div>
 
-                            </tbody>
-                        </table>
+                                    <div class="col-auto pr-0 form-s2"> Purchase Price
+                                        <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2">
+                                            <option value="0"> Select Product *</option>
+                                            @foreach($products as $product)
+                                            <option value="{{$product->id}}">{{$product->product_name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div> 
+                                        <input type="text" id="purchase_price" class="inputfileds " placeholder="" name="purchase_price" hidden>
+                                       <input type="text" id="retail_price" class="inputfileds" placeholder="" name="retail_price" hidden>
+                                    
+                                    <div class="col-2 pr-0">Quantity *
+                                        <input type="text" id="qty" class="inputfileds only_numerics" placeholder="" name="qty" tabindex="5">
+                                    </div>
 
-                    </div>
-                </div>
+                                    <!-- <div class="col-2 pr-0">Expiry Date
+                                <div>
+                                    <input autocomplete="off" id="datepicker" type="text" class="inputfileds new_dob new_form_field expiry_date " name="expiry_date" tabindex="6">
+                                </div>
+                            </div> --> 
+                                        <input type="text" id="amount" class="inputfileds" placeholder="" name="amount" hidden>
+                                    
 
-                <div class="row">
-                    <div class="col-12"><button id="productlist01" class="btn add-product-line list-customer-products"><i class="fa fa-plus"> </i> Add a Product</button></div>
-                </div>
-
-                <div class="row">
-                    <div class="col-12">
-                        <table class="totalValues" width="100%" border="0" cellspacing="0" cellpadding="0">
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td align="right">Discount%</td>
-                                    <td style="width:112px"><input type="text" name="discount" id="discount" class="inputvalue" style="font-size: 13px" placeholder="0.00" onkeypress="return isNumber(event)"></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td align="right">Freight Charges</td>
-                                    <td><input type="text" class="inputvalue" id="freight_charges" name="freight_charges" style="font-size: 13px" placeholder="0.00" onkeypress="return isNumber(event)"></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td align="right">Insurance Charges</td>
-                                    <td><input type="text" class="inputvalue" id="insurance_charges" name="insurance_charges" style="font-size: 13px" placeholder="0.00" onkeypress="return isNumber(event)"></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td align="right">Genset Charges</td>
-                                    <td><input type="text" class="inputvalue" id="genset_charges" name="genset_charges" style="font-size: 13px" placeholder="0.00" onkeypress="return isNumber(event)"></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr style="border:solid 1px #dbdbdb">
-                                    <td class="font18" align="right">Total:</td>
-                                    <td class="totalNo" align="right"><span id="total_ctn">0</span><small>CTNS</small></td>
-                                    <td class="totalNo" align="right"></td>
-                                    <td class="totalNo" align="right"><small>USD.</small><span id="total_price">0</span></td>
-
-                                </tr>
-                            </tbody>
-                        </table>
+                                    <div class="col-md-2 PT-20" id="btns_div">
+                                        <button type="button" id="add-product" class="btn btn-primary mr-2" style="padding: 3px 20px 0px 19px;margin-top: 10px;" tabindex="8">Add</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
 
                     </div>
-                </div>
 
-                <div class="row _notesTER">
-                    <div class="col-md-6">
-                        Notes
-                        <textarea class="textarea-NOTES" name="performa_notes" rows='2' placeholder="Enter Notes or bank transfer details" style="font-size: 13px"></textarea>
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="ProductTable" id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th class="td-pn">ID</th>
+                                        <th class="td-pn">Product Name</th>
+                                        <th style="width:70px">QTY.</th>
+                                        <th style="width:70px">Unit Price</th>
+                                        <th class="td-pr">Total</th>
+                                        <th style="width:28px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productGrid">
+
+                                </tbody>
+                            </table>
+
+                        </div>
                     </div>
 
-                    <div class="col-md-6">
-                        Terms
-                        <textarea class="textarea-TERMS" name="performa_terms" rows='2' placeholder="Enter your terms and conditions" style="font-size: 13px"></textarea>
+                    <!-- <div class="row">
+                        <div class="col-12"><button id="productlist01" class="btn add-product-line list-customer-products"><i class="fa fa-plus"> </i> Add a Product</button></div>
+                    </div> -->
+
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="totalValues" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td align="right">Service charges </td>
+                                        <td style="width:112px"><input type="text" name="discount" id="discount" class="inputvalue service_charges_input" style="font-size: 13px" value="{{@$invoice->service_charges}}" placeholder="0.00" onkeypress="return isNumber(event)" data-id="" data-value=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td align="right">{{Route::currentRouteName() == 'sale-edit' ? 'Remaining Amount' : 'Net Amount'}}</td>
+                                        <td> <input type="text" class="inputvalue amount_pay_input remaning_amount" id="amount_to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td align="right">Cash Recived</td>
+                                        <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" onkeypress="return isNumber(event)" value="0"></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td align="right">Cash Return</td>
+                                        <td class="cash_return">0</td></tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr style="border:solid 1px #dbdbdb">
+                                        <td class="font18" align="right">Total:</td>
+                                        <td class="totalNo" align="right"><span id="total_ctn">0</span><small>CTNS</small></td>
+                                        <td class="totalNo" align="right"></td>
+                                        <td class="totalNo" align="right"><small>Pkr.</small><span class="grand-total">0</span></td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
                     </div>
-                </div>
 
-                <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px">
-                    <button type="submit" class="btn btn-primary mr-2" onclick="savePerforma();">Save</button>
-                    <button id="pl-close" type="submit" class="btn btn-cancel mr-2">Cancel</button>
-                </div>
+                    <!-- <div class="row _notesTER">
+                        <div class="col-md-6">
+                            Notes
+                            <textarea class="t  extarea-NOTES" name="performa_notes" rows='2' placeholder="Enter Notes or bank transfer details" style="font-size: 13px"></textarea>
+                        </div>
 
+                        <div class="col-md-6">
+                            Terms
+                            <textarea class="textarea-TERMS" name="performa_terms" rows='2' placeholder="Enter your terms and conditions" style="font-size: 13px"></textarea>
+                        </div>
+                    </div> -->
+
+                    <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px">
+                        <button type="submit" class="btn btn-primary mr-2" onclick="savePerforma();">Save</button>
+                        <button id="pl-close" type="submit" class="btn btn-cancel mr-2">Cancel</button>
+                    </div>
+
+                </div>
             </div>
-        </div>
 
-    </div>
+        </div>
+    </form>
 </div>
 
 </div>
@@ -838,3 +893,10 @@
 
 
 @endsection
+@push('js')
+<script>
+    var clients = JSON.parse('{!! json_encode($customers)  !!}');
+</script>
+<script src="{{mix('js/custom/sale.js')}}"> </script>
+
+@endpush
