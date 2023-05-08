@@ -17,6 +17,8 @@ $(document).ready(function() {
         $('.dropify-clear').click();
         $('input[name="customer_id"]').val("");
         $('input[name="customer_name"]').val("");
+        $('input[name="phone_no"]').val("");
+        $('textare[name="address"]').val("");
   
         $('#dataSidebarLoader').hide();
         $('.dz-image-preview').remove();
@@ -57,6 +59,15 @@ $(document).ready(function() {
                 $('input[name="customer_name"]').focus();
                 $('input[name="customer_name"]').val(response.customer.customer_name);
                 $('input[name="customer_name"]').blur();
+
+                $('input[name="phone_no"]').focus();
+                $('input[name="phone_no"]').val(response.customer.phone_no);
+                $('input[name="phone_no"]').blur();
+
+                
+                $('textarea[name="address"]').focus();
+                $('textarea[name="address"]').val(response.customer.address);
+                $('textarea[name="address"]').blur();
                 
                 if (response.customer.customer_type ==1) {
                     $('.vendor').prop('checked', true);
@@ -209,7 +220,7 @@ function fetchcustomers() {
     });
     function table(data){
         $('.body').empty();
-        $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Type</th><th>Action</th></tr></thead><tbody></tbody></table>');
+        $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Phone #</th><th>Type</th><th>Action</th></tr></thead><tbody></tbody></table>');
         $('.mainCatsListTable tbody').empty();
         // var response = JSON.parse(response);
         var sNo = 1;
@@ -218,6 +229,7 @@ function fetchcustomers() {
             <tr>
                 <td>${key + 1}</td>
                 <td>${element['customer_name']}</td>
+                <td>${element['phone_no'] ? element['phone_no'] : 'NA'}</td>
                 <td> ${element['customer_type'] == 1 ?'Vendor' : 'Customer'}</td>
                 <td>
                     <button id="${element['id']}" class="btn btn-default btn-line openDataSidebarForUpdatecustomer">Edit</button>

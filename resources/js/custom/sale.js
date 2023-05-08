@@ -31,6 +31,8 @@ let service_charges = 0;
 
 
 $(document).ready(function () {
+    $('.parent-div').show();
+    $('#tblLoader').hide();
     stock_products    = JSON.parse($('#stock_products').val());
     customer_ledger   = JSON.parse($('#customer_ledger').val());
     getProducts();
@@ -43,7 +45,7 @@ $(document).ready(function () {
         customer_id      = $('#curren_customer_id').val(); 
         var invoice_id   = $('#hidden_invoice_id').val(); 
         service_charges = $('#service_charges').val(); 
-        alert(service_charges)
+    
         segment          = segments[3];
         $.ajax({
             url: '/get-sale-products/' + invoice_id,
@@ -78,8 +80,8 @@ $(document).ready(function () {
                         <tr id='tr-${product.product_id}'>
                             <td>${key+1}</td>
                             <td>${product.p_name}</td>
-                            <td><input type="number" value="${product.qty}"  class="qty-input add-stock-input td-input-qty${product.product_id}" data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"></td>
-                            <td><input type="number" value="${product.retail_price}"  class="price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"></td>
+                            <td><input type="number" value="${product.qty}"  class="inputvalue qty-input add-stock-input td-input-qty${product.product_id}" data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"></td>
+                            <td><input type="number" value="${product.retail_price}"  class="inputvalue price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"></td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount}</td>
                             <td><a type="button" id="${product.product_id}" data-id="${product.sale_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</a></td>
                         </tr>
@@ -157,22 +159,22 @@ $('#add-product').on('click', function () {
     p_name = ''; 
 });
 
-$('#invoice_type').change(function(){
-    if($(this).val()==1){ 
-        $('#customer_id').removeClass('required')
-        $('#customer_id').val('8').trigger('change');
-    }else{
-        $('#customer_id').addClass('required')
-        $('#customer_id').val('0').trigger('change'); 
-    }
-    var total_paid_for_net_sale = 0;
-    if($(this).val() == '1'){
-        sales_product_array.forEach(function (data, key) {
-            total_paid_for_net_sale += parseFloat(data.amount)
-        });
-    }
-    $('.amount_pay_input').val(total_paid_for_net_sale);
-});
+// $('#invoice_type').change(function(){
+//     if($(this).val()==1){ 
+//         $('#customer_id').removeClass('required')
+//         $('#customer_id').val('8').trigger('change');
+//     }else{
+//         $('#customer_id').addClass('required')
+//         $('#customer_id').val('0').trigger('change'); 
+//     }
+//     var total_paid_for_net_sale = 0;
+//     if($(this).val() == '1'){
+//         sales_product_array.forEach(function (data, key) {
+//             total_paid_for_net_sale += parseFloat(data.amount)
+//         });
+//     }
+//     $('.amount_pay_input').val(total_paid_for_net_sale);
+// });
 $('#datepicker , #datepicker2').datepicker({
     autoclose: true,
     todayHighlight: true,
@@ -348,9 +350,19 @@ function saleSave(current_action,type){
     let dirty = false;
     $('.required').each(function () {
         if (!$(this).val() || $(this).val() == 0) {
+            console.log($(this).val())
             dirty = true;
         }
     });
+    if($('#customer_id').val() == 0){
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Please select Customer first (*)');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    }
     if (dirty) {
         $('#notifDiv').fadeIn();
         $('#notifDiv').css('background', 'red');
@@ -640,6 +652,19 @@ function getvendors() {
     })
 }
 $('#customer_id').change(function () {
+
+    var total_paid_for_net_sale = 0;
+    if($(this).val()==8){  
+        $('#invoice_type').val('1').trigger('change');
+        sales_product_array.forEach(function (data, key) {
+            total_paid_for_net_sale += parseFloat(data.amount)
+        });
+        $('.previous_payable_tr').hide();
+    }else{ 
+        $('#invoice_type').val('2').trigger('change'); 
+        $('.previous_payable_tr').show();
+    }
+    $('.amount_pay_input').val(total_paid_for_net_sale);
     // $('.current_balance').text('0').trigger('change');
     var selected_index = $(this).val();
     if(selected_index > 0){

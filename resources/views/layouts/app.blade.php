@@ -115,7 +115,7 @@
     <div id="notifDiv">
     </div>
    
-    @if(request()->segment(1) != 'sale-add')
+    @if(request()->segment(1) != 'sale-add' && request()->segment(1) != 'sale-edit')
             @include('layouts.sidebar-menu')
     @endif
 

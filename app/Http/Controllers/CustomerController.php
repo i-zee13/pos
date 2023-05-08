@@ -50,7 +50,9 @@ class CustomerController extends Controller
             Customer::create([
                 'customer_name' => $request->customer_name,
                 'customer_type' => $request->customer_type,
-                'created_by' => Auth::user()->id,
+                'phone_no'      => $request->phone_no,
+                'address'       => $request->address,
+                'created_by'    => Auth::user()->id,
             ]);
             return response()->json([
                 'msg' => 'Added',
@@ -80,6 +82,8 @@ class CustomerController extends Controller
             Customer::where('id', $id)->update([
                 'customer_name' => $request->customer_name,
                 'customer_type' => $request->customer_type,
+                'phone_no'      => $request->phone_no,
+                'address'      => $request->address,
                 'created_by'    => Auth::user()->id,
             ]);
             return response()->json([

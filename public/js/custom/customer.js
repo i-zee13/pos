@@ -106,6 +106,8 @@ $(document).ready(function () {
     $('.dropify-clear').click();
     $('input[name="customer_id"]').val("");
     $('input[name="customer_name"]').val("");
+    $('input[name="phone_no"]').val("");
+    $('textare[name="address"]').val("");
     $('#dataSidebarLoader').hide();
     $('.dz-image-preview').remove();
     $('.dz-default').show();
@@ -142,6 +144,12 @@ $(document).ready(function () {
         $('input[name="customer_name"]').focus();
         $('input[name="customer_name"]').val(response.customer.customer_name);
         $('input[name="customer_name"]').blur();
+        $('input[name="phone_no"]').focus();
+        $('input[name="phone_no"]').val(response.customer.phone_no);
+        $('input[name="phone_no"]').blur();
+        $('textarea[name="address"]').focus();
+        $('textarea[name="address"]').val(response.customer.address);
+        $('textarea[name="address"]').blur();
         if (response.customer.customer_type == 1) {
           $('.vendor').prop('checked', true);
         } else {
@@ -282,12 +290,12 @@ function fetchcustomers() {
   });
   function table(data) {
     $('.body').empty();
-    $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Type</th><th>Action</th></tr></thead><tbody></tbody></table>');
+    $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Phone #</th><th>Type</th><th>Action</th></tr></thead><tbody></tbody></table>');
     $('.mainCatsListTable tbody').empty();
     // var response = JSON.parse(response);
     var sNo = 1;
     data.forEach(function (element, key) {
-      $('.mainCatsListTable tbody').append("\n            <tr>\n                <td>".concat(key + 1, "</td>\n                <td>").concat(element['customer_name'], "</td>\n                <td> ").concat(element['customer_type'] == 1 ? 'Vendor' : 'Customer', "</td>\n                <td>\n                    <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdatecustomer\">Edit</button>\n                    <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg deleteMaincustomer delete_cat\" name=\"main_cat\" title=\"Delete\">Delete</button>\n                    \n                </td>\n            </tr>"));
+      $('.mainCatsListTable tbody').append("\n            <tr>\n                <td>".concat(key + 1, "</td>\n                <td>").concat(element['customer_name'], "</td>\n                <td>").concat(element['phone_no'] ? element['phone_no'] : 'NA', "</td>\n                <td> ").concat(element['customer_type'] == 1 ? 'Vendor' : 'Customer', "</td>\n                <td>\n                    <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdatecustomer\">Edit</button>\n                    <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg deleteMaincustomer delete_cat\" name=\"main_cat\" title=\"Delete\">Delete</button>\n                    \n                </td>\n            </tr>"));
     });
     $('#tblLoader').hide();
     $('.body').fadeIn();

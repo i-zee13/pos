@@ -64,6 +64,7 @@ class SaleController extends Controller
 
     public function saleInvoice(Request $request)
     {
+        // dd($request->all());
         if ($request->hidden_invoice_id) {
             $invoice = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
         } else {
@@ -222,11 +223,11 @@ class SaleController extends Controller
         $products          =     Product::where('stock_balance', '>', 0)->get();
         $invoice           =     SaleInvoice::where('id', $id)->first();
         $purchasd_products =     ProductSale::where('sale_invoice_id', $id)
-            ->selectRaw('products_sales.*')
-            ->get();
+                                                ->selectRaw('products_sales.*')
+                                                ->get();
         $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)->where('trx_type', '=', 1)->orderBy('id', 'DESC')->first();
 
-        return view('sales.add', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger'));
+        return view('sales.test', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger'));
     }
     public function printInvoice($invoice_id, $customer_id, $received_amount)
     {
@@ -248,6 +249,7 @@ class SaleController extends Controller
         $customer_balance = CustomerLedger::where('customer_id', $customerId)
                                             ->whereDate('created_at', '!=', Carbon::today()->toDateString())
                                             ->orderBy('id', 'DESC')->value('balance'); 
+                                           
         return view('sales.sale-invoice', compact('invoice', 'products','customer_balance'));
     }
     public function getSaleProduct($id)

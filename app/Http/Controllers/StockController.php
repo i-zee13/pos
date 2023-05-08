@@ -137,7 +137,7 @@ class StockController extends Controller
                         $add_stock->product_unit_price   = $purchased->purchase_price;
                         $add_stock->product_id           = $purchased->product_id;
                         $add_stock->company_id           = $company_id; 
-                        $add_stock->expiry_date           = $$purchase_product['expiry_date']; 
+                        // $add_stock->expiry_date          = $purchase_product['expiry_date']; 
 
                         $add_stock->vendor_id            = $invoice->customer_id;
                         $add_stock->date                 = $purchased->created_at;

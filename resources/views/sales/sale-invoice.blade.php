@@ -220,7 +220,7 @@
                 </tr>
             </table>
             <table class="bot-5-table">
-            <tr>
+                <tr>
                     <td class="payable-heading">Service Charges :</td>
                     <td>{{number_format($invoice->service_charges)}}</td>
                 </tr>
@@ -248,8 +248,9 @@
                     <td>{{number_format($invoice->received_amount)}}</td>
                 </tr>
                 <tr>
-                    <td class="payable-heading">Cash Return :</td>
-                    <td>{{number_format($invoice->received_amount - collect($products)->sum('sale_total_amount'))}}</td>
+                     <td class="payable-heading">Cash Return :</td>
+                     <td>{{ number_format(($invoice->received_amount - (collect($products)->sum('sale_total_amount')+$invoice->service_charges)) < 0 ? 0 : ($invoice->received_amount - (collect($products)->sum('sale_total_amount')+$invoice->service_charges))) }}
+                    </td>
                 </tr>
                 @endif
             </table>

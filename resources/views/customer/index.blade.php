@@ -36,6 +36,14 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label class="control-label mb-10">Address *</label>
+                                                        <textarea   name="address" class="form-control" rows="4"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <h2 class="_head03 mt-10">Choose Type<span></span></h2>
                                             <div class="col-md-12">

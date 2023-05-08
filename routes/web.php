@@ -16,7 +16,30 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+Route::get('/cache-clear', function () {
+    Artisan::call('cache:clear');
+    return "Cache cleared successfully";
+});
+Route::get('/route-clear', function () {
+    Artisan::call('route:clear');
+    return "Route cache cleared successfully";
+});
+Route::get('/view-clear', function () {
+    Artisan::call('route:clear');
+    return "View cache cleared successfully";
+});
+Route::get('/config-cache', function () {
+    Artisan::call('config:cache');
+    return "Config cache successfully";
+});
+Route::get('/all-cache-clear', function () {
+    Artisan::call('optimize:clear');
+    return "All cache clear successfully";
+});
 
+Route::get('/', function () {
+    return redirect('/home');
+});
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () { 
 Route::Resource('/company'        ,App\Http\Controllers\CompanyController::class);

@@ -3,6 +3,7 @@
 use App\Models\City;
 use App\Models\Country;
 use App\Models\PostalCode;
+use App\Models\PurchaseInvoice;
 use App\Models\State;
 use App\Models\Sale as SaleInvoice; 
 use App\Models\Student; 
@@ -150,6 +151,25 @@ if(!function_exists('getInvoice'))
         }
     }
 }
+
+if(!function_exists('getPurchaseInvoice'))
+{
+    function getPurchaseInvoice()
+    {
+        $year        = date('y');
+        $invoice_no  = 1;
+        $lastinvoice = PurchaseInvoice::latest()->value('id');
+        if(isset($lastinvoice)){
+            $invoice_no = ($lastinvoice+1).'-'.$year;
+           return $invoice_no;
+        }else{
+            $invoice_no = $invoice_no.'-'.$year;
+            return $invoice_no;
+
+        }
+    }
+}
+
 if(!function_exists('getInvoice'))
 {
     function getSaleReturnNo()
