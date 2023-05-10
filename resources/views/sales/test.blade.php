@@ -825,7 +825,7 @@
                             <div class="col-12">
                                 <table class="totalValues" width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
-                                        <tr>
+                                        <tr  class="th-to-hide">
                                             <td></td>
                                             <td></td>
                                             <td align="right">Service charges </td>
@@ -837,13 +837,13 @@
                                             <td align="right">Previous Payable</td>
                                             <td class="previous_payable">0</td>
                                         </tr>
-                                        <tr>
+                                        <tr  class="th-to-hide">
                                             <td></td>
                                             <td></td>
                                             <td align="right">{{Route::currentRouteName() == 'sale-edit' ? 'Remaining Amount' : 'Net Amount'}}</td>
-                                            <td> <input type="text" class="inputvalue amount_pay_input remaning_amount" id="amount_to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly></td>
+                                            <td> <input type="text" class="inputvalue  remaning_amount amount_pay_input   " id="amount_to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly></td>
                                         </tr>
-                                        <tr>
+                                        <tr  class="th-to-hide">
                                             <td></td>
                                             <td></td>
                                             <td align="right">Cash Recived</td>
@@ -853,7 +853,7 @@
 
 
 
-                                        <tr>
+                                        <tr class="th-to-hide">
                                             <td></td>
                                             <td></td>
                                             <td align="right">Cash Return</td>
@@ -861,7 +861,7 @@
                                         </tr>
                                         @if (Route::currentRouteName() == 'sale-edit')
 
-                                        <tr>
+                                        <tr class="th-to-hide">
                                             <td></td>
                                             <td></td>
                                             <td align="right">Paid</td>

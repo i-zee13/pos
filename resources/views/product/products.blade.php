@@ -23,21 +23,20 @@
                                             <div class="row">
                                                 <div class="col-md-6 PB-10 ">
                                                 <label class="font12 mb-0">Companies *</label>   
+                                                    <div class="form-s2 ">
+                                                        <select class="form-control formselect field-required" name="company_id">
+                                                            <option value="0" selected > Select Company</option>
+                                                            @foreach ($companies as $item)
+                                                            <option value="{{ $item->id }}">{{ $item->company_name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div> 
 
-                                                        <div class="form-s2 ">
-                                                            <select class="form-control formselect field-required" name="company_id">
-                                                                <option value="0" selected > Select Company
-                                                                </option>
-                                                                @foreach ($companies as $item)
-                                                                <option value="{{ $item->id }}">{{ $item->company_name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                </div>
                                                 <div class="col-md-6 PB-10">
                                                     <div class="form-group">
                                                         <label class="control-label mb-10">ID*</label>
-                                                        <input type="text" name="barcode" class="form-control" required>
+                                                        <input type="text" name="barcode" class="form-control barcode"  value="" id="barcode">
                                                     </div>
                                                 </div>
                                             </div>
@@ -92,8 +91,7 @@
 @endsection
 @section('content')
 <div class="header">
-
-
+ 
     <!-- Body -->
     <div class="header-body">
         <div class="row  ">

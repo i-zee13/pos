@@ -212,7 +212,7 @@ class SaleController extends Controller
             //         ->whereDate('created_at', Carbon::today())
             //         ->groupBy('customer_id');
             // })
-            ->orderBy('id', 'desc')
+            ->orderBy('id', 'asc')
             ->get();
 
         return view('sales.list', compact('sales'));
@@ -225,8 +225,10 @@ class SaleController extends Controller
         $purchasd_products =     ProductSale::where('sale_invoice_id', $id)
                                                 ->selectRaw('products_sales.*')
                                                 ->get();
-        $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)->where('trx_type', '=', 1)->orderBy('id', 'DESC')->first();
-
+        $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)
+                                                ->where('trx_type', '=', 1)
+                                                ->where('sale_invoice_id',$invoice->id)
+                                                ->orderBy('id', 'DESC')->first(); 
         return view('sales.test', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger'));
     }
     public function printInvoice($invoice_id, $customer_id, $received_amount)
@@ -271,8 +273,8 @@ class SaleController extends Controller
             $customer_count     =  CustomerLedger::where('customer_id', $id)->count();
             if ($customer_count > 1) {
                 $customer_balance = CustomerLedger::where('customer_id', $id)
-                    ->whereDate('created_at', '!=', Carbon::today()->toDateString())
-                    ->orderBy('id', 'DESC')->value('balance');
+                                    ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+                                    ->orderBy('id', 'DESC')->value('balance');
             } else {
                 $customer_balance = 0;
             }
@@ -280,9 +282,10 @@ class SaleController extends Controller
             // $customer_balance = VendorLedger::where('customer_id',$id)->where('created_at','!=',Carbon::today()->toDateString())->orderBy('id', 'DESC')->value('balance');
             $customer_balance = Customer::where('id', $id)->value('balance');
         }
+       
         return response()->json([
-            'msg'       =>  'Vendor fetched',
-            'status'    =>  'success',
+            'msg'               =>  'Vendor fetched',
+            'status'            =>  'success',
             'customer_balance'  => $customer_balance
         ]);
     }

@@ -90,7 +90,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var sweetalert__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sweetalert */ "./node_modules/sweetalert/dist/sweetalert.min.js");
 /* harmony import */ var sweetalert__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sweetalert__WEBPACK_IMPORTED_MODULE_0__);
 var lastOp = "";
-var glob_type = '';
+var barcode = '';
 
 var deleteRef = '';
 $(document).ready(function () {
@@ -102,10 +102,11 @@ $(document).ready(function () {
     fetchcompanies();
   }
   $(document).on('click', '.openDataSidebarForAddingProduct', function () {
+    $('input[name="barcode"]').val(barcode);
     $('.dropify-clear').click();
     $('.dz-image-preview').remove();
     $('#dataSidebarLoader').hide();
-    $('input[name="barcode"]').val("");
+    $('#product_id').val("");
     $('input[name="product_name"]').val("");
     $('input[name="size"]').val("");
     $('input[name="purchase_price"]').val("");
@@ -116,12 +117,10 @@ $(document).ready(function () {
       $('.dropify-clear').click();
       $('input[name="product_name"]').val("");
       $('input[name="product_name"]').blur();
-      $('input[name="barcode"]').val("");
       $('input[name="product_name"]').val("");
       $('input[name="size"]').val("");
       $('input[name="purchase_price"]').val("");
       $('input[name="sale_price"]').val("");
-      $('#primary_services').val("0").trigger('change');
     }
     lastOp = 'add';
     if ($('#saveSubSecondaryServiceForm input[name="_method"]').length) {
@@ -254,7 +253,7 @@ $(document).ready(function () {
         if (response.status == "duplicate") {
           $('#notifDiv').fadeIn();
           $('#notifDiv').css('background', 'red');
-          $('#notifDiv').text('Category Already Exist');
+          $('#notifDiv').text('Product Already Exist');
           setTimeout(function () {
             $('#notifDiv').fadeOut();
           }, 3000);
@@ -267,7 +266,7 @@ $(document).ready(function () {
           $('#saveMainCat').removeAttr('disabled');
           $('#cancelMainCat').removeAttr('disabled');
           $('#saveMainCat').text('Save');
-          $('#notifDiv').text('Category have been updated successfully');
+          $('#notifDiv').text('Product have been updated successfully');
           $('#notifDiv').fadeIn();
           $('#notifDiv').css('background', 'green');
           setTimeout(function () {
@@ -344,7 +343,7 @@ $(document).ready(function () {
         if (response.msg == "duplicate") {
           $('#notifDiv').fadeIn();
           $('#notifDiv').css('background', 'red');
-          $('#notifDiv').text('Category Already Exist');
+          $('#notifDiv').text('Product Already Exist');
           setTimeout(function () {
             $('#notifDiv').fadeOut();
           }, 3000);
@@ -358,13 +357,13 @@ $(document).ready(function () {
           $('#saveProduct').removeAttr('disabled');
           $('#cancelSubCat').removeAttr('disabled');
           $('#saveProduct').text('Save');
-          var msg = 'Category have been updated successfully';
+          var msg = 'Product have been updated successfully';
           if ($('#operation').val() !== "update") {
             $('#saveProduct').find("input[name='product_name']").val("");
-            $('#saveProduct').find("select[name='company_id']").val("-1").trigger();
+            $('#saveProduct').find("select[name='company_id']").val("0").trigger();
             $('#saveProduct').find("input[name='publish_service']").prop('checked', false);
             $('#saveProduct').find("select").val("0").trigger('change');
-            var msg = 'Category have been added successfully';
+            var msg = 'Product have been added successfully';
           }
           $('#notifDiv').fadeIn();
           $('#notifDiv').text(msg);
@@ -527,12 +526,13 @@ function fetchproducts() {
     url: '/get-products',
     success: function success(response) {
       $('.body').empty();
-      $('.body').append("\n                    <table class=\"table table-hover dt-responsive nowrap subCatsListTable\" style=\"width:100%;\">\n                        <thead>\n                            <tr>\n                                <th>S.No</th>\n                                <th>ID</th>\n                                <th>Company</th>\n                                <th>Product</th>\n                                <th>Size</th>\n                                <th>Action</th>\n                            </tr>\n                        </thead>\n                    <tbody></tbody>\n                    </table>");
+      $('.body').append("\n                    <table class=\"table table-hover dt-responsive nowrap subCatsListTable\" style=\"width:100%;\">\n                        <thead>\n                            <tr>\n                                <th>ID</th>\n                                <th>Company</th>\n                                <th>Product</th>\n                                <th>Size</th>\n                                <th>Action</th>\n                            </tr>\n                        </thead>\n                    <tbody></tbody>\n                    </table>");
       $('.subCatsListTable tbody').empty();
       var sNo = 1;
+      $('.barcode').val(barcode).focus();
       response.data.forEach(function (element, key) {
-        console.log(element, element.product_icon);
-        $('.subCatsListTable tbody').append("\n                        <tr>\n                            <td>".concat(key + 1, "</td>\n                            <td>").concat(element['barcode'], " </td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td> <img src=\"").concat(element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                            <td>").concat(element['size'], " </td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                                <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg  delete_product\" name=\"Sub_cat\" title=\"Delete\">Delete</button>\n                            </td>\n                        </tr>"));
+        barcode = element.id + 1;
+        $('.subCatsListTable tbody').append("\n                        <tr> \n                            <td>".concat(element['barcode'], " </td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td> <img src=\"").concat(element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                            <td>").concat(element['size'], " </td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                                <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg  delete_product\" name=\"Sub_cat\" title=\"Delete\">Delete</button>\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();

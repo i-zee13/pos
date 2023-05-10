@@ -1,5 +1,5 @@
 var lastOp = "";
-var glob_type = '';
+var barcode = '';
       import swal from 'sweetalert';
 var deleteRef = '';
 $(document).ready(function() {
@@ -12,10 +12,11 @@ $(document).ready(function() {
         fetchcompanies();
     }
     $(document).on('click', '.openDataSidebarForAddingProduct', function() {
+        $('input[name="barcode"]').val(barcode);
         $('.dropify-clear').click();
         $('.dz-image-preview').remove();
-        $('#dataSidebarLoader').hide();
-        $('input[name="barcode"]').val("");
+        $('#dataSidebarLoader').hide(); 
+        $('#product_id').val("");
         $('input[name="product_name"]').val("");
         $('input[name="size"]').val("");
         $('input[name="purchase_price"]').val("");
@@ -27,15 +28,12 @@ $(document).ready(function() {
 
             $('input[name="product_name"]').val("");
             $('input[name="product_name"]').blur();
-            $('input[name="barcode"]').val("");
             $('input[name="product_name"]').val("");
             $('input[name="size"]').val("");
             $('input[name="purchase_price"]').val("");
             $('input[name="sale_price"]').val("");
             
-            $('#primary_services').val("0").trigger('change');
       
-        
         }
         lastOp = 'add';
 
@@ -47,8 +45,9 @@ $(document).ready(function() {
         openSidebar();
     });
     $(document).on('click', '.openDataSidebarForUpdateProduct', function() {
+     
         $('input[id="operation"]').val('update');
-        lastOp = 'update';
+        lastOp  = 'update';
         $('#dataSidebarLoader').show();
         $('._cl-bottom').hide();
         $('.pc-cartlist').hide();
@@ -187,7 +186,7 @@ $(document).ready(function() {
                 if(response.status == "duplicate") {
                     $('#notifDiv').fadeIn();
                     $('#notifDiv').css('background', 'red');
-                    $('#notifDiv').text('Category Already Exist');
+                    $('#notifDiv').text('Product Already Exist');
                     setTimeout(() => {
                         $('#notifDiv').fadeOut();
                     }, 3000);
@@ -201,7 +200,7 @@ $(document).ready(function() {
                     $('#cancelMainCat').removeAttr('disabled');
                     $('#saveMainCat').text('Save');
 
-                    $('#notifDiv').text('Category have been updated successfully');
+                    $('#notifDiv').text('Product have been updated successfully');
                     $('#notifDiv').fadeIn();
                     $('#notifDiv').css('background', 'green');
                     setTimeout(() => {
@@ -282,7 +281,7 @@ $(document).ready(function() {
                 if(response.msg == "duplicate") {
                     $('#notifDiv').fadeIn();
                     $('#notifDiv').css('background', 'red');
-                    $('#notifDiv').text('Category Already Exist');
+                    $('#notifDiv').text('Product Already Exist');
                     setTimeout(() => {
                         $('#notifDiv').fadeOut();
                     }, 3000);
@@ -292,18 +291,18 @@ $(document).ready(function() {
                 }
                 if (response.status == "success") {
                     closeSidebar();
-                    fetchproducts();
+                    fetchproducts(); 
                     $('#saveProduct').removeAttr('disabled');
                     $('#cancelSubCat').removeAttr('disabled');
                     $('#saveProduct').text('Save');
 
-                    var msg = 'Category have been updated successfully';
+                    var msg = 'Product have been updated successfully';
                     if ($('#operation').val() !== "update") {
                         $('#saveProduct').find("input[name='product_name']").val("");
-                        $('#saveProduct').find("select[name='company_id']").val("-1").trigger();
+                        $('#saveProduct').find("select[name='company_id']").val("0").trigger();
                         $('#saveProduct').find("input[name='publish_service']").prop('checked', false);
                         $('#saveProduct').find("select").val("0").trigger('change');
-                    var msg = 'Category have been added successfully';
+                    var msg = 'Product have been added successfully';
                     }
 
                     $('#notifDiv').fadeIn();
@@ -485,7 +484,6 @@ function fetchproducts() {
                     <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;">
                         <thead>
                             <tr>
-                                <th>S.No</th>
                                 <th>ID</th>
                                 <th>Company</th>
                                 <th>Product</th>
@@ -496,12 +494,12 @@ function fetchproducts() {
                     <tbody></tbody>
                     </table>`);
                     $('.subCatsListTable tbody').empty();
-                    var sNo = 1;
+                    var sNo = 1; 
+                    $('.barcode').val(barcode).focus();
                     response.data.forEach((element,key) => {
-                        console.log(element,element.product_icon)
+                       barcode = element.id+1;
                         $('.subCatsListTable tbody').append(`
-                        <tr>
-                            <td>${key + 1}</td>
+                        <tr> 
                             <td>${element['barcode']} </td>
                             <td> ${element['company_name']}</td>
                             <td> <img src="${element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png'}"  style="height:25px; width:25px;"> ${element['product_name']}</td>
@@ -511,6 +509,7 @@ function fetchproducts() {
                                 <button type="button" id="${element['id'] }" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button>
                             </td>
                         </tr>`);
+                       
                     });
                     $('#tblLoader').hide();
                     $('.body').fadeIn();

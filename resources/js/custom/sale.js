@@ -108,17 +108,7 @@ $('#add-product').on('click', function () {
     } else {
         $('#qty').css('border-color', ''); // Reset the border color
     }
-    if ($('.expiry_date').val() == '') {
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Please Add Expiry Date of Product');
-        setTimeout(() => {
-            $('#notifDiv').fadeOut();
-        }, 3000);
-        return;
-    } else {
-        expiry_date = $('.expiry_date').val();
-    }
+    expiry_date = $('.expiry_date').val();
     sales_product_array.push({
         'sale_prod_id'    :  '',
         'product_id'      :  `${product_id}`,
@@ -675,16 +665,16 @@ $('#customer_id').change(function () {
                 segment:segment
             },
             success : function(response){
-                console.log(customer_ledger)
                 previous_payable          = response.customer_balance;
                 var previous_payable_text = previous_payable >= 0 ? previous_payable + " CR" : previous_payable < 0  ? (-previous_payable) + " DR" : previous_payable;
                 $('.previous_payable').text(previous_payable_text);
                 $('.previous_payable').val(previous_payable);
-                if (segments[3] == "sale-edit") {
+                grandSum(previous_payable,service_charges)
+                if (segments[3] == "sale-edit") { 
                     $('.paid_amount').text(customer_ledger['cr']);
                     $('.remaning_amount').val(customer_ledger['balance'])                
                 }
-                grandSum(previous_payable,service_charges)
+                
                 $('.display').css('display','');
             }
         })
@@ -701,15 +691,16 @@ function grandSum(previous_payable=0,service_charges=0){
     sale_total_amount = sum;
     sum += parseFloat(previous_payable ? previous_payable : 0); 
     sum += parseFloat(service_charges ? service_charges : 0); 
-    $('.grand-total').text(sum); 
-    $('.amount_pay_input').val(sum -  $('.paid_amount').text()); 
-    if( $('.grand-total').text() == $('.paid_amount').text()){
-       $('.th-to-hide').hide();
+    $('.grand-total').text(sum);  
+    $('.amount_pay_input').val(sum -  $('.paid_amount').text());  
+    console.log($('.grand-total').text(),$('.paid_amount').text())
+    setTimeout(function(){ if($('.grand-total').text() == $('.paid_amount').text()){
+       $('.th-to-hide').hide(); 
        $('.amount_received').val($('.amount_pay_input').val());
     }else{
        $('.th-to-hide').show();
 
-    }
+    }}, 300);
 }
 function productRetailAmount(){
     retail_price = $('#retail_price').val();

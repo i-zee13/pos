@@ -11,11 +11,15 @@ class ProductController extends Controller
 {
     Public function index(){
         $companies = Company::all();
-        return view('product.products',compact('companies'));
+        $next_product_id = Product::count()+1;
+   
+        return view('product.products',compact('companies','next_product_id'));
     }
     public function store(Request $request)
-    {
-        if(Product::where('company_id',$request->company_id)->where('product_name',$request->product_name)->where('id','!=',$request->hidden_product_id)->first()){
+    {  
+        if(Product::where('company_id', $request->company_id)
+                    ->whereRaw("(product_name = '".$request->product_name."' OR barcode = '".$request->barcode."') AND id != '".$request->hidden_product_id."'")
+                    ->first()){
         return response()->json([
              'msg'    =>  'duplicate',
              'status' =>  'error',
@@ -40,9 +44,11 @@ class ProductController extends Controller
                    $product->product_icon       =  $product_icon;
                    $product->created_by         =  Auth::user()->id;
             if($product->save()){
+                $next_product_id = $product->id+1;
                 return response()->json([
                     'msg'   => 'Product Added',
                     'status'=>  'success',
+                    'next_product_id' => $next_product_id
                     ]);
             }else{
                 return response()->json([
