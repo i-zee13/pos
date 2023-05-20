@@ -236,7 +236,7 @@
                 </tr>
                 <tr>
                     <td class="payable-heading">Cash Received :</td>
-                    <td>{{number_format($invoice->received_amount)}}</td>
+                    <td>{{number_format($invoice->amount_received)}}</td>
                 </tr>
                 <tr>
                     <td class="payable-heading">Remaining Receivable :</td>
@@ -245,11 +245,11 @@
                 @else
                 <tr>
                     <td class="payable-heading">Cash Received :</td>
-                    <td>{{number_format($invoice->received_amount)}}</td>
+                    <td>{{number_format($invoice->amount_received)}}</td>
                 </tr>
                 <tr>
                      <td class="payable-heading">Cash Return :</td>
-                     <td>{{ number_format(($invoice->received_amount - (collect($products)->sum('sale_total_amount')+$invoice->service_charges)) < 0 ? 0 : ($invoice->received_amount - (collect($products)->sum('sale_total_amount')+$invoice->service_charges))) }}
+                     <td>{{ number_format($invoice->cash_return) }}
                     </td>
                 </tr>
                 @endif

@@ -153,7 +153,7 @@
     <script src="{{asset('/js/jquery.form.min.js')}}"></script>
     <script src="{{asset('/js/selectize.min.js')}}"></script>
     <script src="{{asset('/js/bootstrap-datepicker.js?v=1.1')}}"></script>
-    <script src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
+    <script src="{{asset('/js/dataTables.buttons.min.js')}}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.33/pdfmake.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
@@ -198,7 +198,7 @@
         })
         // for text type inputs which are required to accept only numeric values
         $(document).on('input', '.only_numerics', function() {
-            this.value = this.value.replace(/[^0-9]/gi, '');
+            this.value = this.value.replace(/[^0-9.]/g, '');
         })
         // for text type inputs which are required to accept only aplphabetic values
         $(document).on('input', '.only_alphabets', function() {

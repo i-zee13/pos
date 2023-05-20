@@ -27,13 +27,13 @@
                                                         <input type="text" name="company_name" class="form-control" required>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-12">
+                                                <!-- <div class="col-md-12">
                                                     <span>Upload Icon *</span>
                                                     <div class="upload-pic"></div>
                                                     <div class="img">
                                                         <input type="file" id="input-file-now" data-default-file="" class="dropify" name="company_icon" data-old_input="hidden_company_icon" accept="image/*" data-allowed-file-extensions="jpg png jpeg JPEG" />
                                                     </div>
-                                                </div>
+                                                </div> -->
                                             </div>
                                         </div>
                                     </div>

@@ -22,7 +22,7 @@ class StockController extends Controller
     {   
         $current_date =   Carbon::today()->toDateString();
         $customers    =   Customer::all();
-        $products     =   Product::all();
+        $products     =   Product::withoutTrashed()->get('id'); 
         return view('purchases.add',compact('customers','current_date','products'));
     }
     public function getProduct(Request $request)
@@ -41,7 +41,7 @@ class StockController extends Controller
     }
     public function getProducts()
     {
-        $products     =    Product::all();
+        $products     =    Product::withoutTrashed()->get();
             return response()->json([
                 'msg'       =>  'Product Fetched for Stock',
                 'status'    =>  'success',
@@ -49,7 +49,7 @@ class StockController extends Controller
             ]);
     }
      Public function purchaseInvoice(Request $request){
-         
+          
         if($request->hidden_invoice_id){
             ProductPurchase::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
@@ -60,7 +60,7 @@ class StockController extends Controller
         $invoice->date           = $request->invoice_date;
         $invoice->invoice_no     = $request->invoice_no;
         $invoice->customer_id    = $request->customer_id;
-        $invoice->paid_amount    = $request->amount_paid;
+        $invoice->paid_amount    = $request->amount_paid+($request->hidden_paid_amount ? $request->hidden_paid_amount : 0); 
         $invoice->total_invoice_amount = $request->grand_total;
         $invoice->created_by     = Auth::id();
         if($invoice->save()){
@@ -82,7 +82,7 @@ class StockController extends Controller
                     $purchased->purchased_total_amount =  $purchase_product['amount'];
                     $purchased->created_by      = Auth::id();
                     if($purchased->save()){
-                          $product = Product::where('id',$purchased->product_id)->first();
+                          $product   = Product::where('id',$purchased->product_id)->first(); 
                           $company_id = $product->company_id;
                           $product->expiry_date = $purchased->expiry_date;
                           if($purchase_product['new_price'] != ''){
@@ -195,18 +195,17 @@ class StockController extends Controller
                     $balance        =   0;
                 }
                 if($request->hidden_invoice_id){
-                    $customer_ledger   = VendorLedger::where('purchase_invoice_id',$request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
+                    $customer_ledger   =  VendorLedger::where('purchase_invoice_id',$request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
                 }else{
                     $customer_ledger   =  new  VendorLedger();
                 }
-                $customer_ledger->cr         = $request->purchased_total;
                 // $customer_ledger->cr         = ($request->grand_total-$request->amount_paid)+$balance;
                 $customer_ledger->date       = $request->invoice_date;
                 $customer_ledger->purchase_invoice_id= $invoice->id;
                 $customer_ledger->trx_type   = 1 ; //Purchase inc
-
                 $customer_ledger->customer_id= $request->customer_id;
-                $customer_ledger->dr         = $request->amount_paid;
+                $customer_ledger->dr         = $invoice->total_invoice_amount;
+                $customer_ledger->cr         = $invoice->amount_paid;
                 $customer_ledger->balance    = ($request->grand_total-$request->amount_paid); //+balance
                 $customer_ledger->created_by = Auth::id();
                 $customer_ledger->save();
@@ -239,7 +238,7 @@ class StockController extends Controller
     }
     public function purchaseList(){
         $purchases = PurchaseInvoice::selectRaw('purchase_invoices.*,
-                        (SELECT dr FROM vendor_ledger WHERE purchase_invoice_id = purchase_invoices.id) as paid_amount,
+                        (SELECT cr FROM vendor_ledger WHERE purchase_invoice_id = purchase_invoices.id) as paid_amount,
                         (SELECT customer_name FROM customers WHERE id=purchase_invoices.customer_id) as customer_name')
                         ->whereIn('purchase_invoices.id', function ($query) {
                             $query->selectRaw('MAX(id)')
@@ -253,13 +252,14 @@ class StockController extends Controller
     }
     public function editPurchase($id){
         $customers          =   Customer::all();
-        $products           =   Product::all();
+        $products           =   Product::withoutTrashed()->get();
         $invoice            =   PurchaseInvoice::where('id',$id)->first();
         $purchasd_products  =  ProductPurchase::where('purchase_invoice_id', $id)
                                                 ->selectRaw('(SELECT balance FROM vendor_stocks WHERE vendor_id = products_purchases.vendor_id ORDER BY id DESC LIMIT 1) as balance, products_purchases.*')
                                                 ->from('products_purchases')
                                                 ->get();
-        $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)->where('trx_type','=',2)->orderBy('id', 'DESC')->first();
+        $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)->where('trx_type','=',1)->orderBy('id', 'DESC')->first();
+
         return view('purchases.edit',compact('invoice','customers','products','customers','get_vendor_ledger'));
     }
     public function getPurchaseProduct($id){

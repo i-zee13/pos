@@ -64,11 +64,12 @@ class SaleController extends Controller
 
     public function saleInvoice(Request $request)
     {
-        // dd($request->all());
         if ($request->hidden_invoice_id) {
             $invoice = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
+            $invoice->amount_received      =  $invoice->amount_received+$request->amount_received; 
         } else {
             $invoice = new SaleInvoice();
+             $invoice->amount_received      = $request->amount_received;
         }
         $invoice->date                 = $request->invoice_date;
         $invoice->invoice_no           = $request->invoice_no;
@@ -81,6 +82,9 @@ class SaleController extends Controller
         }
         $invoice->total_invoice_amount = $request->grand_total;
         $invoice->service_charges      = $request->service_charges;
+        $invoice->invoice_discount     = $request->invoice_discount;
+        $invoice->cash_return          = $request->cash_return;
+       
         $invoice->status               = $request->status;
         $invoice->created_by           = Auth::id();
         if ($invoice->save()) {
@@ -97,6 +101,7 @@ class SaleController extends Controller
                     $sale->product_id          = $sale_product['product_id'];
                     $sale->qty                 = $sale_product['qty'];
                     $sale->sale_total_amount   = $sale_product['amount'];
+                    $sale->product_discount   = $sale_product['prod_discount'];
                     $sale->created_by          = Auth::id();
                     if ($sale->save()) {
                         $sale_products_array[] = $sale->id;
@@ -230,6 +235,20 @@ class SaleController extends Controller
                                                 ->where('sale_invoice_id',$invoice->id)
                                                 ->orderBy('id', 'DESC')->first(); 
         return view('sales.test', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger'));
+    }
+    public function show($id)
+    {
+        $customers         =     Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
+        $products          =     Product::where('stock_balance', '>', 0)->get();
+        $invoice           =     SaleInvoice::where('id', $id)->first();
+        $purchasd_products =     ProductSale::where('sale_invoice_id', $id)
+                                                ->selectRaw('products_sales.*')
+                                                ->get();
+        $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)
+                                                ->where('trx_type', '=', 1)
+                                                ->where('sale_invoice_id',$invoice->id)
+                                                ->orderBy('id', 'DESC')->first(); 
+        return view('sales.detail', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger'));
     }
     public function printInvoice($invoice_id, $customer_id, $received_amount)
     {

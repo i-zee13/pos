@@ -78,6 +78,7 @@ Route::get('/get-customer'              ,[App\Http\Controllers\SaleController::c
 Route::post('/add-sale-invoice'         ,[App\Http\Controllers\SaleController::class, 'saleInvoice'])->name('add-sale-invoice');
 Route::get('/sales'                     ,[App\Http\Controllers\SaleController::class, 'saleList'])->name('sales');
 Route::get('/sale-edit/{id}'            ,[App\Http\Controllers\SaleController::class, 'editsale'])->name('sale-edit');
+Route::get('/sale-detail/{id}'            ,[App\Http\Controllers\SaleController::class, 'show'])->name('sale-detail');
 Route::get('/get-sale-products/{id}'    ,[App\Http\Controllers\SaleController::class, 'getSaleProduct'])->name('get-sale-products');
 Route::get('/get-customer-balance/{id}' ,[App\Http\Controllers\SaleController::class, 'getCustomerBalance'])->name('get-customer-balance');
 // Sales Returns / 

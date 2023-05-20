@@ -85,11 +85,25 @@
         </div>
     </div>
     @section('content')
-    <style> 
-    
+    <style>
+        #table-container {
+            position: relative;
+            overflow: auto;
+            height: 200px;
+            /* Set an appropriate height for the container to enable scrolling */
+        }
+
+        tbody tr:first-child {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            /* Set a background color for the sticky row if desired */
+        }
+
         .OrderWrapper {
             padding: 0 !important;
         }
+
         .itemQTY {
             font-size: 12px;
             width: 70px;
@@ -634,16 +648,16 @@
                                 </div>
                             </div>
 
-                            <h2 class="title border-bottom">Invoice <span>Details</span></h2>
+                            <h2 class="title border-bottom">Company <span>Details</span></h2>
                             <div class="row CompanyInfo">
-                                <!-- <div class="col-md-7 pr-0"><strong>Old Recived:</strong> </div>
-                                <div class="col-md-5"><span class=" text-red">{{@$invoice->amount_received}}</span></div>
-                                <div class="col-md-7 pr-0"><strong>Previous Paid :</strong></div>
-                                <div class="col-md-5"><span class="">{{@$invoice->paid_amount}}</span></div> -->
-                                <div class="col-md-7 pr-0"><strong>Previous Receivable :</strong> </div>
-                                <div class="col-md-5"><span class="dashboard_avg_rev_perCust previous_payable">0</span></div>
-                                <!-- <div class="col-md-7 pr-0"><strong>Country:</strong></div>
-                        <div class="col-md-5"><span id="country"></span></div> -->
+                                <div class="col-md-5 pr-0"><strong>Stock Balance:</strong> </div>
+                                <div class="col-md-7"><span class="stock_balance">0</span></div>
+                                <div class="col-md-5 pr-0"><strong>Retail Price:</strong></div>
+                                <div class="col-md-7"><span class="retail_price">0</span></div>
+                                <div class="col-md-5 pr-0"><strong>Previous Receivable :</strong> </div>
+                                <div class="col-md-7"><span class="dashboard_avg_rev_perCust previous_payable">0</span></div>
+                                <!-- <div class="col-md-5 pr-0"><strong>Country:</strong></div>
+                        <div class="col-md-7"><span id="country"></span></div> -->
                             </div>
                             <!-- <h2 class="title m-0 pb-0">Shipping <span>Details</span></h2> -->
                         </div>
@@ -724,9 +738,8 @@
 
                     <div class="row">
                         <div class="col-6">
-                            <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'sale-edit' ? 'Sale' : 'New'}} <span>Invoice</span></h2>
+                            <h2 class="title font22 PT-10 mb-10">New <span>Order</span></h2>
                         </div>
-                        
                         <!-- <div class="col p-0 text-right">
                     <select class="custom-select custom-select-sm custom-select-cs" id="currencySelector">
                         <option sign="$" value="USD" selected>USD - United States Dollar
@@ -748,13 +761,6 @@
 
                     <div class="right_Info">
                         <div class="row inputfileds-top">
-                        <div class="row CompanyInfo">
-                            <div class="col-md-3"><strong class="show_purchase">P.P:</strong> <span class="pp" style="display:none"></span></div>
-                            <div class="col-md-5"><strong>Retail Price:</strong> <span class="retail_price ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
-
-                            <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
-                                  
-                            </div>
                             <!-- <div class="col-auto pr-0">Invoice #
                         <input type="text" id="" class="inputfileds required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
                     </div> -->
@@ -773,7 +779,7 @@
                         @endif
                     </div> -->
 
-                            <div class="infoDiv">
+                            <div class="infoDiv p-15">
                                 <form id="purchse-form">
                                     <div class="row">
                                         <!-- <div class="col-2 pr-0">ID
@@ -788,7 +794,7 @@
                                                 @endforeach
                                             </select>
                                         </div> -->
-                                        <input type="text" id="purchase_price" class="inputfileds  purchase_price " placeholder="" name="purchase_price" hidden>
+                                        <input type="text" id="purchase_price" class="inputfileds " placeholder="" name="purchase_price" hidden>
                                         <input type="text" id="retail _price" class="inputfileds" placeholder="" name="ret ail_price" hidden>
 
                                         <!-- <div class="col-2 pr-0">Quantity *
@@ -812,17 +818,10 @@
                             </div>
 
                         </div>
-<style>
-.ProductTable tbody tr:hover td { background: #152e4d  !important ; 
 
-color: white !important;
-}
-
-
-</style>
                         <div class="row">
                             <div class="col-12" id="table-container">
-                                <table class="ProductTable table  " id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <table class="ProductTable" id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <thead>
                                         <tr>
                                             <th class="">ID</th>
@@ -852,7 +851,7 @@ color: white !important;
                                             <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;"  tabindex="4"  min="0"></td>
                                             <td class='add- S-input '><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;"></td>
                                             <td>
-                                                <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5" style="padding: 5px 15px 5px 15px; background:green">Add</button>
+                                                <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5">Add</button>
                                             </td>
                                         </tr>
 
@@ -893,26 +892,25 @@ color: white !important;
                                         <tr class="th-to-hide">
                                             <td></td>
                                             <td></td>
-                                            <td align="right">Net Amount</td>
-                                          
-                                            <td> <input type="number" class="inputvalue  remaning_amount amount_pay_input " id="amount_ to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly value="{{@$invoice->paid_amount}}"></td>
+                                            <td align="right">{{Route::currentRouteName() == 'sale-edit' ? 'Remaining Amount' : 'Net Amount'}}</td>
+                                            <td> <input type="number" class="inputvalue  remaning_amount amount_pay_input   " id="amount_to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly></td>
                                         </tr>
                                       
                                         <tr class="th-to-hide">
                                             <td></td>
                                             <td></td>
-                                            <td align="right" class="cash-return">Cash Recived </td>
-                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" onkeypress="return isNumber(event)" value="{{@$invoice->amount_received}}"></td>
+                                            <td align="right">  {{Route::currentRouteName() == 'sale-edit' ? 'Old Recived' : 'Cash Recived'}}</td>
+                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" onkeypress="return isNumber(event)" value="{{@$invoice->paid_amount}}"></td>
                                         </tr>
                                        
 
 
 
-                                        <tr class="th-hide ">
+                                        <tr class="th-to-hide">
                                             <td></td>
                                             <td></td>
                                             <td align="right">Cash Return</td>
-                                            <td class="cash_return">{{@$invoice->cash_return}}</td>
+                                            <td class="cash_return">0</td>
                                         </tr>
                                         @if (Route::currentRouteName() == 'sale-edit')
 
@@ -920,7 +918,7 @@ color: white !important;
                                             <td></td>
                                             <td></td>
                                             <td align="right">Paid</td>
-                                            <td class="paid_amount">{{@$invoice->paid_amount}}</td>
+                                            <td class="paid_amount">0</td>
                                         </tr>
                                         @endif
                                         <tr>

@@ -631,12 +631,12 @@
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Paid</th>
                               <th class="paid_amount" colspan="4" style="text-align: center;">0</th>
                             </tr>
-                            <tr rowspan="5">
+                            <!-- <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input" data-id="" data-value="">
                               </th>
-                            </tr>
+                            </tr> -->
 
                             <tr rowspan="5">
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Amount pay</th>

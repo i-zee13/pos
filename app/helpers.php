@@ -137,19 +137,26 @@ if(!function_exists('getZoomAccessToken'))
 if(!function_exists('getInvoice'))
 {
     function getInvoice()
-    {
-        $year        = date('y');
-        $invoice_no  = 1;
-        $lastinvoice = SaleInvoice::latest()->value('id');
-        if(isset($lastinvoice)){
-            $invoice_no = ($lastinvoice+1).'-'.$year;
-           return $invoice_no;
-        }else{
-            $invoice_no = $invoice_no.'-'.$year;
-            return $invoice_no;
-
+{
+    $today       = date('Y-m-d');  // Get today's date
+    $year        = date('y');
+    $invoice_no  = 1;
+    $lastinvoice = SaleInvoice::latest()->first();
+    
+    if ($lastinvoice) {
+        $lastinvoiceDate = $lastinvoice->created_at->format('Y-m-d');
+        
+        if ($lastinvoiceDate === $today) {
+            // Invoice was created today, extract the invoice number
+            $invoice_no = intval(explode('-', $lastinvoice->invoice_no)[0]);
         }
     }
+    
+    // Increment the invoice number and append the year
+    $invoice_no = $invoice_no . '-' . $year;
+    return $invoice_no;
+}
+
 }
 
 if(!function_exists('getPurchaseInvoice'))
