@@ -249,8 +249,7 @@
                 </tr>
                 <?php
                     $difference = $invoice->total_invoice_amount - $invoice->received_amount;
-                    $difference = abs($difference);
-                   
+                    // $difference = abs($difference);
                 ?>
                 <tr>
                     <td class="payable-heading">{{$difference > 0 ? 'Remaining Receivable'  : 'Remaining Payable'}} :</td>

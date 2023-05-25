@@ -85,8 +85,8 @@ $(document).ready(function () {
                         <tr id='tr-${product.product_id}'>
                             <td>${product.product_id}</td>
                             <td>${product.p_name}</td>
-                            <td><input type="number" value="${product.qty}"  data-retail="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product.product_id}" data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
-                            <td><input type="number" value="${product.retail_price}"  data-retail="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
+                            <td><input type="number" value="${product.qty}"  data-retail="${product.retail_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product.product_id}" data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
+                            <td><input type="number" value="${product.retail_price}"  data-retail="${product.retail_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
                             <td><input type="number" value="${product.prod_discount}"  class="inputSale discount-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  style="font-size: 13px" min="0"></td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount}</td>
                             <td><a type="button" id="${product.product_id}" data-id="${product.sale_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</a></td>
@@ -140,8 +140,8 @@ $('#add-product').on('click', function () {
             <tr id='tr-${product_id}'>
                 <td>${product_id}</td>
                 <td>${p_name}</td> 
-                <td><input type="number" value="${qty}"  data-retail="${retail_price}"  data-stock="${stock_in_hand}"  class="inputSale qty-input add-stock-input td-input-qty${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
-                <td><input type="number" value="${retail_price}" data-retail="${retail_price}"  data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
+                <td><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}"  class="inputSale qty-input add-stock-input td-input-qty${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
+                <td><input type="number" value="${retail_price}" data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
                 <td><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${prod_discount}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
                 <td class='purchase-product-amount${product_id} add- S-input '>${amount-prod_discount}</td>
                 <td><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</button></td>
@@ -645,9 +645,14 @@ $(document).on('input', '.qty-input', function () {
 })
 $('body').on('mouseenter', '.ProductTable tr', function() {
     var htmlContent = $(this).html(); 
+    console.log(htmlContent)
     var r_price     = $(this).find('td input').data('retail');
     var stock       = $(this).find('td input').data('stock');
+    var purchase    = $(this).find('td input').data('purchase');
+
     $('.retail_price').text(r_price);
+    $('.pp').text(purchase);
+
     $('.stock_balance').text(stock);
   });
   $('body').on('mouseleave', '.ProductTable tr', function() {
