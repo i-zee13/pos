@@ -85,8 +85,8 @@ $(document).ready(function () {
                         <tr id='tr-${product.product_id}'>
                             <td>${product.product_id}</td>
                             <td>${product.p_name}</td>
-                            <td><input type="number" value="${product.qty}"  class="inputSale qty-input add-stock-input td-input-qty${product.product_id}" data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
-                            <td><input type="number" value="${product.retail_price}"  class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
+                            <td><input type="number" value="${product.qty}"  data-retail="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product.product_id}" data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
+                            <td><input type="number" value="${product.retail_price}"  data-retail="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
                             <td><input type="number" value="${product.prod_discount}"  class="inputSale discount-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  style="font-size: 13px" min="0"></td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount}</td>
                             <td><a type="button" id="${product.product_id}" data-id="${product.sale_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</a></td>
@@ -140,8 +140,8 @@ $('#add-product').on('click', function () {
             <tr id='tr-${product_id}'>
                 <td>${product_id}</td>
                 <td>${p_name}</td> 
-                <td><input type="number" value="${qty}"  class="inputSale qty-input add-stock-input td-input-qty${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
-                <td><input type="number" value="${retail_price}"  class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
+                <td><input type="number" value="${qty}"  data-retail="${retail_price}"  data-stock="${stock_in_hand}"  class="inputSale qty-input add-stock-input td-input-qty${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
+                <td><input type="number" value="${retail_price}" data-retail="${retail_price}"  data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
                 <td><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${prod_discount}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
                 <td class='purchase-product-amount${product_id} add- S-input '>${amount-prod_discount}</td>
                 <td><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn" data-index="">Remove</button></td>
@@ -205,7 +205,7 @@ $('.close').on('click', function () {
 })
 $(document).on('click', '.remove_btn', function () {
     deleteRef = $(this);
-    var product_id          =  $(this).attr('id');
+    var product_id      =  $(this).attr('id');
     var sale_invoice_id =  $(this).attr('data-id');
     if(segments[3] == 'purchase-edit'){
         swal({
@@ -259,10 +259,12 @@ $(document).on('click', '.remove_btn', function () {
         $(".products").val('0');
 
         $(".products").select2();
-
+        $('.amount_received').val($('.paid_amount').text());
+        setTimeout(() => {
+            $('.amount_received').trigger('input');
+        }, 500);
         grandSum(previous_payable,service_charges);
-    }
-   
+    }   
 })
 function getStockRetail(p_id){
     var filter_product = product_list.filter(x => x.id == p_id)
@@ -305,6 +307,7 @@ $('.products').change(function () {
         purchased_price = filter_product[0].old_purchase_price;
         $('.expiry_date').val(filter_product[0].expiry_date)
         $('.bar-code').val(filter_product[0].barcode);
+      
     }
 
 });
@@ -640,6 +643,18 @@ $(document).on('input', '.qty-input', function () {
     })
 
 })
+$('body').on('mouseenter', '.ProductTable tr', function() {
+    var htmlContent = $(this).html(); 
+    var r_price     = $(this).find('td input').data('retail');
+    var stock       = $(this).find('td input').data('stock');
+    $('.retail_price').text(r_price);
+    $('.stock_balance').text(stock);
+  });
+  $('body').on('mouseleave', '.ProductTable tr', function() {
+    $('.retail_price').text(0);
+    $('.stock_balance').text(0);
+  });
+
 $(document).on('input', '.price-input', function () {
     $('.amount_received').val($('.paid_amount').text());
     setTimeout(() => {
@@ -713,17 +728,20 @@ function getvendors() {
     })
 }
 $('#customer_id').change(function () {
-
     var total_paid_for_net_sale = 0;
     if($(this).val()==8){  
         $('#invoice_type').val('1').trigger('change');
         sales_product_array.forEach(function (data, key) {
             total_paid_for_net_sale += parseFloat(data.amount)
         });
+        $('.cash_return_tr').show();
+
         $('.previous_payable_tr').hide();
     }else{ 
         $('#invoice_type').val('2').trigger('change'); 
         $('.previous_payable_tr').show();
+        $('.cash_return_tr').hide();
+
     }
     $('.amount_pay_input').val(total_paid_for_net_sale);
     // $('.current_balance').text('0').trigger('change');
@@ -757,12 +775,14 @@ $('#customer_id').change(function () {
     }
 })
 function grandSum(previous_payable=0,service_charges=0,discount=0){  
-    
+    console.log(service_charges ,invoice_discount)
     var sum = 0;
     sales_product_array.forEach(function (data, key) {
         console.log(data);
         sum += parseFloat(data.amount)
-    })
+    });
+
+    $('.product_net_total').val(sum);
     // sale_total_amount = sum-invoice_discount;
     sum += parseFloat(previous_payable ? previous_payable : 0); 
     sum += parseFloat(service_charges ? service_charges : 0); 

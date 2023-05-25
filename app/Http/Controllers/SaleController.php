@@ -64,13 +64,14 @@ class SaleController extends Controller
 
     public function saleInvoice(Request $request)
     {
+        // dd($request->all());
         if ($request->hidden_invoice_id) {
             $invoice = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
-            $invoice->amount_received      =  $invoice->amount_received+$request->amount_received; 
+            // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received; 
         } else {
             $invoice = new SaleInvoice();
-             $invoice->amount_received      = $request->amount_received;
         }
+        $invoice->amount_received      = $request->amount_received;
         $invoice->date                 = $request->invoice_date;
         $invoice->invoice_no           = $request->invoice_no;
         $invoice->invoice_type         = $request->invoice_type;
@@ -177,12 +178,12 @@ class SaleController extends Controller
                 }
                 if ($request->hidden_invoice_id) {
                     $customer_ledger   =   CustomerLedger::where('sale_invoice_id', $request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
-                    $previous_recived  =   $customer_ledger->cr;
+                    // $previous_recived  =   $customer_ledger->cr;
                 } else {
                     $customer_ledger   =   new  CustomerLedger();
-                    $previous_recived  =   0;
+                    // $previous_recived  =   0;
                 }
-                $customer_ledger->cr          = $previous_recived + $invoice->paid_amount;
+                $customer_ledger->cr          = $invoice->paid_amount;
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
                 $customer_ledger->trx_type    = 1;  //Sale

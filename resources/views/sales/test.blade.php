@@ -870,6 +870,13 @@ color: white !important;
                             <div class="col-12">
                                 <table class="totalValues" width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
+                                    <tr class="th-to-hide">
+                                            <td></td>
+                                            <td></td>
+                                            <td align="right">Net Total</td>
+                                          
+                                            <td> <input type="number" class="inputvalue product_net_total"   name="product_net_total" style="font-size: 13px" placeholder="0.00" readonly ></td>
+                                        </tr>
                                         <tr class="th-to-hide">
                                             <td></td>
                                             <td></td>
@@ -898,7 +905,7 @@ color: white !important;
                                             <td> <input type="number" class="inputvalue  remaning_amount amount_pay_input " id="amount_ to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly value="{{@$invoice->paid_amount}}"></td>
                                         </tr>
                                       
-                                        <tr class="th-to-hide">
+                                        <tr>
                                             <td></td>
                                             <td></td>
                                             <td align="right" class="cash-return">Cash Recived </td>
@@ -906,9 +913,7 @@ color: white !important;
                                         </tr>
                                        
 
-
-
-                                        <tr class="th-hide ">
+                                        <tr  class="cash_return_tr" style="display:none">
                                             <td></td>
                                             <td></td>
                                             <td align="right">Cash Return</td>
