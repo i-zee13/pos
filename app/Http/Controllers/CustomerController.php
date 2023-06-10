@@ -39,18 +39,20 @@ class CustomerController extends Controller
     }
 
     public function store(Request $request)
-    {
+    { 
         // dd($request->all());
-        if (Customer::where('customer_name', $request->customer_name)->first()) {
+        if (Customer::where('customer_name', $request->hidden_customer_name)->first()) {
             return response()->json([
-                'msg' => 'duplicate',
+                'msg'    => 'duplicate',
                 'status' => 'duplicate',
             ]);
         } else {
             Customer::create([
-                'customer_name' => $request->customer_name,
+                'customer_name' => $request->hidden_customer_name,
                 'customer_type' => $request->customer_type,
                 'phone_no'      => $request->phone_no,
+                'whatsapp_no'   => $request->whatsapp_no,
+                'cnic_no'       => $request->cnic_no,
                 'address'       => $request->address,
                 'created_by'    => Auth::user()->id,
             ]);
@@ -70,8 +72,8 @@ class CustomerController extends Controller
         ]);
     }
     public function update(Request $request, $id)
-    {
-        $query = Customer::where('customer_name', $request->customer_name)
+    { 
+        $query = Customer::where('customer_name', $request->hidden_customer_name)
             ->where('id', '!=', $id)->first();
         if ($query) {
             return response()->json([
@@ -80,10 +82,12 @@ class CustomerController extends Controller
             ]);
         } else {
             Customer::where('id', $id)->update([
-                'customer_name' => $request->customer_name,
+                'customer_name' => $request->hidden_customer_name,
                 'customer_type' => $request->customer_type,
                 'phone_no'      => $request->phone_no,
-                'address'      => $request->address,
+                'whatsapp_no'   => $request->whatsapp_no,
+                'cnic_no'       => $request->cnic_no,
+                'address'       => $request->address,
                 'created_by'    => Auth::user()->id,
             ]);
             return response()->json([

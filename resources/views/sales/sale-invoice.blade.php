@@ -232,13 +232,17 @@
                 </tr>
                 @if($invoice->invoice_type == 2)
                 <tr>
+                    <td class="payable-heading">Previous Paid :</td>
+                    <td>{{number_format($invoice->invoice_discount)}}</td>
+                </tr>
+                <tr>
                     <td class="payable-heading">Previous Payable :</td>
                     <td>{{number_format($customer_balance)}}</td>
                 </tr>
-                <tr>
+                <!-- <tr>
                     <td class="payable-heading">Total Amount:</td>
                     <td>{{number_format($invoice->total_invoice_amount)}}</td>
-                </tr>
+                </tr> -->
                 <tr>
                     <td class="payable-heading">Total Receivable :</td>
                     <td>{{number_format($invoice->total_invoice_amount)}}</td>

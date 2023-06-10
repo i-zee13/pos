@@ -21,47 +21,75 @@
                                         <h2 class="_head03">{{$name}} <span>Details</span></h2>
                                         <div class="form-wrap p-0">
                                             <div class="row">
-                                                <div class="col-md-12">
+                                                <!-- <div class="col-md-12">
                                                     <div class="form-group">
                                                         <label class="control-label mb-10">{{$name}} Name *</label>
                                                         <input type="text" name="customer_name" class="form-control" required>
                                                     </div>
+                                                </div> -->
+                                                <div class="col-md-12 PB-10 ">
+                                                    <label class="font12 mb-0">{{$name}} Name *</label>
+                                                    <div class="form-s2">
+                                                        <input type="hidden" id="hidden_customer_name" name="hidden_customer_name">
+                                                        <select id="MCategory" class="demo-default customer_name" data-placeholder="Enter your Name" name="customer_name">
+
+                                                        </select>
+                                                    </div>
                                                 </div>
+
+
                                             </div>
                                             <div class="row">
-                                                <div class="col-md-12">
+                                                <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label class="control-label mb-10">Phone# *</label>
                                                         <input type="text" name="phone_no" class="form-control" required>
                                                     </div>
                                                 </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="control-label mb-10">Whatsapp# *</label>
+                                                        <input type="text" name="whatsapp_no" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label class="control-label mb-10">Cnic# *</label>
+                                                        <input type="text" name="cnic_no" id="cnicInput" class="form-control" placeholder="XXXXX-XXXXXX-X">
+                                                    </div>
+
+                                                </div>
+
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="form-group">
                                                         <label class="control-label mb-10">Address *</label>
-                                                        <textarea   name="address" class="form-control" rows="4"></textarea>
+                                                        <textarea name="address" class="form-control" rows="4"></textarea>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <h2 class="_head03 mt-10">Choose Type<span></span></h2>
-                                            <div class="col-md-12">
-                                                <div class="row">
-                                                    <div class="col-auto">
-                                                        <div class="custom-control custom-radio">
-                                                            <input class="custom-control-input vendor" type="radio" name="customer_type" id="vendor" value="1" {{$name == 'Vendor' ? 'checked' : ''}}>
-                                                            <label class="custom-control-label font13" for="vendor">Vendor</label>
-                                                        </div>
+                                        <input class="custom-control-input vendor" type="radio" name="customer_type" id="vendor" value="1" {{$name == 'Vendor' ? 'checked' : ''}} hidden>
+                                        <input class="custom-control-input customer" type="radio" name="customer_type" id="customer" value="2" {{$name == 'Customer' ? 'checked' : ''}} hidden>
+
+                                        <!-- <h2 class="_head03 mt-10">Choose Type<span></span></h2>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="col-auto">
+                                                    <div class="custom-control custom-radio">
+                                                        <input class="custom-control-input vendor" type="radio" name="customer_type" id="vendor" value="1" {{$name == 'Vendor' ? 'checked' : ''}}>
+                                                        <label class="custom-control-label font13" for="vendor">Vendor</label>
                                                     </div>
-                                                    <div class="col">
-                                                        <div class="custom-control custom-radio">
-                                                            <input class="custom-control-input customer" type="radio" name="customer_type" id="customer" value="2" {{$name == 'Customer' ? 'checked' : ''}}>
-                                                            <label class="custom-control-label font13" for="customer">Customer</label>
-                                                        </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="custom-control custom-radio">
+                                                        <input class="custom-control-input customer" type="radio" name="customer_type" id="customer" value="2" {{$name == 'Customer' ? 'checked' : ''}}>
+                                                        <label class="custom-control-label font13" for="customer">Customer</label>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div> -->
                                     </div>
                                 </form>
                             </div>
@@ -124,4 +152,20 @@
 @endsection
 @push('js')
 <script src="{{asset('js/custom/customer.js')}}"> </script>
+<script>
+   $('#cnicInput').on('input', function() {
+        var cnic = $(this).val();
+        cnic = cnic.replace(/-/g, ''); // Remove existing dashes
+        cnic = cnic.replace(/\D/g, ''); // Remove non-digit characters
+
+        var formattedCnic = '';
+        for (var i = 0; i < cnic.length; i++) {
+            if (i === 5 || i === 12) {
+                formattedCnic += '-';
+            }
+            formattedCnic += cnic[i];
+        }
+        $(this).val(formattedCnic);
+    });
+</script>
 @endpush

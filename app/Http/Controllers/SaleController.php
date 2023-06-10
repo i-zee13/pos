@@ -21,10 +21,12 @@ class SaleController extends Controller
     public function create()
     {
         $invoice_no   =   getInvoice();
+        $parts        = explode('-', $invoice_no);
+        $invoice_first_part   = $parts[0];
         $current_date =   Carbon::today()->toDateString();
         $customers    =   Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
         $products     =   Product::where('stock_balance', '>', '0')->get();
-        return view('sales.test', compact('customers', 'current_date', 'invoice_no', 'products'));
+        return view('sales.test', compact('customers', 'current_date', 'invoice_no', 'products','invoice_first_part'));
     }
     public function getVendors()
     {
@@ -64,7 +66,7 @@ class SaleController extends Controller
 
     public function saleInvoice(Request $request)
     {
-        // dd($request->all());
+        
         if ($request->hidden_invoice_id) {
             $invoice = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
             // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received; 
@@ -79,12 +81,16 @@ class SaleController extends Controller
         if ($request->invoice_type == 1) {
             $invoice->paid_amount      = $request->amount_to_pay;
         } else {
-            $invoice->paid_amount      = $request->amount_received;
+            $invoice->paid_amount      = $request->amount_received ? $request->amount_received : 0;
         }
         $invoice->total_invoice_amount = $request->grand_total;
         $invoice->service_charges      = $request->service_charges;
         $invoice->invoice_discount     = $request->invoice_discount;
         $invoice->cash_return          = $request->cash_return;
+        $invoice->product_net_total    = $request->product_net_total;
+        $invoice->previous_receivable  = $request->previous_receivable;
+
+
        
         $invoice->status               = $request->status;
         $invoice->created_by           = Auth::id();
@@ -212,30 +218,38 @@ class SaleController extends Controller
                                         (SELECT cr FROM customer_ledger WHERE sale_invoice_id = sale_invoices.id) as paid_amount,
                                         (SELECT customer_name FROM customers WHERE id=sale_invoices.customer_id) as customer_name')
             ->whereDate('created_at', Carbon::today())
-            // ->whereIn('sale_invoices.id', function ($query) {
-            //     $query->selectRaw('MAX(id)')
-            //         ->from('sale_invoices')
-            //         ->whereDate('created_at', Carbon::today())
-            //         ->groupBy('customer_id');
-            // })
             ->orderBy('id', 'asc')
             ->get();
-
+         
+            $editableIds = [];
+            $result = collect();
+            foreach ($sales as $sale) {
+                if (!in_array($sale->customer_id, $editableIds)) {
+                    $editableIds[] = $sale->customer_id;
+                } else {
+                    $sale->editable = true;
+                }
+                $result->push($sale);
+            }
+            
+            $sales = $result; 
         return view('sales.list', compact('sales'));
     }
     public function editSale($id)
     {
-        $customers         =     Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
-        $products          =     Product::where('stock_balance', '>', 0)->get();
-        $invoice           =     SaleInvoice::where('id', $id)->first();
-        $purchasd_products =     ProductSale::where('sale_invoice_id', $id)
+        $customers          =     Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
+        $products           =     Product::where('stock_balance', '>', 0)->get();
+        $invoice            =     SaleInvoice::where('id', $id)->first();
+        $parts              =     explode('-', $invoice->invoice_no);
+        $invoice_first_part =     $parts[0];
+        $purchasd_products  =     ProductSale::where('sale_invoice_id', $id)
                                                 ->selectRaw('products_sales.*')
                                                 ->get();
         $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)
                                                 ->where('trx_type', '=', 1)
                                                 ->where('sale_invoice_id',$invoice->id)
                                                 ->orderBy('id', 'DESC')->first(); 
-        return view('sales.test', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger'));
+        return view('sales.test', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger','invoice_first_part'));
     }
     public function show($id)
     {
@@ -267,20 +281,28 @@ class SaleController extends Controller
                                                     ->selectRaw("products_sales.*,
                                                                 (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name")
                                                     ->get();
-                                                   
-        $customer_balance = CustomerLedger::where('customer_id', $customerId)
-                                            ->whereDate('created_at', '!=', Carbon::today()->toDateString())
-                                            ->orderBy('id', 'DESC')->value('balance'); 
+        $ledgerCount      = CustomerLedger::where('customer_id', $customerId)->count();
+        $customer_balance = 0;
+        if ($ledgerCount > 1) {
+            $customer_balance = CustomerLedger::where('customer_id', $customerId)
+                                        // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+                                        ->orderBy('id', 'DESC')->skip(1)->value('balance');    
+        }
+       
+        // $customer_balance = CustomerLedger::where('customer_id', $customerId)
+        //                                     // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+        //                                     ->orderBy('id', 'DESC')->value('balance'); 
                                            
         return view('sales.sale-invoice', compact('invoice', 'products','customer_balance'));
     }
     public function getSaleProduct($id)
     {
         $products   =   ProductSale::where('sale_invoice_id', $id)
-            ->selectRaw('products_sales.*,
-                                    (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name,
-                                    (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=products_sales.product_id) as purchase_price,
-                                    (SELECT stock_balance FROM products WHERE id=products_sales.product_id) as stock_in_hand')->get();
+                                    ->selectRaw('products_sales.*,
+                                                (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name,
+                                                (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=products_sales.product_id) as purchase_price,
+                                                (SELECT stock_balance FROM products WHERE id=products_sales.product_id) as stock_in_hand')
+                                    ->get();
         return response()->json([
             'msg'       => 'Sale Product Fetched',
             'status'    => 'success',
@@ -293,8 +315,8 @@ class SaleController extends Controller
             $customer_count     =  CustomerLedger::where('customer_id', $id)->count();
             if ($customer_count > 1) {
                 $customer_balance = CustomerLedger::where('customer_id', $id)
-                                    ->whereDate('created_at', '!=', Carbon::today()->toDateString())
-                                    ->orderBy('id', 'DESC')->value('balance');
+                // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+                ->orderBy('id', 'DESC')->skip(1)->value('balance');
             } else {
                 $customer_balance = 0;
             }

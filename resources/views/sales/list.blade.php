@@ -47,24 +47,25 @@
                         <th>Invoice #</th>
                         <th>Customer Name</th>
                         <th>Received</th>
-                        <th>Amount</th>
+                        <th>Product Net Total</th>
+                        <th>Invoice Total</th>
                         <th>Action</th>
                     </tr>
                 </thead>
             <tbody>
-                @foreach($sales as $sale)
-            <tr>
-                    <td>{{Str::limit($sale->invoice_no, 20)}} 
-                    (
-                     {{ $sale->created_at->format('h:i A') }})
-                    </td>
-                    <td>{{$sale->customer_name}} </td>
+                @foreach($sales as $sale) 
+                <tr>
+                    <td>{{Str::limit($sale->invoice_no, 20)}} ({{ $sale->created_at->format('h:i A') }})</td>
+                    <td>{{$sale->customer_name}}</td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->paid_amount}} </td>
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total}} </td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td>
                     <td>
-                        <a id="{{$sale->id}}" class="btn btn-default btn-line" href="{{route('sale-edit' ,['id'=>$sale->id])}}">Edit</a>
-                        <a id="{{$sale->id}}" class="btn btn-default " href="{{route('sale-detail' ,['id'=>$sale->id])}}">Detail</a>
-                        <button id="{{$sale->id}}" data-invoice="{{$sale->id}}" data-customer-id="{{$sale->customer_id}}" paid-amount="{{$sale->paid_amount}}" class="btn btn-default print-invoice">Print</button>
+                        
+                        <a id="{{$sale->id}}" class="btn btn-default {{$sale->editable == 'true' ? 'btn-line'  : '' }}" href="{{$sale->editable == 'true' ? route('sale-edit' ,['id'=>$sale->id]) : route('sale-edit' ,['id'=>$sale->id ,'invoice' => 'detail'])}}">{{$sale->editable == 'true' ? 'Edit'  : "Detail" }}</a>
+                        <!-- <a id="{{$sale->id}}" class="btn btn-default " href="{{route('sale-detail' ,['id'=>$sale->id])}}">Detail</a> -->
+                        <button id="{{$sale->id}}" data-invoice="{{$sale->id}}" data-customer-id="{{$sale->customer_id}}"
+                         paid-amount="{{$sale->paid_amount}}" class="btn btn-default print-invoice">Print</button>
                         <!-- <button type="button" id="{{$sale->id}}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button> -->
                     </td>
                 </tr>
@@ -86,7 +87,7 @@
         var printWindow = window.open("/print-sale-invoice/"+invoice_id+'/'+customer_id+'/'+paid_amount);
                     printWindow.onload = function() {
                         printWindow.print();
-                        printWindow.close();
+                        // printWindow.close();
                     };
     })
 </script>

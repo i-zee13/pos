@@ -6,7 +6,8 @@ use App\Models\PostalCode;
 use App\Models\PurchaseInvoice;
 use App\Models\State;
 use App\Models\Sale as SaleInvoice; 
-use App\Models\Student; 
+use App\Models\Student;
+use Carbon\Carbon;
 use Firebase\JWT\JWT; 
 use Stevebauman\Location\Facades\Location;
 
@@ -138,22 +139,20 @@ if(!function_exists('getInvoice'))
 {
     function getInvoice()
 {
-    $today       = date('Y-m-d');  // Get today's date
     $year        = date('y');
     $invoice_no  = 1;
-    $lastinvoice = SaleInvoice::latest()->first();
-    
-    if ($lastinvoice) {
-        $lastinvoiceDate = $lastinvoice->created_at->format('Y-m-d');
-        
-        if ($lastinvoiceDate === $today) {
-            // Invoice was created today, extract the invoice number
-            $invoice_no = intval(explode('-', $lastinvoice->invoice_no)[0]);
-        }
-    }
+    // $lastinvoice = SaleInvoice::latest()->first();
+    $lastinvoice         = SaleInvoice::where('date',Carbon::today())->count();
+    // if ($lastinvoice) {
+    //     // $lastinvoiceDate = $lastinvoice->created_at->format('Y-m-d'); 
+    //     // if ($lastinvoiceDate === $today) {
+    //     //     // Invoice was created today, extract the invoice number
+    //     //     $invoice_no = intval(explode('-', $lastinvoice->invoice_no)[0]);
+    //     // }
+    // }
     
     // Increment the invoice number and append the year
-    $invoice_no = $invoice_no . '-' . $year;
+    $invoice_no = ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
     return $invoice_no;
 }
 

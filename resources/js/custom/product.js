@@ -3,11 +3,13 @@ var barcode = '';
       import swal from 'sweetalert';
 var deleteRef = '';
 let products ='';
+let companies = '';
 let prod_name = '';
+let action = '' 
 $(document).ready(function() {
     
     var segments = location.href.split('/');
-    var action = segments[3];
+    action = segments[3];
     if (action == "products") {
         fetchproducts();
     }else {
@@ -64,9 +66,9 @@ $(document).ready(function() {
                 $('input[name="barcode"]').focus();
                 $('input[name="barcode"]').val(response.product.barcode);
                 $('input[name="barcode"]').blur();
-                setTimeout(() => {
+                setTimeout(() => { 
                     selectize.setValue(id);
-                    var selectedOption = selectize.getItem(id);
+                    var selectedOption = selectize.getItem(id); 
                     $('#hidden_product_name').val($(selectedOption).text()); 
                 }, 1000);
                
@@ -141,31 +143,36 @@ $(document).ready(function() {
                 $('#dataSidebarLoader').hide();
                 $('._cl-bottom').show();
                 $('.pc-cartlist').show();
-
-                $('input[name="company_name"]').focus();
-                $('input[name="company_name"]').val(response.company.company_name);
-                $('input[name="company_name"]').blur();
+                setTimeout(() => { 
+                    selectize.setValue(response.company.id); 
+                    var selectedOption = selectize.getItem(response.company.id); 
+                    $('#hidden_company_name').val($(selectedOption).text()); 
+                }, 500);
+                $('.company').trigger('click');
+                // $('input[name="company_name"]').focus();
+                // $('input[name="company_name"]').val(response.company.company_name);
+                // $('input[name="company_name"]').blur();
                 
-                var input = `<input type="hidden"  name="hidden_company_icon" value="${response.company.company_icon}"/> 
-                <input type="file" id="input-file-now" class="dropify"  name="company_icon" data-old_input="hidden_company_icon"  data-default-file = "/storage/${response.category.company_icon}" value="${response.category.company_icon}"  accept="image/*" data-allowed-file-extensions="jpg png jpeg JPEG"/>`
-                $('.img').empty();
-                $('.img').html(input);
-                $('.dropify').dropify();
+                // var input = `<input type="hidden"  name="hidden_company_icon" value="${response.company.company_icon}"/> 
+                // <input type="file" id="input-file-now" class="dropify"  name="company_icon" data-old_input="hidden_company_icon"  data-default-file = "/storage/${response.category.company_icon}" value="${response.category.company_icon}"  accept="image/*" data-allowed-file-extensions="jpg png jpeg JPEG"/>`
+                // $('.img').empty();
+                // $('.img').html(input);
+                // $('.dropify').dropify();
                  
             }
         });
         openSidebar();
     });
     $(document).on('click', '#saveMainCat', function() {
-        if (!$('input[name="company_name"]').val()) {
-            $('#notifDiv').fadeIn();
-            $('#notifDiv').css('background', 'red');
-            $('#notifDiv').text('Please provide all the required information (*)');
-            setTimeout(() => {
-                $('#notifDiv').fadeOut();
-            }, 3000);
-            return;
-        }
+        // if (!$('input[name="company_name"]').val()) {
+        //     $('#notifDiv').fadeIn();
+        //     $('#notifDiv').css('background', 'red');
+        //     $('#notifDiv').text('Please provide all the required information (*)');
+        //     setTimeout(() => {
+        //         $('#notifDiv').fadeOut();
+        //     }, 3000);
+        //     return;
+        // }
         $('#saveMainCat').attr('disabled', 'disabled');
         $('#cancelMainCat').attr('disabled', 'disabled');
         $('#saveMainCat').text('Processing..');
@@ -178,7 +185,9 @@ $(document).ready(function() {
         $('#saveMainCatForm').ajaxSubmit({
             type: "POST",
             url: ajaxUrl,
-            data: $('#saveMainCatForm').serialize(),
+            data: {
+                prod_name:prod_name
+            },
             cache: false,
             success: function(response) {
                 if(response.status == "duplicate") {
@@ -452,12 +461,14 @@ function fetchcompanies() {
         type    :     'GET',
         url     :     '/get-companies',
         success :     function(response) {
+            companies =  response.companies;
                     $('.body').empty();
                     $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Icon</th><th>Name</th><th>Action</th></tr></thead><tbody></tbody></table>');
                     $('.mainCatsListTable tbody').empty();
                     // var response = JSON.parse(response);
                     var sNo = 1;
                     response.companies.forEach((element, key) => {
+                        selectize.addOption({value:element.id,text:element.company_name});
                         $('.mainCatsListTable tbody').append(`
                         <tr>
                             <td>${key + 1}</td>
@@ -465,9 +476,6 @@ function fetchcompanies() {
                             <td> ${element['company_name']}</td>
                             <td>
                                 <button id=" ${element['id']} " class="btn btn-default btn-line openDataSidebarForUpdateCompany">Edit</button>
-                                 
-                                <button type="button" id="${ element['id'] }" class="btn btn-default red-bg deleteMainCategory delete_cat" name="main_cat" title="Delete">Delete</button>
-                                
                             </td>
                         </tr>`);
                     });
@@ -534,44 +542,46 @@ $(document).on('click', '.dropify-clear', function () {
     var old_input_name = $(this).parent().children('input').attr('data-old_input');
     $('input[name="' + old_input_name + '"]').val('');
 });
-var select = $('.attribute').selectize({
-    
+var select = $('.company,.attribute').selectize({ 
     onFocus: function() {
         var $activeSelect = select[0].selectize;
-        var $value = $activeSelect.getValue();
-        
+        var $value        = $activeSelect.getValue(); 
         if ($value.length > 0) {
-          var item = $activeSelect.getItem($value);
-          console.log(item)
-          if (item) {
-            var element = document.querySelector('div.item');
-            var innerHTMLValue = element.innerHTML; 
-          
-            
+          var item = $activeSelect.getItem($value); 
+          if(item) {
+            var element        = document.querySelector('div.item');
+            var innerHTMLValue = element.innerHTML;  
             $activeSelect.clear();
             $activeSelect.setTextboxValue(innerHTMLValue);
           }
         }
-      },
-      
+      }, 
     create:function(input,callback){
         prod_name = input;
-        $('#hidden_product_name').val(input)
+        (action == "products") ?  $('#hidden_product_name').val(input) :  $('#hidden_company_name').val(input);
+        // $('#hidden_product_name').val(input)
         callback({value:input,text:input})
         return; 
     },
 });
 var selectize = select[0].selectize;
-$('.attribute').on('click input',function(){ 
-     
-    products.forEach(element => {
-        selectize.addOption({value:element.id,text:element.product_name});
-    }); 
+$('.company,.attribute').on('click input',function(){  
+    if (action == "products") {
+        products.forEach(element => {
+            selectize.addOption({value:element.id,text:element.product_name});
+        });
+    }else {
+        companies.forEach(element => {
+            selectize.addOption({value:element.id,text:element.company_name});
+        });
+    } 
 });
-selectize.on('change', function onChange(id) {
+ selectize.on('change', function onChange(id) {  
     var selectedOption  = selectize.getItem(id);
     prod_name           = $(selectedOption).text();  
-    $('#hidden_product_name').val($(selectedOption).text());
+    console.log(prod_name); 
+    (action == "products") ? $('#hidden_product_name').val($(selectedOption).text()) : $('#hidden_company_name').val($(selectedOption).text());
+    // $('#hidden_product_name').val($(selectedOption).text());
 }); 
 selectize.clear();
 

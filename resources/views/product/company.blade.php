@@ -21,10 +21,21 @@
                                         <h2 class="_head03">Company <span>Details</span></h2>
                                         <div class="form-wrap p-0">
                                             <div class="row">
-                                                <div class="col-md-12">
+                                                <!-- <div class="col-md-12">
                                                     <div class="form-group">
                                                         <label class="control-label mb-10">Company Name *</label>
                                                         <input type="text" name="company_name" class="form-control" required>
+                                                    </div>
+                                                </div> -->
+                                                <div class="col-md-12 PB-10 ">
+                                                    <label class="font12 mb-0">Name *</label>
+                                                    <div class="form-s2">
+                                                        <input type="hidden" id="hidden_company_name" name="hidden_company_name">
+
+                                                        <!-- <select class="form-control formselect attribute" placeholder="select Designation" style="width:100%!important" name="attribute_id"> -->
+                                                        <select id="MCategory" class="demo-default company" data-placeholder="Comapny name" name="company_name">
+
+                                                        </select>
                                                     </div>
                                                 </div>
                                                 <!-- <div class="col-md-12">

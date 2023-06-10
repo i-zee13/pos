@@ -85,11 +85,11 @@
         </div>
     </div>
     @section('content')
-    <style> 
-    
+    <style>
         .OrderWrapper {
             padding: 0 !important;
         }
+
         .itemQTY {
             font-size: 12px;
             width: 70px;
@@ -586,6 +586,8 @@
                 <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
                 <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
                 <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
+                <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
+
                 <input type="hidden" id="" value="1" name="form_status">
                 <input type="hidden" id="stock_products" name="stock_products" value="{{json_encode($products)}}">
                 <div class="col-md-4 left-sidebox">
@@ -607,7 +609,8 @@
                             <div class="col-md-12 PB-10">
                                 <label class="font13 mb-5">Invoice #</label>
                                 <div class="form-s2">
-                                    <input type="text" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
+                                    <input type="text" id="" class="form-control" value="{{@$invoice_first_part}}">
+                                    <input type="hidden" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
 
                                 </div>
                             </div>
@@ -641,7 +644,8 @@
                                 <div class="col-md-7 pr-0"><strong>Previous Paid :</strong></div>
                                 <div class="col-md-5"><span class="">{{@$invoice->paid_amount}}</span></div> -->
                                 <div class="col-md-7 pr-0"><strong>Previous Receivable :</strong> </div>
-                                <div class="col-md-5"><span class="dashboard_avg_rev_perCust previous_payable">0</span></div>
+
+                                <div class="col-md-5"><span class="dashboard_avg_rev_perCust {{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '' }}</span></div>
                                 <!-- <div class="col-md-7 pr-0"><strong>Country:</strong></div>
                         <div class="col-md-5"><span id="country"></span></div> -->
                             </div>
@@ -726,7 +730,7 @@
                         <div class="col-6">
                             <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'sale-edit' ? 'Sale' : 'New'}} <span>Invoice</span></h2>
                         </div>
-                        
+
                         <!-- <div class="col p-0 text-right">
                     <select class="custom-select custom-select-sm custom-select-cs" id="currencySelector">
                         <option sign="$" value="USD" selected>USD - United States Dollar
@@ -748,12 +752,12 @@
 
                     <div class="right_Info">
                         <div class="row inputfileds-top">
-                        <div class="row CompanyInfo">
-                            <div class="col-md-3"><strong class="show_purchase">P.P:</strong> <span class="pp" style="display:none"></span></div>
-                            <div class="col-md-5"><strong>Retail Price:</strong> <span class="retail_price ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
+                            <div class="row CompanyInfo">
+                                <div class="col-md-3"><strong class="show_purchase">P.P:</strong> <span class="pp" style="display:none"></span></div>
+                                <div class="col-md-5"><strong>Retail Price:</strong> <span class="retail_price ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
 
-                            <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
-                                  
+                                <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
+
                             </div>
                             <!-- <div class="col-auto pr-0">Invoice #
                         <input type="text" id="" class="inputfileds required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
@@ -765,7 +769,7 @@
                             <!-- <div class="col-auto pr-0">PO.NO. <input type="text" class="inputfileds" id="poNumForm"></div> -->
                             <!-- <div class="col-auto pr-0">Invoice Type
                         <select class="custom-select custom-select-sm form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
-                            <option value="1" {{@$invoice->invoice_type == 1 ? 'selected' : ''}}>Net Sale</option>
+                            <option value="1" {{@$invoice->invoice_type == 1 ? 'sehlected' : ''}}>Net Sale</option>
                             <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
                         </select>
                         @if (@$invoice->customer_id)
@@ -812,14 +816,13 @@
                             </div>
 
                         </div>
-<style>
-.ProductTable tbody tr:hover td { background: #152e4d  !important ; 
+                        <style>
+                            .ProductTable tbody tr:hover td {
+                                background: #152e4d !important;
 
-color: white !important;
-}
-
-
-</style>
+                                color: white !important;
+                            }
+                        </style>
                         <div class="row">
                             <div class="col-12" id="table-container">
                                 <table class="ProductTable table  " id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -847,9 +850,9 @@ color: white !important;
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td> <input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3"   min="0"></td>
+                                            <td> <input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
                                             <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" readonly></td>
-                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;"  tabindex="4"  min="0"></td>
+                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" tabindex="4" min="0"></td>
                                             <td class='add- S-input '><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;"></td>
                                             <td>
                                                 <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5" style="padding: 5px 15px 5px 15px; background:green">Add</button>
@@ -870,12 +873,12 @@ color: white !important;
                             <div class="col-12">
                                 <table class="totalValues" width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
-                                    <tr class="th-to-hide">
+                                        <tr class="th-to-hide">
                                             <td></td>
                                             <td></td>
                                             <td align="right">Net Total</td>
-                                          
-                                            <td> <input type="number" class="inputvalue product_net_total"   name="product_net_total" style="font-size: 13px" placeholder="0.00" readonly ></td>
+
+                                            <td> <input type="number" class="inputvalue product_net_total" name="product_net_total" style="font-size: 13px" placeholder="0.00" readonly></td>
                                         </tr>
                                         <tr class="th-to-hide">
                                             <td></td>
@@ -886,8 +889,8 @@ color: white !important;
                                         <tr class="previous_payable_tr" style="display:none">
                                             <td></td>
                                             <td></td>
-                                            <td align="right">Previous Payable</td>
-                                            <td class="previous_payable">0</td>
+                                            <td align="right">Previous Receivable</td>
+                                            <td class="{{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '0' }}</td>
                                         </tr>
 
                                         <tr class="th-to-hide">
@@ -901,19 +904,25 @@ color: white !important;
                                             <td></td>
                                             <td></td>
                                             <td align="right">Net Amount</td>
-                                          
-                                            <td> <input type="number" class="inputvalue  remaning_amount amount_pay_input " id="amount_ to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly value="{{@$invoice->paid_amount}}"></td>
+
+                                            <td>
+                                                @if(request()->query('invoice') == 'detail')
+                                                {{$invoice->total_invoice_amount}}
+                                                @else
+                                                <input type="number" class="inputvalue  remaning_amount amount_pay_input " id="amount_ to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly value="{{@$invoice->paid_amount}}">
+                                                @endif
+                                            </td>
                                         </tr>
-                                      
+
                                         <tr>
                                             <td></td>
                                             <td></td>
                                             <td align="right" class="cash-return">Cash Recived </td>
                                             <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" onkeypress="return isNumber(event)" value="{{@$invoice->amount_received}}"></td>
                                         </tr>
-                                       
 
-                                        <tr  class="cash_return_tr" style="display:none">
+
+                                        <tr class="cash_return_tr" style="display:none">
                                             <td></td>
                                             <td></td>
                                             <td align="right">Cash Return</td>
@@ -940,7 +949,13 @@ color: white !important;
                                                 <!-- <span id="total_ctn">0</span><small>CTNS</small> -->
                                             </td>
                                             <td class="totalNo" align="right"></td>
-                                            <td class="totalNo" align="right"><small>Pkr.</small><span class="grand-total">0</span></td>
+                                            <td class="totalNo" align="right"><small>Pkr.</small>
+                                                @if(request()->query('invoice') == 'detail')
+                                                <span>{{$invoice->total_invoice_amount}}</span>
+                                                @else
+                                                <span class="grand-total">0</span>
+                                                @endif
+                                            </td>
 
                                         </tr>
                                     </tbody>
@@ -962,11 +977,14 @@ color: white !important;
                     </div> -->
 
                         <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
+                            @if(request()->query('invoice') == 'detail')
+                            <a href="{{route('sales')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
+                            @else
                             <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
                             <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>
                             <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                            @endif
                         </div>
-
                     </div>
                 </div>
 
