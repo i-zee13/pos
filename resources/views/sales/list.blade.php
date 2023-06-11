@@ -48,7 +48,7 @@
                         <th>Customer Name</th>
                         <th>Received</th>
                         <th>Product Net Total</th>
-                        <th>Invoice Total</th>
+                        <!-- <th>Invoice Total</th> -->
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -58,8 +58,8 @@
                     <td>{{Str::limit($sale->invoice_no, 20)}} ({{ $sale->created_at->format('h:i A') }})</td>
                     <td>{{$sale->customer_name}}</td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->paid_amount}} </td>
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total}} </td>
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td>
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total +$sale->service_charges - $sale->invoice_discount}} </td>
+                    <!-- <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td> -->
                     <td>
                         
                         <a id="{{$sale->id}}" class="btn btn-default {{$sale->editable == 'true' ? 'btn-line'  : '' }}" href="{{$sale->editable == 'true' ? route('sale-edit' ,['id'=>$sale->id]) : route('sale-edit' ,['id'=>$sale->id ,'invoice' => 'detail'])}}">{{$sale->editable == 'true' ? 'Edit'  : "Detail" }}</a>

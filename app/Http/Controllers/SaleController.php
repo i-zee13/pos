@@ -223,16 +223,28 @@ class SaleController extends Controller
          
             $editableIds = [];
             $result = collect();
-            foreach ($sales as $sale) {
-                if (!in_array($sale->customer_id, $editableIds)) {
-                    $editableIds[] = $sale->customer_id;
-                } else {
-                    $sale->editable = true;
+            
+            foreach ($sales as $index => $sale) {
+                $editable = false;
+            
+                if (count($sales) === 1 || !in_array($sale->customer_id, $editableIds)) {
+                    $editable = true;
                 }
+                if (in_array($sale->customer_id, $editableIds)) {
+                    $lastEditableIndex = array_search($sale->customer_id, array_reverse($editableIds));
+                    $lastEditableSale = $result[$lastEditableIndex];
+                    $lastEditableSale->editable = true;
+                }
+            
+                $sale->editable = $editable;
+                $editableIds[] = $sale->customer_id;
                 $result->push($sale);
             }
             
+            
+            
             $sales = $result; 
+            // dd($sales);
         return view('sales.list', compact('sales'));
     }
     public function editSale($id)

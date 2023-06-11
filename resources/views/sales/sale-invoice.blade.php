@@ -183,7 +183,11 @@
         <div id="bot">
             <table class="bot-1-table">
                 <tr>
-                    <td class="bot-1-table-td">Bill No: <b>{{$invoice->id}}</b></td>
+                    @php 
+                    $parts                = explode('-',$invoice->invoice_no);
+                    $invoice_first_part   = $parts[0];
+                    @endphp
+                    <td class="bot-1-table-td">Bill No: <b>{{$invoice_first_part}}</b></td>
                     <td class="bot-1-table-td">Date: {{date('d-m-Y',strtotime($invoice->date))}}</td>
                     <td class="bot-1-table-td">Time: {{date('H:i A')}}</td>
                 </tr>

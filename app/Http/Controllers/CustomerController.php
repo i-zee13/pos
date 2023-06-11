@@ -110,8 +110,7 @@ class CustomerController extends Controller
         ]);
     }
     public function getCustomers(Request $request)
-    {
-    
+    { 
         if($request->route == 'vendors'){
             $customers = Customer::where('customer_type',1)->get();
         }else{
