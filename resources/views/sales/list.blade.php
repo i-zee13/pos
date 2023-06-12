@@ -62,7 +62,7 @@
                     <!-- <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td> -->
                     <td>
                         
-                        <a id="{{$sale->id}}" class="btn btn-default {{$sale->editable == 'true' ? 'btn-line'  : '' }}" href="{{$sale->editable == 'true' ? route('sale-edit' ,['id'=>$sale->id]) : route('sale-edit' ,['id'=>$sale->id ,'invoice' => 'detail'])}}">{{$sale->editable == 'true' ? 'Edit'  : "Detail" }}</a>
+                        <a id="{{$sale->id}}" class="btn btn-default {{$sale->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$sale->is_editable== 1 ? route('sale-edit' ,['id'=>$sale->id]) : route('sale-edit' ,['id'=>$sale->id ,'invoice' => 'detail'])}}">{{$sale->is_editable== 1 ? 'Edit'  : "Detail" }}</a>
                         <!-- <a id="{{$sale->id}}" class="btn btn-default " href="{{route('sale-detail' ,['id'=>$sale->id])}}">Detail</a> -->
                         <button id="{{$sale->id}}" data-invoice="{{$sale->id}}" data-customer-id="{{$sale->customer_id}}"
                          paid-amount="{{$sale->paid_amount}}" class="btn btn-default print-invoice">Print</button>

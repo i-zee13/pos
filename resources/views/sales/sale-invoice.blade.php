@@ -189,7 +189,7 @@
                     @endphp
                     <td class="bot-1-table-td">Bill No: <b>{{$invoice_first_part}}</b></td>
                     <td class="bot-1-table-td">Date: {{date('d-m-Y',strtotime($invoice->date))}}</td>
-                    <td class="bot-1-table-td">Time: {{date('H:i A')}}</td>
+                    <td class="bot-1-table-td">Time: {{ date('h:i A') }}</td>
                 </tr>
             </table>
             <table class="bot-2-table">
@@ -235,12 +235,12 @@
                     <td>{{number_format($invoice->invoice_discount)}}</td>
                 </tr>
                 @if($invoice->invoice_type == 2)
-                <tr>
+                <!-- <tr>
                     <td class="payable-heading">Previous Paid :</td>
                     <td>{{number_format($invoice->invoice_discount)}}</td>
-                </tr>
+                </tr> -->
                 <tr>
-                    <td class="payable-heading">Previous Payable :</td>
+                    <td class="payable-heading">Previous {{$customer_balance >= 0 ? 'Receivable' : 'Payable' }} :</td>
                     <td>{{number_format($customer_balance)}}</td>
                 </tr>
                 <!-- <tr>
@@ -260,7 +260,7 @@
                     // $difference = abs($difference);
                 ?>
                 <tr>
-                    <td class="payable-heading">{{$difference > 0 ? 'Remaining Receivable'  : 'Remaining Payable'}} :</td>
+                    <td class="payable-heading">{{$difference >= 0 ? 'Remaining Receivable'  : 'Remaining Payable'}} :</td>
                     <td>{{number_format($difference,2)}}</td>
                 </tr>
                 @else

@@ -470,6 +470,8 @@ function saleSave(current_action,type){
     }
     current_action.attr('disabled', 'disabled');
     $('.btn-cancel').attr('disabled', 'disabled');
+    $('#print-invoice').attr('disabled', 'disabled');
+
     $('#form').ajaxSubmit({
         url  : '/add-sale-invoice',
         type : 'post',
@@ -485,6 +487,7 @@ function saleSave(current_action,type){
         success: function (response) {
             current_action.removeAttr('disabled');
             $('.btn-cancel').removeAttr('disabled');
+            $('#print-invoice').removeAttr('disabled');
             if ("success") {
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'green');

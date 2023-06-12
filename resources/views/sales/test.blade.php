@@ -643,7 +643,7 @@
                                 <div class="col-md-5"><span class=" text-red">{{@$invoice->amount_received}}</span></div>
                                 <div class="col-md-7 pr-0"><strong>Previous Paid :</strong></div>
                                 <div class="col-md-5"><span class="">{{@$invoice->paid_amount}}</span></div> -->
-                                <div class="col-md-7 pr-0"><strong>Previous Receivable :</strong> </div>
+                                <div class="col-md-7 pr-0"><strong class="previous_payable_heading">Previous Receivable :</strong> </div>
 
                                 <div class="col-md-5"><span class="dashboard_avg_rev_perCust {{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '' }}</span></div>
                                 <!-- <div class="col-md-7 pr-0"><strong>Country:</strong></div>
@@ -889,7 +889,7 @@
                                         <tr class="previous_payable_tr" style="display:none">
                                             <td></td>
                                             <td></td>
-                                            <td align="right">Previous Receivable</td>
+                                            <td align="right" class="previous_payable_heading">Previous Receivable</td>
                                             <td class="{{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '0' }}</td>
                                         </tr>
 
@@ -907,7 +907,7 @@
 
                                             <td>
                                                 @if(request()->query('invoice') == 'detail')
-                                                {{$invoice->total_invoice_amount}}
+                                                {{$invoice->invoice_remaining_amount_after_pay}}
                                                 @else
                                                 <input type="number" class="inputvalue  remaning_amount amount_pay_input " id="amount_ to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly value="{{@$invoice->paid_amount}}">
                                                 @endif
@@ -951,7 +951,7 @@
                                             <td class="totalNo" align="right"></td>
                                             <td class="totalNo" align="right"><small>Pkr.</small>
                                                 @if(request()->query('invoice') == 'detail')
-                                                <span>{{$invoice->total_invoice_amount}}</span>
+                                                <span>{{$invoice->invoice_remaining_amount_after_pay}}</span>
                                                 @else
                                                 <span class="grand-total">0</span>
                                                 @endif

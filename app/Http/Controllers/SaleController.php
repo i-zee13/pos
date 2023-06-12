@@ -66,13 +66,20 @@ class SaleController extends Controller
 
     public function saleInvoice(Request $request)
     {
-        
+
+        // dd($request->all());
         if ($request->hidden_invoice_id) {
             $invoice = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
             // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received; 
         } else {
-            $invoice = new SaleInvoice();
+            $invoice     = new SaleInvoice();
+             SaleInvoice::where('customer_id', $request->customer_id)
+                        ->whereDate('created_at', Carbon::today())
+                        ->where('is_editable',1)
+                        ->orderBy('customer_id','DESC')->update(['is_editable'=>0]);
+
         }
+      
         $invoice->amount_received      = $request->amount_received;
         $invoice->date                 = $request->invoice_date;
         $invoice->invoice_no           = $request->invoice_no;
@@ -83,15 +90,15 @@ class SaleController extends Controller
         } else {
             $invoice->paid_amount      = $request->amount_received ? $request->amount_received : 0;
         }
-        $invoice->total_invoice_amount = $request->grand_total;
+        $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges + $request->previous_receivable)- $request->invoice_discount;
+        $invoice->invoice_remaining_amount_after_pay  =  $invoice->total_invoice_amount-$request->amount_received;
         $invoice->service_charges      = $request->service_charges;
         $invoice->invoice_discount     = $request->invoice_discount;
         $invoice->cash_return          = $request->cash_return;
         $invoice->product_net_total    = $request->product_net_total;
         $invoice->previous_receivable  = $request->previous_receivable;
+        $invoice->is_editable          = 1;
 
-
-       
         $invoice->status               = $request->status;
         $invoice->created_by           = Auth::id();
         if ($invoice->save()) {
@@ -218,33 +225,8 @@ class SaleController extends Controller
                                         (SELECT cr FROM customer_ledger WHERE sale_invoice_id = sale_invoices.id) as paid_amount,
                                         (SELECT customer_name FROM customers WHERE id=sale_invoices.customer_id) as customer_name')
             ->whereDate('created_at', Carbon::today())
-            ->orderBy('id', 'asc')
+            ->orderBy('id', 'DESC')
             ->get();
-         
-            $editableIds = [];
-            $result = collect();
-            
-            foreach ($sales as $index => $sale) {
-                $editable = false;
-            
-                if (count($sales) === 1 || !in_array($sale->customer_id, $editableIds)) {
-                    $editable = true;
-                }
-                if (in_array($sale->customer_id, $editableIds)) {
-                    $lastEditableIndex = array_search($sale->customer_id, array_reverse($editableIds));
-                    $lastEditableSale = $result[$lastEditableIndex];
-                    $lastEditableSale->editable = true;
-                }
-            
-                $sale->editable = $editable;
-                $editableIds[] = $sale->customer_id;
-                $result->push($sale);
-            }
-            
-            
-            
-            $sales = $result; 
-            // dd($sales);
         return view('sales.list', compact('sales'));
     }
     public function editSale($id)
