@@ -25,7 +25,7 @@ class SaleController extends Controller
         $invoice_first_part   = $parts[0];
         $current_date =   Carbon::today()->toDateString();
         $customers    =   Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
-        $products     =   Product::where('stock_balance', '>', '0')->get();
+        $products     =   Product::get();
         return view('sales.test', compact('customers', 'current_date', 'invoice_no', 'products','invoice_first_part'));
     }
     public function getVendors()
@@ -75,6 +75,7 @@ class SaleController extends Controller
             $invoice     = new SaleInvoice();
              SaleInvoice::where('customer_id', $request->customer_id)
                         ->whereDate('created_at', Carbon::today())
+                        ->where('invoice_type',2)
                         ->where('is_editable',1)
                         ->orderBy('customer_id','DESC')->update(['is_editable'=>0]);
 

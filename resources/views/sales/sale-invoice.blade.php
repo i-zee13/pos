@@ -167,7 +167,7 @@
     </style>
 </head>
 
-<body translate="no">
+<body translate="no" onload="javascript:window.print()">
     <div id="invoice-POS">
         <center id="top">
             <div class="info">

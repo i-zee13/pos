@@ -17629,6 +17629,7 @@ $(document).on('focusout', '.bar-code', function () {
       is_in_array[0].qty++;
       // $('.qty-input').val(sales_product_array[0].qty);
       $('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
+      $('#bar-code').val('').focus();
     } else {
       var filter_product = product_list.filter(function (x) {
         return x.barcode == data_variable;
@@ -17769,9 +17770,11 @@ function saleSave(current_action, type) {
     }, 3000);
     return;
   }
+  current_action.text('Processing...');
   current_action.attr('disabled', 'disabled');
   $('.btn-cancel').attr('disabled', 'disabled');
   $('#print-invoice').attr('disabled', 'disabled');
+  $('#save').attr('disabled', 'disabled');
   $('#form').ajaxSubmit({
     url: '/add-sale-invoice',
     type: 'post',
@@ -17786,9 +17789,6 @@ function saleSave(current_action, type) {
       'existing_product_ids': existing_product_ids
     },
     success: function success(response) {
-      current_action.removeAttr('disabled');
-      $('.btn-cancel').removeAttr('disabled');
-      $('#print-invoice').removeAttr('disabled');
       if (true) {
         $('#notifDiv').fadeIn();
         $('#notifDiv').css('background', 'green');
@@ -17796,6 +17796,7 @@ function saleSave(current_action, type) {
         var received_amount = $('.amount_received').val().trim();
         if (type == 'print') {
           var printWindow = window.open("/print-sale-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
+          window.location.reload();
           printWindow.onload = function () {
             printWindow.print();
             // printWindow.close();
@@ -17820,7 +17821,7 @@ function saleSave(current_action, type) {
         $('#form')[0].reset();
         $('#client_type').val(0).trigger('change');
         $('.formselect').select2();
-      }
+      } else {}
     },
     error: function error(e) {
       $('#notifDiv').fadeIn();
@@ -17832,6 +17833,8 @@ function saleSave(current_action, type) {
       current_action.removeAttr('disabled');
       ;
       $('.btn-cancel').removeAttr('disabled');
+      $('#save').attr('disabled', 'disabled');
+      current_action.text('Save');
     }
   });
 }
@@ -18043,6 +18046,7 @@ $('#customer_id').change(function () {
     sales_product_array.forEach(function (data, key) {
       total_paid_for_net_sale += parseFloat(data.amount);
     });
+    $('#invoice_type').val('1').trigger('change');
     $('.cash_return_tr').show();
     $('.previous_payable_tr').hide();
   } else {

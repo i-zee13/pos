@@ -44,8 +44,8 @@
             <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;" id="example">
                 <thead>
                     <tr>
-                        <th>Invoice #</th>
                         <th>Customer Name</th>
+                        <th>Invoice #</th>
                         <th>Received</th>
                         <th>Product Net Total</th>
                         <!-- <th>Invoice Total</th> -->
@@ -53,16 +53,19 @@
                     </tr>
                 </thead>
             <tbody>
-                @foreach($sales as $sale) 
+                @foreach($sales as $sale)
+                @php  $parts              =     explode('-', $sale->invoice_no);
+                      $invoice_first_part =     $parts[0];
+                       @endphp
                 <tr>
-                    <td>{{Str::limit($sale->invoice_no, 20)}} ({{ $sale->created_at->format('h:i A') }})</td>
+                    <td>{{$invoice_first_part}} ({{ $sale->created_at->format('h:i A') }})</td>
                     <td>{{$sale->customer_name}}</td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->paid_amount}} </td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total +$sale->service_charges - $sale->invoice_discount}} </td>
                     <!-- <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td> -->
                     <td>
                         
-                        <a id="{{$sale->id}}" class="btn btn-default {{$sale->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$sale->is_editable== 1 ? route('sale-edit' ,['id'=>$sale->id]) : route('sale-edit' ,['id'=>$sale->id ,'invoice' => 'detail'])}}">{{$sale->is_editable== 1 ? 'Edit'  : "Detail" }}</a>
+                        <a id="{{$sale->id}}" class="btn btn-default {{$sale->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$sale->is_editable== 1 ? route('sale-edit' ,['id'=>$sale->id]) : route('sale-edit' ,['id'=>$sale->id ,'invoice' => 'detail'])}}">{{$sale->is_editable== 1  ? 'Edit'  : "Detail" }}</a>
                         <!-- <a id="{{$sale->id}}" class="btn btn-default " href="{{route('sale-detail' ,['id'=>$sale->id])}}">Detail</a> -->
                         <button id="{{$sale->id}}" data-invoice="{{$sale->id}}" data-customer-id="{{$sale->customer_id}}"
                          paid-amount="{{$sale->paid_amount}}" class="btn btn-default print-invoice">Print</button>
