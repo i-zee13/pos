@@ -8,5 +8,6 @@
     "/js/custom/transaction.js": "/js/custom/transaction.js",
     "/js/custom/vendor_customer_report.js": "/js/custom/vendor_customer_report.js",
     "/js/custom/stock_report.js": "/js/custom/stock_report.js",
+    "/js/custom/sale_report.js": "/js/custom/sale_report.js",
     "/css/app.css": "/css/app.css"
 }

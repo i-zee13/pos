@@ -40,16 +40,17 @@ class SaleController extends Controller
     public function updateStock($v_stock, $stock, $sale, $balance)
     {
         if ($stock) {
-            if ($stock->qty > $sale->qty) {
-                $in_hand   = $stock->qty - $sale->qty;
+            dump($stock->total_qty,$sale->qty);
+            if ($stock->total_qty > $sale->qty) {
+                $in_hand   = $stock->total_qty - $sale->qty;
                 $balance   = $balance + $in_hand;
                 $status    = 1;     //in 
-            } else if ($sale->qty > $stock->qty) {
-                $in_hand     = $sale->qty - $stock->qty;
+            } else if ($sale->qty > $stock->total_qty) {
+                $in_hand     = $sale->qty - $stock->total_qty;
                 $balance     = $balance - $in_hand;
                 $status      = 2;     //out 
-            } else if ($sale->qty == $stock->qty) {
-                $in_hand     = $stock->qty;
+            } else if ($sale->qty == $stock->total_qty) {
+                $in_hand     = $stock->total_qty;
                 $balance     = $stock->balance;
                 $status      = 0;     //in 
             }
@@ -126,10 +127,15 @@ class SaleController extends Controller
                             $balance           =  $check_stock->balance;
                         }
                         $status = 0;
-                        $v_stock   =  new VendorStock();
+                        $v_stock     =  new VendorStock();
                         if ($request->hidden_invoice_id) {
-                            $stock   = VendorStock::where('sale_invoice_id', $request->hidden_invoice_id)
-                                ->where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
+                            $stock = Stock::where('sale_invoice_id', $request->hidden_invoice_id)
+                                                    ->where('product_id', $sale->product_id)
+                                                    ->where('status', 2)
+                                                    ->orderBy('id', 'ASC')
+                                                    ->selectRaw('stocks.*, SUM(qty) AS total_qty')
+                                                    ->first();
+                                                   dd($stock);
                             $in_hand = 0;
                             $v_stock = $this->updateStock($v_stock,$stock, $sale, $balance);  
                         } else {
@@ -150,8 +156,13 @@ class SaleController extends Controller
                             $company_stock             =  new Stock();
 
                             if ($request->hidden_invoice_id) {
-                                $stock   = Stock::where('sale_invoice_id', $request->hidden_invoice_id)
-                                    ->where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
+                                $stock = Stock::where('sale_invoice_id', $request->hidden_invoice_id)
+                                                ->where('product_id', $sale->product_id)
+                                                ->where('status', 2)
+                                                ->orderBy('id', 'asc')
+                                                ->first(); 
+                                                dd($stock);
+                                              
                                 $in_hand = 0;
                                 $v_stock = $this->updateStock($v_stock,$stock, $sale, $balance);   
                             } else {

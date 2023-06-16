@@ -16,26 +16,26 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-Route::get('/cache-clear', function () {
-    Artisan::call('cache:clear');
-    return "Cache cleared successfully";
-});
-Route::get('/route-clear', function () {
-    Artisan::call('route:clear');
-    return "Route cache cleared successfully";
-});
-Route::get('/view-clear', function () {
-    Artisan::call('route:clear');
-    return "View cache cleared successfully";
-});
-Route::get('/config-cache', function () {
+Route::get('/clear', function () {
     Artisan::call('config:cache');
-    return "Config cache successfully";
-});
-Route::get('/all-cache-clear', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
     Artisan::call('optimize:clear');
     return "All cache clear successfully";
 });
+// Route::get('/route-clear', function () {
+//     return "Route cache cleared successfully";
+// });
+// Route::get('/view-clear', function () {
+//     Artisan::call('route:clear');
+//     return "View cache cleared successfully";
+// });
+// Route::get('/config-cache', function () {
+//     return "Config cache successfully";
+// });
+// Route::get('/all-cache-clear', function () {
+//     return "All cache clear successfully";
+// });
 
 Route::get('/', function () {
     return redirect('/home');
@@ -101,5 +101,10 @@ Route::post('/report-list'              ,[App\Http\Controllers\ReportsController
 
 Route::get('/stock-reports'             ,[App\Http\Controllers\ReportsController::class, 'stockReport'])->name('stock-reports');
 Route::post('/stocks'                   ,[App\Http\Controllers\ReportsController::class, 'stockReportList'])->name('stock-report-list');
+
+//Sale Report
+Route::get('/sale-report'               ,[App\Http\Controllers\ReportsController::class, 'saleReport'])->name('sale-reports');
+Route::post('/sales-list'               ,[App\Http\Controllers\ReportsController::class, 'saleReportList'])->name('stock-report-list');
+
 
 });

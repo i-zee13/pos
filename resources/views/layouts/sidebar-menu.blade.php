@@ -202,6 +202,12 @@
                   Stock
                 </a>
               </li>
+
+              <li class="nav-item">
+                <a href="{{route('sale-reports')}}" class="nav-link ">
+                  Sale
+                </a>
+              </li>
                
             </ul>
           </div>

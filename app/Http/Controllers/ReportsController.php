@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Product;
+use App\Models\ProductSale;
 use App\Models\Stock;
 use App\Models\VendorLedger;
 use Illuminate\Http\Request;
@@ -38,7 +39,7 @@ class ReportsController extends Controller
          'vendor'  => $vendor
       ]);
    }
-    public function stockReport(){
+   public function stockReport(){
     $companies  =   Company::select('id','company_name')->get();
     $products   =   Product::select('id','product_name')->get();
      return view('reports.stock',compact('companies','products'));
@@ -70,6 +71,45 @@ class ReportsController extends Controller
                               ->orderBy('stocks.balance', 'DESC')
                               ->get();
                            
+      return response()->json([
+         'msg'     => 'Stock reports list fetched',
+         'status'  =>  'success',
+         'stocks'  => $query
+      ]);
+   }
+
+   //Sales Reports 
+
+   public function saleReport(){
+      $companies  =   Company::select('id','company_name')->get();
+      $products   =   Product::select('id','product_name')->get();
+       return view('reports.sale',compact('companies','products'));
+     }
+     public function saleReportList(Request $request){  
+//   dd($request->all());
+      $query         =  ProductSale::SelectRaw('
+                            products_sales.*,
+                            (SELECT invoice_no FROM sale_invoices WHERE id = products_sales.sale_invoice_id) as invoice_no,
+                              IFNULL(
+                                 (SELECT company_name FROM companies WHERE id = (SELECT company_id FROM products WHERE id = products_sales.product_id)), "") AS company_name
+                                   ,
+                                IFNULL(
+                                    (SELECT product_name FROM products WHERE id = products_sales.product_id),
+                                    ""
+                              ) as product_name
+                         '); 
+      if(isset($request->company_id)){
+         $query         = $query->where('products_sales.company_id', $request->company_id);
+      }
+      if(isset($request->product_id)){
+         $query         = $query->where('products_sales.product_id', $request->product_id);
+      }
+      if ($request->start_date != '' && $request->end_date != '') {
+         $query      = $query->whereBetween('products_sales.created_at', [$request->start_date, $request->end_date]);
+     }  
+         $query      = $query->groupBy('products_sales.product_id')
+                              ->orderBy('products_sales.sale_total_amount', 'DESC')
+                              ->get(); 
       return response()->json([
          'msg'     => 'Stock reports list fetched',
          'status'  =>  'success',
