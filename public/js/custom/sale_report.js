@@ -27,13 +27,13 @@ $('.search-btn').on('click', function () {
     }, 3000);
     return;
   }
-  if ($('.company_id').val() == 0 && $('.product_id').val() == 0) {
-    $('#notifDiv').fadeIn().css('background', 'red').text('Please Select Company/Product First.');
-    setTimeout(function () {
-      $('#notifDiv').fadeOut();
-    }, 3000);
-    return;
-  }
+  // if($('.company_id').val() == 0 && $('.product_id').val() == 0){
+  //     $('#notifDiv').fadeIn().css('background', 'red').text('Please Select Company/Product First.');
+  //     setTimeout(() => {
+  //         $('#notifDiv').fadeOut();
+  //     }, 3000);
+  //     return
+  // }
   CurrentRef = $(this);
   CurrentRef.text('Fetching...');
   CurrentRef.attr('disabled', 'disabled');
@@ -64,7 +64,7 @@ $('.search-btn').on('click', function () {
         console.log(element.expire_date);
         var date = new Date(element.expire_date);
         var formattedDate = date.toDateString();
-        $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td>".concat(element.invoice_no, "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat(element['product_name'], "</td>\n                        <td>").concat(element['qty'], "</td> \n                        <td>").concat(element['product_discount'], "</td> \n                        <td>").concat(element['sale_total_amount'], "</td> \n\n                    </tr>"));
+        $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td>".concat(element.invoice_no, "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat(element['product_name'], "</td>\n                        <td>").concat(element['qty'], "</td> \n                        <td>").concat(element['product_discount'] ? element['product_discount'] : 'NA', "</td> \n                        <td>").concat(element['sale_total_amount'], "</td> \n\n                    </tr>"));
       });
       $('.TeacherAttendanceListTable').fadeIn();
       $('.loader').hide();

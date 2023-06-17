@@ -17383,7 +17383,7 @@ $(document).ready(function () {
       type: 'get',
       success: function success(response) {
         response.products.forEach(function (product) {
-          existing_product_ids.push(product.id);
+          existing_product_ids.push(product.product_id);
           p_name = product.product_name;
           sales_product_array.push({
             'sale_prod_id': "".concat(product.id),
@@ -17778,11 +17778,12 @@ function saleSave(current_action, type) {
     }, 3000);
     return;
   }
-  current_action.text('Processing...');
-  current_action.attr('disabled', 'disabled');
+  // current_action.text('Processing...')
+  // current_action.attr('disabled', 'disabled');
   $('.btn-cancel').attr('disabled', 'disabled');
-  $('#print-invoice').attr('disabled', 'disabled');
-  $('#save').attr('disabled', 'disabled');
+  // $('#print-invoice').attr('disabled', 'disabled');
+  // $('#save').attr('disabled', 'disabled');
+
   $('#form').ajaxSubmit({
     url: '/add-sale-invoice',
     type: 'post',
@@ -17822,13 +17823,13 @@ function saleSave(current_action, type) {
             // console.log(received_amount);
             // window.location     = "/print-sale-invoice/"+response.invoice_id+'/'+response.customer_id+'/'+received_amount;
           } else {
-            window.location = "/sale-add";
+            // window.location     = "/sale-add";
           }
         }, 1500);
-        vendors = [];
-        $('#form')[0].reset();
-        $('#client_type').val(0).trigger('change');
-        $('.formselect').select2();
+        // vendors = [];
+        // $('#form')[0].reset();
+        // $('#client_type').val(0).trigger('change'); 
+        // $('.formselect').select2();
       } else {}
     },
     error: function error(e) {
@@ -18024,7 +18025,7 @@ function getProducts() {
   $("#products").empty();
   $("#products").append("<option value=\"0\">Select Product</option>");
   stock_products.forEach(function (data) {
-    $("#products").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.product_name, "\" data-qty=\"").concat(data.qty, "\">").concat(data.product_name, "</option>"));
+    $("#products").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.product_name, "\" data-qty=\"").concat(data.qty, "\">").concat(data.id, "-").concat(data.product_name, "</option>"));
     product_list.push(data);
   });
 }
@@ -18036,7 +18037,7 @@ function getvendors() {
     success: function success(response) {
       $("#customer_id").append("<option value=\"0\">Select Customer</option>");
       response.customers.forEach(function (data) {
-        $("#customer_id").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.customer_name, "\" ").concat(data.id == customer_id ? 'seleced' : '', ">").concat(data.customer_name, "</option>"));
+        $("#customer_id").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.customer_name, "\" ").concat(data.id == customer_id ? 'seleced' : '', ">").concat(data.id, "-").concat(data.customer_name, "</option>"));
         vendors.push(data);
       });
       $("#customer_id").val(customer_id).trigger('change');

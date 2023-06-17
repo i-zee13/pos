@@ -90,8 +90,8 @@
                             <div class="form-s2">
                                 <select class="form-control formselect customer_id" name="customer_id">
                                     <option value="">Select Customer</option>
-                                    @foreach($products as $company)
-                                    <option value="{{$company->id}}">{{$company->product_name}}</option>
+                                    @foreach($customers as $customer)
+                                    <option value="{{$customer->id}}">{{$customer->customer_name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -106,10 +106,10 @@
                 <div class="row">
                     <div class="col pr-0">
                         <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
-                            <input type="text" autocomplete="off" class="form-control datepicker start_date" placeholder="Start Date" name="start_date">
+                            <input type="date" autocomplete="off" class="form-control " placeholder="Start Date" name="start_date">
                         </div>
                         <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
-                            <input type="text" autocomplete="off" class="form-control datepicker end_date" placeholder="End Date" name="end_date">
+                            <input type="date" autocomplete="off" class="form-control" placeholder="End Date" name="end_date">
                         </div>
                       
                     </div>

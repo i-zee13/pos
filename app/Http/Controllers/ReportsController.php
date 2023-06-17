@@ -83,7 +83,8 @@ class ReportsController extends Controller
    public function saleReport(){
       $companies  =   Company::select('id','company_name')->get();
       $products   =   Product::select('id','product_name')->get();
-       return view('reports.sale',compact('companies','products'));
+      $customers  =   Customer::select('id','customer_name')->where('customer_type',2)->get();
+       return view('reports.sale',compact('companies','products','customers'));
      }
      public function saleReportList(Request $request){  
 //   dd($request->all());
@@ -107,9 +108,9 @@ class ReportsController extends Controller
       if ($request->start_date != '' && $request->end_date != '') {
          $query      = $query->whereBetween('products_sales.created_at', [$request->start_date, $request->end_date]);
      }  
-         $query      = $query->groupBy('products_sales.product_id')
-                              ->orderBy('products_sales.sale_total_amount', 'DESC')
-                              ->get(); 
+         $query      = $query
+                              ->orderBy('products_sales.invoice_no', 'DESC')
+                              ->get();
       return response()->json([
          'msg'     => 'Stock reports list fetched',
          'status'  =>  'success',

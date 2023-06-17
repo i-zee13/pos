@@ -288,10 +288,8 @@ var select = $('.customer_name').selectize({
 var selectize = select[0].selectize;
 $('.customer_name,.attribute').on('click input',function(){  
         vendors.forEach(element => { 
-            selectize.addOption({value:element.id,text:element.customer_name});
-        });
-   
-    
+            selectize.addOption({value:element.id,text:element.id+'-'+element.customer_name});
+        });  
 });
  selectize.on('change', function onChange(id) {  
     var selectedOption  = selectize.getItem(id);
