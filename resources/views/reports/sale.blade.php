@@ -27,7 +27,7 @@
     }
 
     ._cust_filter {
-        width: 218px !important;
+        width: 250px !important;
     }
 
     @media (max-width: 1366px) {
@@ -97,28 +97,28 @@
                             </div>
                         </div>
 
-                        <div class="CL-Product inputmonth"><i class="fa fa-search"></i>
+                        <div class="CL-Product inputmonth" style="width:250px"><i class="fa fa-search"></i>
                             <input type="text" class="form-control" placeholder="Bill #" name="bill_no">
                         </div>
 
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" style="padding-bottom:10px">
                     <div class="col pr-0">
-                        <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
-                            <input type="text" autocomplete="off" class="form-control datepicker start_date" placeholder="Start Date" name="start_date">
+                        <div class="CL-Product inputmonth" style="width:250px"><i class="fa fa-calendar-alt"></i>
+                            <input type="date" autocomplete="off" class="form-control start_date" placeholder="From Date" name="start_date">
                         </div>
-                        <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
-                            <input type="text" autocomplete="off" class="form-control datepicker end_date" placeholder="End Date" name="end_date">
+                        <div class="CL-Product inputmonth" style="width:250px"><i class="fa fa-calendar-alt"></i>
+                            <input type="date" autocomplete="off" class="form-control end_date" placeholder="To Date" name="end_date">
                         </div>
                       
                     </div>
                     <div class="col-auto pl-0">
-                            <button type="button" class="btn btn-primary m-0 reset-btn mr-2"> Reset</button>
-                        </div>
-                        <div class="col-auto pl-0">
-                            <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
-                        </div>
+                        <button type="button" class="btn btn-primary m-0 reset-btn"> Reset</button>
+                    </div>
+                    <div class="col-auto pl-0">
+                        <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
+                    </div>
                 </div>
             </form>
             <div class="clearfix"></div>
