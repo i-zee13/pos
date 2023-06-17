@@ -58,7 +58,7 @@ $(document).ready(function () {
             type: 'get',
             success: function (response) {
                 response.products.forEach(function (product) {
-                    existing_product_ids.push(product.id);
+                    existing_product_ids.push(product.product_id);
                     p_name = product.product_name;
                     sales_product_array.push({
                         'sale_prod_id'       : `${product.id}`,
@@ -478,11 +478,11 @@ function saleSave(current_action,type){
         }, 3000);
         return;
     }
-    current_action.text('Processing...')
-    current_action.attr('disabled', 'disabled');
+    // current_action.text('Processing...')
+    // current_action.attr('disabled', 'disabled');
     $('.btn-cancel').attr('disabled', 'disabled');
-    $('#print-invoice').attr('disabled', 'disabled');
-    $('#save').attr('disabled', 'disabled');
+    // $('#print-invoice').attr('disabled', 'disabled');
+    // $('#save').attr('disabled', 'disabled');
 
 
     $('#form').ajaxSubmit({
@@ -526,18 +526,18 @@ function saleSave(current_action,type){
                         // console.log(received_amount);
                         // window.location     = "/print-sale-invoice/"+response.invoice_id+'/'+response.customer_id+'/'+received_amount;
                     }else{
-                        window.location     = "/sale-add";
+                        // window.location     = "/sale-add";
                     }
                 }, 1500);
-                vendors = [];
-                $('#form')[0].reset();
-                $('#client_type').val(0).trigger('change'); 
-                $('.formselect').select2();
+                // vendors = [];
+                // $('#form')[0].reset();
+                // $('#client_type').val(0).trigger('change'); 
+                // $('.formselect').select2();
                 
             }else{
-                current_action.removeAttr('disabled');
-                $('.btn-cancel').removeAttr('disabled');
-                $('#print-invoice').removeAttr('disabled');
+                // current_action.removeAttr('disabled');
+                // $('.btn-cancel').removeAttr('disabled');
+                // $('#print-invoice').removeAttr('disabled');
             }
         },
         error: function (e) {
@@ -744,7 +744,7 @@ function getProducts() {
         $("#products").empty();  
         $("#products").append(`<option value="0">Select Product</option>`)
         stock_products.forEach(data => { 
-            $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.product_name}</option>`)
+            $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name}</option>`)
             product_list.push(data);
         }); 
 }
@@ -756,7 +756,7 @@ function getvendors() {
         success: function (response) {
             $("#customer_id").append(`<option value="0">Select Customer</option>`)
             response.customers.forEach(data => {
-                $("#customer_id").append(`<option value="${data.id}" data-name="${data.customer_name}" ${data.id == customer_id ? 'seleced' : ''}>${data.customer_name}</option>`)
+                $("#customer_id").append(`<option value="${data.id}" data-name="${data.customer_name}" ${data.id == customer_id ? 'seleced' : ''}>${data.id}-${data.customer_name}</option>`)
                 vendors.push(data);
             });
             $("#customer_id").val(customer_id).trigger('change');

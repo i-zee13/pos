@@ -353,7 +353,7 @@ $('.customer_name,.attribute').on('click input', function () {
   vendors.forEach(function (element) {
     selectize.addOption({
       value: element.id,
-      text: element.customer_name
+      text: element.id + '-' + element.customer_name
     });
   });
 });

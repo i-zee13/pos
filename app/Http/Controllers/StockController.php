@@ -22,7 +22,7 @@ class StockController extends Controller
     {   
         $current_date =   Carbon::today()->toDateString();
         $customers    =   Customer::all();
-        $products     =   Product::withoutTrashed()->get('id'); 
+        $products     =   Product::get('id'); 
         return view('purchases.add',compact('customers','current_date','products'));
     }
     public function getProduct(Request $request)

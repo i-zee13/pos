@@ -22,13 +22,13 @@ let segments = location.href.split('/');
         }, 3000);
         return
     }
-    if($('.company_id').val() == 0 && $('.product_id').val() == 0){
-        $('#notifDiv').fadeIn().css('background', 'red').text('Please Select Company/Product First.');
-        setTimeout(() => {
-            $('#notifDiv').fadeOut();
-        }, 3000);
-        return
-    }
+    // if($('.company_id').val() == 0 && $('.product_id').val() == 0){
+    //     $('#notifDiv').fadeIn().css('background', 'red').text('Please Select Company/Product First.');
+    //     setTimeout(() => {
+    //         $('#notifDiv').fadeOut();
+    //     }, 3000);
+    //     return
+    // }
     CurrentRef = $(this);
     CurrentRef.text('Fetching...')
     CurrentRef.attr('disabled', 'disabled');
@@ -80,7 +80,7 @@ let segments = location.href.split('/');
                         <td>${element['company_name'] }</td>
                         <td>${element['product_name'] }</td>
                         <td>${element['qty'] }</td> 
-                        <td>${element['product_discount'] }</td> 
+                        <td>${element['product_discount'] ? element['product_discount'] : 'NA' }</td> 
                         <td>${element['sale_total_amount'] }</td> 
 
                     </tr>`);

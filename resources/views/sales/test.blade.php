@@ -628,7 +628,7 @@
                                             <select class="form-control formselect form_clear  " placeholder="Select Customer" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
                                                 <option value="0">Select Customer</option>
                                                 @foreach($customers as $customer)
-                                                <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->customer_name}}</option>
+                                                <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->id}} - {{$customer->customer_name}}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -845,7 +845,7 @@
                                                     <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 150;">
                                                         <option value="0">Select Product *</option>
                                                         @foreach($products as $product)
-                                                        <option value="{{$product->id}}">{{$product->product_name}}</option>
+                                                        <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>

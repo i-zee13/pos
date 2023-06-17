@@ -137,7 +137,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div class="header">
+            <div class="header mb-0">
                 <a class="btn add_button openDataSidebarForAddingCustomer"><i class="fa fa-plus"></i> New {{$name}}</a>
                 <h2>{{$name}}s</h2>
             </div>
