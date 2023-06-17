@@ -48,7 +48,7 @@
 	padding: 10px 10px 0px 10px;
 	/* box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2); */
 	margin-bottom: 20px;
-	border-bottom: solid 2px #a2c95c
+	border-bottom: solid 2px #152e4d
 }
 
 .Product-Filter .nav-link {
@@ -772,11 +772,11 @@
 }
 
 .switch input:checked+.slider {
-	background-color: #a1c95c
+	background-color: #152e4d
 }
 
 input:focus+.slider {
-	box-shadow: 0 0 1px #a1c95c
+	box-shadow: 0 0 1px #152e4d
 }
 
 .switch input:checked+.slider:before {
@@ -884,7 +884,7 @@ input:focus+.slider {
 	line-height: 24px;
   }
    .inputmonth {
-	width: 125px;
+	width: 215;
   }
   
   .table thead th {

@@ -15,7 +15,7 @@ class CompanyController extends Controller
     }
     public function store(Request $request)
     {
-        if (Company::where('company_name', $request->company_name)->first()) {
+        if (Company::where('company_name', $request->hidden_company_name)->first()) {
             return response()->json([
                 'msg' => 'duplicate',
                 'status' => 'duplicate',
@@ -27,7 +27,7 @@ class CompanyController extends Controller
                 $company_icon = '';
             }
             Company::create([
-                'company_name' => $request->company_name,
+                'company_name' => $request->hidden_company_name,
                 'company_icon' => $company_icon,
                 'created_by' => Auth::user()->id,
             ]);

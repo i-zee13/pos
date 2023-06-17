@@ -3,12 +3,12 @@
 use App\Models\City;
 use App\Models\Country;
 use App\Models\PostalCode;
+use App\Models\PurchaseInvoice;
 use App\Models\State;
+use App\Models\Sale as SaleInvoice; 
 use App\Models\Student;
-use Firebase\JWT\JWT;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Firebase\JWT\JWT; 
 use Stevebauman\Location\Facades\Location;
 
 if(!function_exists('isStudentActive'))
@@ -132,5 +132,64 @@ if(!function_exists('getZoomAccessToken'))
             'exp' => time() + 3600,
         );
         return JWT::encode($payload, $key);
+    }
+}
+
+if(!function_exists('getInvoice'))
+{
+    function getInvoice()
+{
+    $year        = date('y');
+    $invoice_no  = 1;
+    // $lastinvoice = SaleInvoice::latest()->first();
+    $lastinvoice         = SaleInvoice::where('date',Carbon::today())->count();
+    // if ($lastinvoice) {
+    //     // $lastinvoiceDate = $lastinvoice->created_at->format('Y-m-d'); 
+    //     // if ($lastinvoiceDate === $today) {
+    //     //     // Invoice was created today, extract the invoice number
+    //     //     $invoice_no = intval(explode('-', $lastinvoice->invoice_no)[0]);
+    //     // }
+    // }
+    
+    // Increment the invoice number and append the year
+    $invoice_no = ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+    return $invoice_no;
+}
+
+}
+
+if(!function_exists('getPurchaseInvoice'))
+{
+    function getPurchaseInvoice()
+    {
+        $year        = date('y');
+        $invoice_no  = 1;
+        $lastinvoice = PurchaseInvoice::latest()->value('id');
+        if(isset($lastinvoice)){
+            $invoice_no = ($lastinvoice+1).'-'.$year;
+           return $invoice_no;
+        }else{
+            $invoice_no = $invoice_no.'-'.$year;
+            return $invoice_no;
+
+        }
+    }
+}
+
+if(!function_exists('getInvoice'))
+{
+    function getSaleReturnNo()
+    {
+        $year        = date('y');
+        $invoice_no  = 1;
+        $lastinvoice = SaleInvoice::latest()->value('id');
+        if(isset($lastinvoice)){
+            $invoice_no = ($lastinvoice+1).'-'.$year;
+           return $invoice_no;
+        }else{
+            $invoice_no = $invoice_no.'-'.$year;
+            return $invoice_no;
+
+        }
     }
 }

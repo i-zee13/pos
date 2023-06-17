@@ -48,7 +48,7 @@
             <div class="form-group">
 
               <!-- Label -->
-              <label class="form-label">
+              <label class="form-label text-white">
                 Email Address
               </label>
 
@@ -69,7 +69,7 @@
                 <div class="col">
 
                   <!-- Label -->
-                  <label class="form-label">
+                  <label class="form-label text-white">
                     Password
                   </label>
 

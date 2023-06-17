@@ -93,18 +93,29 @@ var lastOp = "";
 var glob_type = '';
 
 var deleteRef = '';
+var action = '';
+var vendors = '';
+var cust_name = '';
 $(document).ready(function () {
   var segments = location.href.split('/');
-  var action = segments[3];
+  action = segments[3];
   if (action == "customer") {
+    fetchcustomers();
+  } else {
     fetchcustomers();
   }
   $(document).on('click', '.openDataSidebarForAddingCustomer', function () {
     $('.dropify-clear').click();
+    $('#savaCustomerForm')[0].reset();
     $('input[name="customer_id"]').val("");
     $('input[name="customer_name"]').val("");
+    $('input[name="phone_no"]').val("");
+    $('textare[name="address"]').val("");
+    $('input[name="whatsapp_no"]').val("");
+    $('input[name="cnic_no"]').val("");
     $('#dataSidebarLoader').hide();
     $('.dz-image-preview').remove();
+    selectize.clear();
     $('.dz-default').show();
     if (lastOp == "update") {
       $('input[name="customer_name"]').val("");
@@ -136,9 +147,29 @@ $(document).ready(function () {
         $('#dataSidebarLoader').hide();
         $('._cl-bottom').show();
         $('.pc-cartlist').show();
-        $('input[name="customer_name"]').focus();
-        $('input[name="customer_name"]').val(response.customer.customer_name);
-        $('input[name="customer_name"]').blur();
+        setTimeout(function () {
+          selectize.setValue(response.customer.id);
+          var selectedOption = selectize.getItem(response.customer.id);
+          $('#hidden_customer_name').val($(selectedOption).text());
+        }, 500);
+        $('.customer_name').trigger('click');
+
+        // $('input[name="customer_name"]').focus();
+        // $('input[name="customer_name"]').val(response.customer.customer_name);
+        // $('input[name="customer_name"]').blur();
+
+        $('input[name="phone_no"]').focus();
+        $('input[name="phone_no"]').val(response.customer.phone_no);
+        $('input[name="phone_no"]').blur();
+        $('input[name="whatsapp_no"]').focus();
+        $('input[name="whatsapp_no"]').val(response.customer.whatsapp_no);
+        $('input[name="whatsapp_no"]').blur();
+        $('input[name="cnic_no"]').focus();
+        $('input[name="cnic_no"]').val(response.customer.cnic_no);
+        $('input[name="cnic_no"]').blur();
+        $('textarea[name="address"]').focus();
+        $('textarea[name="address"]').val(response.customer.address);
+        $('textarea[name="address"]').blur();
         if (response.customer.customer_type == 1) {
           $('.vendor').prop('checked', true);
         } else {
@@ -149,15 +180,15 @@ $(document).ready(function () {
     openSidebar();
   });
   $(document).on('click', '#savaCustomer', function () {
-    if (!$('input[name="customer_name"]').val()) {
-      $('#notifDiv').fadeIn();
-      $('#notifDiv').css('background', 'red');
-      $('#notifDiv').text('Please provide all the required information (*)');
-      setTimeout(function () {
-        $('#notifDiv').fadeOut();
-      }, 3000);
-      return;
-    }
+    // if (!$('input[name="customer_name"]').val()) {
+    //     $('#notifDiv').fadeIn();
+    //     $('#notifDiv').css('background', 'red');
+    //     $('#notifDiv').text('Please provide all the required information (*)');
+    //     setTimeout(() => {
+    //         $('#notifDiv').fadeOut();
+    //     }, 3000);
+    //     return;
+    // }
     $('#savaCustomer').attr('disabled', 'disabled');
     $('#cancelMainCat').attr('disabled', 'disabled');
     $('#savaCustomer').text('Processing..');
@@ -267,23 +298,73 @@ $(document).ready(function () {
 });
 function fetchcustomers() {
   $.ajax({
-    type: 'GET',
+    type: 'post',
     url: '/get-customers',
+    data: {
+      _token: $('meta[name="csrf_token"]').attr('content'),
+      route: action
+    },
     success: function success(response) {
-      $('.body').empty();
-      $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Type</th><th>Action</th></tr></thead><tbody></tbody></table>');
-      $('.mainCatsListTable tbody').empty();
-      // var response = JSON.parse(response);
-      var sNo = 1;
-      response.customers.forEach(function (element, key) {
-        $('.mainCatsListTable tbody').append("\n                        <tr>\n                            <td>".concat(key + 1, "</td>\n                            <td>").concat(element['customer_name'], "</td>\n                            <td> ").concat(element['customer_type'] == 1 ? 'Vendor' : 'Customer', "</td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdatecustomer\">Edit</button>\n                                <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg deleteMaincustomer delete_cat\" name=\"main_cat\" title=\"Delete\">Delete</button>\n                                \n                            </td>\n                        </tr>"));
-      });
-      $('#tblLoader').hide();
-      $('.body').fadeIn();
-      $('.mainCatsListTable').DataTable();
+      vendors = response.customers;
+      table(response.customers);
     }
   });
+  function table(data) {
+    $('.body').empty();
+    $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Cnic</th><th>Phone #</th><th>Whatsapp #</th><th>Address</th><th>Action</th></tr></thead><tbody></tbody></table>');
+    $('.mainCatsListTable tbody').empty();
+    // var response = JSON.parse(response);
+    var sNo = 1;
+    data.forEach(function (element, key) {
+      $('.mainCatsListTable tbody').append("\n            <tr>\n                <td>".concat(key + 1, "</td>\n                <td>").concat(element['customer_name'], "</td>\n                <td>").concat(element['cnic_no'] ? element['cnic_no'] : 'NA', "</td>\n                <td>").concat(element['phone_no'] ? element['phone_no'] : 'NA', "</td>\n                <td>").concat(element['whatsapp_no'] ? element['whatsapp_no'] : 'NA', "</td>\n                <td>").concat(element['address'] ? element['address'].substring(0, 40) + '...' : 'NA', "</td> \n                <td>\n                    <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdatecustomer\">Edit</button>\n                    <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg deleteMaincustomer delete_cat\" name=\"main_cat\" title=\"Delete\">Delete</button>\n                    \n                </td>\n            </tr>"));
+    });
+    $('#tblLoader').hide();
+    $('.body').fadeIn();
+    $('.mainCatsListTable').DataTable();
+  }
 }
+var select = $('.customer_name').selectize({
+  onFocus: function onFocus() {
+    var $activeSelect = select[0].selectize;
+    var $value = $activeSelect.getValue();
+    if ($value.length > 0) {
+      var item = $activeSelect.getItem($value);
+      if (item) {
+        var element = document.querySelector('div.item');
+        var innerHTMLValue = element.innerHTML;
+        $activeSelect.clear();
+        $activeSelect.setTextboxValue(innerHTMLValue);
+      }
+    }
+  },
+  create: function create(input, callback) {
+    cust_name = input;
+    $('#hidden_customer_name').val(input);
+    // $('#hidden_product_name').val(input)
+    callback({
+      value: input,
+      text: input
+    });
+    return;
+  }
+});
+var selectize = select[0].selectize;
+$('.customer_name,.attribute').on('click input', function () {
+  vendors.forEach(function (element) {
+    selectize.addOption({
+      value: element.id,
+      text: element.customer_name
+    });
+  });
+});
+selectize.on('change', function onChange(id) {
+  var selectedOption = selectize.getItem(id);
+  cust_name = $(selectedOption).text();
+  $('#hidden_customer_name').val($(selectedOption).text());
+  // $('#hidden_product_name').val($(selectedOption).text());
+});
+
+selectize.clear();
 })();
 
 /******/ })()

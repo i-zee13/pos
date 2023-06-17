@@ -535,7 +535,7 @@
 
                     <div class="col-md-2 mb-10">
 
-                      <label class="control-label mb-5">Bar Code</label>
+                      <label class="control-label mb-5">ID *</label>
                       <input type="text" id="" class="form-control   bar-code " placeholder="" name="bar_code" data-attr='bar_code'>
 
                     </div>
@@ -631,12 +631,12 @@
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Paid</th>
                               <th class="paid_amount" colspan="4" style="text-align: center;">0</th>
                             </tr>
-                            <tr rowspan="5">
+                            <!-- <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input" data-id="" data-value="">
                               </th>
-                            </tr>
+                            </tr> -->
 
                             <tr rowspan="5">
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Amount pay</th>

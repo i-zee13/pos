@@ -71,7 +71,7 @@ class TransactionController extends Controller
       }else{  
          $ledger->dr       =  $request->amount;
       }
-      $ledger->trx_type    =  1;    //transactions
+      $ledger->trx_type    =  3;    //transactions
       $ledger->date        =  $request->transaction_date;  
       $ledger->created_by  =  Auth::user()->id;
       if($ledger->save()){

@@ -126,7 +126,6 @@ $(document).ready(function () {
     customer_id = $('#curren_customer_id').val();
     var invoice_id = $('#invoice_id').val();
     vendor_ledger = JSON.parse($('#vendor_ledger').val());
-    console.log(vendor_ledger);
     segment = segments[3];
     $.ajax({
       url: '/get-purchase-products/' + invoice_id,
@@ -268,13 +267,13 @@ $('#add-product').on('click', function () {
   }
 
   if ($('.expiry_date').val() == '') {
-    $('#notifDiv').fadeIn();
-    $('#notifDiv').css('background', 'red');
-    $('#notifDiv').text('Please Add Expiry Date of Product');
-    setTimeout(function () {
-      $('#notifDiv').fadeOut();
-    }, 3000);
-    return;
+    // $('#notifDiv').fadeIn();
+    // $('#notifDiv').css('background', 'red');
+    // $('#notifDiv').text('Please Add Expiry Date of Product');
+    // setTimeout(() => {
+    //     $('#notifDiv').fadeOut();
+    // }, 3000);
+    // return;
   } else {
     expiry_date = $('.expiry_date').val();
   }
@@ -396,7 +395,7 @@ $("#save").on('click', function () {
       $('#form')[0].reset();
       $('#client_type').val(0).trigger('change');
       setTimeout(function () {
-        window.location = "/stock-add";
+        window.location = "/purchases";
         $('#notifDiv').fadeOut();
       }, 1500);
       $('.formselect').select2();
@@ -506,10 +505,11 @@ $('.customer_id').change(function () {
         } else {
           previous_payable = response.customer_balance;
         }
-        var previous_payable_text = previous_payable > 0 ? previous_payable + " DR" : previous_payable < 0 ? -previous_payable + " CR" : previous_payable;
+        var previous_payable_text = previous_payable > 0 ? previous_payable + " CR" : previous_payable < 0 ? -previous_payable + " DR" : previous_payable;
         $('.previous_payable').text(previous_payable_text);
         $('.previous_payable').val(previous_payable);
         $('.paid_amount').text(vendor_ledger['dr']);
+        console.log(vendor_ledger['balance']);
         $('.remaning_amount').val(vendor_ledger['balance']);
         grandSum(previous_payable);
         $('.display').css('display', '');

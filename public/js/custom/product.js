@@ -90,44 +90,45 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var sweetalert__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sweetalert */ "./node_modules/sweetalert/dist/sweetalert.min.js");
 /* harmony import */ var sweetalert__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sweetalert__WEBPACK_IMPORTED_MODULE_0__);
 var lastOp = "";
-var glob_type = '';
+var barcode = '';
 
 var deleteRef = '';
+var products = '';
+var companies = '';
+var prod_name = '';
+var action = '';
 $(document).ready(function () {
   var segments = location.href.split('/');
-  var action = segments[3];
+  action = segments[3];
   if (action == "products") {
     fetchproducts();
   } else {
     fetchcompanies();
   }
   $(document).on('click', '.openDataSidebarForAddingProduct', function () {
+    $('input[name="barcode"]').val(barcode).focus();
     $('.dropify-clear').click();
     $('.dz-image-preview').remove();
     $('#dataSidebarLoader').hide();
-    $('input[name="barcode"]').val("");
-    $('input[name="product_name"]').val("");
-    $('input[name="size"]').val("");
-    $('input[name="purchase_price"]').val("");
+    $('#product_id').val("");
+    $('select[name="product_name"]').val("").blur();
+    $('input[name="size"]').val("").blur();
+    $('input[name="purchase_price"]').val("").blur();
     $('input[name="sale_price"]').val("");
     $('select[name="company_id"]').val("0").trigger('change');
     $('.dz-default').show();
     if (lastOp == "update") {
       $('.dropify-clear').click();
-      $('input[name="product_name"]').val("");
-      $('input[name="product_name"]').blur();
-      $('input[name="barcode"]').val("");
-      $('input[name="product_name"]').val("");
-      $('input[name="size"]').val("");
-      $('input[name="purchase_price"]').val("");
-      $('input[name="sale_price"]').val("");
-      $('#primary_services').val("0").trigger('change');
+      $('select[name="product_name"]').val("").blur();
+      $('input[name="size"]').val("").blur();
+      $('input[name="purchase_price"]').val("").blur();
+      $('input[name="sale_price"]').val("").blur();
     }
+    selectize.clear();
     lastOp = 'add';
     if ($('#saveSubSecondaryServiceForm input[name="_method"]').length) {
       $('#saveSubSecondaryServiceForm input[name="_method"]').remove();
     }
-    $('select[name="company_id"]').val("-1");
     $('input[id="operation"]').val('add');
     openSidebar();
   });
@@ -150,23 +151,26 @@ $(document).ready(function () {
         $('input[name="barcode"]').focus();
         $('input[name="barcode"]').val(response.product.barcode);
         $('input[name="barcode"]').blur();
-        $('input[name="product_name"]').focus();
-        $('input[name="product_name"]').val(response.product.product_name);
-        $('input[name="product_name"]').blur();
+        setTimeout(function () {
+          selectize.setValue(id);
+          var selectedOption = selectize.getItem(id);
+          $('#hidden_product_name').val($(selectedOption).text());
+        }, 1000);
+        $('.attribute').trigger('click');
         $('input[name="size"]').focus();
         $('input[name="size"]').val(response.product.size);
         $('input[name="size"]').blur();
         $('input[name="purchase_price"]').focus();
-        $('input[name="purchase_price"]').val(response.product.old_purchase_price);
+        $('input[name="purchase_price"]').val(response.product.old_purchase_price.toFixed(2));
         $('input[name="purchase_price"]').blur();
         $('input[name="sale_price"]').focus();
-        $('input[name="sale_price"]').val(response.product.sale_price);
+        $('input[name="sale_price"]').val(response.product.sale_price.toFixed(2));
         $('input[name="sale_price"]').blur();
         $.ajax({
           url: "/get-companies",
           success: function success(subcat) {
-            $('select[name="company_id"]').append("<option value=\"-1\">Select Company</option>");
             $('select[name="company_id"]').empty();
+            $('select[name="company_id"]').append("<option value=\"0\">Select Company</option>");
             subcat.companies.forEach(function (data) {
               $('select[name="company_id"]').append("<option value=\"".concat(data.id, "\" ").concat(response.product.company_id == data.id ? 'selected' : '', ">").concat(data.company_name, "</option>")).focus();
             });
@@ -217,27 +221,36 @@ $(document).ready(function () {
         $('#dataSidebarLoader').hide();
         $('._cl-bottom').show();
         $('.pc-cartlist').show();
-        $('input[name="company_name"]').focus();
-        $('input[name="company_name"]').val(response.company.company_name);
-        $('input[name="company_name"]').blur();
-        var input = "<input type=\"hidden\"  name=\"hidden_company_icon\" value=\"".concat(response.company.company_icon, "\"/> \n                <input type=\"file\" id=\"input-file-now\" class=\"dropify\"  name=\"company_icon\" data-old_input=\"hidden_company_icon\"  data-default-file = \"/storage/").concat(response.category.company_icon, "\" value=\"").concat(response.category.company_icon, "\"  accept=\"image/*\" data-allowed-file-extensions=\"jpg png jpeg JPEG\"/>");
-        $('.img').empty();
-        $('.img').html(input);
-        $('.dropify').dropify();
+        setTimeout(function () {
+          selectize.setValue(response.company.id);
+          var selectedOption = selectize.getItem(response.company.id);
+          $('#hidden_company_name').val($(selectedOption).text());
+        }, 500);
+        $('.company').trigger('click');
+        // $('input[name="company_name"]').focus();
+        // $('input[name="company_name"]').val(response.company.company_name);
+        // $('input[name="company_name"]').blur();
+
+        // var input = `<input type="hidden"  name="hidden_company_icon" value="${response.company.company_icon}"/> 
+        // <input type="file" id="input-file-now" class="dropify"  name="company_icon" data-old_input="hidden_company_icon"  data-default-file = "/storage/${response.category.company_icon}" value="${response.category.company_icon}"  accept="image/*" data-allowed-file-extensions="jpg png jpeg JPEG"/>`
+        // $('.img').empty();
+        // $('.img').html(input);
+        // $('.dropify').dropify();
       }
     });
+
     openSidebar();
   });
   $(document).on('click', '#saveMainCat', function () {
-    if (!$('input[name="company_name"]').val()) {
-      $('#notifDiv').fadeIn();
-      $('#notifDiv').css('background', 'red');
-      $('#notifDiv').text('Please provide all the required information (*)');
-      setTimeout(function () {
-        $('#notifDiv').fadeOut();
-      }, 3000);
-      return;
-    }
+    // if (!$('input[name="company_name"]').val()) {
+    //     $('#notifDiv').fadeIn();
+    //     $('#notifDiv').css('background', 'red');
+    //     $('#notifDiv').text('Please provide all the required information (*)');
+    //     setTimeout(() => {
+    //         $('#notifDiv').fadeOut();
+    //     }, 3000);
+    //     return;
+    // }
     $('#saveMainCat').attr('disabled', 'disabled');
     $('#cancelMainCat').attr('disabled', 'disabled');
     $('#saveMainCat').text('Processing..');
@@ -248,13 +261,15 @@ $(document).ready(function () {
     $('#saveMainCatForm').ajaxSubmit({
       type: "POST",
       url: ajaxUrl,
-      data: $('#saveMainCatForm').serialize(),
+      data: {
+        prod_name: prod_name
+      },
       cache: false,
       success: function success(response) {
         if (response.status == "duplicate") {
           $('#notifDiv').fadeIn();
           $('#notifDiv').css('background', 'red');
-          $('#notifDiv').text('Category Already Exist');
+          $('#notifDiv').text('Product Already Exist');
           setTimeout(function () {
             $('#notifDiv').fadeOut();
           }, 3000);
@@ -267,7 +282,7 @@ $(document).ready(function () {
           $('#saveMainCat').removeAttr('disabled');
           $('#cancelMainCat').removeAttr('disabled');
           $('#saveMainCat').text('Save');
-          $('#notifDiv').text('Category have been updated successfully');
+          $('#notifDiv').text('Product have been updated successfully');
           $('#notifDiv').fadeIn();
           $('#notifDiv').css('background', 'green');
           setTimeout(function () {
@@ -333,18 +348,22 @@ $(document).ready(function () {
     //     }, 3000);
     //     return;
     // }
+
     $('#saveProduct').attr('disabled', 'disabled');
     $('#cancelSubCat').attr('disabled', 'disabled');
     $('#saveProduct').text('Processing..');
     $('#saveProductForm').ajaxSubmit({
       type: "POST",
       url: '/product-store',
+      data: {
+        prod_name: prod_name
+      },
       cache: false,
       success: function success(response) {
         if (response.msg == "duplicate") {
           $('#notifDiv').fadeIn();
           $('#notifDiv').css('background', 'red');
-          $('#notifDiv').text('Category Already Exist');
+          $('#notifDiv').text(response.duplicate_msg);
           setTimeout(function () {
             $('#notifDiv').fadeOut();
           }, 3000);
@@ -355,16 +374,18 @@ $(document).ready(function () {
         if (response.status == "success") {
           closeSidebar();
           fetchproducts();
+          selectize.clear();
+          location.reload();
           $('#saveProduct').removeAttr('disabled');
           $('#cancelSubCat').removeAttr('disabled');
           $('#saveProduct').text('Save');
-          var msg = 'Category have been updated successfully';
+          var msg = 'Product have been updated successfully';
           if ($('#operation').val() !== "update") {
             $('#saveProduct').find("input[name='product_name']").val("");
-            $('#saveProduct').find("select[name='company_id']").val("-1").trigger();
+            $('#saveProduct').find("select[name='company_id']").val("0").trigger();
             $('#saveProduct').find("input[name='publish_service']").prop('checked', false);
             $('#saveProduct').find("select").val("0").trigger('change');
-            var msg = 'Category have been added successfully';
+            var msg = 'Product have been added successfully';
           }
           $('#notifDiv').fadeIn();
           $('#notifDiv').text(msg);
@@ -457,6 +478,7 @@ $(document).ready(function () {
   $(document).on('click', '.delete_product', function () {
     var _this2 = this;
     var id = $(this).attr('id');
+    var status = $(this).attr('data-status');
     deleteRef = $(this);
     sweetalert__WEBPACK_IMPORTED_MODULE_0___default()({
       title: "Are you sure?",
@@ -475,13 +497,12 @@ $(document).ready(function () {
           url: '/product-delete/' + id,
           data: {
             _token: $('meta[name="csrf_token"]').attr('content'),
-            id: id
+            id: id,
+            status: status
           },
           success: function success(response) {
             if (response.status == 'success') {
-              $('#notifDiv').fadeIn();
-              $('#notifDiv').css('background', 'green');
-              $('#notifDiv').text('Successfully deleted.');
+              $('#notifDiv').fadeIn().css('background', 'green').text(response.msg);
               fetchproducts();
               setTimeout(function () {
                 $('#notifDiv').fadeOut();
@@ -489,9 +510,7 @@ $(document).ready(function () {
             } else {
               deleteRef.removeAttr('disabled');
               deleteRef.text('Delete');
-              $('#notifDiv').fadeIn();
-              $('#notifDiv').css('background', 'red');
-              $('#notifDiv').text('Unable to delete at the moment');
+              $('#notifDiv').fadeIn().css('background', 'red').text('Unable to delete at the moment');
               setTimeout(function () {
                 $('#notifDiv').fadeOut();
               }, 3000);
@@ -507,13 +526,18 @@ function fetchcompanies() {
     type: 'GET',
     url: '/get-companies',
     success: function success(response) {
+      companies = response.companies;
       $('.body').empty();
       $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Icon</th><th>Name</th><th>Action</th></tr></thead><tbody></tbody></table>');
       $('.mainCatsListTable tbody').empty();
       // var response = JSON.parse(response);
       var sNo = 1;
       response.companies.forEach(function (element, key) {
-        $('.mainCatsListTable tbody').append("\n                        <tr>\n                            <td>".concat(key + 1, "</td>\n                            <td> <img src=\"").concat(element['company_icon'] ? '/storage/'.element['company_icon'] : '/images/company.png', "\"  style=\"height:25px; width:25px;\"></td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td>\n                                <button id=\" ").concat(element['id'], " \" class=\"btn btn-default btn-line openDataSidebarForUpdateCompany\">Edit</button>\n                                 \n                                <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg deleteMainCategory delete_cat\" name=\"main_cat\" title=\"Delete\">Delete</button>\n                                \n                            </td>\n                        </tr>"));
+        selectize.addOption({
+          value: element.id,
+          text: element.company_name
+        });
+        $('.mainCatsListTable tbody').append("\n                        <tr>\n                            <td>".concat(key + 1, "</td>\n                            <td> <img src=\"").concat(element['company_icon'] ? '/storage/'.element['company_icon'] : '/images/company.png', "\"  style=\"height:25px; width:25px;\"></td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td>\n                                <button id=\" ").concat(element['id'], " \" class=\"btn btn-default btn-line openDataSidebarForUpdateCompany\">Edit</button>\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();
@@ -526,13 +550,27 @@ function fetchproducts() {
     type: 'GET',
     url: '/get-products',
     success: function success(response) {
+      products = response.data;
+      barcode = response.barcode;
+      products.forEach(function (element) {
+        selectize.addOption({
+          value: element.id,
+          text: element.product_name
+        });
+      });
       $('.body').empty();
-      $('.body').append("\n                    <table class=\"table table-hover dt-responsive nowrap subCatsListTable\" style=\"width:100%;\">\n                        <thead>\n                            <tr>\n                                <th>S.No</th>\n                                <th>Company</th>\n                                <th>Bar Code</th>\n                                <th>Product</th>\n                                <th>Size</th>\n                                <th>Action</th>\n                            </tr>\n                        </thead>\n                    <tbody></tbody>\n                    </table>");
+      $('.body').append("\n                    <table class=\"table table-hover dt-responsive nowrap subCatsListTable\" style=\"width:100%;\">\n                        <thead>\n                            <tr>\n                                <th>ID</th>\n                                <th>Company</th>\n                                <th>Product</th>\n                                <th>Size</th>\n                                <th>Action</th>\n                            </tr>\n                        </thead>\n                    <tbody></tbody>\n                    </table>");
       $('.subCatsListTable tbody').empty();
       var sNo = 1;
+      $('.barcode').val(barcode).focus();
       response.data.forEach(function (element, key) {
-        console.log(element, element.product_icon);
-        $('.subCatsListTable tbody').append("\n                        <tr>\n                            <td>".concat(key + 1, "</td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td>").concat(element['barcode'], " </td>\n                            <td> <img src=\"").concat(element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                            <td>").concat(element['size'], " </td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                                <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg  delete_product\" name=\"Sub_cat\" title=\"Delete\">Delete</button>\n                            </td>\n                        </tr>"));
+        var delet_status = '';
+        if (element.deleted_at == null) {
+          delet_status = "<button type=\"button\" id=\"".concat(element['id'], "\" class=\"btn btn-default red-bg  delete_product\" name=\"Sub_cat\" title=\"Delete\" data-status =\"delete\">Delete</button>");
+        } else {
+          delet_status = "<button type=\"button\" id=\"".concat(element['id'], "\" class=\"btn btn-default btn-line  delete_product\" name=\"Sub_cat\" title=\"Restore\" data-status =\"restore\">Restore</button>");
+        }
+        $('.subCatsListTable tbody').append("\n                        <tr> \n                            <td>".concat(element['barcode'], " </td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td> <img src=\"").concat(element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                            <td>").concat(element['size'], " </td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                                ").concat(delet_status, "\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();
@@ -540,36 +578,62 @@ function fetchproducts() {
     }
   });
 }
-function get_primary_services() {
-  $.ajax({
-    url: 'get-primary-services',
-    success: function success(response) {
-      $("#primary_services").append("<option value=\"0\">Select Primary Services </option>");
-      $("#secondary_services").append("<option value=\"-1\">Select Secondary Services</option>");
-      response.forEach(function (data) {
-        $("#primary_services").append("<option data-id=\"".concat(data.id, "\" value=\"").concat(data.id, "\">").concat(data.company_name, "</option>"));
-      });
-    }
-  });
-}
-$("#primary_services").change(function () {
-  $('#secondary_services').empty();
-  var primary_service_id = $(this).val();
-  $.ajax({
-    url: "/get-products-against-main-cat/".concat(primary_service_id),
-    success: function success(response) {
-      $("#secondary_services").focus();
-      $("#secondary_services").append("<option value=\"-1\">Select Secondary Services</option>");
-      response.forEach(function (data) {
-        $("#secondary_services").append("<option value=\"".concat(data.id, "\">").concat(data.company_name, "</option>"));
-      });
-    }
-  });
-});
 $(document).on('click', '.dropify-clear', function () {
   var old_input_name = $(this).parent().children('input').attr('data-old_input');
   $('input[name="' + old_input_name + '"]').val('');
 });
+var select = $('.company,.attribute').selectize({
+  onFocus: function onFocus() {
+    var $activeSelect = select[0].selectize;
+    var $value = $activeSelect.getValue();
+    if ($value.length > 0) {
+      var item = $activeSelect.getItem($value);
+      if (item) {
+        var element = document.querySelector('div.item');
+        var innerHTMLValue = element.innerHTML;
+        $activeSelect.clear();
+        $activeSelect.setTextboxValue(innerHTMLValue);
+      }
+    }
+  },
+  create: function create(input, callback) {
+    prod_name = input;
+    action == "products" ? $('#hidden_product_name').val(input) : $('#hidden_company_name').val(input);
+    // $('#hidden_product_name').val(input)
+    callback({
+      value: input,
+      text: input
+    });
+    return;
+  }
+});
+var selectize = select[0].selectize;
+$('.company,.attribute').on('click input', function () {
+  if (action == "products") {
+    products.forEach(function (element) {
+      selectize.addOption({
+        value: element.id,
+        text: element.product_name
+      });
+    });
+  } else {
+    companies.forEach(function (element) {
+      selectize.addOption({
+        value: element.id,
+        text: element.company_name
+      });
+    });
+  }
+});
+selectize.on('change', function onChange(id) {
+  var selectedOption = selectize.getItem(id);
+  prod_name = $(selectedOption).text();
+  console.log(prod_name);
+  action == "products" ? $('#hidden_product_name').val($(selectedOption).text()) : $('#hidden_company_name').val($(selectedOption).text());
+  // $('#hidden_product_name').val($(selectedOption).text());
+});
+
+selectize.clear();
 })();
 
 /******/ })()

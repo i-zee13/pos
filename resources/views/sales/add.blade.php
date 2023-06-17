@@ -2,9 +2,10 @@
 
 @section('content')
 <style>
-  .modal-header .close { 
-      margin: 0px ;  
-}
+  .modal-header .close {
+    margin: 0px;
+  }
+
   .pocPROFILE {
     font-size: 14px;
     padding: 15px 20px;
@@ -329,7 +330,7 @@
   } */
 
   .top-border {
-    border-top: solid 2px #152e4d ;
+    border-top: solid 2px #152e4d;
   }
 
   .addBTN-act {
@@ -363,50 +364,49 @@
     background-color: #f6f6f6;
   }
 </style>
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content top-border">
-            <div class="modal-header statusMH">
-                <h5 class="modal-title" id="exampleModalLabel">Status: <span class="modal_poc_name"> </span></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content top-border">
+      <div class="modal-header statusMH">
+        <h5 class="modal-title" id="exampleModalLabel">Status: <span class="modal_poc_name"> </span></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-20">
+        <div class="row">
+          <div class="col-4">
+            <div class="custom-control custom-radio">
+              <input class="custom-control-input radio_status net_sale" type="radio" value="1" id="net_sale" name="radio_status" checked="checked">
+              <label class="custom-control-label head-sta" for="net_sale">Net Sale</label>
             </div>
-            <div class="modal-body p-20">
-                    <div class="row">
-                        <div class="col-4">
-                            <div class="custom-control custom-radio">
-                                <input class="custom-control-input radio_status net_sale" type="radio" value="1" id="net_sale" name="radio_status" checked="checked">
-                                <label class="custom-control-label head-sta" for="net_sale">Net Sale</label>
-                            </div>
-                        </div>
+          </div>
 
-                        <div class="col-4">
-                            <div class="custom-control custom-radio">
-                                <input class="custom-control-input radio_status add_to_ledger" type="radio" value="2" id="add_to_ledger" name="radio_status">
-                                <label class="custom-control-label head-sta" for="add_to_ledger">Add to Ledger</label>
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="custom-control custom-radio">
-                                <input class="custom-control-input radio_status bank_transfer" type="radio" value="3" id="bank_transfer" name="radio_status">
-                                <label class="custom-control-label head-sta" for="bank_transfer"> Bank Transfer</label>
-                            </div>
-                        </div> 
-                    </div>
-
-                </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary save_status"  style="font-size: 12px;" btn-value='0'>Save</button>
-                <button type="submit" class="btn btn-primary save_status"  style="font-size: 12px;" btn-value='1'>Print</button>
+          <div class="col-4">
+            <div class="custom-control custom-radio">
+              <input class="custom-control-input radio_status add_to_ledger" type="radio" value="2" id="add_to_ledger" name="radio_status">
+              <label class="custom-control-label head-sta" for="add_to_ledger">Add to Ledger</label>
             </div>
+          </div>
+
+          <div class="col-4">
+            <div class="custom-control custom-radio">
+              <input class="custom-control-input radio_status bank_transfer" type="radio" value="3" id="bank_transfer" name="radio_status">
+              <label class="custom-control-label head-sta" for="bank_transfer"> Bank Transfer</label>
+            </div>
+          </div>
         </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary save_status" style="font-size: 12px;" btn-value='0'>Save</button>
+        <button type="submit" class="btn btn-primary save_status" style="font-size: 12px;" btn-value='1'>Print</button>
+      </div>
     </div>
-    <button hidden data-toggle="modal" data-target="#deleteModal" id="hidden_btn_to_open_modal"></button>
+  </div>
+  <button hidden data-toggle="modal" data-target="#deleteModal" id="hidden_btn_to_open_modal"></button>
 </div>
- 
+
 
 <!-- HEADER -->
 <div class="header">
@@ -436,14 +436,12 @@
     </div>
   </div>
 </div>
-
 <form id="form" enctype="multipart/form-data" class="">
   @csrf
   <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
   <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
+  <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
   <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
-
-
   <div class="row">
     <div class="col-md-12">
       <div class="card">
@@ -452,12 +450,12 @@
             <div class="col-12">
               <div class="header pt-0">
                 <h2>Sale <span>Definition</span>
-              </h2>
-              <a href="{{route('sales')}}" type="submit" class="btn btn-primary mr-2" id="cancel" style="    margin-top: -10px;float: right;">Sales</a>
+                </h2>
+                <a href="{{route('sales')}}" type="submit" class="btn btn-primary mr-2" id="cancel" style="    margin-top: -10px;float: right;">Sales</a>
               </div>
 
             </div>
-             
+
           </div>
           <div class="se_cus-type p-20 mb-3">
             <div class="row">
@@ -473,10 +471,10 @@
                 </div>
 
               </div>
-              <div class="col-md-4 client">
+              <div class="col-md-3 client">
                 <h2 class="_head04 border-0">Select <span>Cusotmer</span>*</h2>
                 <div class="form-s2">
-                <select class="form-control formselect custom er_id form_clear required" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                  <select class="form-control formselect custom er_id form_clear required" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
                     <option value="0"> Select Customer*</option>
                     @foreach($customers as $customer)
                     <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->customer_name}}</option>
@@ -484,8 +482,18 @@
                   </select>
                 </div>
               </div>
-             
-             
+              <div class="col-md-3 client">
+                <h2 class="_head04 border-0">Invoice<span> Type</span>*</h2>
+                <div class="form-s2">
+                  <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                    <option value="1" {{@$invoice->invoice_type == 1 ? 'selected' : ''}}>Net Sale</option>
+                    <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
+                  </select>
+                  @if (@$invoice->customer_id)
+                  <input type="hidden" name="invoice_type" value="{{ @$invoice->invoice_type }}">
+                  @endif
+                </div>
+              </div>
             </div>
 
           </div>
@@ -497,10 +505,10 @@
             </div>
           </div>
           <div class="se_cus-type p-20 mb-3">
-              <div class="row">
-                <div class=" col-12">
-                  <div class="row">
-                    <!-- <div class="col-md-3 mb-30">
+            <div class="row">
+              <div class=" col-12">
+                <div class="row">
+                  <!-- <div class="col-md-3 mb-30">
                       <div class="card cp-stats">
                         <div class="cp-stats-icon"><img src="/images/totalreveneue.svg" alt="" /></div>
                         <h5 class="text-muted">Total Reveneue</h5>
@@ -509,48 +517,48 @@
                       </div>
                     </div> -->
 
-                    <div class="col-md-3 mb-30">
+                  <div class="col-md-3 mb-30">
 
-                      <div class="card cp-stats">
-                        <div class="cp-stats-icon"><img src="/images/totalbookings.svg" alt="" /></div>
-                        <h5 class="text-muted">Stock Balance</h5>
-                        <h3 class="cp-stats-value dashboard_ttl_orders stock_balance">0</h3>
-                        <p class="mb-0"></p>
-                      </div>
-
+                    <div class="card cp-stats">
+                      <div class="cp-stats-icon"><img src="/images/totalbookings.svg" alt="" /></div>
+                      <h5 class="text-muted">Stock Balance</h5>
+                      <h3 class="cp-stats-value dashboard_ttl_orders stock_balance">0</h3>
+                      <p class="mb-0"></p>
                     </div>
 
-                    <div class="col-md-3 mb-30">
+                  </div>
 
-                      <div class="card cp-stats">
-                        <div class="cp-stats-icon"><img src="/images/active-cust.svg" alt="" /></div>
-                        <h5 class="text-muted">Retail Price</h5>
-                        <h3 class="cp-stats-value dashboard_active_cust retail_price">0</h3>
-                        <p class="mb-0"></p>
-                      </div>
+                  <div class="col-md-3 mb-30">
 
+                    <div class="card cp-stats">
+                      <div class="cp-stats-icon"><img src="/images/active-cust.svg" alt="" /></div>
+                      <h5 class="text-muted">Retail Price</h5>
+                      <h3 class="cp-stats-value dashboard_active_cust retail_price">0</h3>
+                      <p class="mb-0"></p>
                     </div>
 
-                    <div class="col-md-3 mb-30">
+                  </div>
 
-                      <div class="card cp-stats">
-                        <div class="cp-stats-icon"><img src="/images/avg-rv-cust.svg" alt="" /></div>
-                        <h5 class="text-muted">Previous Receivable</h5>
-                        <h3 class="cp-stats-value dashboard_avg_rev_perCust previous_payable">0</h3>
-                        <p class="mb-0"></p>
-                      </div>
+                  <div class="col-md-3 mb-30">
 
+                    <div class="card cp-stats">
+                      <div class="cp-stats-icon"><img src="/images/avg-rv-cust.svg" alt="" /></div>
+                      <h5 class="text-muted">Previous Receivable</h5>
+                      <h3 class="cp-stats-value dashboard_avg_rev_perCust previous_payable">0</h3>
+                      <p class="mb-0"></p>
                     </div>
 
                   </div>
 
                 </div>
-               
+
               </div>
+
+            </div>
           </div>
           <div class="row display" style="display: none;">
-            <input type="hidden" id=""   value="1" name="form_status" >
-            <input type="hidden" id="stock_products"  name="stock_products" value="{{json_encode($products)}}">
+            <input type="hidden" id="" value="1" name="form_status">
+            <input type="hidden" id="stock_products" name="stock_products" value="{{json_encode($products)}}">
 
             <div class="col-12">
               <div class="property_info">
@@ -563,62 +571,62 @@
                 </div>
 
                 <div class="infoDiv p-15">
-                <form id="purchse-form">
-                  <div class="row">
+                  <form id="purchse-form">
+                    <div class="row">
 
-                    <div class="col-md-2 mb-10">
+                      <div class="col-md-2 mb-10">
 
-                      <label class="control-label mb-5">Bar Code</label>
-                      <input type="text" id="bar-code" class="form-control bar-code" placeholder="" name="bar_code" data-attr='bar_code'>
+                        <label class="control-label mb-5">ID</label>
+                        <input type="text" id="bar-code" class="form-control bar-code" placeholder="" name="bar_code" data-attr='bar_code'>
 
-                    </div>
-                    <div class="col-md-3 mb-10">
-
-                      <label class="control-label mb-5">Product Name</label>
-                      <div class="form-s2">
-                        <!-- <input type="text" id="product-name" class="form-control required " placeholder="" name="product_name" data-attr='product'> -->
-                        <select class="form-control formselect products" name="product_name" id="products">
-                          <option value="0"> Select Product *</option>
-                          @foreach($products as $product)
-                          <option value="{{$product->id}}">{{$product->product_name}}
-                          </option>
-                          @endforeach
-                        </select>
                       </div>
-                    </div>
+                      <div class="col-md-3 mb-10">
 
-                    <div class="col-md-3 mb-10">
-                      <label class="control-label mb-5">Purchase Price</label>
-                      <input type="text" id="purchase_price" class="form-control " placeholder="" name="purchase_price" readonly>
-                    </div>
-                    <div class="col-md-3 mb-10">
-                      <label class="control-label mb-5">Retail Price</label>
-                      <input type="text" id="retail_price" class="form-control" placeholder="" name="retail_price" readonly>
-                    </div>
-
-                    <div class="col-md-2 mb-10">
-
-                      <label class="control-label mb-5">Quantity *</label>
-                      <input type="text" id="qty" class="form-control   only_numerics" placeholder="" name="qty">
-
-                    </div>
-                    <div class="col-md-3">
-                      <label class="control-label mb-5">Expiry Date</label>
-                      <div>
-                        <input autocomplete="off" id="datepicker" type="text" class="form-control new_dob new_form_field expiry_date " name="expiry_date">
+                        <label class="control-label mb-5">Product Name</label>
+                        <div class="form-s2">
+                          <!-- <input type="text" id="product-name" class="form-control required " placeholder="" name="product_name" data-attr='product'> -->
+                          <select class="form-control formselect products" name="product_name" id="products">
+                            <option value="0"> Select Product *</option>
+                            @foreach($products as $product)
+                            <option value="{{$product->id}}">{{$product->product_name}}
+                            </option>
+                            @endforeach
+                          </select>
+                        </div>
                       </div>
-                    </div>
 
-                    <div class="col-md-3 mb-10">
-                      <label class="control-label mb-5">Amount</label>
-                      <input type="text" id="amount" class="form-control  " placeholder="" name="amount" readonly>
-                    </div>
+                      <div class="col-md-3 mb-10">
+                        <label class="control-label mb-5">Purchase Price</label>
+                        <input type="text" id="purchase_price" class="form-control " placeholder="" name="purchase_price" readonly>
+                      </div>
+                      <div class="col-md-3 mb-10">
+                        <label class="control-label mb-5">Retail Price</label>
+                        <input type="text" id="retail_price" class="form-control" placeholder="" name="retail_price" readonly>
+                      </div>
 
-                    <div class="col-md-3  PT-20" id="btns_div">
-                      <button type="button" id="add-product" class="btn btn-primary mr-2">Add</button>
-                    </div>
+                      <div class="col-md-2 mb-10">
 
-                  </div>
+                        <label class="control-label mb-5">Quantity *</label>
+                        <input type="text" id="qty" class="form-control   only_numerics" placeholder="" name="qty">
+
+                      </div>
+                      <div class="col-md-3">
+                        <label class="control-label mb-5">Expiry Date</label>
+                        <div>
+                          <input autocomplete="off" id="datepicker" type="text" class="form-control new_dob new_form_field expiry_date " name="expiry_date">
+                        </div>
+                      </div>
+
+                      <div class="col-md-3 mb-10">
+                        <label class="control-label mb-5">Amount</label>
+                        <input type="text" id="amount" class="form-control  " placeholder="" name="amount" readonly>
+                      </div>
+
+                      <div class="col-md-3  PT-20" id="btns_div">
+                        <button type="button" id="add-product" class="btn btn-primary mr-2">Add</button>
+                      </div>
+
+                    </div>
                   </form>
                 </div>
               </div>
@@ -652,40 +660,54 @@
                           </tbody>
                           <tfoot class="table-footer">
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Previous Payable</th>
-                              <th class="previous_payable" colspan="4" style="text-align: center;">0
+                              <th colspan="" style="text-align:right;font-family:sans-serif">Previous Payable</th>
+                              <th class="previous_payable" colspan="" style="text-align: center;">0
                                 <!-- <input type="text" value="" class="qty-input add-stock-input previous_payable" name="previous_payable"> -->
                               </th>
-                            </tr>
-                            <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Grand Total</th>
+                              <th colspan="" style="text-align:right;font-family:sans-serif">Grand Total</th>
                               <th class="grand-total" colspan="4" style="text-align: center;">0</th>
                             </tr>
-
-                            @if (Route::currentRouteName() == 'sale-edit')
-                              <tr rowspan="5">
-                                  <th colspan="3" style="text-align:right;font-family:sans-serif">Paid</th>
-                                  <th class="paid_amount" colspan="4" style="text-align: center;">0</th>
-                              </tr>
-                          @endif
-
                             <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Disscount </th>
+
+                            </tr>
+                            @if (Route::currentRouteName() == 'sale-edit')
+                            <tr rowspan="5">
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Paid</th>
+                              <th class="paid_amount" colspan="4" style="text-align: center;">0</th>
+                            </tr>
+                            @endif
+
+                            <tr rowspan="5" class="th-to-hide">
+                              <!-- <th colspan="3" style="text-align:right;font-family:sans-serif">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input" data-id="" data-value="">
-                              </th>
-                            </tr><tr rowspan="5">
+                              </th> -->
+                            </tr>
+                            <tr rowspan="5" class="th-to-hide">
                               <th colspan="3" style="text-align:right;font-family:sans-serif">Service charges </th>
                               <th class="" colspan="4" style="text-align: center;">
-                                <input type="text" value="" class=" qty-input add-stock-input service_charges_input" data-id="" data-value="">
+                                <input type="text" value="{{@$invoice->service_charges}}" class=" qty-input add-stock-input service_charges_input" data-id="" data-value="">
                               </th>
                             </tr>
-                            <tr rowspan="5">
-                              <th colspan="3" style="text-align:right;font-family:sans-serif">Amount pay</th>
+                            <tr rowspan="5" class="th-to-hide">
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">{{Route::currentRouteName() == 'sale-edit' ? 'Remaining Amount' : 'Net Amount'}}</th>
                               <th class="" colspan="4" style="text-align: center;">
-                                <input type="text" value="" class="qty-input add-stock-input amount_pay_input remaning_amount" name="amount_paid">
+                                <input type="text" value="" class="qty-input add-stock-input amount_pay_input remaning_amount" name="amount_to_pay" readonly>
                               </th>
                             </tr>
+                            <tr rowspan="5" class="th-to-hide">
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Cash Recived</th>
+                              <th class="" colspan="4" style="text-align: center;">
+                                <input type="number" class="add-stock-input amount_received" name="amount_received" value="0">
+                              </th>
+                            </tr>
+                            <tr rowspan="5" class="th-to-hide">
+                              <th colspan="3" style="text-align:right;font-family:sans-serif">Cash Return</th>
+                              <th class="cash_return" colspan="4" style="text-align: center;">
+                                0
+                              </th>
+                            </tr>
+
                           </tfoot>
                         </table>
                       </div>
@@ -698,6 +720,7 @@
 
                 <div class="col-md-12 text-right pr-0 PT-10" id="btns_div">
                   <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
+                  <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>
                   <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                 </div>
 
