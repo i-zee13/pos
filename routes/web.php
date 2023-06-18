@@ -73,14 +73,16 @@ Route::get('/purchase-return'                     ,[App\Http\Controllers\Purchas
 Route::post('/add-purchase-return'                ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
 
 /** sale Routes */
-Route::get('/sale-add'                  ,[App\Http\Controllers\SaleController::class, 'create'])->name('sale-add');
-Route::get('/get-customer'              ,[App\Http\Controllers\SaleController::class, 'getVendors'])->name('get-vendors');
-Route::post('/add-sale-invoice'         ,[App\Http\Controllers\SaleController::class, 'saleInvoice'])->name('add-sale-invoice');
-Route::get('/sales'                     ,[App\Http\Controllers\SaleController::class, 'saleList'])->name('sales');
-Route::get('/sale-edit/{id}'            ,[App\Http\Controllers\SaleController::class, 'editsale'])->name('sale-edit');
+Route::get('/sale-add'                    ,[App\Http\Controllers\SaleController::class, 'create'])->name('sale-add');
+Route::get('/get-customer'                ,[App\Http\Controllers\SaleController::class, 'getVendors'])->name('get-vendors');
+Route::post('/add-sale-invoice'           ,[App\Http\Controllers\SaleController::class, 'saleInvoice'])->name('add-sale-invoice');
+Route::get('/sales'                       ,[App\Http\Controllers\SaleController::class, 'saleList'])->name('sales');
+Route::get('/sale-edit/{id}'              ,[App\Http\Controllers\SaleController::class, 'editsale'])->name('sale-edit');
 Route::get('/sale-detail/{id}'            ,[App\Http\Controllers\SaleController::class, 'show'])->name('sale-detail');
-Route::get('/get-sale-products/{id}'    ,[App\Http\Controllers\SaleController::class, 'getSaleProduct'])->name('get-sale-products');
-Route::get('/get-customer-balance/{id}' ,[App\Http\Controllers\SaleController::class, 'getCustomerBalance'])->name('get-customer-balance');
+Route::get('/get-sale-products/{id}'      ,[App\Http\Controllers\SaleController::class, 'getSaleProduct'])->name('get-sale-products');
+Route::get('/get-customer-balance/{id}'   ,[App\Http\Controllers\SaleController::class, 'getCustomerBalance'])->name('get-customer-balance');
+Route::delete('/delete-product-from-sale' ,[App\Http\Controllers\SaleController::class, 'deleteProduct'])->name('delete-product');
+
 // Sales Returns / 
 // Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
 Route::get('/sale-return'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'purchaseReturn'])->name('purchase-return');
