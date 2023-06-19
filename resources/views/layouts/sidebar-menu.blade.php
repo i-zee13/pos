@@ -143,7 +143,12 @@
               </li>
               <li class="nav-item">
                 <a href="{{route('sales')}}" class="nav-link ">
-                  List
+                  Today List
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('all-sales-list')}}" class="nav-link ">
+                  All List
                 </a>
               </li>
               <li class="nav-item">
@@ -198,9 +203,23 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('stock-reports')}}" class="nav-link ">
-                  Stock
+                <a href="#sidebarStockDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarStockDropDown">
+                  Stock Report
                 </a>
+                <div class="collapse" id="sidebarStockDropDown" style="">
+                  <ul class="nav nav-sm flex-column">
+                    <li class="nav-item">
+                      <a href="{{route('stock-reports')}}" class="nav-link ">
+                        Stock
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{route('stock-value-report')}}" class="nav-link ">
+                        Value Report
+                      </a>
+                    </li>
+                  </ul>
+                </div>
               </li>
 
               <li class="nav-item">

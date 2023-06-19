@@ -2800,12 +2800,12 @@
             </h6>
             <!-- Title -->
             <h1 class="header-title">
-                <h2 class="_head01">Stock<span> Report</span></h2>
+                <h2 class="_head01">Stock Value<span> Report</span></h2>
             </h1>
         </div>
         <div class="col-auto">
             <ol class="breadcrumb">
-                <li><a href="#"><span>Stock</span></a></li>
+                <li><a href="#"><span>Stock Value Report</span></a></li>
                 <li><span>Active</span></li>
             </ol>
         </div>
@@ -2848,20 +2848,14 @@
                             </div>
                         </div>
                         <div class="_cust_filter col-3" style="width: 210px!important">
-                            <div class="form-s2">
-                                <select class="form-control formselect expiry-select" name="expiry">
-                                    <option value="">Select Expiry</option>
-                                    <option value="1">With In One Month</option>
-                                    <option value="2">With In Two Month</option>
-                                </select>
-                            </div>
+                            <input type="radio" value="1" name="filter_by_value"> AVG Value
+                            <input type="radio" value="2" name="filter_by_value"> Last Value
                         </div>
                         <style>
                             .CL-Product input{
                                 height: 31px!important;
                             }
                         </style>
-
                     </div>
                 </div>
                 <div class="row" style="margin-bottom: 10px;margin-left:0px">
@@ -2906,27 +2900,27 @@
                                 <canvas id="timechart" width="310" height="110"></canvas>
                             </div> --}}
 
-                            <h2 class="card-heading">Total <span> Stock In Hand</span></h2>
-                            <div class="total-amount ttl_stock_in_hand p-0" >0</div>
+                            <h2 class="card-heading">Total <span> Value</span></h2>
+                            <div class="total-amount ttl_stock_in_hand p-0"><span>Rs. </span>0</div>
                         </div>
-                        {{-- <div class="col-12">
+                        <div class="col-12">
                             <div class="row top_three_units_div">
-                                <div class="col unit-v">Total Quantity<span class="ttl_quantity">0</span></div>
-                                <div class="col unit-v">Total Units<span class="ttl_units">0</span> </div>
-                                <div class="col unit-v">Total Net Revenue<span class="ttl_net_revenue">0.00</span></div>
+                                <div class="col unit-v">Total Products<span class="ttl_products">0</span></div>
+                                {{-- <div class="col unit-v">Total Units<span class="ttl_units">0</span> </div>
+                                <div class="col unit-v">Total Net Revenue<span class="ttl_net_revenue">0.00</span></div> --}}
                             </div>
-                        </div> --}}
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-5 col-md-12">
-                    <div class="row m-0">
-                        <div class="col-6 total-val border-bottom"><span class="ttl_stock_in">0</span>Total Stock In</div>
-                        <div class="col-6 total-val border-left border-bottom"><span class="ttl_stock_out">0</span> Total Stock Out</div>
+                    {{-- <div class="row m-0">
+                        <div class="col-6 total-val border-bottom"><span class="ttl_stock_in">0</span>Total Products</div>
+                        <div class="col-6 total-val border-left border-bottom"><span class="ttl_stock_out">0</span> Total Quantity</div>
                         <div class="col-6 total-val"><span class="ttl_invoice_discount">0</span> Total Return Stock</div>
                         <div class="col-6 total-val border-left">
-                            {{-- <span class="expiry_date">00-00-0000</span> Expiry Date --}}
+                            <span class="expiry_date">00-00-0000</span> Expiry Date
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -2938,7 +2932,6 @@
         <div class="card" style="padding: 0px">
             <div class="header m-0">
                 <h2 style="width: 100%">Stock <span>List</span> <p style="text-align: right;margin:-20px 0px 0px 0px;font-size: 15px;" class="filter_name"></p></h2>
-                
             </div>
             <div style="min-height: 400px; display: none;" class="loader">
                 <img src="images/loading.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
@@ -2955,5 +2948,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/stock_report.js') }}"></script>
+<script src="{{asset('js/custom/stock-value-report.js') }}"></script>
 @endpush

@@ -31,7 +31,7 @@ $('.search-btn').on('click', function () {
   }
   CurrentRef  = $(this);
   CurrentRef.attr('disabled', 'disabled');
-  url         = '/stocks';
+  url         = '/fetch-stock-value-report';
   $("#search-form").ajaxSubmit({
     type: 'POST',
     url : url,
@@ -48,17 +48,11 @@ $('.search-btn').on('click', function () {
           <thead>
             <tr>
               <th>#</th>
-              <th>Invoice #</th>
+              <!-- <th>Invoice #</th> -->
               ${$('.company_id').val() != '' ? `<th>Product Name</th>` : ''}
-              ${$('.expiry-select').val() != '' ? `
-              <th>Product Name</th>
-              <th>Expiry Date</th>
-              `:`
               <th>Rate</th>
-              <th>In</th>
-              <th>Out</th>
-              `}
-              <th>Balance</th>
+              <th>QTY</th>
+              <th>Amount</th>
             </tr>
           </thead>
           <tbody> </tbody>
@@ -74,80 +68,43 @@ $('.search-btn').on('click', function () {
         }, 3000);
       }
       var last_balance    = 0;
-      var stock_in        = 0;
-      var stock_out       = 0;
-      var stock_in_row    = "";
-      var stock_out_row   = "";
-      var Pinvoice         = '';
-      var Sinvoice         = '';
+      var balance_qty     = 0;
+      var total_payment   = 0;
+      var table_rows      = "";
+      var Pinvoice        = '';
+      var ttl_qty_purchase= 0;
+      var filter_selected   =   $('input[name="filter_by_value"]:checked').val();
       response.records.forEach(function (element, key) {
-        if($('.expiry-select').val() != ''){
-          last_balance      += element.balance;
+        if(filter_selected == 1){
+            last_balance    +=  parseInt(element.qty) * parseInt(element.p_price);
         }else{
-          last_balance      = element.balance;
+            last_balance    +=  parseInt(element.balance) * parseInt(element.p_price);
         }
-        var date          = new Date(element.expire_date);
-        var formattedDate = date.toDateString();
-        stock_in_row      = '';
-        stock_out_row     = '';
-        if(element.status == 1){
-          Pinvoice        = element.purchase_invoice_id.split('-');
-          stock_in        += element.qty;
-          stock_in_row   = `<tr>
-                              <td>${key+1}</td>
-                              <td>${Pinvoice[0]} (${element.vendor_name ? element.vendor_name : "NA"})</td>
-                              ${$('.company_id').val() != '' ? `<td>${element.product_name ? element.product_name : 'NA'}</td>` : ''}
-                              ${$('.expiry-select').val() != '' ? 
-                              `
-                              <td>${element.product_name ? element.product_name : 'NA'}</td>
-                              <td>${element.expiry_date ? element.expiry_date : 'NA'}</td>
-                              ` 
-                              : `
-                              <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element.p_price ? addCommas(element.p_price) : 0}</td>
-                              <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element.qty ? addCommas(element.qty) : 0}</td>
-                              <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">0</td>
-                              `}
-                              <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element.balance ? addCommas(element.balance) : 0}</td>
-                            </tr>`;
-        }
-        if(element.status == 2){
-          Sinvoice        = element.sale_invoice_id.split('-');
-          stock_out       += element.qty;
-          stock_out_row   = `<tr>
-                              <td>${key+1}</td>
-                              <td>${Sinvoice[0]} (${element.customer_name ? element.customer_name : "NA"})</td>
-                              ${$('.company_id').val() != '' ? `<td>${element.product_name ? element.product_name : 'NA'}</td>` : ''}
-                              ${$('.expiry-select').val() != '' ? 
-                              `
-                              <td>${element.product_name ? element.product_name : 'NA'}</td>
-                              <td>${element.expiry_date ? element.expiry_date : 'NA'}</td>
-                              ` 
-                              : `
-                              <td></td>
-                              <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">0</td>
-                              <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element.qty ? addCommas(element.qty) : 0}</td>
-                              `}
-                              <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element.balance ? addCommas(element.balance) : 0}</td>
-                            </tr>`;
-        }
+        var date            =   new Date(element.expire_date);
+        var formattedDate   =   date.toDateString();
+        table_rows          =   '';
+        // Pinvoice            = element.purchase_invoice_id.split('-');
+          balance_qty       +=  element.balance;
+          total_payment     +=  element.p_price;
+          ttl_qty_purchase  +=  element.qty;
+          table_rows        =   `<tr>
+                                    <td>${key+1}</td>
+                                    <!-- <td>${Pinvoice[0]} (${element.vendor_name ? element.vendor_name : "NA"})</td> -->
+                                    ${$('.company_id').val() != '' ? `<td>${element.product_name ? element.product_name : 'NA'}</td>` : ''}
+                                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element.p_price ? addCommas(element.p_price) : 0}</td>
+                                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${filter_selected == 1 ? addCommas(element.qty) : addCommas(element.balance)}</td>
+                                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${filter_selected == 1 ? addCommas(parseInt(element.qty) * parseInt(element.p_price)) : addCommas(parseInt(element.balance) * parseInt(element.p_price))}</td>
+                                </tr>`;
         $('.StockListTable tbody').append(`
-          ${stock_in_row}
-          ${stock_out_row}
+          ${table_rows}
         `)
       });
       $('.StockListTable tbody').append(`
         <tr style="background-color: #f6f6f6">
-            <th></th>
-            <th></th>
             ${$('.company_id').val() != '' ? `<th></th>` : ''}
-            ${$('.expiry-select').val() != '' ? `
-            <th></th>
             <th>Total</th>
-            ` : `
-            <th>Total</th>
-            <th style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${stock_in ? addCommas(stock_in) : '0'}</th>
-            <th style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${stock_out ? addCommas(stock_out) : '0'}</th>
-            `}
+            <th style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${total_payment ? addCommas(total_payment) : '0'}</th>
+            <th style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${filter_selected == 1 ? addCommas(ttl_qty_purchase) :  addCommas(balance_qty)}</th>
             <th style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${last_balance ? addCommas(last_balance) : 0}</th>
         </tr>
       `);
@@ -157,7 +114,12 @@ $('.search-btn').on('click', function () {
       }
       $('.StockListTable').fadeIn();
       $('.loader').hide();
-      $('.ttl_stock_in_hand').html(last_balance ? addCommas(last_balance) : 0);
+      if(filter_selected == 1){
+        console.log(last_balance,ttl_qty_purchase);
+        last_balance    =  parseFloat(last_balance / ttl_qty_purchase).toFixed(3);
+      }
+      $('.ttl_stock_in_hand').html(last_balance ? '<span>Rs. </span>'+addCommas(last_balance) : '<span>Rs. </span>'+0);
+      $('.ttl_products').html(response.records.length ? addCommas(response.records.length) : 0);
       if($('.expiry-select').val() != ''){
         $('.ttl_stock_in').html(0);
         $('.ttl_stock_out').html(0);

@@ -106,5 +106,12 @@ Route::post('/stocks'                   ,[App\Http\Controllers\ReportsController
 Route::get('/sale-report'               ,[App\Http\Controllers\ReportsController::class, 'saleReport'])->name('sale-reports');
 Route::post('/sales-list'               ,[App\Http\Controllers\ReportsController::class, 'saleReportList'])->name('stock-report-list');
 
+// All Sales List Fakahr
+Route::get('/all-sales-list',[App\Http\Controllers\SaleController::class, 'allSalesList'])->name('all-sales-list');
+Route::post('/fetch-all-list-sale',[App\Http\Controllers\SaleController::class, 'fetchAllSalesList'])->name('fetch-all-list-sale');
+
+// Stock Report Value
+Route::get('/stock-value-report',[App\Http\Controllers\ReportsController::class, 'allStockValueReport'])->name('stock-value-report');
+Route::post('/fetch-stock-value-report',[App\Http\Controllers\ReportsController::class, 'fetchStockValueReport'])->name('fetch-stock-value-report');
 
 });

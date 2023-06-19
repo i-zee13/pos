@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Auth;
 use Laravel\Ui\Presets\React;
 use stdClass;
-
+use DateTime;
 class SaleController extends Controller
 {
 
@@ -411,6 +411,35 @@ class SaleController extends Controller
             'msg'               =>  'Vendor fetched',
             'status'            =>  'success',
             'customer_balance'  => $customer_balance
+        ]);
+    }
+
+
+    public function allSalesList(){
+        $customers  =   Customer::select('id','customer_name')->where('customer_type',2)->get();
+        return view('sales.all-list', compact('customers'));
+    }
+    public function fetchAllSalesList(Request $request){
+        $current_date   =   Date('Y-m-d');
+        // $previous_date  =   new DateTime($previous_date);
+        // $previous_date  =   $previous_date->modify('-1 day')->format('Y-m-d');
+        if($request->start_date != '' && $request->end_date != ''){
+            $where      =   "DATE(created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
+        }else if($request->customer_id != ''){
+            $where      =   " customer_id = $request->customer_id";
+        }else if($request->bill_no != ''){
+            $where      =   " SUBSTRING_INDEX(invoice_no, '-', 1) = '$request->bill_no'";
+        }else{
+            $where      =   " DATE(created_at) != '$current_date'";
+        }
+        $sales          =   SaleInvoice::selectRaw("
+                                sale_invoices.*,DATE_FORMAT(created_at,'%d-%m-%Y %h:%i %p') as created,
+                                (SELECT cr FROM customer_ledger WHERE sale_invoice_id = sale_invoices.id) as paid_amount,
+                                (SELECT customer_name FROM customers WHERE id=sale_invoices.customer_id) as customer_name
+                            ")->whereRaw("$where")->get();
+        return response()->JSON([
+            'status'    =>  'success',
+            'sales'     =>  $sales
         ]);
     }
 }
