@@ -241,20 +241,19 @@ $(document).on('click', '.remove_btn', function () {
 });
 
 $('#add-product').on('click', function () {
-  if ($('.expiry_date').val() == '') {
-    $('#notifDiv').fadeIn();
-    $('#notifDiv').css('background', 'red');
-    $('#notifDiv').text('Please Add Expiry Date of Product');
-    setTimeout(function () {
-      $('#notifDiv').fadeOut();
-    }, 3000);
-    return;
-  } else {
-    expiry_date = $('.expiry_date').val();
-  }
+  // if ($('.expiry_date').val() == '') {
+  //     $('#notifDiv').fadeIn();
+  //     $('#notifDiv').css('background', 'red');
+  //     $('#notifDiv').text('Please Add Expiry Date of Product');
+  //     setTimeout(() => {
+  //         $('#notifDiv').fadeOut();
+  //     }, 3000);
+  //     return;
+  // } else {
+  //     expiry_date = $('.expiry_date').val();
+  // }
   purchased_product_array.push({
     'product_id': "".concat(product_id),
-    'expiry_date': "".concat(expiry_date),
     'qty': "".concat(qty),
     'amount': "".concat(amount),
     'new_price': "".concat(new_price),

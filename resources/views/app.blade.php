@@ -334,7 +334,9 @@
 
             $(".formselect").select2();
 
-            $('#example').DataTable();
+            $('#example').DataTable({
+                "bSort" : false
+            });
 
 
 
