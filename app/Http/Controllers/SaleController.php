@@ -380,7 +380,6 @@ class SaleController extends Controller
         ]);
     }
 
-
     public function allSalesList(){
         $customers  =   Customer::select('id','customer_name')->where('customer_type',2)->get();
         return view('sales.all-list', compact('customers'));
@@ -408,7 +407,6 @@ class SaleController extends Controller
             'sales'     =>  $sales
         ]);
     }
-}
 
     public function deleteProduct(Request $request)
     {
