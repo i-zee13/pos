@@ -166,24 +166,23 @@ $(document).on('click', '.remove_btn', function () {
 
 })
 $('#add-product').on('click', function () {
-    if ($('.expiry_date').val() == '') {
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Please Add Expiry Date of Product');
-        setTimeout(() => {
-            $('#notifDiv').fadeOut();
-        }, 3000);
-        return;
-    } else {
-        expiry_date = $('.expiry_date').val();
-    }
+    // if ($('.expiry_date').val() == '') {
+    //     $('#notifDiv').fadeIn();
+    //     $('#notifDiv').css('background', 'red');
+    //     $('#notifDiv').text('Please Add Expiry Date of Product');
+    //     setTimeout(() => {
+    //         $('#notifDiv').fadeOut();
+    //     }, 3000);
+    //     return;
+    // } else {
+    //     expiry_date = $('.expiry_date').val();
+    // }
     purchased_product_array.push({
-        'product_id': `${product_id}`,
-        'expiry_date': `${expiry_date}`,
+        'product_id' : `${product_id}`, 
         'qty'        : `${qty}`,
         'amount'     : `${amount}`,
-        'new_price': `${new_price}`,
-        'old_price': `${old_price}`,
+        'new_price'  : `${new_price}`,
+        'old_price'  : `${old_price}`,
     });
     $('.show_existing_div').show()
     $('#designationsTable tbody').append(`

@@ -85,7 +85,7 @@ Route::delete('/delete-product-from-sale' ,[App\Http\Controllers\SaleController:
 
 // Sales Returns / 
 // Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
-Route::get('/sale-return'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'purchaseReturn'])->name('purchase-return');
+Route::get('/sale-return'                     ,[App\Http\Controllers\SalesReturnController::class, 'saleReturn'])->name('purchase-return');
 // Route::post('/add-purchase-return'                ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
 
 //Genrate invoice

@@ -487,7 +487,7 @@ function saleSave(current_action,type){
     current_action.text('Processing...')
     current_action.attr('disabled', 'disabled');
     $('.btn-cancel').attr('disabled', 'disabled');
-    $('#print-invoice').attr('disabled', 'disabled');
+    // $('#print-invoice').attr('disabled', 'disabled');
     $('#save').attr('disabled', 'disabled');
 
     $('#form').ajaxSubmit({
@@ -510,13 +510,13 @@ function saleSave(current_action,type){
                 $('#notifDiv').text('Added successfully');
                 var received_amount = $('.amount_received').val().trim();
                 if(type == 'print'){
-                    var printWindow = window.open("/print-sale-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
+                    var printWindow    = window.open("/print-sale-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
                     printWindow.onload = function() {
                     printWindow.print();
                     };
-                    setTimeout(() => {
-                        window.location.reload();
-                        },1000);
+                    // setTimeout(() => {
+                    //     window.location.reload();
+                    //     },1000);
                 }
                 setTimeout(() => {
                     $('#notifDiv').fadeOut();

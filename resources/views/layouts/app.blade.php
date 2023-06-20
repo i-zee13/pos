@@ -170,7 +170,9 @@
             $("#contentContainerDiv").removeClass("blur-div");
             $('.dropify').dropify();
             $(".formselect").select2();
-            $('#example').DataTable();
+            $('#example').DataTable({
+                "bSort" : false
+            });
 
             $(".form-control").on("focus blur", function(e) {
                 $(this)

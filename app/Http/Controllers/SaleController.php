@@ -273,12 +273,14 @@ class SaleController extends Controller
     }
     public function saleList()
     {
+        $current_date   =   date('Y-m-d');
         $sales     =   SaleInvoice::selectRaw('sale_invoices.* ,
                                         (SELECT cr FROM customer_ledger WHERE sale_invoice_id = sale_invoices.id) as paid_amount,
                                         (SELECT customer_name FROM customers WHERE id=sale_invoices.customer_id) as customer_name')
-            ->whereDate('created_at', Carbon::today())
+            ->whereRaw("Date(created_at) = '$current_date'")
             ->orderBy('id', 'DESC')
             ->get();
+            // dd($sales);
         return view('sales.list', compact('sales'));
     }
     public function editSale($id)

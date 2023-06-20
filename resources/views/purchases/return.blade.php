@@ -551,12 +551,12 @@
                       <input type="text" id="qty" class="form-control   only_numerics" placeholder="" name="qty">
 
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                       <label class="control-label mb-5">Expiry Date</label>
                       <div>
                         <input autocomplete="off" id="datepicker" type="text" class="form-control new_dob new_form_field expiry_date " name="expiry_date">
                       </div>
-                    </div>
+                    </div> -->
 
                     <div class="col-md-3 mb-10">
                       <label class="control-label mb-5">Amount</label>

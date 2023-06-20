@@ -17789,7 +17789,7 @@ function saleSave(current_action, type) {
   current_action.text('Processing...');
   current_action.attr('disabled', 'disabled');
   $('.btn-cancel').attr('disabled', 'disabled');
-  $('#print-invoice').attr('disabled', 'disabled');
+  // $('#print-invoice').attr('disabled', 'disabled');
   $('#save').attr('disabled', 'disabled');
   $('#form').ajaxSubmit({
     url: '/add-sale-invoice',
@@ -17815,10 +17815,11 @@ function saleSave(current_action, type) {
           printWindow.onload = function () {
             printWindow.print();
           };
-          setTimeout(function () {
-            window.location.reload();
-          }, 1000);
+          // setTimeout(() => {
+          //     window.location.reload();
+          //     },1000);
         }
+
         setTimeout(function () {
           $('#notifDiv').fadeOut();
           window.location = "/sale-add";
