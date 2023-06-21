@@ -17429,6 +17429,11 @@ $('#add-product').on('click', function () {
     }
     // $('.qty-input').val(sales_product_array[0].qty);
     $('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
+    $('#tr-' + data_variable).css('background', '#152e4d').addClass('text-white');
+    var ss = data_variable;
+    setTimeout(function () {
+      $('#tr-' + ss).css('background', '').removeClass('text-white');
+    }, 1500);
   } else {
     if ($('#qty').val() == '') {
       $(this).focus();
@@ -17483,6 +17488,7 @@ $('#add-product').on('click', function () {
   $('#discount').val('');
   $('#bar-code').focus();
   data_variable = '';
+  qty = '';
 });
 
 // $('#invoice_type').change(function(){
@@ -17609,6 +17615,7 @@ function getStockRetail(p_id) {
 }
 $('.products').change(function () {
   var selected_product = $(this).val();
+  data_variable = $(this).val();
   $('.purchase_price').val('');
   $('#product-name').val('');
   $('#qty').val('');
@@ -17642,26 +17649,28 @@ $(document).on('focusout', '.bar-code', function () {
   $('#product-name').val('');
   $('#qty').val('');
   $('#amount').val('');
-  var filter_product = product_list.filter(function (x) {
-    return x.barcode == data_variable;
-  });
-  if (filter_product.length > 0) {
-    $('#products').val(filter_product[0].id).trigger('change');
-    // $('.retail_price').text(filter_product[0].sale_price);
-    $('.purchase_price').val(filter_product[0].old_purchase_price);
-    $('.stock_balance').text(filter_product[0].stock_balance);
-    p_name = filter_product[0].product_name;
-    product_id = filter_product[0].id;
-  } else {
-    $('#products').val('0').trigger('change');
-    $('#retail_price').val('');
-    $('.expiry_date ').val('');
-    if (data_variable) {
-      $('#notifDiv').fadeIn().css('background', 'red').text('Product Not Found');
-      // $('.bar-code').focus();
-      setTimeout(function () {
-        $('#notifDiv').fadeOut();
-      }, 3000);
+  if (data_variable != '') {
+    var filter_product = product_list.filter(function (x) {
+      return x.barcode == data_variable || x.id == data_variable;
+    });
+    if (filter_product.length > 0) {
+      $('#products').val(filter_product[0].id).trigger('change');
+      // $('.retail_price').text(filter_product[0].sale_price);
+      $('.purchase_price').val(filter_product[0].old_purchase_price);
+      $('.stock_balance').text(filter_product[0].stock_balance);
+      p_name = filter_product[0].product_name;
+      product_id = filter_product[0].id;
+    } else {
+      $('#products').val('0').trigger('change');
+      $('#retail_price').val('');
+      $('.expiry_date ').val('');
+      if (data_variable) {
+        $('#notifDiv').fadeIn().css('background', 'red').text('Product Not Found');
+        // $('.bar-code').focus();
+        setTimeout(function () {
+          $('#notifDiv').fadeOut();
+        }, 3000);
+      }
     }
   }
   return 0;
@@ -17810,7 +17819,9 @@ function saleSave(current_action, type) {
         $('#notifDiv').css('background', 'green');
         $('#notifDiv').text('Added successfully');
         var received_amount = $('.amount_received').val().trim();
+        received_amount = received_amount ? received_amount : 0;
         if (type == 'print') {
+          console.log(response);
           var printWindow = window.open("/print-sale-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
           printWindow.onload = function () {
             printWindow.print();

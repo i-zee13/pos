@@ -106,7 +106,8 @@ $(document).ready(function () {
     fetchcompanies();
   }
   $(document).on('click', '.openDataSidebarForAddingProduct', function () {
-    $('input[name="barcode"]').val(barcode).focus();
+    // $('input[name="barcode"]').val(barcode).focus();
+    $('.barcode_span').text(barcode);
     $('.dropify-clear').click();
     $('.dz-image-preview').remove();
     $('#dataSidebarLoader').hide();
@@ -148,6 +149,7 @@ $(document).ready(function () {
         $('#dataSidebarLoader').hide();
         $('._cl-bottom').show();
         $('.pc-cartlist').show();
+        $('.barcode_span').text(response.product.id);
         $('input[name="barcode"]').focus();
         $('input[name="barcode"]').val(response.product.barcode);
         $('input[name="barcode"]').blur();
@@ -562,7 +564,8 @@ function fetchproducts() {
       $('.body').append("\n                    <table class=\"table table-hover dt-responsive nowrap subCatsListTable\" style=\"width:100%;\">\n                        <thead>\n                            <tr>\n                                <th>ID</th>\n                                <th>Company</th>\n                                <th>Product</th>\n                                <th>Size</th>\n                                <th>Action</th>\n                            </tr>\n                        </thead>\n                    <tbody></tbody>\n                    </table>");
       $('.subCatsListTable tbody').empty();
       var sNo = 1;
-      $('.barcode').val(barcode).focus();
+      // $('.barcode').val(barcode).focus();
+      $('.barcode_span').text(barcode);
       response.data.forEach(function (element, key) {
         var delet_status = '';
         if (element.deleted_at == null) {
@@ -570,7 +573,7 @@ function fetchproducts() {
         } else {
           delet_status = "<button type=\"button\" id=\"".concat(element['id'], "\" class=\"btn btn-default btn-line  delete_product\" name=\"Sub_cat\" title=\"Restore\" data-status =\"restore\">Restore</button>");
         }
-        $('.subCatsListTable tbody').append("\n                        <tr> \n                            <td>".concat(element['barcode'], " </td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td> <img src=\"").concat(element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                            <td>").concat(element['size'], " </td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                                ").concat(delet_status, "\n                            </td>\n                        </tr>"));
+        $('.subCatsListTable tbody').append("\n                        <tr> \n                            <td>".concat(element['barcode'] ? element['barcode'] : element['id'], " </td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td> <img src=\"").concat(element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                            <td>").concat(element['size'], " </td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                                ").concat(delet_status, "\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();

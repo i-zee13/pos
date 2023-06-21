@@ -412,7 +412,7 @@
               <div class="col-md-2 mb-10">
 
                 <label class="control-label mb-5">Invoice # *</label>
-                <input type="text" id="" class="form-control required new_form_field" placeholder="" name="invoice_no" value="">
+                <input type="text" id="" class="form-control required new_form_field" placeholder="" name="invoice_no" value="{{$invoice_no}}">
 
               </div>
               <div class="col-md-4">

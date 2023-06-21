@@ -16,7 +16,7 @@
                                 <form style="display: flex;" id="saveProductForm">
                                     @csrf
                                     <input type="text" id="operation" hidden>
-                                    <input type="text" id="product_id" hidden name="hidden_product_id">
+                                    <input type="text" id="product_id" hidden name="hidden_product_id"> 
                                     <div id="floating-label" class="card p-20 top_border mb-3" style="width: 100%">
                                         <h2 class="_head03">Product <span>Details</span></h2>
                                         <div class="form-wrap p-0">
@@ -35,22 +35,24 @@
 
                                                 <div class="col-md-6 PB-10">
                                                     <div class="form-group">
-                                                        <label class="control-label mb-10">ID*</label>
+                                                        <label class="control-label mb-10">Bar Code </label>
                                                         <input type="text" name="barcode" class="form-control barcode" value="" id="barcode">
+                                                       
                                                     </div>
+                                                    <h6 class="_head03" style="padding-bottom:0px;border-bottom:0px">ID :  <span class="barcode_span"></span></h6>  
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <div class="col-md-6 PB-10 ">
+                                            <div class="col-md-12 PB-10 ">
                                                     <label class="font12 mb-0">Products *</label>
                                                     <div class="form-s2">
-                                                        <input type="hidden" id="hidden_product_name" name="hidden_product_name">
+                                                    <input type="hidden" id="hidden_product_name"  name="hidden_product_name">
 
-                                                        <!-- <select class="form-control formselect attribute" placeholder="select Designation" style="width:100%!important" name="attribute_id"> -->
-                                                        <select id="MCategory" class="demo-default attribute" data-placeholder="Product name" name="product_name">
+                                                    <!-- <select class="form-control formselect attribute" placeholder="select Designation" style="width:100%!important" name="attribute_id"> -->
+                                                    <select id="MCategory" class="demo-default attribute" data-placeholder="Product name" name="product_name">
 
-                                                        </select>
-                                                    </div>
+                                                    </select>
+                                                </div>
                                                 </div>
                                                 <div class="col-md-6 PB-10">
                                                     <div class="form-group">
@@ -71,13 +73,13 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-12">
-                                                <span class="_head03 mt-10">Upload Icon *</span>
-                                                <div class="upload-pic"></div>
-                                                <div class="sub-img">
-                                                    <input type="file" id="input-file-now" data-default-file="" class="dropify" name="product_icon" accept="image/*" data-allowed-file-extensions="jpg png jpeg JPEG" />
-                                                </div>
-                                            </div>
+                                            <!--<div class="col-md-12">-->
+                                            <!--    <span class="_head03 mt-10">Upload Icon *</span>-->
+                                            <!--    <div class="upload-pic"></div>-->
+                                            <!--    <div class="sub-img">-->
+                                            <!--        <input type="file" id="input-file-now" data-default-file="" class="dropify" name="product_icon" accept="image/*" data-allowed-file-extensions="jpg png jpeg JPEG" />-->
+                                            <!--    </div>-->
+                                            <!--</div>-->
                                         </div>
                                     </div>
                                 </form>
@@ -95,7 +97,7 @@
 </div>
 @endsection
 @section('content')
-
+ 
 
 <div class="header">
 

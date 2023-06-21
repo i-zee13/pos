@@ -5,7 +5,8 @@ use App\Models\Country;
 use App\Models\PostalCode;
 use App\Models\PurchaseInvoice;
 use App\Models\State;
-use App\Models\Sale as SaleInvoice; 
+use App\Models\Sale as SaleInvoice;
+use App\Models\SaleReturn;
 use App\Models\Student;
 use Carbon\Carbon;
 use Firebase\JWT\JWT; 
@@ -164,32 +165,22 @@ if(!function_exists('getPurchaseInvoice'))
     {
         $year        = date('y');
         $invoice_no  = 1;
-        $lastinvoice = PurchaseInvoice::latest()->value('id');
-        if(isset($lastinvoice)){
-            $invoice_no = ($lastinvoice+1).'-'.$year;
-           return $invoice_no;
-        }else{
-            $invoice_no = $invoice_no.'-'.$year;
+        $lastinvoice = PurchaseInvoice::where('date',Carbon::today())->count();
+        $invoice_no  = ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+       
             return $invoice_no;
-
-        }
+ 
     }
 }
 
-if(!function_exists('getInvoice'))
+if(!function_exists('getSaleReturnNo'))
 {
     function getSaleReturnNo()
     {
-        $year        = date('y');
-        $invoice_no  = 1;
-        $lastinvoice = SaleInvoice::latest()->value('id');
-        if(isset($lastinvoice)){
-            $invoice_no = ($lastinvoice+1).'-'.$year;
-           return $invoice_no;
-        }else{
-            $invoice_no = $invoice_no.'-'.$year;
-            return $invoice_no;
-
-        }
+        $year          = date('y');
+        $invoice_no    = 1;
+        $lastinvoice   = SaleReturn::where('date',Carbon::today())->count();
+        $invoice_no = ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+        return $invoice_no; 
     }
 }

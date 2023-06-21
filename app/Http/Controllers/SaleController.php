@@ -54,17 +54,13 @@ class SaleController extends Controller
             $v->transaction_type =  $previous_qty > 0 ? 4 : 2; //4 = Edit , 2= Sale
         }
         
-        if($previous_qty > 0){
-            dump('Previous qty');
-            dump($previous_qty);
+        if($previous_qty > 0){ 
             $v->qty =  $previous_qty;
             $v->balance = $balance + $v->qty;
-            dump($v->balance,$sale->product_id);
+            
         }else if($old_record != '' ){
-            dump('old Record in Company stosk');
             $v->qty =  $old_record->qty;
         }else{
-            dump('else');
             $v->qty     = $sale->qty;
             $v->balance = $balance - $sale->qty;
         }
@@ -266,7 +262,7 @@ class SaleController extends Controller
             return response()->json([
                 'msg'        =>  'Product Invoice has generated.',
                 'status'     =>  'success',
-                'invoice_id' =>  $invoice->id,
+                'invoice_id'  =>  $invoice->id,
                 'customer_id' =>  $invoice->customer_id,
             ]);
         }
@@ -319,16 +315,16 @@ class SaleController extends Controller
         $customerId                 =   $customer_id;
         $customer_balance           =   0;
         $invoice                    =   SaleInvoice::where('id', $invoiceId)->where('customer_id', $customerId)
-            ->selectRaw("sale_invoices.*,
-                                                            (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
-                                                            (SELECT cr FROM customer_ledger WHERE sale_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
-                                                          ")
-            ->first();
+                                                    ->selectRaw("sale_invoices.*,
+                                                        (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
+                                                        (SELECT cr FROM customer_ledger WHERE sale_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
+                                                        ")
+                                                    ->first();
         $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
         $products                   =   ProductSale::where('sale_invoice_id', $invoice_id)
-            ->selectRaw("products_sales.*,
-                                                                (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name")
-            ->get();
+                                                    ->selectRaw("products_sales.*,
+                                                    (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name")
+                                                    ->get();
         $ledgerCount      = CustomerLedger::where('customer_id', $customerId)->count();
         $customer_balance = 0;
         if ($ledgerCount > 1) {

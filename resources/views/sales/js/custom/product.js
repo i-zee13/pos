@@ -17,8 +17,7 @@ $(document).ready(function() {
     }
     $(document).on('click', '.openDataSidebarForAddingProduct', function() {
        
-        // $('input[name="barcode"]').val(barcode).focus();
-        $('.barcode_span').text(barcode);
+        $('input[name="barcode"]').val(barcode).focus();
         $('.dropify-clear').click();
         $('.dz-image-preview').remove();
         $('#dataSidebarLoader').hide(); 
@@ -63,12 +62,10 @@ $(document).ready(function() {
                 $('#dataSidebarLoader').hide();
                 $('._cl-bottom').show();
                 $('.pc-cartlist').show();
-                $('.barcode_span').text(response.product.id);
-
+                
                 $('input[name="barcode"]').focus();
                 $('input[name="barcode"]').val(response.product.barcode);
                 $('input[name="barcode"]').blur();
-                
                 setTimeout(() => { 
                     selectize.setValue(id);
                     var selectedOption = selectize.getItem(id); 
@@ -514,8 +511,7 @@ function fetchproducts() {
                     </table>`);
                     $('.subCatsListTable tbody').empty();
                     var sNo = 1; 
-                    // $('.barcode').val(barcode).focus();
-                    $('.barcode_span').text(barcode)
+                    $('.barcode').val(barcode).focus();
                     response.data.forEach((element,key) => { 
                         var delet_status  = ''; 
                         if(element.deleted_at == null){
@@ -525,7 +521,7 @@ function fetchproducts() {
                         }
                         $('.subCatsListTable tbody').append(`
                         <tr> 
-                            <td>${element['barcode'] ? element['barcode'] : element['id']} </td>
+                            <td>${element['barcode']} </td>
                             <td> ${element['company_name']}</td>
                             <td> <img src="${element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png'}"  style="height:25px; width:25px;"> ${element['product_name']}</td>
                             <td>${element['size']} </td>
