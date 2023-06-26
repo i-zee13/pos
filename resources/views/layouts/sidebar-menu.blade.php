@@ -40,7 +40,7 @@
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link " href="{{route('home')}}">
-          <i class="fa fa-home" aria-hidden="true"></i> Dashboard
+            <i class="fa fa-home" aria-hidden="true"></i> Dashboard
           </a>
         </li>
       </ul>
@@ -56,11 +56,11 @@
       <ul class="navbar-nav ">
         <li class="nav-item">
           <a class="nav-link collapsed" href="#sidebarclient" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarclient">
-          <i class="fa fa-briefcase" aria-hidden="true"></i> Clients
+            <i class="fa fa-briefcase" aria-hidden="true"></i> Clients
           </a>
           <div class="collapse" id="sidebarclient">
             <ul class="nav nav-sm flex-column">
-               <li class="nav-item">
+              <li class="nav-item">
                 <a href="{{route('vendors.index')}}" class="nav-link ">
                   Vendors
                 </a>
@@ -105,7 +105,7 @@
       <ul class="navbar-nav ">
         <li class="nav-item">
           <a class="nav-link collapsed" href="#sidebarStock" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarStock">
-          <i class="fa fa-briefcase" aria-hidden="true"></i> Purchases
+            <i class="fa fa-briefcase" aria-hidden="true"></i> Purchases
           </a>
           <div class="collapse " id="sidebarStock">
             <ul class="nav nav-sm flex-column">
@@ -132,7 +132,7 @@
       <ul class="navbar-nav ">
         <li class="nav-item">
           <a class="nav-link collapsed" href="#salesStock" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="salesStock">
-          <i class="fa fa-shopping-bag" aria-hidden="true"></i> Sales
+            <i class="fa fa-shopping-bag" aria-hidden="true"></i> Sales
           </a>
           <div class="collapse " id="salesStock">
             <ul class="nav nav-sm flex-column">
@@ -152,9 +152,24 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('purchase-return')}}" class="nav-link ">
+                <a href="#sidebarSaleReturnDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSaleReturnDropDown">
                   Sales Returns
                 </a>
+                <div class="collapse" id="sidebarSaleReturnDropDown" style="">
+                  <ul class="nav nav-sm flex-column">
+                    <li class="nav-item">
+                      <a href="{{route('salereturn.create')}}" class="nav-link ">
+                        Add New
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{route('salereturn.index')}}" class="nav-link ">
+                        List
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
               </li>
             </ul>
           </div>
@@ -165,13 +180,13 @@
       <ul class="navbar-nav ">
         <li class="nav-item">
           <a class="nav-link collapsed" href="#transactions" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="transactions">
-          <i class="fa fa-money" aria-hidden="true"></i> Transactions
+            <i class="fa fa-money" aria-hidden="true"></i> Transactions
           </a>
           <div class="collapse " id="transactions">
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
                 <a href="{{route('customer-ledgers')}}" class="nav-link ">
-                 Customers
+                  Customers
                 </a>
               </li>
               <li class="nav-item">
@@ -179,22 +194,22 @@
                   Vendors
                 </a>
               </li>
-               
+
             </ul>
           </div>
         </li>
 
-      </ul> 
+      </ul>
       <ul class="navbar-nav ">
         <li class="nav-item">
           <a class="nav-link collapsed" href="#reporting" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="reporting">
-          <i class="fa fa-bar-chart" aria-hidden="true"></i> Reporting
+            <i class="fa fa-bar-chart" aria-hidden="true"></i> Reporting
           </a>
           <div class="collapse " id="reporting">
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
                 <a href="{{route('customer-reports')}}" class="nav-link ">
-                 Customers
+                  Customers
                 </a>
               </li>
               <li class="nav-item">
@@ -227,7 +242,7 @@
                   Sale
                 </a>
               </li>
-               
+
             </ul>
           </div>
         </li>
@@ -260,14 +275,13 @@
             <a href="#" class="dropdown-item">Profile</a>
             <a href="#" class="dropdown-item">Settings</a>
             <hr class="dropdown-divider">
-            <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
+            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-              </a>
-              <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                  @csrf
-              </form>
+              {{ __('Logout') }}
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+              @csrf
+            </form>
 
           </div>
 

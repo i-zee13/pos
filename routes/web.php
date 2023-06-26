@@ -85,7 +85,13 @@ Route::delete('/delete-product-from-sale' ,[App\Http\Controllers\SaleController:
 
 // Sales Returns / 
 // Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
-Route::get('/sale-return'                     ,[App\Http\Controllers\SalesReturnController::class, 'saleReturn'])->name('purchase-return');
+Route::get('/sale-return'                  ,[App\Http\Controllers\SalesReturnController::class, 'create'])->name('salereturn.create');
+Route::post('/add-sale-return-invoice'     ,[App\Http\Controllers\SalesReturnController::class, 'store'])->name('salereturn.store');
+Route::get('/sale-returns'                 ,[App\Http\Controllers\SalesReturnController::class, 'index'])->name('salereturn.index');
+Route::get('/edit-sale-return/{id}'        ,[App\Http\Controllers\SalesReturnController::class, 'edit'])->name('salereturn-edit');
+Route::get('/get-sale-return-products/{id}',[App\Http\Controllers\SalesReturnController::class, 'getReturnProduct'])->name('get-salereturn-products');
+Route::get('/print-salereturn-invoice/{invoice_id}/{customer_id}/{received_amount}'       ,[App\Http\Controllers\SalesReturnController::class, 'printInvoice'])->name('print-salereturn-invoice');
+
 // Route::post('/add-purchase-return'                ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
 
 //Genrate invoice

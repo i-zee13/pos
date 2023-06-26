@@ -83,11 +83,7 @@ class SaleController extends Controller
             // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received; 
         } else {
             $invoice     = new SaleInvoice();
-            SaleInvoice::where('customer_id', $request->customer_id)
-                ->whereDate('created_at', Carbon::today())
-                ->where('invoice_type', 2)
-                ->where('is_editable', 1)
-                ->orderBy('customer_id', 'DESC')->update(['is_editable' => 0]);
+            isEditable($request->customer_id); 
         }
 
         $invoice->amount_received      = $request->amount_received;
@@ -287,12 +283,12 @@ class SaleController extends Controller
         $parts              =     explode('-', $invoice->invoice_no);
         $invoice_first_part =     $parts[0];
         $purchasd_products  =     ProductSale::where('sale_invoice_id', $id)
-            ->selectRaw('products_sales.*')
-            ->get();
+                                                ->selectRaw('products_sales.*')
+                                                ->get();
         $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)
-            ->where('trx_type', '=', 1)
-            ->where('sale_invoice_id', $invoice->id)
-            ->orderBy('id', 'DESC')->first();
+                                                ->where('trx_type', '=', 1)
+                                                ->where('sale_invoice_id', $invoice->id)
+                                                ->orderBy('id', 'DESC')->first();
         return view('sales.test', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger', 'invoice_first_part'));
     }
     public function show($id)
@@ -319,7 +315,7 @@ class SaleController extends Controller
                                                         (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
                                                         (SELECT cr FROM customer_ledger WHERE sale_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
                                                         ")
-                                                    ->first();
+                                                    ->first(); 
         $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
         $products                   =   ProductSale::where('sale_invoice_id', $invoice_id)
                                                     ->selectRaw("products_sales.*,
@@ -355,7 +351,7 @@ class SaleController extends Controller
     }
     public function getCustomerBalance(Request $request, $id)
     {
-        if ($request->segment == 'sale-edit') {
+        if ($request->segment == 'sale-edit' || $request->segment == 'edit-sale-return') {
             $customer_count     =  CustomerLedger::where('customer_id', $id)->count();
             if ($customer_count > 1) {
                 $customer_balance = CustomerLedger::where('customer_id', $id)
@@ -374,8 +370,7 @@ class SaleController extends Controller
             'status'            =>  'success',
             'customer_balance'  => $customer_balance
         ]);
-    }
-
+    } 
     public function allSalesList(){
         $customers  =   Customer::select('id','customer_name')->where('customer_type',2)->get();
         return view('sales.all-list', compact('customers'));
@@ -402,8 +397,7 @@ class SaleController extends Controller
             'status'    =>  'success',
             'sales'     =>  $sales
         ]);
-    }
-
+    } 
     public function deleteProduct(Request $request)
     {
        

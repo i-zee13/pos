@@ -183,6 +183,10 @@ $('#add-product').on('click', function () {
     $('#bar-code').focus();
     data_variable = '';
     qty = '';
+    $('.retail_price').text(0.0);
+    $('.pp').text(0.0);
+
+    $('.stock_balance').text(0);
     
 });
 
@@ -680,7 +684,8 @@ $(document).on('input', '.qty-input', function () {
     })
 
 })
-$('body').on('mouseenter', '.ProductTable tr', function() {
+$('body').on('click', '.ProductTable tr', function() {
+
     var htmlContent = $(this).html(); 
     var r_price     = $(this).find('td input').data('retail');
     var stock       = $(this).find('td input').data('stock');
@@ -691,10 +696,10 @@ $('body').on('mouseenter', '.ProductTable tr', function() {
 
     $('.stock_balance').text(stock);
   });
-$('body').on('mouseleave', '.ProductTable tr', function() {
-$('.retail_price').text(0);
-$('.stock_balance').text(0);
-});
+// $('body').on('mouseleave', '.ProductTable tr', function() {
+// $('.retail_price').text(0);
+// $('.stock_balance').text(0);
+// });
 
 $(document).on('input', '.price-input', function () {
     $('.amount_received').val($('.paid_amount').text());

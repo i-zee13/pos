@@ -7,7 +7,9 @@ use App\Models\PurchaseInvoice;
 use App\Models\State;
 use App\Models\Sale as SaleInvoice;
 use App\Models\SaleReturn;
+use App\Models\Stock;
 use App\Models\Student;
+use App\Models\VendorStock;
 use Carbon\Carbon;
 use Firebase\JWT\JWT; 
 use Stevebauman\Location\Facades\Location;
@@ -176,11 +178,60 @@ if(!function_exists('getPurchaseInvoice'))
 if(!function_exists('getSaleReturnNo'))
 {
     function getSaleReturnNo()
-    {
-        $year          = date('y');
+    { 
         $invoice_no    = 1;
         $lastinvoice   = SaleReturn::where('date',Carbon::today())->count();
-        $invoice_no = ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+       
+        $invoice_no    = ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+      
         return $invoice_no; 
+    }
+}
+if(!function_exists('updateStock')){
+    function updateStock($previous_qty, $sale, $balance, $vendor_id, $type)
+    {
+       
+        $old_record = '' ;
+        if ($type == 'company') {
+           //
+        } else {
+            $v                   =  new VendorStock();
+        } 
+        if($previous_qty > 0){ 
+            $v->qty     =  $previous_qty;
+            $v->balance = $balance - $v->qty;
+            
+        }else{
+            $v->qty     = $sale->qty;
+            $v->balance = $balance + $sale->qty;
+        }
+      
+        $v->vendor_id            =  $vendor_id;
+        $v->transaction_type     =  $previous_qty > 0 ? 4 : 3; //4 = Edit , 2= Return
+        $v->status               =  $previous_qty > 0 ? 2 : 1;
+        $v->sale_return_id       =  $sale->sale_invoice_id;
+        $v->product_unit_price   =  $sale->purchased_price;
+        $v->product_id           =  $sale->product_id;
+        $v->company_id           =  $sale->company_id;
+        $v->date                 =  $sale->created_at;
+        $v->amount               =  $sale->sale_total_amount;
+        $v->created_by           =  Auth::id();
+        $v->save();
+        return $v;
+    }
+}
+if(!function_exists('isEditable'))
+{
+    function isEditable($customer_id)
+    { 
+        SaleReturn::where('customer_id',$customer_id)
+                    ->whereDate('created_at', Carbon::today()) 
+                    ->where('is_editable', 1) 
+                    ->update(['is_editable' => 0]);
+        SaleInvoice::where('customer_id',$customer_id)
+                    ->whereDate('created_at', Carbon::today()) 
+                    ->where('is_editable', 1) 
+                    ->update(['is_editable' => 0]);
+            return true;
     }
 }

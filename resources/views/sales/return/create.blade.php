@@ -610,7 +610,7 @@
                                 <label class="font13 mb-5">Invoice #</label>
                                 <div class="form-s2">
                                     <input type="text" id="" class="form-control" value="{{@$invoice_first_part}}">
-                                    <input type="hidden" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
+                                    <input type="hidden" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? @$invoice->invoice_no : $invoice_first_part}}">
 
                                 </div>
                             </div>
@@ -760,7 +760,7 @@
 
                             </div>
                             <!-- <div class="col-auto pr-0">Invoice #
-                        <input type="text" id="" class="inputfileds required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
+                        <input type="text" id="" class="inputfileds required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_first_part}}">
                     </div> -->
                             <!-- <div class="col-auto pr-0">Date
                         <input type="Date" name="invoice_date" class="inputfileds datefileds new_dob new_form_field " value="{{@$invoice ? $invoice->created_at->format('Y-d-m') : $current_date}}">
@@ -982,7 +982,7 @@
                             @else
                             <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
                             <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>
-                            <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                            <a href="{{route('salereturn.index')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                             @endif
                         </div>
                     </div>
@@ -1003,6 +1003,6 @@
 <script>
     var clients = JSON.parse('{!! json_encode($customers)  !!}');
 </script>
-<script src="{{mix('js/custom/sale.js')}}"> </script>
+<script src="{{mix('js/custom/sale_return.js')}}"> </script>
 
 @endpush

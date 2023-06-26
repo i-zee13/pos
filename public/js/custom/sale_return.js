@@ -17372,14 +17372,14 @@ $(document).ready(function () {
     }, 2000);
 
     //
-  } else if (segments[3] == 'sale-edit') {
+  } else if (segments[3] == 'edit-sale-return') {
     customer_id = $('#curren_customer_id').val();
     var invoice_id = $('#hidden_invoice_id').val();
     service_charges = $('#service_charges').val();
     invoice_discount = $('#invoice_discount').val();
     segment = segments[3];
     $.ajax({
-      url: '/get-sale-products/' + invoice_id,
+      url: '/get-sale-return-products/' + invoice_id,
       type: 'get',
       success: function success(response) {
         response.products.forEach(function (product) {
@@ -17527,7 +17527,7 @@ $(document).on('click', '.remove_btn', function () {
   var product_id = $(this).attr('id');
   var sale_invoice_id = $(this).attr('data-id');
   var q = $(this).attr('data-quantity');
-  if (segments[3] == 'sale-edit' && sale_invoice_id != undefined) {
+  if (segments[3] == 'edit-sale-return' && sale_invoice_id != undefined) {
     sweetalert__WEBPACK_IMPORTED_MODULE_1___default()({
       title: "Are you sure?",
       icon: "warning",
@@ -17792,7 +17792,7 @@ function saleSave(current_action, type) {
   // $('#print-invoice').attr('disabled', 'disabled');
   $('#save').attr('disabled', 'disabled');
   $('#form').ajaxSubmit({
-    url: '/add-sale-invoice',
+    url: '/add-sale-return-invoice',
     type: 'post',
     data: {
       'cash_return': result,
@@ -17811,7 +17811,7 @@ function saleSave(current_action, type) {
         $('#notifDiv').text('Added successfully');
         var received_amount = $('.amount_received').val().trim();
         if (type == 'print') {
-          var printWindow = window.open("/print-sale-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
+          var printWindow = window.open("/print-salereturn-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
           printWindow.onload = function () {
             printWindow.print();
           };
@@ -17822,7 +17822,7 @@ function saleSave(current_action, type) {
 
         setTimeout(function () {
           $('#notifDiv').fadeOut();
-          window.location = "/sale-add";
+          window.location = "/sale-return";
         }, 1500);
         // $('#form')[0].reset();
         // $('#client_type').val(0).trigger('change'); 
@@ -18075,10 +18075,9 @@ $('#customer_id').change(function () {
         $('.previous_payable').text(previous_payable_text);
         $('.previous_payable').val(previous_payable);
         grandSum(previous_payable, service_charges, invoice_discount);
-        if (segments[3] == "sale-edit") {
-          $('.paid_amount').text(customer_ledger['cr']);
-
-          // $('.remaning_amount').val(customer_ledger['balance'])                
+        if (segments[3] == "edit-sale-return") {
+          $('.paid_amount').text(customer_ledger['dr']);
+          // $('.remaning_amount').val(customer_ledger['balance']);                
         }
 
         $('.display').css('display', '');
@@ -18102,7 +18101,8 @@ function grandSum() {
   });
   $('.product_net_total').val(sum);
   // sale_total_amount = sum-invoice_discount;
-  sum += parseFloat(previous_payable ? previous_payable : 0);
+  previous_payable >= 0 ? sum += parseFloat(previous_payable ? previous_payable : 0) : sum -= parseFloat(previous_payable ? previous_payable : 0);
+  // sum -= parseFloat(previous_payable ? previous_payable : 0); 
   sum += parseFloat(service_charges ? service_charges : 0);
   sale_total_amount = sum - invoice_discount;
   $('.grand-total').text(sale_total_amount - $('.paid_amount').text());
