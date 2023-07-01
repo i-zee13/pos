@@ -242,7 +242,7 @@
                         <td>{{number_format($invoice->invoice_discount)}}</td>
                     </tr> -->
                     <tr>
-                        <td class="payable-heading">Previous {{$customer_balance >= 0 ? 'Receivable' : 'Payable' }} :</td>
+                        <td class="payable-heading">Previous {{$invoice->previous_receivable >= 0 ? 'Receivable' : 'Payable' }} :</td>
                         <td>{{number_format($invoice->previous_receivable)}}</td>
                     </tr>
                     <!-- <tr>
@@ -250,11 +250,11 @@
                         <td>{{number_format($invoice->total_invoice_amount)}}</td>
                     </tr> -->
                     <tr>
-                        <td class="payable-heading">{{$customer_balance > 0 ? 'Total Receivable'  : 'Total Payable'}} :</td>
+                        <td class="payable-heading">{{$invoice->previous_receivable > 0 ? 'Total Receivable'  : 'Total Payable'}} :</td>
                         <td>{{number_format($invoice->invoice_remaining_amount_after_pay)}}</td>
                     </tr>
                     <tr>
-                        <td class="payable-heading">Cash Received :</td>
+                        <td class="payable-heading">{{$invoice->previous_receivable > 0 ? 'Cash Recevied'  : 'Cash Paid'}} :</td>
                         <td>{{number_format($invoice->amount_received)}}</td>
                     </tr>
                     <?php
@@ -262,12 +262,12 @@
                         // $difference = abs($difference);
                     ?>
                     <tr>
-                        <td class="payable-heading">{{$customer_balance > 0 ? 'Remaining Receivable'  : 'Remaining Payable'}} :</td>
+                        <td class="payable-heading">{{$invoice->previous_receivable > 0 ? 'Remaining Receivable'  : 'Remaining Payable'}} :</td>
                         <td>{{number_format($invoice->invoice_remaining_amount_after_pay,2)}}</td>
                     </tr>
                     @else
                     <tr>
-                        <td class="payable-heading">Cash Received :</td>
+                        <td class="payable-heading">Cash Paid :</td>
                         <td>{{number_format($invoice->amount_received)}}</td>
                     </tr>
                     <tr>

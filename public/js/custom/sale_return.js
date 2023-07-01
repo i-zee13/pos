@@ -17939,28 +17939,30 @@ $(document).on('input', '.qty-input', function () {
       data.qty = update_qty;
       current_product_qty = data.stock_in_hand;
       current_product_price = p_price;
-      if (parseInt(update_qty) > parseInt(current_product_qty)) {
-        // update_qty      = update_qty.replace(update_qty, current_product_qty)
-        $(".td-input-qty".concat(current_product_id)).val(current_product_qty).css('border-color', 'red').focus();
-        $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then ' + current_product_qty);
-        setTimeout(function () {
-          $('#notifDiv').fadeOut();
-        }, 3000);
-        $('.grand-total').text('0');
-        return;
-      } else {
-        $(".td-input-qty".concat(current_product_id)).css('border-color', '#dddddd');
-        new_amount_of_purchase_product = update_qty * current_product_price;
-        data.amount = new_amount_of_purchase_product - data.prod_discount;
-        var invoice_type = $('#invoice_type').val();
-        // $('#invoice_type').val(invoice_type).trigger('change');
-        $(".purchase-product-amount".concat(current_product_id)).text(data.amount);
-        getStockRetail(data.product_id);
-        grandSum(previous_payable, service_charges, invoice_discount);
-      }
+      // if(parseInt(update_qty) > parseInt(current_product_qty)){
+      //     // update_qty      = update_qty.replace(update_qty, current_product_qty)
+      //     $(`.td-input-qty${current_product_id}`).val(current_product_qty).css('border-color', 'red').focus();
+      //     $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then '+current_product_qty);
+      //     setTimeout(() => {
+      //         $('#notifDiv').fadeOut();
+      //     }, 3000); 
+      //     $('.grand-total').text('0');
+      //     return;
+      // }else{ 
+
+      $(".td-input-qty".concat(current_product_id)).css('border-color', '#dddddd');
+      new_amount_of_purchase_product = update_qty * current_product_price;
+      data.amount = new_amount_of_purchase_product - data.prod_discount;
+      var invoice_type = $('#invoice_type').val();
+      // $('#invoice_type').val(invoice_type).trigger('change');
+      $(".purchase-product-amount".concat(current_product_id)).text(data.amount);
+      getStockRetail(data.product_id);
+      grandSum(previous_payable, service_charges, invoice_discount);
+      // }
     }
   });
 });
+
 $('body').on('mouseenter', '.ProductTable tr', function () {
   var htmlContent = $(this).html();
   var r_price = $(this).find('td input').data('retail');
@@ -18106,8 +18108,11 @@ function grandSum() {
 
   sum += parseFloat(service_charges ? service_charges : 0);
   sale_total_amount = sum - invoice_discount;
-  $('.grand-total').text(sale_total_amount - $('.paid_amount').text());
-  $('.amount_pay_input').val(sale_total_amount - $('.paid_amount').text());
+  setTimeout(function () {
+    $('.grand-total').text(sale_total_amount - $('.paid_amount').text());
+    $('.amount_pay_input').val(sale_total_amount - $('.paid_amount').text());
+  }, 500);
+
   // $('.amount_pay_input').val(sale_total_amount) ;   
 
   if (parseFloat($('.amount_pay_input').val()) < 0) {

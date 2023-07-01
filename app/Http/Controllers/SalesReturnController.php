@@ -12,6 +12,7 @@ use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Auth;
+use Illuminate\Support\Facades\Route;
 
 class SalesReturnController extends Controller
 {
@@ -53,14 +54,15 @@ class SalesReturnController extends Controller
         $invoice->invoice_no           = $request->invoice_no;
         $invoice->invoice_type         = $request->invoice_type;
         $invoice->customer_id          = $request->customer_id;
+
         // if ($request->invoice_type == 1) {
         //     $invoice->paid_amount      = $request->amount_to_pay;
         // } else {
         //     $invoice->paid_amount      = $request->amount_received ? $request->amount_received : 0;
         // }
 
-        $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges ) - $request->invoice_discount;
-        $invoice->invoice_remaining_amount_after_pay  =  $invoice->total_invoice_amount - $request->previous_receivable;
+        $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges ) - $request->invoice_discount - $request->amount_received;
+        $invoice->invoice_remaining_amount_after_pay  =  $invoice->total_invoice_amount - $request->previous_receivable ;
      
         // $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges ) - $request->invoice_discount;
         // $invoice->invoice_remaining_amount_after_pay  =  $invoice->total_invoice_amount - $request->amount_received - $request->previous_receivable;
@@ -71,7 +73,6 @@ class SalesReturnController extends Controller
         $invoice->product_net_total    = $request->product_net_total;
         $invoice->previous_receivable  = $request->previous_receivable;
         $invoice->is_editable          = 1;
-
         $invoice->status               = $request->invoice_type;
         $invoice->created_by           = Auth::id();
         if ($invoice->save()) {
@@ -152,7 +153,11 @@ class SalesReturnController extends Controller
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
                 $customer_ledger->trx_type    = 2;                     //Return
-                $customer_ledger->balance     =  $request->previous_receivable - $invoice->total_invoice_amount; //balance
+                if($invoice->invoice_type == 1 && $invoice->invoice_remaining_amount_after_pay == $invoice->amount_received){
+                    $customer_ledger->balance     =  0; //balance
+                }else{
+                    $customer_ledger->balance     =  $request->previous_receivable - $invoice->total_invoice_amount; //balance
+                }
             
                 $customer_ledger->created_by  = Auth::id();
                 $customer_ledger->sale_return_invoice_id = $invoice->id;
@@ -173,6 +178,7 @@ class SalesReturnController extends Controller
     }
     public function edit($id)
     {
+                  
         $customers          =     Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
         $products           =     Product::get();
         $invoice            =     SaleReturn::where('id', $id)->first();
@@ -203,7 +209,7 @@ class SalesReturnController extends Controller
     }
     public function printInvoice($invoice_id, $customer_id, $received_amount)
     {
-         
+          
         $invoiceId                  =   $invoice_id;
         $customerId                 =   $customer_id;
         $customer_balance           =   0;

@@ -645,16 +645,16 @@ $(document).on('input', '.qty-input', function () {
             data.qty              = update_qty;
             current_product_qty   = data.stock_in_hand;
             current_product_price = p_price;
-            if(parseInt(update_qty) > parseInt(current_product_qty)){
-                // update_qty      = update_qty.replace(update_qty, current_product_qty)
-                $(`.td-input-qty${current_product_id}`).val(current_product_qty).css('border-color', 'red').focus();
-                $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then '+current_product_qty);
-                setTimeout(() => {
-                    $('#notifDiv').fadeOut();
-                }, 3000); 
-                $('.grand-total').text('0');
-                return;
-            }else{ 
+            // if(parseInt(update_qty) > parseInt(current_product_qty)){
+            //     // update_qty      = update_qty.replace(update_qty, current_product_qty)
+            //     $(`.td-input-qty${current_product_id}`).val(current_product_qty).css('border-color', 'red').focus();
+            //     $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then '+current_product_qty);
+            //     setTimeout(() => {
+            //         $('#notifDiv').fadeOut();
+            //     }, 3000); 
+            //     $('.grand-total').text('0');
+            //     return;
+            // }else{ 
               
                 $(`.td-input-qty${current_product_id}`).css('border-color', '#dddddd');
                 new_amount_of_purchase_product = update_qty * current_product_price;
@@ -664,7 +664,7 @@ $(document).on('input', '.qty-input', function () {
                 $(`.purchase-product-amount${current_product_id}`).text(data.amount)
                 getStockRetail(data.product_id)
                 grandSum(previous_payable,service_charges,invoice_discount);
-            }
+            // }
         }
     })
 
@@ -814,11 +814,13 @@ function grandSum(previous_payable=0,service_charges=0,discount=0){
     sum -= parseFloat(previous_payable)  // sum -= parseFloat(previous_payable ? previous_payable : 0); 
     // previous_payable >= 0 ? sum -= parseFloat(previous_payable ? previous_payable : 0) : sum += parseFloat(previous_payable);
   
-    sum += parseFloat(service_charges ? service_charges : 0); 
-    
+    sum += parseFloat(service_charges ? service_charges : 0);  
     sale_total_amount = sum-invoice_discount; 
-    $('.grand-total').text(sale_total_amount -  $('.paid_amount').text()); 
-    $('.amount_pay_input').val(sale_total_amount -  $('.paid_amount').text());
+    setTimeout(() => {
+        $('.grand-total').text(sale_total_amount -  $('.paid_amount').text()); 
+        $('.amount_pay_input').val(sale_total_amount -  $('.paid_amount').text());
+    }, 500);
+   
     // $('.amount_pay_input').val(sale_total_amount) ;   
    
     if(parseFloat($('.amount_pay_input').val()) < 0) {

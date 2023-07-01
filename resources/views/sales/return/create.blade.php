@@ -850,7 +850,7 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
+                                            <td> <input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
                                             <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" readonly></td>
                                             <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" tabindex="4" min="0"></td>
                                             <td class='add- S-input '><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;"></td>
@@ -928,7 +928,7 @@
                                             <td align="right">Cash Return</td>
                                             <td class="cash_return">{{@$invoice->cash_return}}</td>
                                         </tr>
-                                        @if (Route::currentRouteName() == 'sale-edit')
+                                        @if (Route::currentRouteName() == 'salereturn-edit')
 
                                         <tr class="th-to-hide" hidden>
                                             <td></td>
