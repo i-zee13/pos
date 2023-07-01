@@ -177,7 +177,7 @@
         </center><!--End InvoiceTop-->
         <div id="mid">
             <div class="info">
-                Sale Invoice
+            {{request()->segment(1) == 'print-salereturn-invoice' ? 'Return' : 'Sale'}} Invoice
             </div>
         </div><!--End Invoice Mid--> 
         <div id="bot">
@@ -243,7 +243,7 @@
                     </tr> -->
                     <tr>
                         <td class="payable-heading">Previous {{$customer_balance >= 0 ? 'Receivable' : 'Payable' }} :</td>
-                        <td>{{number_format($customer_balance)}}</td>
+                        <td>{{number_format($invoice->previous_receivable)}}</td>
                     </tr>
                     <!-- <tr>
                         <td class="payable-heading">Total Amount:</td>
@@ -251,7 +251,7 @@
                     </tr> -->
                     <tr>
                         <td class="payable-heading">{{$customer_balance > 0 ? 'Total Receivable'  : 'Total Payable'}} :</td>
-                        <td>{{number_format($invoice->total_invoice_amount)}}</td>
+                        <td>{{number_format($invoice->invoice_remaining_amount_after_pay)}}</td>
                     </tr>
                     <tr>
                         <td class="payable-heading">Cash Received :</td>
@@ -263,11 +263,11 @@
                     ?>
                     <tr>
                         <td class="payable-heading">{{$customer_balance > 0 ? 'Remaining Receivable'  : 'Remaining Payable'}} :</td>
-                        <td>{{number_format($difference,2)}}</td>
+                        <td>{{number_format($invoice->invoice_remaining_amount_after_pay,2)}}</td>
                     </tr>
                     @else
                     <tr>
-                        <td class="payable-heading">Casdsadash Received :</td>
+                        <td class="payable-heading">Cash Received :</td>
                         <td>{{number_format($invoice->amount_received)}}</td>
                     </tr>
                     <tr>
@@ -287,7 +287,7 @@
                         <td>{{number_format($customer_balance)}}</td>
                     </tr>
                     <!-- <tr>
-                        <td class="payable-heading">Total Amount:</td>
+                        <td class="payable-heading">p;;;l Amount:</td>
                         <td>{{number_format($invoice->total_invoice_amount)}}</td>
                     </tr> -->
                     <tr>

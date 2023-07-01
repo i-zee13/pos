@@ -508,7 +508,7 @@ function saleSave(current_action,type){
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'green');
                 $('#notifDiv').text('Added successfully');
-                var received_amount = $('.amount_received').val().trim();
+                var received_amount = $('.amount_received').val().trim() > 0 ? $('.amount_received').val().trim() : 0;
                 if(type == 'print'){
                     var printWindow    = window.open("/print-salereturn-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
                     printWindow.onload = function() {
@@ -806,14 +806,14 @@ $('#customer_id').change(function () {
 function grandSum(previous_payable=0,service_charges=0,discount=0){  
     var sum = 0;
     sales_product_array.forEach(function (data, key) {
-        // console.log(data);
+       //console.log(data);
         sum += parseFloat(data.amount)
     });
-
     $('.product_net_total').val(sum);
     // sale_total_amount = sum-invoice_discount;
-    previous_payable >= 0 ? sum += parseFloat(previous_payable ? previous_payable : 0) : sum -= parseFloat(previous_payable ? previous_payable : 0);
-    // sum -= parseFloat(previous_payable ? previous_payable : 0); 
+    sum -= parseFloat(previous_payable)  // sum -= parseFloat(previous_payable ? previous_payable : 0); 
+    // previous_payable >= 0 ? sum -= parseFloat(previous_payable ? previous_payable : 0) : sum += parseFloat(previous_payable);
+  
     sum += parseFloat(service_charges ? service_charges : 0); 
     
     sale_total_amount = sum-invoice_discount; 

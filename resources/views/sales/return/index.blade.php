@@ -9,16 +9,16 @@
                 <div class="col">
                     <!-- Pretitle -->
                     <h6 class="header-pretitle">
-                        Overview
+                        Sale
                     </h6>
                     <!-- Title -->
                     <h1 class="header-title">
-                        <h2 class="_head01">Sale <span>Management</span></h2>
+                        <h2 class="_head01">Return <span>Management</span></h2>
                     </h1>
                 </div>
                 <div class="col-auto">
                     <ol class="breadcrumb">
-                        <li><a href="#"><span>Sale</span></a></li>
+                        <li><a href="#"><span>Return</span></a></li>
                         <li><span>Active</span></li>
                     </ol>
                 </div>
@@ -32,7 +32,7 @@
         <div class="card">
             <div class="header mb-0">
                 <!-- <a class="btn add_button openDataSidebarForAddingProduct"><i class="fa fa-plus"></i> New  Product</a> -->
-                <h2>Sales List</h2>
+                <h2>Sale Returns List</h2>
               <a href="{{route('salereturn.create')}}" type="submit" class="btn btn-primary mr-2" style="font-size: 13px;padding: 6px 11px 4px 9px;margin-top: -10px; float: right;">Add New</a>
 
             </div>
@@ -45,7 +45,7 @@
                     <tr>
                         <th>Customer Name</th>
                         <th>Invoice #</th>
-                        <th>Received</th>
+                        <th>Paid</th>
                         <th>Product Net Total</th>
                         <!-- <th>Invoice Total</th> -->
                         <th>Action</th>
@@ -67,7 +67,7 @@
                         <a id="{{$sale->id}}" class="btn btn-default {{$sale->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$sale->is_editable== 1 ? route('salereturn-edit' ,['id'=>$sale->id]) : route('salereturn-edit' ,['id'=>$sale->id ,'invoice' => 'detail'])}}">{{$sale->is_editable== 1  ? 'Edit'  : "Detail" }}</a>
                         <!-- <a id="{{$sale->id}}" class="btn btn-default " href="{{route('sale-detail' ,['id'=>$sale->id])}}">Detail</a> -->
                         <button id="{{$sale->id}}" data-invoice="{{$sale->id}}" data-customer-id="{{$sale->customer_id}}"
-                         paid-amount="{{$sale->paid_amount}}" class="btn btn-default print-invoice">Print</button>
+                         paid-amount="{{$sale->paid_amount > 0 ? $sale->paid_amount  : 0}}" class="btn btn-default print-invoice">Print</button>
                         <!-- <button type="button" id="{{$sale->id}}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button> -->
                     </td>
                 </tr>

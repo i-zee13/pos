@@ -918,7 +918,7 @@
                                             <td></td>
                                             <td></td>
                                             <td align="right" class="cash-return">Cash Recived </td>
-                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" onkeypress="return isNumber(event)" value="{{@$invoice->amount_received}}"></td>
+                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00"  value="{{@$invoice->amount_received ?? 0}}"></td>
                                         </tr>
 
 
@@ -978,7 +978,7 @@
 
                         <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
                             @if(request()->query('invoice') == 'detail')
-                            <a href="{{route('sales')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
+                            <a href="{{route('salereturn.index')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
                             @else
                             <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
                             <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>

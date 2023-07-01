@@ -24,6 +24,7 @@ class SalesReturnController extends Controller
                                         ->whereRaw("Date(created_at) = '$current_date'")
                                         ->orderBy('id', 'DESC')
                                         ->get();
+                                        
         return view('sales.return.index', compact('sales'));
     }
     public function create(){
@@ -39,7 +40,7 @@ class SalesReturnController extends Controller
     }
     public function store(Request $request)
     { 
-         
+       
         if ($request->hidden_invoice_id) {
             $invoice = SaleReturn::where('id', $request->hidden_invoice_id)->first();
         } else {
@@ -57,8 +58,13 @@ class SalesReturnController extends Controller
         // } else {
         //     $invoice->paid_amount      = $request->amount_received ? $request->amount_received : 0;
         // }
+
         $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges ) - $request->invoice_discount;
-        $invoice->invoice_remaining_amount_after_pay  =  $invoice->total_invoice_amount - $request->amount_received - $request->previous_receivable;
+        $invoice->invoice_remaining_amount_after_pay  =  $invoice->total_invoice_amount - $request->previous_receivable;
+     
+        // $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges ) - $request->invoice_discount;
+        // $invoice->invoice_remaining_amount_after_pay  =  $invoice->total_invoice_amount - $request->amount_received - $request->previous_receivable;
+        
         $invoice->service_charges      = $request->service_charges;
         $invoice->invoice_discount     = $request->invoice_discount;
         $invoice->cash_return          = $request->cash_return;
@@ -134,14 +140,7 @@ class SalesReturnController extends Controller
                     SaleReturnProduct::where('sale_invoice_id', $request->hidden_invoice_id)
                         ->whereNotIn('id', $sale_products_array)
                         ->delete();
-                }
-
-                $customer_ledger       =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->first();
-                if ($customer_ledger) {
-                    $balance           =   $customer_ledger->balance;
-                } else {
-                    $balance           =   0;
-                }
+                } 
                 if ($request->hidden_invoice_id) {
                     $customer_ledger   =   CustomerLedger::where('sale_return_invoice_id', $request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
                 } else {
@@ -153,7 +152,8 @@ class SalesReturnController extends Controller
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
                 $customer_ledger->trx_type    = 2;                     //Return
-                $customer_ledger->balance     = $balance-($invoice->total_invoice_amount-$invoice->amount_received); //balance
+                $customer_ledger->balance     =  $request->previous_receivable - $invoice->total_invoice_amount; //balance
+            
                 $customer_ledger->created_by  = Auth::id();
                 $customer_ledger->sale_return_invoice_id = $invoice->id;
                 $customer_ledger->save();
