@@ -439,7 +439,11 @@ $(document).ready(function () {
         // alert($(window).width());
         closeSubNav();
     });
-
+    if(currentSegment != 'quizzes' && currentSegment != 'create-session' && currentSegment != 'edit-incubator-session' ){
+        $(document).on("click", "#SN-close, .overlay-for-sidebar", function () {
+            closeSidebar();
+        });
+    }
     $(document).on("click", "#SN-close, .overlay-for-sidebar", function () {
         closeSidebar();
     });

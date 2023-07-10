@@ -6425,6 +6425,7 @@ fieldset:disabled .btn {
 }
 
 .modal-footer {
+    background-color: #f9f9f9;
     align-items: center;
     border-bottom-left-radius: calc(.5rem - 1px);
     border-bottom-right-radius: calc(.5rem - 1px);

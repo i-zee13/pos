@@ -50,7 +50,6 @@ class StockController extends Controller
             ]);
     }
      Public function purchaseInvoice(Request $request){
-          
         if($request->hidden_invoice_id){
             ProductPurchase::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
@@ -206,7 +205,7 @@ class StockController extends Controller
                 $customer_ledger->trx_type   = 1 ; //Purchase inc
                 $customer_ledger->customer_id= $request->customer_id;
                 $customer_ledger->dr         = $invoice->total_invoice_amount;
-                $customer_ledger->cr         = $invoice->amount_paid;
+                $customer_ledger->cr         = $invoice->paid_amount;
                 $customer_ledger->balance    = ($request->grand_total-$request->amount_paid); //+balance
                 $customer_ledger->created_by = Auth::id();
                 $customer_ledger->save();

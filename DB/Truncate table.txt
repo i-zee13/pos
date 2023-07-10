@@ -1,4 +1,5 @@
 jin s leny wo DR  jin ko deny wo CR
+  
 
 // INVOICES
 TRUNCATE `purchase_invoices` ; 

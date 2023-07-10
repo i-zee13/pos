@@ -185,15 +185,48 @@
           <div class="collapse " id="transactions">
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
-                <a href="{{route('customer-ledgers')}}" class="nav-link ">
+                <a href="#sidebarCustomerLedger" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarCustomerLedger">
                   Customers
                 </a>
+                <div class="collapse" id="sidebarCustomerLedger" style="">
+                  <ul class="nav nav-sm flex-column">
+                    <li class="nav-item">
+                      <a href="{{route('customer-ledger-jama')}}" class="nav-link " style="font-size:20px;">
+                        جمع
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{route('customer-ledger-banam')}}" class="nav-link " style="font-size:20px;">
+                        بنام
+                      </a>
+                    </li>
+                  </ul>
+                </div>
               </li>
               <li class="nav-item">
+                <a href="#sidebarVendorLedger" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarVendorLedger">
+                  Vendors
+                </a>
+                <div class="collapse" id="sidebarVendorLedger" style="">
+                  <ul class="nav nav-sm flex-column">
+                    <li class="nav-item">
+                      <a href="{{route('vendor-ledger-jama')}}" class="nav-link " style="font-size:20px;">
+                        جمع
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{route('vendor-ledger-banam')}}" class="nav-link " style="font-size:20px;">
+                        بنام
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <!-- <li class="nav-item">
                 <a href="{{route('vendor-ledgers')}}" class="nav-link ">
                   Vendors
                 </a>
-              </li>
+              </li> -->
 
             </ul>
           </div>

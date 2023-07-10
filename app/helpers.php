@@ -2,16 +2,20 @@
 
 use App\Models\City;
 use App\Models\Country;
+use App\Models\CustomerLedger;
 use App\Models\PostalCode;
 use App\Models\PurchaseInvoice;
+use App\Models\PurchaseReturn;
 use App\Models\State;
 use App\Models\Sale as SaleInvoice;
 use App\Models\SaleReturn;
 use App\Models\Stock;
 use App\Models\Student;
+use App\Models\VendorLedger;
 use App\Models\VendorStock;
 use Carbon\Carbon;
-use Firebase\JWT\JWT; 
+use Firebase\JWT\JWT;
+use JetBrains\PhpStorm\Pure;
 use Stevebauman\Location\Facades\Location;
 
 if(!function_exists('isStudentActive'))
@@ -187,6 +191,52 @@ if(!function_exists('getSaleReturnNo'))
         return $invoice_no; 
     }
 }
+if(!function_exists('getCrvNo'))
+{
+    function getCrvNo()
+    { 
+        $invoice_no    = 1;
+        $lastinvoice   = CustomerLedger::where('date',Carbon::today())->where('trx_type',3)->where('cr','>',0)->count();
+       
+        $invoice_no    = 'Crv -'. ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+    
+        return $invoice_no; 
+    }
+}
+if(!function_exists('getCpvNo'))
+{
+    function getCpvNo()
+    { 
+        $invoice_no    = 1;
+        $lastinvoice   = CustomerLedger::where('date',Carbon::today())->where('trx_type',3)->where('dr','>',0)->count();
+       
+        $invoice_no    = 'Cpv -'. ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+      
+        return $invoice_no; 
+    }
+}
+if(!function_exists('getVendorCrvNo'))
+{
+    function getVendorCrvNo()
+    { 
+        $invoice_no    = 1;
+        $lastinvoice   = VendorLedger::where('date',Carbon::today())->where('trx_type',3)->where('cr','>',0)->count();
+        $invoice_no    = 'Crv-'.  ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+       
+        return $invoice_no; 
+    }
+}
+if(!function_exists('getVendorCpvNo'))
+{
+    function getVendorCpvNo()
+    { 
+        $invoice_no    = 1;
+        $lastinvoice   = VendorLedger::where('date',Carbon::today())->where('trx_type',3)->where('dr','>',0)->count();
+        $invoice_no    = 'Cpv -'. ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+      
+        return $invoice_no; 
+    }
+}
 if(!function_exists('updateStock')){
     function updateStock($previous_qty, $sale, $balance, $vendor_id, $type)
     {
@@ -224,14 +274,24 @@ if(!function_exists('isEditable'))
 {
     function isEditable($customer_id)
     { 
-        SaleReturn::where('customer_id',$customer_id)
-                    ->whereDate('created_at', Carbon::today()) 
-                    ->where('is_editable', 1) 
-                    ->update(['is_editable' => 0]);
+        //Sales
         SaleInvoice::where('customer_id',$customer_id)
                     ->whereDate('created_at', Carbon::today()) 
                     ->where('is_editable', 1) 
                     ->update(['is_editable' => 0]);
+        SaleReturn::where('customer_id',$customer_id)
+                    ->whereDate('created_at', Carbon::today()) 
+                    ->where('is_editable', 1) 
+                    ->update(['is_editable' => 0]);
+        PurchaseInvoice::where('customer_id',$customer_id)
+                    ->whereDate('created_at', Carbon::today()) 
+                    ->where('is_editable', 1) 
+                    ->update(['is_editable' => 0]);
+        PurchaseReturn::where('customer_id',$customer_id)
+                    ->whereDate('created_at', Carbon::today()) 
+                    ->where('is_editable', 1) 
+                    ->update(['is_editable' => 0]);
+        
             return true;
     }
 }

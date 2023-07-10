@@ -45,21 +45,21 @@ $(document).ready(function() {
                     balance_sum += data.balance;
                     cr_sum += data.cr;
                     dr_sum += data.dr;
-                    if(action == operation+'-ledger-jama' &&  data.cr > 0){
+                    if(action == operation+'-ledger-banam' &&  data.cr > 0){
                         console.log(data.cr)
-                        $('#transactionTable tbody').append(`
+                    $('#transactionTable tbody').append(`
                                 <tr id='tr-${data.id}'>
-                                    <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td> 
-                                    <td>${action == operation+'-ledger-jama' ? data.cr : data.dr}</td>
+                                    <td>${action == operation+'-ledger-banam' ? data.crv_no : data.cpv_no}</td> 
+                                    <td>${action == operation+'-ledger-banam' ? data.cr : data.dr}</td>
                                     <td>${data.comment}</td> 
                                     </tr>`
                         );
                     }
-                    if(action == operation+'-ledger-banam' &&  data.dr > 0){ 
+                    if(action == operation+'-ledger-jama' &&  data.dr > 0){ 
                         $('#transactionTable tbody').append(`
                         <tr id='tr-${data.id}'>
-                            <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td> 
-                            <td>${action == operation+'-ledger-jama' ? data.cr : data.dr}</td>
+                            <td>${action == operation+'-ledger-banam' ? data.crv_no : data.cpv_no}</td> 
+                            <td>${action == operation+'-ledger-banam' ? data.cr : data.dr}</td>
                             <td>${data.comment}</td> 
                             </tr>`
                             );
@@ -68,11 +68,12 @@ $(document).ready(function() {
                 });
                 $('#transactionTable tbody').append(`
                 <tr style="background: #152e4d;color: white;">  
-                    <td style="font-family:bold" >Total:</td>
-                    <td colspan="2">${action == operation+'-ledger-jama' ? cr_sum : dr_sum}</td>
+                    <td style="font-family:bold">Total:</td>
+                    <td colspan="2">${action == operation+'-ledger-banam' ? cr_sum : dr_sum}</td>
+                   
                 </tr>
             `);
-            this_btn.closest('tr').find('.total_balance').text((action == operation+'-ledger-jama' ? cr_sum + 'CR' : dr_sum + 'DR') ); 
+            this_btn.closest('tr').find('.total_balance').text((action == operation+'-ledger-banam' ? cr_sum + 'CR' : dr_sum + 'DR') ); 
             $('.add-more').append(` 
                 <h5 class="_head03">${customer_name}<span> (${balance})</span></h5>
                     <div class="row  remove_div" >
@@ -289,37 +290,54 @@ function fetchLedgers() {
                     $('.subCatsListTable tbody').empty();
                     var sNo = 1;
                     response.customers.forEach((element,key) => {  
-                       
                         var total_cr_dr = 0;
                         var voucher = '';
                         if(operation == 'vendor'){
-                         total_cr_dr    =    action == 'vendor-ledger-jama'? element.rec[0].total_cr ?? '0' :  element.rec[0].total_dr ?? '0';
-                         voucher        =    action == 'vendor-ledger-jama'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
-                         ledger_balance =   element['balance'] >= 0 ? element['balance'] + ' CR' : (-element['balance']) + ' DR' 
-                        }else{
-                         total_cr_dr    =    action == 'customer-ledger-jama'? element.rec[0].total_cr ?? '0' :  element.rec[0].total_dr ?? '0';
-                         voucher        =    action == 'customer-ledger-jama'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
-                         ledger_balance =    element['balance'] >= 0 ? element['balance'] + ' DR' : (-element['balance']) + ' CR' 
+                            total_cr_dr    =    action == 'vendor-ledger-banam'? element.rec[0].total_cr ?? '0' :  element.rec[0].total_dr ?? '0';
+                            voucher        =    action == 'vendor-ledger-banam'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
+                            ledger_balance =    element['balance'] >= 0 ? element['balance'] + ' CR' : (-element['balance']) + ' DR' 
                         }
-
-                        $('.subCatsListTable tbody').append(`
-                        <tr>
-                        <td> ${voucher}</td> 
-                        <td> ${element['customer_name']}</td>
-                        <!-- <td class='total_balance'>${ledger_balance}</td> --!>
-                        <td>${total_cr_dr}</td>
-                        <td> ${element['comment'] ?? 'NA'}</td>
-                        <td> ${moment(element['date']).format('D MMM YYYY')}</td> 
-                            <td>
-                                <button  class="btn btn-default btn-line openDataSidebarForUpdateCustomerLedger"
-                                        customer-id="${element['customer_id']}" 
-                                        customer_name="${element['customer_name']}" 
-                                        cr="${element['cr']}" 
-                                        dr="${element['dr']}" 
-                                        balance="${element['balance']}" 
-                                >Add Payment</button>
-                            </td>
-                        </tr>`);
+                        if(action == 'vendor-ledger-banam' && element.crv_no){
+                             $('.subCatsListTable tbody').append(`
+                                <tr>
+                                <td> ${voucher}</td> 
+                                <td> ${element['customer_name']}</td>
+                                <!-- <td class='total_balance'>${ledger_balance}</td> --!>
+                                <td>${total_cr_dr}</td>
+                                <td> ${element['comment'] ?? 'NA'}</td>
+                                <td> ${moment(element['date']).format('D MMM YYYY')}</td> 
+                                    <td>
+                                        <button  class="btn btn-default btn-line openDataSidebarForUpdateCustomerLedger"
+                                                customer-id="${element['customer_id']}" 
+                                                customer_name="${element['customer_name']}" 
+                                                cr="${element['cr']}" 
+                                                dr="${element['dr']}" 
+                                                balance="${element['balance']}" 
+                                        >Add Payment</button>
+                                    </td>
+                                </tr>`);
+                        }
+                        if(action == 'vendor-ledger-jama' && element.cpv_no){
+                            $('.subCatsListTable tbody').append(`
+                               <tr>
+                               <td> ${voucher}</td> 
+                               <td> ${element['customer_name']}</td>
+                               <!-- <td class='total_balance'>${ledger_balance}</td> --!>
+                               <td>${total_cr_dr}</td>
+                               <td> ${element['comment'] ?? 'NA'}</td>
+                               <td> ${moment(element['date']).format('D MMM YYYY')}</td> 
+                                   <td>
+                                       <button  class="btn btn-default btn-line openDataSidebarForUpdateCustomerLedger"
+                                               customer-id="${element['customer_id']}" 
+                                               customer_name="${element['customer_name']}" 
+                                               cr="${element['cr']}" 
+                                               dr="${element['dr']}" 
+                                               balance="${element['balance']}" 
+                                       >Add Payment</button>
+                                   </td>
+                               </tr>`);
+                       }
+                       
                     });
                     $('#tblLoader').hide();
                     $('.body').fadeIn();

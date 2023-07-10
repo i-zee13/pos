@@ -1090,8 +1090,7 @@ $(".existing_client").change(function () {
                 <td><button id="${response.client['id']}" class="btn  smBTN red-bg remove_btn" data-index="">Remove</button></td>
             </tr>`);
             // console.log($(".existing_client option:selected"));
-            if($('#intake_form_type').val() > 4){
-              
+            if($('#intake_form_type').val() > 4){ 
                 $(".existing_client option").attr('disabled',false);
             }
             $('#existing_client').children('option[value="' + response.client['id'] + '"]').attr('disabled', true);

@@ -524,7 +524,6 @@ function saleSave(current_action,type){
                 var received_amount = $('.amount_received').val().trim();
                     received_amount = received_amount ? received_amount : 0 ;
                 if(type == 'print'){
-                    console.log( response)
                     var printWindow    = window.open("/print-sale-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
                     printWindow.onload = function() {
                     printWindow.print();

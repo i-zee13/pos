@@ -106,7 +106,8 @@
     <link rel="stylesheet" type="text/css" href="{{asset('/css/product.css?v=8.1')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('/css/jquery.mCustomScrollbar.css')}}" />
     <link rel="stylesheet" href="{{asset('/css/animate.css')}}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+    <script src="{{asset('/js/moment.js')}}"></script>
+
     <!-- Title -->
     <title>Store</title>
 </head>
@@ -165,7 +166,8 @@
 
     <script>
         let dateFormat = "yyyy-mm-dd";
-
+        var segments = location.href.split('/');
+         var action = segments[3];
         $(document).ready(function() {
             $("#contentContainerDiv").removeClass("blur-div");
             $('.dropify').dropify();
@@ -227,11 +229,15 @@
             // }
             // alert($(window).width());
             closeSubNav();
-        });
-
-        $(document).on("click", "#SN-close, .overlay-for-sidebar", function() {
+        }); 
+    if(action != 'customer-ledger-jama' && action != 'customer-ledger-banam' && action != 'vendor-ledger-jama' && action != 'vendor-ledger-banam'  ){
+        $(document).on("click", "#SN-close, .overlay-for-sidebar", function () {
             closeSidebar();
         });
+    }
+        // $(document).on("click", "#SN-close, .overlay-for-sidebar", function() {
+        //     closeSidebar();
+        // });
 
         function closeSidebar() {
             $(".customer_form_div").removeClass("active");
