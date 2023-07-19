@@ -115,12 +115,12 @@
 <body style="display: block;">
     <div id="notifDiv">
     </div>
-   
+
     @if(request()->segment(1) != 'sale-add' && request()->segment(1) != 'sale-edit'  && request()->segment(1) != 'sale-return'  && request()->segment(1) != 'edit-sale-return')
             @include('layouts.sidebar-menu')
     @endif
 
-    
+
     <!-- MAIN CONTENT -->
     <div class="main-content">
         <div id="content-wrapper">
@@ -229,7 +229,7 @@
             // }
             // alert($(window).width());
             closeSubNav();
-        }); 
+        });
     if(action != 'customer-ledger-jama' && action != 'customer-ledger-banam' && action != 'vendor-ledger-jama' && action != 'vendor-ledger-banam'  ){
         $(document).on("click", "#SN-close, .overlay-for-sidebar", function () {
             closeSidebar();

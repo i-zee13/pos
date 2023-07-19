@@ -17,6 +17,7 @@ $(document).ready(function () {
   ledger_type = action.split('-')[2];
   fetchLedgers();
   $(document).on('click', '.openDataSidebarForUpdateCustomerLedger', function () {
+    $('input[id="action"]').val('');
     $('select option').removeAttr('disabled');
     $('.customer_id').select2();
     $('.add-more').empty();
@@ -50,19 +51,57 @@ $(document).ready(function () {
           dr_sum += data.dr;
           if (action == operation + '-ledger-jama' && data.cr > 0) {
             console.log(data.cr);
-            $('#transactionTable tbody').append("\n                                <tr id='tr-".concat(data.id, "'>\n                                    <td>").concat(action == operation + '-ledger-jama' ? data.crv_no : data.cpv_no, "</td> \n                                    <td>").concat(action == operation + '-ledger-jama' ? data.cr : data.dr, "</td>\n                                    <td>").concat(data.comment, "</td> \n                                    </tr>"));
+            $('#transactionTable tbody').append("\n                                <tr id='tr-".concat(data.id, "'>\n                                    <td>").concat(action == operation + '-ledger-jama' ? data.crv_no : data.cpv_no, "</td>\n                                    <td>").concat(action == operation + '-ledger-jama' ? data.cr : data.dr, "</td>\n                                    <td>").concat(data.comment ? data.comment : 'NA', "</td>\n                                </tr>"));
           }
           if (action == operation + '-ledger-banam' && data.dr > 0) {
-            $('#transactionTable tbody').append("\n                        <tr id='tr-".concat(data.id, "'>\n                            <td>").concat(action == operation + '-ledger-jama' ? data.crv_no : data.cpv_no, "</td> \n                            <td>").concat(action == operation + '-ledger-jama' ? data.cr : data.dr, "</td>\n                            <td>").concat(data.comment, "</td> \n                            </tr>"));
+            $('#transactionTable tbody').append("\n                        <tr id='tr-".concat(data.id, "'>\n                            <td>").concat(action == operation + '-ledger-jama' ? data.crv_no : data.cpv_no, "</td>\n                            <td>").concat(action == operation + '-ledger-jama' ? data.cr : data.dr, "</td>\n                            <td>").concat(data.comment ? data.comment : 'NA', "</td>\n                            </tr>"));
           }
         });
-        $('#transactionTable tbody').append("\n                <tr style=\"background: #152e4d;color: white;\">  \n                    <td style=\"font-family:bold\" >Total:</td>\n                    <td colspan=\"2\">".concat(action == operation + '-ledger-jama' ? cr_sum : dr_sum, "</td>\n                </tr>\n            "));
+        $('#transactionTable tbody').append("\n                <tr style=\"background: #152e4d;color: white;\">\n                    <td style=\"font-family:bold\" >Total:</td>\n                    <td colspan=\"2\">".concat(action == operation + '-ledger-jama' ? cr_sum : dr_sum, "</td>\n                </tr>\n            "));
         this_btn.closest('tr').find('.total_balance').text(action == operation + '-ledger-jama' ? cr_sum + 'CR' : dr_sum + 'DR');
-        $('.add-more').append(" \n                <h5 class=\"_head03\">".concat(customer_name, "<span> (").concat(balance, ")</span></h5>\n                    <div class=\"row  remove_div\" >\n                        <div class=\"col-md-5 PB-10\">\n                            <div class=\"form-group focused\">\n                                <label class=\"control-label mb-10\">Add Amount *</label>\n                                <input type=\"hidden\" name=\"hidden_cust_balance[]\" value=\"").concat(balance, "\">\n                                <input type=\"hidden\" name=\"hidden_cust_id[]\" value=\"").concat(id, "\">\n                                <input type=\"number\" name=\"amount[]\" class=\"form-control field-required amount\" id=\"amount_").concat(id, "\" required tabindex=\"2\" data-customer_id=\"").concat(id, "\">\n                            </div>\n                        </div>\n                        <div class=\"col-md-6 PB-10\">\n                            <div class=\"form-group focused\">\n                                <label class=\"control-label mb-10\">Remarks </label>\n                                <textarea name=\"comment[]\" class=\"form-control remarks_").concat(id, "\" rows=\"6\" tabindex=\"3\"></textarea>\n                            </div>\n                        </div>\n                        <div class=\"col-md-1 PB-10\" style=\"margin-top: 21px;\">\n                            <a type=\"button\" id=\"\" data-customer_id=\"").concat(id, "\" class=\"btn smBTN red-bg remove remove_btn_").concat(id, "\" data-index=\"\" data-quantity=\"\">Remove</a>\n                        </div>\n                    </div>\n                "));
+        $('.add-more').append("\n                <h5 class=\"_head03\">".concat(customer_name, "<span> (").concat(balance, ")</span></h5>\n                    <div class=\"row  remove_div\" >\n                        <div class=\"col-md-5 PB-10\">\n                            <div class=\"form-group focused\">\n                                <label class=\"control-label mb-10\">Add Amount *</label>\n                                <input type=\"hidden\" name=\"hidden_cust_balance[]\" value=\"").concat(balance, "\">\n                                <input type=\"hidden\" name=\"hidden_cust_id[]\" value=\"").concat(id, "\">\n                                <input type=\"number\" name=\"amount[]\" class=\"form-control field-required amount\" id=\"amount_").concat(id, "\" required tabindex=\"2\" data-customer_id=\"").concat(id, "\">\n                            </div>\n                        </div>\n                        <div class=\"col-md-6 PB-10\">\n                            <div class=\"form-group focused\">\n                                <label class=\"control-label mb-10\">Remarks </label>\n                                <textarea name=\"comment[]\" class=\"form-control remarks_").concat(id, "\" rows=\"6\" tabindex=\"3\"></textarea>\n                            </div>\n                        </div>\n                        <div class=\"col-md-1 PB-10\" style=\"margin-top: 21px;\">\n                            <a type=\"button\" id=\"\" data-customer_id=\"").concat(id, "\" class=\"btn smBTN red-bg remove remove_btn_").concat(id, "\" data-index=\"\" data-quantity=\"\">Remove</a>\n                        </div>\n                    </div>\n                "));
         n++;
       }
     });
     $('input[id="operation"]').val('update');
+    lastOp = 'update';
+    $('#dataSidebarLoader').show();
+    $('._cl-bottom').hide();
+    $('.pc-cartlist').hide();
+    $('#dataSidebarLoader').hide();
+    $('._cl-bottom').show();
+    $('.pc-cartlist').show();
+    $('input[id="customer_id"]').val(id);
+    $('input[id="hidden_balance"]').val(balance);
+    $('.customer_name').text(customer_name + ' Details');
+    $('input[name="cr"]').focus().val(cr).blur();
+    $('input[name="dr"]').focus().val(dr).blur();
+    $('input[name="balance"]').focus().val(balance >= 0 ? balance + ' DR' : -balance + ' CR').blur();
+    openSidebar();
+  });
+  $(document).on('click', '.openDataSidebarForEditCustomerLedger', function () {
+    $('select option').removeAttr('disabled');
+    $('.customer_id').select2();
+    $('.add-more').empty();
+    $('#saveTransactionForm')[0].reset();
+    $('textarea[name="comment"]').val('');
+    $('.customers').hide();
+    $('.ProductTable').show();
+    $('#transactionTable tbody').empty();
+    var this_btn = $(this);
+    var id = this_btn.attr('customer-id');
+    var customer_name = this_btn.attr('customer_name');
+    var cr = this_btn.attr('cr');
+    var dr = this_btn.attr('dr');
+    var balance = this_btn.attr('balance');
+    if (action == operation + '-ledger-jama' && cr > 0) {
+      balance = parseFloat(balance) + parseFloat(cr);
+    } else {
+      balance -= parseFloat(balance) - parseFloat(dr);
+    }
+    $('.add-more').append("\n                <div class=\"row  remove_div\" >\n                    <div class=\"col-md-5 PB-10\">\n                        <div class=\"form-group focused\">\n                            <label class=\"control-label mb-10\">Add Amount *</label>\n                            <input type=\"hidden\" name=\"hidden_cust_balance[]\" value=\"".concat(balance, "\">\n                            <input type=\"hidden\" name=\"hidden_cust_id[]\" value=\"").concat(id, "\">\n                            <input type=\"number\" name=\"amount[]\" class=\"form-control field-required amount\" id=\"amount_").concat(id, "\" required tabindex=\"2\" data-customer_id=\"").concat(id, "\" value=\"").concat(cr, "\">\n                        </div>\n                    </div>\n                    <div class=\"col-md-6 PB-10\">\n                        <div class=\"form-group focused\">\n                            <label class=\"control-label mb-10\">Remarks </label>\n                            <textarea name=\"comment[]\" class=\"form-control remarks_").concat(id, "\" rows=\"6\" tabindex=\"3\"></textarea>\n                        </div>\n                    </div>\n                    <div class=\"col-md-1 PB-10\" style=\"margin-top: 21px;\">\n                        <a type=\"button\" id=\"\" data-customer_id=\"").concat(id, "\" class=\"btn smBTN red-bg remove remove_btn_").concat(id, "\" data-index=\"\" data-quantity=\"\">Remove</a>\n                    </div>\n                </div>\n            "));
+    n++;
+    $('input[id="action"]').val('edit');
     lastOp = 'update';
     $('#dataSidebarLoader').show();
     $('._cl-bottom').hide();
@@ -87,7 +126,7 @@ $(document).ready(function () {
     var current_action = $(this);
     saveTransaction(current_action, 'save');
     current_action.text('Save');
-    // $('#hidden_btn_to_open_modal').click(); 
+    // $('#hidden_btn_to_open_modal').click();
   });
 
   function saveTransaction(current_action, type) {
@@ -241,7 +280,7 @@ function fetchLedgers() {
           voucher = action == 'customer-ledger-jama' ? (_element$crv_no2 = element.crv_no) !== null && _element$crv_no2 !== void 0 ? _element$crv_no2 : '0' : (_element$cpv_no2 = element.cpv_no) !== null && _element$cpv_no2 !== void 0 ? _element$cpv_no2 : '0';
           ledger_balance = element['balance'] >= 0 ? element['balance'] + ' DR' : -element['balance'] + ' CR';
         }
-        $('.subCatsListTable tbody').append("\n                        <tr>\n                        <td> ".concat(voucher, "</td> \n                        <td> ").concat(element['customer_name'], "</td>\n                        <!-- <td class='total_balance'>").concat(ledger_balance, "</td> --!>\n                        <td>").concat(total_cr_dr, "</td>\n                        <td> ").concat((_element$comment = element['comment']) !== null && _element$comment !== void 0 ? _element$comment : 'NA', "</td>\n                        <td> ").concat(moment(element['date']).format('D MMM YYYY'), "</td> \n                            <td>\n                                <button  class=\"btn btn-default btn-line openDataSidebarForUpdateCustomerLedger\"\n                                        customer-id=\"").concat(element['customer_id'], "\" \n                                        customer_name=\"").concat(element['customer_name'], "\" \n                                        cr=\"").concat(element['cr'], "\" \n                                        dr=\"").concat(element['dr'], "\" \n                                        balance=\"").concat(element['balance'], "\" \n                                >Add Payment</button>\n                            </td>\n                        </tr>"));
+        $('.subCatsListTable tbody').append("\n                        <tr>\n                            <td> ".concat(voucher, "</td>\n                            <td> ").concat(element['customer_name'], "</td>\n                            <!-- <td class='total_balance'>").concat(ledger_balance, "</td> --!>\n                            <td>").concat(total_cr_dr, "</td>\n                            <td> ").concat((_element$comment = element['comment']) !== null && _element$comment !== void 0 ? _element$comment : 'NA', "</td>\n                            <td> ").concat(moment(element['date']).format('D MMM YYYY'), "</td>\n                            <td>\n                                <button  class=\"btn btn-default btn-line openDataSidebarForEditCustomerLedger ").concat(element.is_editable == 1 ? '' : 'd-none', "\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['balance'], "\"\n                                    >Edit</button>\n                                    <button  class=\"btn btn-default btn-line openDataSidebarForUpdateCustomerLedger\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['balance'], "\"\n                                    >Add Payment</button>\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();
@@ -259,7 +298,7 @@ $('.customer_id').on('change', function () {
   if (customer_val > 0) {
     n++;
     $('.customer_balnce').val(cust_bal);
-    $('.add-more').append(" \n        <div class=\"row  remove_div\" >\n        <h5 class=\"_head03\">".concat(cus_name, "<span> (").concat(cust_bal, ")</span></h5>\n           \n                <div class=\"col-md-5 PB-10\">\n                    <div class=\"form-group focused\">\n                        <label class=\"control-label mb-10\">Add Amount *</label>\n                        <input type=\"hidden\" name=\"hidden_cust_balance[]\" value=\"").concat(cust_bal, "\">\n                        <input type=\"hidden\" name=\"hidden_cust_id[]\" value=\"").concat(customer_val, "\">\n                        <input type=\"number\" name=\"amount[]\" class=\"form-control field-required amount\" id=\"amount_").concat(customer_val, "\" required tabindex=\"2\" data-customer_id=\"").concat(customer_val, "\">\n                    </div>\n                </div>\n                <div class=\"col-md-6 PB-10\">\n                    <div class=\"form-group focused\">\n                        <label class=\"control-label mb-10\">Remarks </label>\n                        <textarea name=\"comment[]\" class=\"form-control remarks_").concat(customer_val, "\" rows=\"6\" tabindex=\"3\"></textarea>\n                    </div>\n                </div>\n                <div class=\"col-md-1 PB-10\" style=\"margin-top: 21px;\">\n                    <a type=\"button\" id=\"\" data-customer_id=\"").concat(customer_val, "\" class=\"btn smBTN red-bg remove remove_btn_").concat(customer_val, "\" data-index=\"\" data-quantity=\"\">Remove</a>\n                </div>\n            </div>\n        "));
+    $('.add-more').append("\n        <div class=\"row  remove_div\" >\n        <h5 class=\"_head03\">".concat(cus_name, "<span> (").concat(cust_bal, ")</span></h5>\n\n                <div class=\"col-md-5 PB-10\">\n                    <div class=\"form-group focused\">\n                        <label class=\"control-label mb-10\">Add Amount *</label>\n                        <input type=\"hidden\" name=\"hidden_cust_balance[]\" value=\"").concat(cust_bal, "\">\n                        <input type=\"hidden\" name=\"hidden_cust_id[]\" value=\"").concat(customer_val, "\">\n                        <input type=\"number\" name=\"amount[]\" class=\"form-control field-required amount\" id=\"amount_").concat(customer_val, "\" required tabindex=\"2\" data-customer_id=\"").concat(customer_val, "\">\n                    </div>\n                </div>\n                <div class=\"col-md-6 PB-10\">\n                    <div class=\"form-group focused\">\n                        <label class=\"control-label mb-10\">Remarks </label>\n                        <textarea name=\"comment[]\" class=\"form-control remarks_").concat(customer_val, "\" rows=\"6\" tabindex=\"3\"></textarea>\n                    </div>\n                </div>\n                <div class=\"col-md-1 PB-10\" style=\"margin-top: 21px;\">\n                    <a type=\"button\" id=\"\" data-customer_id=\"").concat(customer_val, "\" class=\"btn smBTN red-bg remove remove_btn_").concat(customer_val, "\" data-index=\"\" data-quantity=\"\">Remove</a>\n                </div>\n            </div>\n        "));
     $('.customer_id').children("option[value=\"".concat(customer_val, "\"]")).attr('disabled', true);
     setTimeout(function () {
       $('.customer_id').val('0');

@@ -17,13 +17,13 @@ use Auth;
 
 class StockController extends Controller
 {
-  
+
     public function create()
-    {   
+    {
         $invoice_no   =   getPurchaseInvoice();
         $current_date =   Carbon::today()->toDateString();
         $customers    =   Customer::all();
-        $products     =   Product::get('id'); 
+        $products     =   Product::get('id');
         return view('purchases.add',compact('customers','current_date','products','invoice_no'));
     }
     public function getProduct(Request $request)
@@ -60,7 +60,7 @@ class StockController extends Controller
         $invoice->date           = $request->invoice_date;
         $invoice->invoice_no     = $request->invoice_no;
         $invoice->customer_id    = $request->customer_id;
-        $invoice->paid_amount    = $request->amount_paid+($request->hidden_paid_amount ? $request->hidden_paid_amount : 0); 
+        $invoice->paid_amount    = $request->amount_paid+($request->hidden_paid_amount ? $request->hidden_paid_amount : 0);
         $invoice->total_invoice_amount = $request->grand_total;
         $invoice->created_by     = Auth::id();
         if($invoice->save()){
@@ -75,14 +75,14 @@ class StockController extends Controller
                     }
                     $purchased->purchase_invoice_id = $invoice->id;
                     $purchased->product_id      = $purchase_product['product_id'];
-                    $purchased->vendor_id       = $request->customer_id; 
-                    $purchased_products_array[] = $purchased->product_id; 
+                    $purchased->vendor_id       = $request->customer_id;
+                    $purchased_products_array[] = $purchased->product_id;
                     $purchased->expiry_date     = $purchase_product['expiry_date'];
                     $purchased->qty             = $purchase_product['qty'];
                     $purchased->purchased_total_amount =  $purchase_product['amount'];
                     $purchased->created_by      = Auth::id();
                     if($purchased->save()){
-                          $product   = Product::where('id',$purchased->product_id)->first(); 
+                          $product   = Product::where('id',$purchased->product_id)->first();
                           $company_id = $product->company_id;
                           $product->expiry_date = $purchased->expiry_date;
                           if($purchase_product['new_price'] != ''){
@@ -94,40 +94,40 @@ class StockController extends Controller
                         $product->save();
                         $check_stock    = VendorStock::where('product_id',$purchased->product_id)->orderBy('id', 'DESC')->first();
                         if($check_stock){
-                            $balance    =   $check_stock->balance; 
+                            $balance    =   $check_stock->balance;
                         }else{
                             $balance = 0;
-                        } 
-                        $status      =  0;    
+                        }
+                        $status      =  0;
                         $add_stock   =  new VendorStock();
                         if($request->hidden_invoice_id){
                             $stock   = VendorStock::where('purchase_invoice_id',$request->hidden_invoice_id)
                                             ->where('product_id',$purchased->product_id)->orderBy('id', 'DESC')->first();
                             $in_hand = 0;
-                            if($stock){ 
+                            if($stock){
                                 if($purchased->qty > $stock->qty){
                                     $in_hand   = $purchased->qty-$stock->qty;
                                     $balance   = $balance+$in_hand;
-                                    $status    = 1;     //in 
+                                    $status    = 1;     //in
                                 }else if($stock->qty > $purchased->qty){
                                     $in_hand = $stock->qty-$purchased->qty;
                                     $balance     = $balance-$in_hand;
-                                    $status      = 2;     //out 
+                                    $status      = 2;     //out
                                 }else if($purchased->qty == $stock->qty){
                                     $in_hand     = $stock->qty;
                                     $balance     = $stock->balance;
-                                    $status      = 1;     //in 
+                                    $status      = 1;     //in
                                 }
                                 $add_stock->qty         = $in_hand;
-                                $add_stock->status      = $status;      
+                                $add_stock->status      = $status;
                                 $add_stock->balance     = $balance;
                             }else{
-                                $add_stock->status      = 1;  //in    
+                                $add_stock->status      = 1;  //in
                                 $add_stock->balance     = $purchased->qty+$balance;
                                 $add_stock->qty         = $purchased->qty;
                             }
                         }else{
-                                $status      = 1;      
+                                $status      = 1;
                                 $add_stock->balance     = $purchased->qty+$balance;
                                 $add_stock->qty         = $purchased->qty;
                                 $add_stock->status      =   $status;
@@ -136,8 +136,8 @@ class StockController extends Controller
                         $add_stock->purchase_invoice_id  = $purchased->purchase_invoice_id;
                         $add_stock->product_unit_price   = $purchased->purchase_price;
                         $add_stock->product_id           = $purchased->product_id;
-                        $add_stock->company_id           = $company_id; 
-                        // $add_stock->expiry_date          = $purchase_product['expiry_date']; 
+                        $add_stock->company_id           = $company_id;
+                        // $add_stock->expiry_date          = $purchase_product['expiry_date'];
 
                         $add_stock->vendor_id            = $invoice->customer_id;
                         $add_stock->date                 = $purchased->created_at;
@@ -154,14 +154,14 @@ class StockController extends Controller
                             $company_stock->qty                  =  $add_stock->qty;
                             $company_stock->status               =  1; //out
                             $company_stock->date                 =  $purchased->created_at;
-                            $company_stock->balance              =  $add_stock->balance; 
+                            $company_stock->balance              =  $add_stock->balance;
                             $company_stock->created_by           =  Auth::id();
                             $company_stock->save();
                             // dd($purchased_products_array);
-                                //    
+                                //
                             // $deleted_product = Stock::where('purchase_invoice_id',$request->hidden_invoice_id)
                             //                 ->whereNotIn('product_id',$purchased_products_array)->where('status',1)->orderBy('id', 'DESC')->get();
-                           
+
                             // if($deleted_product){
                             //     foreach($deleted_product as $prod){
                             //     $out_stock  =   new Stock();
@@ -183,7 +183,7 @@ class StockController extends Controller
                         }
                     }
                 }
-                 
+
                 $customer_ledger = VendorLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
                 if($customer_ledger){
                     // $credit  = $customer_ledger->credit;  //Out from System and Paid to Vendor;
@@ -218,7 +218,7 @@ class StockController extends Controller
                 //     $vendor->debit      = $request->amount_paid;
                 //     $vendor->updated_by = Auth::id();
                 //     $vendor->save();
-                    
+
                 // }
             }
             return response()->json([
@@ -228,7 +228,7 @@ class StockController extends Controller
         }
     }
     public function getVendors(){
-    
+
         $customers = Customer::where('customer_type',1)->get(); //1=vendor
         return response()->json([
             'msg'       => 'Vendor Fetched',
@@ -265,7 +265,7 @@ class StockController extends Controller
     public function getPurchaseProduct($id){
         $products   =   ProductPurchase::where('products_purchases.purchase_invoice_id',$id)
                                     ->selectRaw('products_purchases.*, (SELECT product_name FROM products WHERE id=products_purchases.product_id) as product_name')->get();
-                                   
+
         return response()->json([
             'msg'       => 'Vendor Fetched',
             'status'    => 'success',
@@ -318,7 +318,7 @@ class StockController extends Controller
                         $company_stock->qty                  =  $out_stock->qty;
                         $company_stock->status               =  2; //out
                         $company_stock->date                 =  Carbon::now();
-                        $company_stock->balance              =  $out_stock->balance; 
+                        $company_stock->balance              =  $out_stock->balance;
                         $company_stock->created_by           =  Auth::id();
                         $company_stock->save();
                         Product::where('id',$out_stock->product_id)->update([
@@ -337,9 +337,9 @@ class StockController extends Controller
                         'status'    => 'failed',
                     ]);
                 }
-       
-    }
-    //Purchase Returns 
 
-     
+    }
+    //Purchase Returns
+
+
 }

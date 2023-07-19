@@ -23,6 +23,7 @@ mix.js('resources/js/app.js', 'public/js')
     .js('resources/js/custom/sale_report.js', 'public/js/custom')
     .js('resources/js/custom/sale_return.js', 'public/js/custom')
     .js('resources/js/custom/vendor_transaction.js', 'public/js/custom')
+    .js('resources/js/custom/purchase.js', 'public/js/custom')
 
 
 

@@ -1,4 +1,4 @@
-var lastOp = "";  
+var lastOp = "";
 var action = '';
 let ledger_balance = '';
 let n = 0;
@@ -6,14 +6,14 @@ let customer_transaction_array = [];
 let ledger_type = '';
 let operation = '';
 $(document).ready(function() {
-    var segments = location.href.split('/'); 
-     action      = segments[3]; 
+    var segments = location.href.split('/');
+     action      = segments[3];
      operation   = action.split('-')[0];
      ledger_type = action.split('-')[2];
-        fetchLedgers(); 
-       
+        fetchLedgers();
+
     $(document).on('click', '.openDataSidebarForUpdateCustomerLedger', function() {
-       
+        $('input[id="action"]').val('');
         $('select option').removeAttr('disabled');
         $('.customer_id').select2();
         $('.add-more').empty();
@@ -49,31 +49,31 @@ $(document).ready(function() {
                         console.log(data.cr)
                         $('#transactionTable tbody').append(`
                                 <tr id='tr-${data.id}'>
-                                    <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td> 
+                                    <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td>
                                     <td>${action == operation+'-ledger-jama' ? data.cr : data.dr}</td>
-                                    <td>${data.comment}</td> 
-                                    </tr>`
+                                    <td>${data.comment ? data.comment : 'NA'}</td>
+                                </tr>`
                         );
                     }
-                    if(action == operation+'-ledger-banam' &&  data.dr > 0){ 
+                    if(action == operation+'-ledger-banam' &&  data.dr > 0){
                         $('#transactionTable tbody').append(`
                         <tr id='tr-${data.id}'>
-                            <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td> 
+                            <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td>
                             <td>${action == operation+'-ledger-jama' ? data.cr : data.dr}</td>
-                            <td>${data.comment}</td> 
+                            <td>${data.comment ? data.comment : 'NA'}</td>
                             </tr>`
                             );
                     }
-                    
+
                 });
                 $('#transactionTable tbody').append(`
-                <tr style="background: #152e4d;color: white;">  
+                <tr style="background: #152e4d;color: white;">
                     <td style="font-family:bold" >Total:</td>
                     <td colspan="2">${action == operation+'-ledger-jama' ? cr_sum : dr_sum}</td>
                 </tr>
             `);
-            this_btn.closest('tr').find('.total_balance').text((action == operation+'-ledger-jama' ? cr_sum + 'CR' : dr_sum + 'DR') ); 
-            $('.add-more').append(` 
+            this_btn.closest('tr').find('.total_balance').text((action == operation+'-ledger-jama' ? cr_sum + 'CR' : dr_sum + 'DR') );
+            $('.add-more').append(`
                 <h5 class="_head03">${customer_name}<span> (${balance})</span></h5>
                     <div class="row  remove_div" >
                         <div class="col-md-5 PB-10">
@@ -98,22 +98,87 @@ $(document).ready(function() {
                 n++;
             }
         });
-      
+
         $('input[id="operation"]').val('update');
         lastOp = 'update';
         $('#dataSidebarLoader').show();
         $('._cl-bottom').hide();
         $('.pc-cartlist').hide();
-        
+
         $('#dataSidebarLoader').hide();
         $('._cl-bottom').show();
         $('.pc-cartlist').show();
-        
+
         $('input[id="customer_id"]').val(id);
         $('input[id="hidden_balance"]').val(balance);
         $('.customer_name').text(customer_name+' Details');
         $('input[name="cr"]').focus().val(cr).blur();
         $('input[name="dr"]').focus().val(dr).blur();
+        $('input[name="balance"]').focus().val(balance >= 0 ? balance + ' DR' : (-balance) + ' CR').blur();
+
+        openSidebar();
+    });
+    $(document).on('click', '.openDataSidebarForEditCustomerLedger', function() {
+
+        $('select option').removeAttr('disabled');
+        $('.customer_id').select2();
+        $('.add-more').empty();
+        $('#saveTransactionForm')[0].reset();
+        $('textarea[name="comment"]').val('');
+        $('.customers').hide();
+        $('.ProductTable').show();
+        $('#transactionTable tbody').empty();
+        var this_btn = $(this)
+        var id            =  this_btn.attr('customer-id');
+        var customer_name =  this_btn.attr('customer_name');
+        var cr            =  this_btn.attr('cr');
+        var dr            =  this_btn.attr('dr');
+        var balance       =  this_btn.attr('balance');
+        if(action == operation+'-ledger-jama' &&  cr > 0) {
+            balance  =  parseFloat(balance) + parseFloat(cr)
+        }else{
+            balance -=  parseFloat(balance) - parseFloat(dr)
+        }
+        $('.add-more').append(`
+                <div class="row  remove_div" >
+                    <div class="col-md-5 PB-10">
+                        <div class="form-group focused">
+                            <label class="control-label mb-10">Add Amount *</label>
+                            <input type="hidden" name="hidden_cust_balance[]" value="${balance}">
+                            <input type="hidden" name="hidden_cust_id[]" value="${id}">
+                            <input type="number" name="amount[]" class="form-control field-required amount" id="amount_${id}" required tabindex="2" data-customer_id="${id}" value="${cr}">
+                        </div>
+                    </div>
+                    <div class="col-md-6 PB-10">
+                        <div class="form-group focused">
+                            <label class="control-label mb-10">Remarks </label>
+                            <textarea name="comment[]" class="form-control remarks_${id}" rows="6" tabindex="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-1 PB-10" style="margin-top: 21px;">
+                        <a type="button" id="" data-customer_id="${id}" class="btn smBTN red-bg remove remove_btn_${id}" data-index="" data-quantity="">Remove</a>
+                    </div>
+                </div>
+            `);
+           n++;
+        $('input[id="action"]').val('edit');
+        lastOp = 'update';
+        $('#dataSidebarLoader').show();
+        $('._cl-bottom').hide();
+        $('.pc-cartlist').hide();
+
+        $('#dataSidebarLoader').hide();
+        $('._cl-bottom').show();
+        $('.pc-cartlist').show();
+
+
+        $('input[id="customer_id"]').val(id);
+        $('input[id="hidden_balance"]').val(balance);
+        $('.customer_name').text(customer_name+' Details');
+        $('input[name="cr"]').focus().val(cr).blur();
+        $('input[name="dr"]').focus().val(dr).blur();
+
+
         $('input[name="balance"]').focus().val(balance >= 0 ? balance + ' DR' : (-balance) + ' CR').blur();
 
         openSidebar();
@@ -127,7 +192,7 @@ $(document).ready(function() {
         var current_action = $(this);
         saveTransaction(current_action,'save');
         current_action.text('Save')
-        // $('#hidden_btn_to_open_modal').click(); 
+        // $('#hidden_btn_to_open_modal').click();
     });
     function saveTransaction(current_action,type){
          var dirty = true;
@@ -150,7 +215,7 @@ $(document).ready(function() {
                 }, 3000);
                 dirty = false;
                 return;
-            }  
+            }
         })
         if(dirty){
         current_action.text('Processing...')
@@ -170,21 +235,21 @@ $(document).ready(function() {
 
                     if($("#print-invoice").prop("checked")){
                         var zz = 0;
-                        if(action == operation+'-ledger-jama') { 
+                        if(action == operation+'-ledger-jama') {
                            zz = 1;
                         }else{
                            zz = 2;
-                        } 
+                        }
                         var printWindow    = window.open("/print-transaction-invoice/" + response.transaction_id + '/' + response.customer_id + '/' + operation + '/' + zz);
                         printWindow.onload = function() {
                         printWindow.print();
                         };
                         location.reload();
                     }
-            
+
                     $('#saveTransactionForm')[0].reset();
                     console.log($('.voucher_no').val())
-                    $('.voucher_no').empty().val(response.voucher) 
+                    $('.voucher_no').empty().val(response.voucher)
                     closeSidebar();
                     fetchLedgers();
                     $('#saveTransaction').removeAttr('disabled').text('Save');
@@ -192,11 +257,11 @@ $(document).ready(function() {
                     $('#amount').val('');
                     var msg = 'Transaction Successfully Updated';
                     $('#notifDiv').fadeIn().text(msg).css('background', 'green');
-                    
+
                     setTimeout(() => {
                         $('#notifDiv').fadeOut();
                     }, 3000);
-                }   
+                }
                 if (response.status == "failed") {
                     $('#saveTransaction').removeAttr('disabled');
                     $('#cancelSubCat').removeAttr('disabled');
@@ -219,7 +284,7 @@ $(document).ready(function() {
             }
         });
         }
-       
+
     }
     $(document).on('click', '.openDataSidebarForAddCustomerLedger', function() {
         // $('.customer_id').children(`option`).attr('disabled', false);
@@ -238,18 +303,18 @@ $(document).ready(function() {
         var cr            =  $(this).attr('cr');
         var dr            =  $(this).attr('dr');
         var balance       =  $(this).attr('balance');
- 
-      
+
+
         $('input[id="operation"]').val('update');
         lastOp = 'update';
         $('#dataSidebarLoader').show();
         $('._cl-bottom').hide();
         $('.pc-cartlist').hide();
-        
+
         $('#dataSidebarLoader').hide();
         $('._cl-bottom').show();
         $('.pc-cartlist').show();
-        
+
         $('input[id="customer_id"]').val(id);
         $('input[id="hidden_balance"]').val(balance);
         $('.customer_name').text(customer_name ?? 'Customer'+' Details');
@@ -288,36 +353,43 @@ function fetchLedgers() {
                     </table>`);
                     $('.subCatsListTable tbody').empty();
                     var sNo = 1;
-                    response.customers.forEach((element,key) => {  
-                       
+                    response.customers.forEach((element,key) => {
+
                         var total_cr_dr = 0;
                         var voucher = '';
                         if(operation == 'vendor'){
                          total_cr_dr    =    action == 'vendor-ledger-jama'? element.rec[0].total_cr ?? '0' :  element.rec[0].total_dr ?? '0';
                          voucher        =    action == 'vendor-ledger-jama'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
-                         ledger_balance =   element['balance'] >= 0 ? element['balance'] + ' CR' : (-element['balance']) + ' DR' 
+                         ledger_balance =   element['balance'] >= 0 ? element['balance'] + ' CR' : (-element['balance']) + ' DR'
                         }else{
                          total_cr_dr    =    action == 'customer-ledger-jama'? element.rec[0].total_cr ?? '0' :  element.rec[0].total_dr ?? '0';
                          voucher        =    action == 'customer-ledger-jama'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
-                         ledger_balance =    element['balance'] >= 0 ? element['balance'] + ' DR' : (-element['balance']) + ' CR' 
+                         ledger_balance =    element['balance'] >= 0 ? element['balance'] + ' DR' : (-element['balance']) + ' CR'
                         }
 
                         $('.subCatsListTable tbody').append(`
                         <tr>
-                        <td> ${voucher}</td> 
-                        <td> ${element['customer_name']}</td>
-                        <!-- <td class='total_balance'>${ledger_balance}</td> --!>
-                        <td>${total_cr_dr}</td>
-                        <td> ${element['comment'] ?? 'NA'}</td>
-                        <td> ${moment(element['date']).format('D MMM YYYY')}</td> 
+                            <td> ${voucher}</td>
+                            <td> ${element['customer_name']}</td>
+                            <!-- <td class='total_balance'>${ledger_balance}</td> --!>
+                            <td>${total_cr_dr}</td>
+                            <td> ${element['comment'] ?? 'NA'}</td>
+                            <td> ${moment(element['date']).format('D MMM YYYY')}</td>
                             <td>
-                                <button  class="btn btn-default btn-line openDataSidebarForUpdateCustomerLedger"
-                                        customer-id="${element['customer_id']}" 
-                                        customer_name="${element['customer_name']}" 
-                                        cr="${element['cr']}" 
-                                        dr="${element['dr']}" 
-                                        balance="${element['balance']}" 
-                                >Add Payment</button>
+                                <button  class="btn btn-default btn-line openDataSidebarForEditCustomerLedger ${element.is_editable == 1 ? '' : 'd-none'}"
+                                            customer-id="${element['customer_id']}"
+                                            customer_name="${element['customer_name']}"
+                                            cr="${element['cr']}"
+                                            dr="${element['dr']}"
+                                            balance="${element['balance']}"
+                                    >Edit</button>
+                                    <button  class="btn btn-default btn-line openDataSidebarForUpdateCustomerLedger"
+                                            customer-id="${element['customer_id']}"
+                                            customer_name="${element['customer_name']}"
+                                            cr="${element['cr']}"
+                                            dr="${element['dr']}"
+                                            balance="${element['balance']}"
+                                    >Add Payment</button>
                             </td>
                         </tr>`);
                     });
@@ -326,8 +398,8 @@ function fetchLedgers() {
                     $('.subCatsListTable').DataTable();
                 }
     });
-}   
- $('.customer_id').on('change',function(){ 
+}
+ $('.customer_id').on('change',function(){
     var cust_bal     =  $('option:selected', this).attr('balance');
     var cus_name     =  $('option:selected', this).attr('cus_name');
     var customer_val =  $(this).val()
@@ -338,10 +410,10 @@ function fetchLedgers() {
     {
         n++
         $('.customer_balnce').val(cust_bal)
-        $('.add-more').append(` 
+        $('.add-more').append(`
         <div class="row  remove_div" >
         <h5 class="_head03">${cus_name}<span> (${cust_bal})</span></h5>
-           
+
                 <div class="col-md-5 PB-10">
                     <div class="form-group focused">
                         <label class="control-label mb-10">Add Amount *</label>
@@ -363,15 +435,15 @@ function fetchLedgers() {
         `);
         $('.customer_id').children(`option[value="${customer_val}"]`).attr('disabled', true);
         setTimeout(() => {
-            $('.customer_id').val('0');$('.customer_id').select2(); 
+            $('.customer_id').val('0');$('.customer_id').select2();
             $(`#amount_${customer_val}`).focus();
         }, 500);
-        
+
     }
-  
+
  });
  $(document).on('click', `.remove`, function () {
-    var cus_id = $(this).attr('data-customer_id'); 
+    var cus_id = $(this).attr('data-customer_id');
     // $(`.remove_btn_${cus_id}`).parent().parent().remove();
     $(this).closest('.remove_div').remove();
     // customer_transaction_array = customer_transaction_array.filter(x => x.customer_id != $(this).attr('data-customer_id'));
@@ -388,9 +460,9 @@ function fetchLedgers() {
     $(this).css('background', 'green');
 });
 $('#saveTransaction').on('blur', function() {
-    $(this).css('background', 'linear-gradient(90deg, #152e4d 0%, #152e4d 100%)'); 
+    $(this).css('background', 'linear-gradient(90deg, #152e4d 0%, #152e4d 100%)');
 });
-$(document).on('click', '.btn-cancel', function () { 
+$(document).on('click', '.btn-cancel', function () {
     if(n > 0){
         $('#hidden_btn_to_open_modal').click();
     }else{closeSidebar();}

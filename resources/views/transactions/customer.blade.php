@@ -41,6 +41,7 @@
                                 <form style="display: flex;" id="saveTransactionForm">
                                     @csrf
                                     <input type="text" hidden value="{{$operation}}" name="operation">
+                                    <input type="text" hidden  name="action" id="action">
                                     <input type="text" id="customer_id" hidden name="hidden_customer_id">
                                     <input type="text" id="hidden_balance" hidden name="hidden_balance">
                                     <div id="floating-label" class="card p-20 top_border mb-3" style="width: 100%">
@@ -119,6 +120,12 @@
                                                         <textarea name="comment" class="form-control" rows="6" tabindex="3"></textarea>
                                                     </div>
                                                 </div> -->
+                                                <table class="table">
+                                                <tr style="background: #152e4d;color: white;">  
+                                                    <td style="font-family:bold" >Total:</td>
+                                                    <td colspan="2" class="total_ledger_sum"></td>
+                                                </tr>
+                                                </table>
                                                 <h2 class="_head03 ">To <span>Print</span></h2>
                                                     <div class="row status-sh">
                                                         <div class="col-12">

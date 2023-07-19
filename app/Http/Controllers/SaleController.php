@@ -53,11 +53,11 @@ class SaleController extends Controller
             $v->status           =  $previous_qty > 0 ? 1 : 2;
             $v->transaction_type =  $previous_qty > 0 ? 4 : 2; //4 = Edit , 2= Sale
         }
-        
-        if($previous_qty > 0){ 
+
+        if($previous_qty > 0){
             $v->qty =  $previous_qty;
             $v->balance = $balance + $v->qty;
-            
+
         }else if($old_record != '' ){
             $v->qty =  $old_record->qty;
         }else{
@@ -80,10 +80,10 @@ class SaleController extends Controller
     {
         if ($request->hidden_invoice_id) {
             $invoice = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
-            // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received; 
+            // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received;
         } else {
             $invoice     = new SaleInvoice();
-            isEditable($request->customer_id); 
+            isEditable($request->customer_id);
         }
 
         $invoice->amount_received      = $request->amount_received;
@@ -143,7 +143,7 @@ class SaleController extends Controller
                         }
                         $status = 0;
                         $sale->purchased_price = $sale_product['purchased_price'];
-                        if ($request->hidden_invoice_id) { 
+                        if ($request->hidden_invoice_id) {
                             if ($previous_qty != 0) {
                                 $v = $this->updateStock($previous_qty, $sale, $balance, $vendor_id, 'vendor');
                                 $balance =  $v->balance;
@@ -219,7 +219,7 @@ class SaleController extends Controller
                     //                         'stock_balance' =>  $v_stock->balance,
                     //                     ]);
                     //                 }
-                    //             }  
+                    //             }
                     //     }
 
                     // }
@@ -315,7 +315,7 @@ class SaleController extends Controller
                                                         (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
                                                         (SELECT cr FROM customer_ledger WHERE sale_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
                                                         ")
-                                                    ->first(); 
+                                                    ->first();
         $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
         $products                   =   ProductSale::where('sale_invoice_id', $invoice_id)
                                                     ->selectRaw("products_sales.*,
@@ -331,7 +331,7 @@ class SaleController extends Controller
 
         // $customer_balance = CustomerLedger::where('customer_id', $customerId)
         //                                     // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
-        //                                     ->orderBy('id', 'DESC')->value('balance'); 
+        //                                     ->orderBy('id', 'DESC')->value('balance');
 
         return view('sales.sale-invoice', compact('invoice', 'products', 'customer_balance'));
     }
@@ -370,7 +370,7 @@ class SaleController extends Controller
             'status'            =>  'success',
             'customer_balance'  => $customer_balance
         ]);
-    } 
+    }
     public function allSalesList(){
         $customers  =   Customer::select('id','customer_name')->where('customer_type',2)->get();
         return view('sales.all-list', compact('customers'));
@@ -397,17 +397,17 @@ class SaleController extends Controller
             'status'    =>  'success',
             'sales'     =>  $sales
         ]);
-    } 
+    }
     public function deleteProduct(Request $request)
     {
-       
+
                $vs      = VendorStock::where('sale_invoice_id', $request->sale_invoice_id)
                                     ->where('product_id',$request->product_id)
                                     ->where('qty', $request->qty)
                                     ->where('status', 2)->orderBy('id', 'DESC')
-                                    ->first(); 
+                                    ->first();
             if($vs){
-            
+
                 $stock_inHand                  = VendorStock::where('product_id', $request->product_id)
                                                              ->orderBy('id', 'DESC')->value('balance');
                 $v_stock                       =  new VendorStock();
@@ -433,7 +433,7 @@ class SaleController extends Controller
                     // unset($v_stock->vendor_id);
                     // $stockData = $v_stock->toArray();
                     // Stock::insert($stockData);
-                 
+
                     return response()->json([
                         'msg'       => 'product removed',
                         'status'    => 'success',

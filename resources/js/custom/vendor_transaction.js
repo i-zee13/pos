@@ -297,17 +297,17 @@ function fetchLedgers() {
                             voucher        =    action == 'vendor-ledger-banam'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
                             ledger_balance =    element['balance'] >= 0 ? element['balance'] + ' CR' : (-element['balance']) + ' DR' 
                         }
-                        if(action == 'vendor-ledger-banam' && element.crv_no){
-                             $('.subCatsListTable tbody').append(`
+                        if ((action === 'vendor-ledger-banam' && element.crv_no) || (action === 'vendor-ledger-jama' && element.cpv_no)) {
+                            $('.subCatsListTable tbody').append(`
                                 <tr>
-                                <td> ${voucher}</td> 
-                                <td> ${element['customer_name']}</td>
-                                <!-- <td class='total_balance'>${ledger_balance}</td> --!>
-                                <td>${total_cr_dr}</td>
-                                <td> ${element['comment'] ?? 'NA'}</td>
-                                <td> ${moment(element['date']).format('D MMM YYYY')}</td> 
+                                    <td>${voucher}</td> 
+                                    <td>${element['customer_name']}</td>
+                                    <!-- <td class='total_balance'>${ledger_balance}</td> -->
+                                    <td>${total_cr_dr}</td>
+                                    <td>${element['comment'] ?? 'NA'}</td>
+                                    <td>${moment(element['date']).format('D MMM YYYY')}</td> 
                                     <td>
-                                        <button  class="btn btn-default btn-line openDataSidebarForUpdateCustomerLedger"
+                                        <button class="btn btn-default btn-line openDataSidebarForUpdateCustomerLedger"
                                                 customer-id="${element['customer_id']}" 
                                                 customer_name="${element['customer_name']}" 
                                                 cr="${element['cr']}" 
@@ -315,28 +315,10 @@ function fetchLedgers() {
                                                 balance="${element['balance']}" 
                                         >Add Payment</button>
                                     </td>
-                                </tr>`);
+                                </tr>
+                            `);
                         }
-                        if(action == 'vendor-ledger-jama' && element.cpv_no){
-                            $('.subCatsListTable tbody').append(`
-                               <tr>
-                               <td> ${voucher}</td> 
-                               <td> ${element['customer_name']}</td>
-                               <!-- <td class='total_balance'>${ledger_balance}</td> --!>
-                               <td>${total_cr_dr}</td>
-                               <td> ${element['comment'] ?? 'NA'}</td>
-                               <td> ${moment(element['date']).format('D MMM YYYY')}</td> 
-                                   <td>
-                                       <button  class="btn btn-default btn-line openDataSidebarForUpdateCustomerLedger"
-                                               customer-id="${element['customer_id']}" 
-                                               customer_name="${element['customer_name']}" 
-                                               cr="${element['cr']}" 
-                                               dr="${element['dr']}" 
-                                               balance="${element['balance']}" 
-                                       >Add Payment</button>
-                                   </td>
-                               </tr>`);
-                       }
+                        
                        
                     });
                     $('#tblLoader').hide();
