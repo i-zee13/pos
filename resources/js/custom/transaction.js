@@ -5,6 +5,7 @@ let n = 0;
 let customer_transaction_array = [];
 let ledger_type = '';
 let operation = '';
+let  total_amount = 0;
 $(document).ready(function() {
     var segments = location.href.split('/');
      action      = segments[3];
@@ -41,12 +42,14 @@ $(document).ready(function() {
                 var dr_sum = 0;
                 var cr_sum = 0;
                 $('#transactionTable tbody').empty()
+                $('.customer_balnce').val(response.customer.balance);
                 response.transactions.forEach(data => {
+                  
                     balance_sum += data.balance;
                     cr_sum += data.cr;
                     dr_sum += data.dr;
                     if(action == operation+'-ledger-jama' &&  data.cr > 0){
-                        console.log(data.cr)
+                        console.log(data)
                         $('#transactionTable tbody').append(`
                                 <tr id='tr-${data.id}'>
                                     <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td>
@@ -56,15 +59,15 @@ $(document).ready(function() {
                         );
                     }
                     if(action == operation+'-ledger-banam' &&  data.dr > 0){
+                        console.log(data)
                         $('#transactionTable tbody').append(`
-                        <tr id='tr-${data.id}'>
-                            <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td>
-                            <td>${action == operation+'-ledger-jama' ? data.cr : data.dr}</td>
-                            <td>${data.comment ? data.comment : 'NA'}</td>
+                            <tr id='tr-${data.id}'>
+                                <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td>
+                                <td>${action == operation+'-ledger-jama' ? data.cr : data.dr}</td>
+                                <td>${data.comment ? data.comment : 'NA'}</td>
                             </tr>`
-                            );
-                    }
-
+                        );
+                    } 
                 });
                 $('#transactionTable tbody').append(`
                 <tr style="background: #152e4d;color: white;">
@@ -74,12 +77,20 @@ $(document).ready(function() {
             `);
             this_btn.closest('tr').find('.total_balance').text((action == operation+'-ledger-jama' ? cr_sum + 'CR' : dr_sum + 'DR') );
             $('.add-more').append(`
-                <h5 class="_head03">${customer_name}<span> (${balance})</span></h5>
+                    <div class="row _head03">
+                        <div class="col-6"> 
+                        <h5 class="">${customer_name}</h5>
+                        </div>
+                        <div class="col-6" style="text-align:right;"> 
+                        <span> <strong>Balance</strong> : ${response.customer.balance > 0 ? response.customer.balance + ' <strong>DR</strong>' : response.customer.balance + ' <strong>CR</strong>'}</span>
+                        </div>
+                    </div>
+               
                     <div class="row  remove_div" >
                         <div class="col-md-5 PB-10">
                             <div class="form-group focused">
                                 <label class="control-label mb-10">Add Amount *</label>
-                                <input type="hidden" name="hidden_cust_balance[]" value="${balance}">
+                                <input type="hidden" name="hidden_cust_balance[]" value="${response.customer.balance}">
                                 <input type="hidden" name="hidden_cust_id[]" value="${id}">
                                 <input type="number" name="amount[]" class="form-control field-required amount" id="amount_${id}" required tabindex="2" data-customer_id="${id}">
                             </div>
@@ -188,12 +199,15 @@ $(document).ready(function() {
     //     saveTransaction(current_action,'print');
     //     current_action.text('Print')
     // })
+
     $("#saveTransaction").on('click', function () {
         var current_action = $(this);
         saveTransaction(current_action,'save');
         current_action.text('Save')
         // $('#hidden_btn_to_open_modal').click();
     });
+
+   
     function saveTransaction(current_action,type){
          var dirty = true;
         if (n == 0) {
@@ -340,7 +354,7 @@ function fetchLedgers() {
                     <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;">
                         <thead>
                             <tr>
-                                <th>Voucher #</th>
+                            <!-- <th>Voucher #</th>  --!>
                                 <th>Name</th>
                               <!--  <th>Balance</th> --!>
                                 <th>Total </th>
@@ -354,7 +368,7 @@ function fetchLedgers() {
                     $('.subCatsListTable tbody').empty();
                     var sNo = 1;
                     response.customers.forEach((element,key) => {
-
+                        console.log(element);
                         var total_cr_dr = 0;
                         var voucher = '';
                         if(operation == 'vendor'){
@@ -366,10 +380,10 @@ function fetchLedgers() {
                          voucher        =    action == 'customer-ledger-jama'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
                          ledger_balance =    element['balance'] >= 0 ? element['balance'] + ' DR' : (-element['balance']) + ' CR'
                         }
-
+                        
                         $('.subCatsListTable tbody').append(`
                         <tr>
-                            <td> ${voucher}</td>
+                        <!-- <td> ${voucher}</td>--!>
                             <td> ${element['customer_name']}</td>
                             <!-- <td class='total_balance'>${ledger_balance}</td> --!>
                             <td>${total_cr_dr}</td>
@@ -412,20 +426,27 @@ function fetchLedgers() {
         $('.customer_balnce').val(cust_bal)
         $('.add-more').append(`
         <div class="row  remove_div" >
-        <h5 class="_head03">${cus_name}<span> (${cust_bal})</span></h5>
+            <div class="row _head03">
+                <div class="col-6"> 
+                    <h5 class="">${cus_name}</h5>
+                </div>
+                <div class="col-6" style="text-align:right;"> 
+                     <span> <strong>Balance</strong> : ${cust_bal  > 0 ? cust_bal  + '<strong> DR</strong>' : cust_bal  + ' <strong>CR</strong>'}</span>
+                </div>
+            </div> 
 
                 <div class="col-md-5 PB-10">
                     <div class="form-group focused">
                         <label class="control-label mb-10">Add Amount *</label>
                         <input type="hidden" name="hidden_cust_balance[]" value="${cust_bal}">
                         <input type="hidden" name="hidden_cust_id[]" value="${customer_val}">
-                        <input type="number" name="amount[]" class="form-control field-required amount" id="amount_${customer_val}" required tabindex="2" data-customer_id="${customer_val}">
+                        <input type="number" name="amount[]" class="form-control field-required amount nnnn" id="amount_${customer_val}" required tabindex="${customer_val * 2 + 2}" data-customer_id="${customer_val}">
                     </div>
                 </div>
                 <div class="col-md-6 PB-10">
                     <div class="form-group focused">
                         <label class="control-label mb-10">Remarks </label>
-                        <textarea name="comment[]" class="form-control remarks_${customer_val}" rows="6" tabindex="3"></textarea>
+                        <textarea name="comment[]" class="form-control remarks_${customer_val}" rows="6"tabindex="${customer_val * 2 + 3}"></textarea>
                     </div>
                 </div>
                 <div class="col-md-1 PB-10" style="margin-top: 21px;">
@@ -451,7 +472,13 @@ function fetchLedgers() {
     n--;
     $('.customer_id').children('option[value="' + cus_id + '"]').attr('disabled', false);
     $(".customer_id").val('0');
-    $(".customer_id").select2();
+    $(".customer_id").select2(); 
+    var  total_amount = 0;
+    $('.amount').each(function(){
+        var inputValue = parseFloat($(this).val()); 
+        total_amount += inputValue; 
+    });   
+        $('.total_ledger_sum').text(total_amount);
 })
  $('.close').on('click',function(){
     $(this).remove();
@@ -470,3 +497,14 @@ $(document).on('click', '.btn-cancel', function () {
 $(document).on('click', '.confirm_btn', function () {
     closeSidebar();
 });
+ 
+$(document).on('focusout','.amount',function(){ 
+    var total_amount = 0;
+    $('.amount').each(function(){
+        var inputValue = parseFloat($(this).val()); 
+        total_amount += inputValue; 
+    });   
+        $('.total_ledger_sum').text(total_amount);
+     
+ })   
+ 

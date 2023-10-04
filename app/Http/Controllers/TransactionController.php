@@ -16,7 +16,7 @@ class TransactionController extends Controller
    {
       $operation    =   'customer';
       $current_date =   Carbon::today()->toDateString();
-      $customers    =   Customer::where('customer_type', 2)->get();
+      $customers    =   Customer::where('customer_type', 2)->get(); 
       return view('transactions.customer', compact('current_date','customers','operation'));
       
    }
@@ -35,7 +35,7 @@ class TransactionController extends Controller
       if ($request->operation == 'vendor') {
          $customers  =  VendorLedger::selectRaw('vendor_ledger.*,
                                        (SELECT customer_name FROM customers WHERE id = vendor_ledger.customer_id) as customer_name')
-                                       ->join(DB::raw('(SELECT customer_id, MAX(id) as max_id FROM vendor_ledger GROUP BY customer_id) as t'), function ($join) {
+                                       ->leftjoin(DB::raw('(SELECT customer_id, MAX(id) as max_id FROM vendor_ledger GROUP BY customer_id) as t'), function ($join) {
                                           $join->on('vendor_ledger.customer_id', '=', 't.customer_id')
                                              ->on('vendor_ledger.id', '=', 't.max_id');
                                        })->whereDate('created_at', Carbon::today())
@@ -47,26 +47,33 @@ class TransactionController extends Controller
                                           ->whereDate('created_at', Carbon::today())
                                           ->where('customer_id', $item->customer_id)
                                           ->get();
-         return $item;
-      });
-     
+                                       return $item;
+                        });
+ 
       } else {
          $customers  =  CustomerLedger::selectRaw('customer_ledger.*,
                                                  (SELECT customer_name FROM customers WHERE id = customer_ledger.customer_id) as customer_name')
-                                          ->join(DB::raw('(SELECT customer_id, MAX(id) as max_id FROM customer_ledger GROUP BY customer_id) as t'), function ($join) {
+                                          ->leftjoin(DB::raw('(SELECT customer_id, MAX(id) as max_id FROM customer_ledger GROUP BY customer_id) as t'), function ($join) {
                                              $join->on('customer_ledger.customer_id', '=', 't.customer_id')
                                                 ->on('customer_ledger.id', '=', 't.max_id');
-                                          })->whereDate('created_at', Carbon::today())
+                                          })
+                                          ->whereDate('created_at', Carbon::today())
                                           ->groupby('customer_id')
-                                          ->orderBy('customer_ledger.id', 'DESC')
-                                          ->get();
+                                          ->orderBy('customer_ledger.id', 'DESC');  
+         if($request->current_url == 'customer-ledger-jama'){
+            $customers = $customers->where('cr','>',0)->where('crv_no','!=','')->get();
+         }else{ 
+            $customers = $customers->where('dr','>',0)->get();
+         } 
+                                          
          $customers   = collect($customers)->filter(function ($item) {
                                  $item->rec = $item->selectRaw('SUM(cr) as total_cr , SUM(dr) as total_dr')->where('trx_type', 3)
                                     ->whereDate('created_at', Carbon::today())
                                     ->where('customer_id', $item->customer_id)
+                                    ->orderBy('customer_ledger.id', 'DESC')
                                     ->get();
-            return $item;
-         });
+                                       return $item;
+                                    });
         
       } 
       return response()->json([
@@ -76,7 +83,7 @@ class TransactionController extends Controller
       ]);
    }
    public function store(Request $request)
-   {  
+   {   
       if ($request->operation == 'vendor') {
          // $ledger              =   new VendorLedger();
          // $ledger->customer_id =  $request->hidden_vendor_id;
@@ -130,16 +137,17 @@ class TransactionController extends Controller
                }
             }else{
                if($request->action == 'edit'){
-                  $ledger = CustomerLedger::where('customer_id',$customer)->first();
+                  $ledger              = CustomerLedger::where('customer_id',$customer)->first();
                }else{
                   $ledger              =   new CustomerLedger();
                   isEditable($customer);
                }
-               if ($request->amount_to == 1) {  //1 = CR Ledger-jama
+               if ($request->amount_to == 1) {     //1 = CR Ledger-jama
                   $ledger->crv_no   =  getCrvNo(); 
                   $ledger->balance  =  $balance - $request->amount[$key];
                   $ledger->cr       =  $request->amount[$key];
-               } else { // DR Ledger-Banam
+              
+               } else {                            // DR Ledger-Banam
                   $ledger->cpv_no   =  getCpvNo();
                   $ledger->balance  =  $balance + $request->amount[$key];
                   $ledger->dr       =  $request->amount[$key];
@@ -152,6 +160,7 @@ class TransactionController extends Controller
             $ledger->date        =   $request->transaction_date;
             $ledger->created_by  =   Auth::user()->id;
             if($ledger->save()){
+               // dd($ledger);
                Customer::where('id', $customer)->update([ 'balance' => $ledger->balance]);
             }
            
@@ -177,15 +186,17 @@ class TransactionController extends Controller
           $transactions  =  CustomerLedger::selectRaw('customer_ledger.*,
                                                        (SELECT customer_name FROM customers WHERE id = customer_ledger.customer_id) as customer_name')
                                              ->where('trx_type', 3)->whereDate('created_at', Carbon::today())->where('customer_id', $request->id)
-                                             ->where('is_editable',0)->orderBy('customer_ledger.id', 'ASC')
+                                            ->orderBy('customer_ledger.id', 'ASC')
                                              ->get();
          $last_inserted  =  CustomerLedger::where('customer_id',$request->id)->where('is_editable',1)->first();
       }
+     $customer_balance =  Customer::where('id',$request->id)->orderBy('id', 'DESC')->first('balance');
       return response()->json([
          'status' => 'success',
          'msg'    => 'Customers Fetched',
          'transactions' => $transactions,
-         'last_inserted' => $last_inserted 
+         'last_inserted' => $last_inserted ,
+         'customer' => $customer_balance 
       ]);
    }
    public function printInvoice($transaction_id, $customer_id,$operation ,$sro)

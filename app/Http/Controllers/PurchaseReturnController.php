@@ -43,20 +43,22 @@ class PurchaseReturnController extends Controller
             'customer_balance'  => $customer_balance
         ]);
     }
-    public function purchaseReturn(){
-        $invoice_no   =  'inv-'.Str::random(15);
-        $current_date =   Carbon::today()->toDateString();
-        $customers    =   Customer::where('customer_type', 1)
-                            ->whereIn('id', function($query){
-                                $query->select('customer_id')
-                                    ->from('purchase_invoices')
-                                    ->groupBy('customer_id');
-                            })
-                            ->get();
-        $products     =   Product::all();
-        return view('purchases.return',compact('customers','current_date','invoice_no','products'));
+    public function create(){
+        $invoice_no          =   getPurchaseReturnNo();
+        $parts               =   explode('-', $invoice_no); 
+        $invoice_first_part  =   $parts[0];
+        $current_date        =   Carbon::today()->toDateString();
+        $products            =   Product::all();
+        $customers           =   Customer::where('customer_type', 1)
+                                            ->whereIn('id', function($query){
+                                                $query->select('customer_id')
+                                                    ->from('purchase_invoices')
+                                                    ->groupBy('customer_id');
+                                            })
+                                ->get();
+        return view('purchases.return.create',compact('customers','current_date','invoice_first_part','products'));
     }
-    Public function addpurchaseReturn(Request $request){
+    Public function store(Request $request){
         if($request->hidden_invoice_id){
             ProductReturns::where('return_invoice_id ',$request->hidden_invoice_id)->delete();
             // Stock::where('return_invoice_id ',$request->hidden_invoice_id)->delete();

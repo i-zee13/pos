@@ -657,71 +657,71 @@
 
                         <!-- <div class="left_Info_">
 
-                    <div class="row" style="margin-right:-5px; padding-bottom: 20px;">
-                        <div class="col-md-12 PB-10">
-                            <label class="font13 mb-5">Country Of Origin</label>
-                            <div class="form-s2">
-                                <select class="form-control formselect" placeholder="select Country Of Origin" name="country_of_origin">
-                                    <option disabled selected>Select Country Of Origin</option>
-                                    <option selected value="Pakistan">Pakistan</option>
-                                </select>
+                            <div class="row" style="margin-right:-5px; padding-bottom: 20px;">
+                                <div class="col-md-12 PB-10">
+                                    <label class="font13 mb-5">Country Of Origin</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect" placeholder="select Country Of Origin" name="country_of_origin">
+                                            <option disabled selected>Select Country Of Origin</option>
+                                            <option selected value="Pakistan">Pakistan</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 PB-10">
+                                    <label class="font13 mb-5">Port of Loading</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect" placeholder="select Port of Loading" name="port_of_loading">
+                                            <option disabled selected>Select Port of Loading</option>
+
+                                            <option value=" ">Select Port of Lo </option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 PB-10">
+                                    <label class="font13 mb-5">Port of Discharge</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect" placeholder="select Port of Discharge" name="port_of_discharge">
+                                            <option disabled selected>Select Port of Discharge</option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 PB-10">
+                                    <label class="font13 mb-5">Mode of Shipment</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect" placeholder="select Mode of Shipment" name="mode_of_shipment">
+                                            <option disabled selected>Select Mode of Shipment</option>
+                                            <option value="Sea">By Sea</option>
+                                            <option value="Land">By Land</option>
+                                            <option value="Air">By Air</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-12 mb-20 nonFobDiv">
+                                    <label class="font12">Select Route</label>
+                                    <div class="form-s2">
+                                        <select class="form-control sd-type" name="shipping_route" multiple="multiple" style="width: 100%">
+
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-md-12 PB-10">
+                                    <label class="font13 mb-5">Shipped Via</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect" placeholder="Select Shipped Via" name="shipment_company">
+                                            <option disabled selected>Select Company Name</option>
+
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="col-md-12 PB-10">
-                            <label class="font13 mb-5">Port of Loading</label>
-                            <div class="form-s2">
-                                <select class="form-control formselect" placeholder="select Port of Loading" name="port_of_loading">
-                                    <option disabled selected>Select Port of Loading</option>
-
-                                    <option value=" ">Select Port of Lo </option>
-
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12 PB-10">
-                            <label class="font13 mb-5">Port of Discharge</label>
-                            <div class="form-s2">
-                                <select class="form-control formselect" placeholder="select Port of Discharge" name="port_of_discharge">
-                                    <option disabled selected>Select Port of Discharge</option>
-
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-12 PB-10">
-                            <label class="font13 mb-5">Mode of Shipment</label>
-                            <div class="form-s2">
-                                <select class="form-control formselect" placeholder="select Mode of Shipment" name="mode_of_shipment">
-                                    <option disabled selected>Select Mode of Shipment</option>
-                                    <option value="Sea">By Sea</option>
-                                    <option value="Land">By Land</option>
-                                    <option value="Air">By Air</option>
-                                </select>
-                            </div>
-                        </div>
-
-
-                        <div class="col-md-12 mb-20 nonFobDiv">
-                            <label class="font12">Select Route</label>
-                            <div class="form-s2">
-                                <select class="form-control sd-type" name="shipping_route" multiple="multiple" style="width: 100%">
-
-                                </select>
-                            </div>
-                        </div>
-
-
-
-                        <div class="col-md-12 PB-10">
-                            <label class="font13 mb-5">Shipped Via</label>
-                            <div class="form-s2">
-                                <select class="form-control formselect" placeholder="Select Shipped Via" name="shipment_company">
-                                    <option disabled selected>Select Company Name</option>
-
-                                </select>
-                            </div>
-                        </div>
-                    </div>
                 </div> -->
 
 
@@ -887,7 +887,7 @@
                                             <td></td>
                                             <td></td>
                                             <td align="right">Service charges </td>
-                                            <td style="width:112px"><input type="number" name="discount" id="discount" class="inputvalue service_charges_input" style="font-size: 13px" value="{{@$invoice->service_charges}}" placeholder="0.00" onkeypress="return isNumber(event)" data-id="" data-value="" min="0"></td>
+                                            <td style="width:112px"><input type="number" name="discount" id="discount" class="inputvalue service_charges_input" style="font-size: 13px" value="{{@$invoice->service_charges}}" placeholder="0.00"  data-id="" data-value="" min="0"></td>
                                         </tr>
                                         <tr class="previous_payable_tr" style="display:none">
                                             <td></td>
@@ -921,7 +921,7 @@
                                             <td></td>
                                             <td></td>
                                             <td align="right" class="cash-return">Cash Recived </td>
-                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" onkeypress="return isNumber(event)" value="{{@$invoice->amount_received}}"></td>
+                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00"  value="{{@$invoice->amount_received}}"></td>
                                         </tr>
 
 
@@ -929,7 +929,7 @@
                                             <td></td>
                                             <td></td>
                                             <td align="right">Cash Return</td>
-                                            <td class="cash_return">{{@$invoice->cash_return}}</td>
+                                            <td class="cash_return_amount">{{@$invoice->cash_return}}</td>
                                         </tr>
                                         @if (Route::currentRouteName() == 'sale-edit')
 
@@ -956,7 +956,7 @@
                                                 @if(request()->query('invoice') == 'detail')
                                                 <span>{{$invoice->invoice_remaining_amount_after_pay}}</span>
                                                 @else
-                                                <span class="grand-total">0</span>
+                                                <span class="grand-total">0.00</span>
                                                 @endif
                                             </td>
 
@@ -997,11 +997,7 @@
 
 </div>
 </div>
-@endsection
-@section('content')
-
-
-@endsection
+@endsection 
 @push('js')
 <script>
     var clients = JSON.parse('{!! json_encode($customers)  !!}');

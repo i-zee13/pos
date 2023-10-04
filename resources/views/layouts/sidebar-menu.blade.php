@@ -120,9 +120,24 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('purchase-return')}}" class="nav-link ">
-                  Purchase Returns
+                <a href="#sidebarPurchaseReturnDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarPurchaseReturnDropDown">
+                 Returns
                 </a>
+                <div class="collapse" id="sidebarPurchaseReturnDropDown" style="">
+                  <ul class="nav nav-sm flex-column">
+                    <li class="nav-item">
+                      <a href="{{route('purchase-return.create')}}" class="nav-link ">
+                        Add New
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{route('purchase-return.index')}}" class="nav-link ">
+                        List
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
               </li>
             </ul>
           </div>
@@ -153,7 +168,7 @@
               </li>
               <li class="nav-item">
                 <a href="#sidebarSaleReturnDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSaleReturnDropDown">
-                  Sales Returns
+                 Returns
                 </a>
                 <div class="collapse" id="sidebarSaleReturnDropDown" style="">
                   <ul class="nav nav-sm flex-column">
@@ -164,6 +179,26 @@
                     </li>
                     <li class="nav-item">
                       <a href="{{route('salereturn.index')}}" class="nav-link ">
+                        List
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
+              </li>
+              <li class="nav-item">
+                <a href="#sidebarSaleReplacementDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSaleReplacementDropDown">
+                  Replacements
+                </a>
+                <div class="collapse" id="sidebarSaleReplacementDropDown" style="">
+                  <ul class="nav nav-sm flex-column">
+                    <li class="nav-item">
+                      <a href="{{route('salereplacement.create')}}" class="nav-link ">
+                        Add New
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{route('salereplacement.index')}}" class="nav-link ">
                         List
                       </a>
                     </li>

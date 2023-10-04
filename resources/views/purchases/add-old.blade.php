@@ -373,12 +373,12 @@
         </h6>
         <!-- Title -->
         <h1 class="header-title">
-          <h2 class="_head01">Purchase <span>Returns</span></h2>
+          <h2 class="_head01">Purchase <span>Invoice</span></h2>
         </h1>
       </div>
       <div class="col-auto">
         <ol class="breadcrumb">
-          <li><a href="#"><span>Returns</span></a></li>
+          <li><a href="#"><span>Purchase</span></a></li>
           <li><span>add</span></li>
         </ol>
         <!-- Button -->
@@ -400,7 +400,9 @@
           <div class="row">
             <div class="col-12">
               <div class="header pt-0">
-                <h2>Returns <span>Definition</span></h2>
+                <h2>Purchase <span>Definition</span></h2>
+              <a href="{{route('purchases')}}"  class="btn btn-primary mr-2" style="    margin-top: -10px;float: right;">Purchases</a>
+
               </div>
             </div>
           </div>
@@ -410,13 +412,13 @@
               <div class="col-md-2 mb-10">
 
                 <label class="control-label mb-5">Invoice # *</label>
-                <input type="text" id="" class="form-control required" placeholder="" name="invoice_no" value="{{$invoice_no}}">
+                <input type="text" id="" class="form-control required new_form_field" placeholder="" name="invoice_no" value="{{$invoice_no}}">
 
               </div>
               <div class="col-md-4">
                 <label class="control-label mb-5">Date </label>
                 <div>
-                  <input autocomplete="off" id="datepicker" type="text" class="form-control new_dob new_form_field " name="invoice_date" value="{{$current_date}}">
+                  <input autocomplete="off"   type="date" class="form-control new_dob new_form_field " name="invoice_date" value="{{$current_date}}">
                 </div>
 
               </div>
@@ -425,27 +427,16 @@
                 <div class="form-s2">
                   <select class="form-control formselect customer_id form_clear required" name="customer_id" id="customer_id">
                     <option value="0"> Select Vendor*</option>
-                    @foreach($customers as $customer)
-                    <option value="{{$customer->id}}"> {{$customer->customer_name}}</option>
-                    @endforeach
+
                     </option>
                   </select>
                 </div>
               </div>
-              <!-- <div class="col-md-2  PT-20" id="btns_div">
-                      <button type="button" id="add-product" class="btn btn-primary mr-2">Add</button>
-              </div> -->
-
+             
             </div>
 
           </div>
-          
-          
-          <div class="row display" style="display: none;">
-            <input type="text" id="" class="form-control " value="1" name="form_status" hidden>
-
-            <div class="col-12">
-            <div class="row">
+          <div class="row">
             <div class="col-12">
               <div class="header pt-0">
                 <h2>Stock <span>Definition</span></h2>
@@ -499,25 +490,31 @@
                     </div>
 
                   </div>
+
                 </div>
+               
               </div>
           </div>
+          <div class="row display" style="display: none;">
+            <input type="text" id="" class="form-control " value="1" name="form_status" hidden>
+
+            <div class="col-12">
               <div class="property_info">
                 <div class="row">
                   <div class="col-12 pt-10">
                     <div class="header pt-0">
-                      <h2> Returns <span>Information</span></h2>
+                      <h2> Purchase <span>Information</span></h2>
                     </div>
                   </div>
                 </div>
 
                 <div class="infoDiv p-15">
-
-                  <div class="row ">
+                <form id="purchse-form">
+                  <div class="row">
 
                     <div class="col-md-2 mb-10">
 
-                      <label class="control-label mb-5">Bar Code</label>
+                      <label class="control-label mb-5">ID*</label>
                       <input type="text" id="bar-code" class="form-control bar-code" placeholder="" name="bar_code" data-attr='bar_code'>
 
                     </div>
@@ -540,10 +537,10 @@
                       <label class="control-label mb-5">Current Purchase Price</label>
                       <input type="text" id="purchase_price" class="form-control " placeholder="" name="purchase_price">
                     </div>
-                    <!-- <div class="col-md-3 mb-10">
+                    <div class="col-md-3 mb-10">
                       <label class="control-label mb-5">New Purchase Price</label>
                       <input type="text" id="new_purchase_price" class="form-control" placeholder="" name="new_purchase_price">
-                    </div> -->
+                    </div>
 
                     <div class="col-md-2 mb-10">
 
@@ -551,12 +548,12 @@
                       <input type="text" id="qty" class="form-control   only_numerics" placeholder="" name="qty">
 
                     </div>
-                    <!-- <div class="col-md-3">
+                    <div class="col-md-3">
                       <label class="control-label mb-5">Expiry Date</label>
                       <div>
-                        <input autocomplete="off" id="datepicker" type="text" class="form-control new_dob new_form_field expiry_date " name="expiry_date">
+                        <input autocomplete="off"   type="date" class="form-control new_dob new_form_field expiry_date " name="expiry_date">
                       </div>
-                    </div> -->
+                    </div>
 
                     <div class="col-md-3 mb-10">
                       <label class="control-label mb-5">Amount</label>
@@ -568,7 +565,7 @@
                     </div>
 
                   </div>
-
+                  </form>
                 </div>
               </div>
             </div>
@@ -580,7 +577,7 @@
                 <div class=" show_existing_div" style="display: none">
                   <div class="col-12">
                     <div class="header pt-0">
-                      <h2>Returns<span> Products List:</span></h2>
+                      <h2>Purchase<span> Products List:</span></h2>
                     </div>
                   </div>
                   <div class=" p-15 show_existing_div" style="display:none">
@@ -609,19 +606,19 @@
                               <th colspan="3" style="text-align:right;">Grand Total</th>
                               <th class="grand-total" colspan="4" style="text-align: center;">0</th>
                             </tr>
-                            <!-- <tr rowspan="5">
+                            <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Disscount </th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class=" qty-input add-stock-input" data-id="" data-value="">
                               </th>
-                            </tr> -->
+                            </tr>
 
-                            <!-- <tr rowspan="5">
+                            <tr rowspan="5">
                               <th colspan="3" style="text-align:right;">Amount pay</th>
                               <th class="" colspan="4" style="text-align: center;">
                                 <input type="text" value="" class="qty-input add-stock-input" name="amount_paid">
                               </th>
-                            </tr> -->
+                            </tr>
                           </tfoot>
                         </table>
                       </div>
@@ -636,14 +633,13 @@
 
                 <div class="col-md-12 text-right pr-0 PT-10" id="btns_div">
                   <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
-                  <a href="#" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                  <a href="/intake-forms" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                 </div>
 
               </div>
             </div>
 
           </div>
-          
         </div>
       </div>
 
@@ -659,6 +655,6 @@
 <script>
   var clients = JSON.parse('{!! json_encode($customers)  !!}');
 </script>
-<script src="{{asset('js/custom/purchase_returns.js')}}"> </script>
+<script src="{{asset('js/custom/stock.js')}}"> </script>
 
 @endpush

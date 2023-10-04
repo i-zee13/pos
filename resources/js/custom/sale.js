@@ -2,6 +2,8 @@ import { filter, update } from 'lodash';
 import swal from 'sweetalert';
 
 var segments = location.href.split('/');
+var queryString = location.search;
+
 var invalidSave = [];
 var result = 0;
 var product_list = [];
@@ -20,7 +22,7 @@ let sale_total_amount = 0;
 let segment = '';
 var deleteRef = '';
 var expiry_date = '';
-let retail_price  = '';
+let retail_price  = 0;
 var p_price = '';
 let stock_in_hand = '';
 let stock_products = '' ;
@@ -47,7 +49,13 @@ $(document).ready(function () {
 
         //
         
-    } else if (segments[3] == 'sale-edit') {
+    } else if (segments[3] == 'sale-edit') { 
+        var is_removable = true;
+        if (queryString.includes('invoice=detail')) {
+            is_removable = false;
+          } else {
+            is_removable = true;
+          }
         customer_id      = $('#curren_customer_id').val(); 
         var invoice_id   = $('#hidden_invoice_id').val(); 
         service_charges  = $('#service_charges').val(); 
@@ -91,7 +99,7 @@ $(document).ready(function () {
                             <td><input type="number" value="${product.retail_price}"  data-retail="${product.retail_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
                             <td><input type="number" value="${product.prod_discount}"  class="inputSale discount-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  style="font-size: 13px" min="0"></td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount}</td>
-                            <td><a type="button" id="${product.product_id}" data-id="${product.sale_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="" data-quantity="${product.qty}">Remove</a></td>
+                            <td><a type="button" id="${product.product_id}" data-id="${product.sale_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="" data-quantity="${product.qty}" style="${!is_removable ? 'display:none' : ''}">Remove</a></td>
                         `);
                 })
             }
@@ -102,9 +110,7 @@ $(document).ready(function () {
     $('.new_form_field').addClass('required_client'); 
 })
 $('#add-product').on('click', function () { 
-   console.log(data_variable);
     var is_in_array = sales_product_array.filter(x => x.product_id == data_variable);
-    console.log(sales_product_array);
     if(is_in_array.length > 0){
         for(var x =1 ; x <= qty ; x++){
             is_in_array[0].qty++;
@@ -736,17 +742,16 @@ $(document).on('input', '.discount-input', function () {
     }, 500);
     $(`.purchase-product-amount${current_product_id}`).empty();
     sales_product_array.filter(function (data) { 
-        if (data.product_id      == current_product_id) {
-            data.prod_discount   = p_discount;  
-            data.qty             = current_product_qty
-                new_amount_of_sale_product = (current_product_qty * data.retail_price)-p_discount;
-                data.amount = new_amount_of_sale_product;
-                $(`.purchase-product-amount${current_product_id}`).text(data.amount)
-                grandSum(previous_payable,service_charges); 
+        if (data.product_id == current_product_id) {
+            data.prod_discount          = p_discount;  
+            data.qty                    = current_product_qty
+            new_amount_of_sale_product  = (current_product_qty * data.retail_price) - p_discount;
+            data.amount                 = new_amount_of_sale_product;
+            $(`.purchase-product-amount${current_product_id}`).text(data.amount)
+            grandSum(previous_payable,service_charges); 
         }
     })
-})
-
+}) 
 function getProducts() {
         $("#products").empty();  
         $("#products").append(`<option value="0">Select Product</option>`)
@@ -875,17 +880,16 @@ $('#invoice_discount').on('input',function(){
         $('.amount_received').trigger('input');
     }, 500);
     grandSum(previous_payable,service_charges,$(this).val());
-  })
-
-  $('#add-product').on('focus', function() {
-    $(this).css('background','#152e4d ');
-  });
-  $('#add-product').on('blur', function() {
-    $(this).css('background','green');
-  });
-  $(document).on('mouseenter', '.show_purchase', function() {
-    $('.pp').show();
-  }).on('mouseleave', '.show_purchase', function() {
+});
+$('#add-product').on('focus', function() {
+$(this).css('background','#152e4d ');
+});
+$('#add-product').on('blur', function() {
+$(this).css('background','green');
+});
+$(document).on('mouseenter', '.show_purchase', function() {
+$('.pp').show();
+}).on('mouseleave', '.show_purchase', function() {
     $('.pp').hide();
   });
   

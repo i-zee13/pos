@@ -118,7 +118,14 @@
                                                         <label class="control-label mb-10">Remarks </label>
                                                         <textarea name="comment" class="form-control" rows="6" tabindex="3"></textarea>
                                                     </div>
+                                                    
                                                 </div> -->
+                                                <table class="table">
+                                                <tr style="background: #152e4d;color: white;">  
+                                                    <td style="font-family:bold" >Total:</td>
+                                                    <td colspan="2" class="total_ledger_sum"></td>
+                                                </tr>
+                                                </table>
                                                 <h2 class="_head03 ">To <span>Print</span></h2>
                                                     <div class="row status-sh">
                                                         <div class="col-12">

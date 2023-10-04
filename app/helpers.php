@@ -191,6 +191,18 @@ if(!function_exists('getSaleReturnNo'))
         return $invoice_no; 
     }
 }
+if(!function_exists('getPurchaseReturnNo'))
+{
+    function getPurchaseReturnNo()
+    { 
+        $invoice_no    = 1;
+        $lastinvoice   = PurchaseReturn::where('date',Carbon::today())->count();
+       
+        $invoice_no    = ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+      
+        return $invoice_no; 
+    }
+}
 if(!function_exists('getCrvNo'))
 {
     function getCrvNo()

@@ -21,10 +21,12 @@ class StockController extends Controller
     public function create()
     {
         $invoice_no   =   getPurchaseInvoice();
+        $parts        = explode('-', $invoice_no);
+        $invoice_first_part   = $parts[0];
         $current_date =   Carbon::today()->toDateString();
         $customers    =   Customer::all();
         $products     =   Product::get('id');
-        return view('purchases.add',compact('customers','current_date','products','invoice_no'));
+        return view('purchases.add',compact('customers','current_date','products','invoice_no','invoice_first_part'));
     }
     public function getProduct(Request $request)
     {
@@ -49,141 +51,174 @@ class StockController extends Controller
                 'products'  =>   $products
             ]);
     }
+    public function updateStock($previous_qty, $sale, $balance, $vendor_id, $type)
+    {
+        $old_record = '';
+        if ($type == 'company') {
+            $old_record          =  $previous_qty;
+            $previous_qty        =  0;
+            $v                   =  new Stock();
+            $v->vendor_stock_id  =  $old_record->vendor_stock_id ?? $sale->vendor_stock_id;
+            $v->status           =  $old_record != ''  ? 1 : 2;
+            $v->transaction_type =  $old_record != '' ? 4 : 2; //4 = Edit , 2= Sale
+        } else {
+            $v                   =  new VendorStock();
+            $v->vendor_id        =  $vendor_id;
+            $v->status           =  $previous_qty > 0 ? 1 : 2;
+            $v->transaction_type =  $previous_qty > 0 ? 4 : 2; //4 = Edit , 2= Sale
+        }
+
+        if($previous_qty > 0){
+            $v->qty     =  $previous_qty;
+            $v->balance = $balance - $v->qty;
+
+        }else if($old_record != '' && !empty($old_record) ){
+                $v->qty =  $old_record->qty;
+        }else{
+            $v->qty     = $sale->qty;
+            $v->balance = $balance + $sale->qty;
+        }
+        // $v->qty                  =  $previous_qty > 0 ? $previous_qty : ($old_record != '' ? $old_record->qty  : $sale->qty);
+        // $v->balance              =  $previous_qty > 0 ? $balance + $v->qty : $balance - $sale->qty;
+ 
+        $v->purchase_invoice_id  =  $old_record != '' && !empty($old_record) ? $old_record->purchase_invoice_id  : $sale->purchase_invoice_id;
+        $v->product_unit_price   =  $sale->purchase_price;
+        $v->product_id           =  $old_record != '' && !empty($old_record) ? $old_record->product_id  : $sale->product_id;
+        $v->date                 =  $old_record != '' && !empty($old_record) ? $old_record->date  : $sale->created_at;
+        $v->amount               =  $old_record != '' && !empty($old_record) ? $old_record->amount  : $sale->purchased_total_amount;
+        $v->created_by           =  Auth::id();
+        $v->save();
+        return $v;
+    }
      Public function purchaseInvoice(Request $request){
         if($request->hidden_invoice_id){
-            ProductPurchase::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
+            // ProductPurchase::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             $invoice = PurchaseInvoice::where('id',$request->hidden_invoice_id)->first();
         }else{
+            isEditable($request->customer_id);
             $invoice = new PurchaseInvoice();
+        } 
+        $invoice->paid_amount          = $request->paid_amount;
+        $invoice->date                 = $request->invoice_date;
+        $invoice->invoice_no           = $request->invoice_no;
+        $invoice->invoice_type         = $request->invoice_type;
+        $invoice->customer_id          = $request->customer_id;
+        if ($request->invoice_type == 1) {
+            $invoice->paid_amount      = $request->amount_to_pay;
+        } else {
+            $invoice->paid_amount      = $request->amount_received ? $request->amount_received : 0;
         }
-        $invoice->date           = $request->invoice_date;
-        $invoice->invoice_no     = $request->invoice_no;
-        $invoice->customer_id    = $request->customer_id;
-        $invoice->paid_amount    = $request->amount_paid+($request->hidden_paid_amount ? $request->hidden_paid_amount : 0);
-        $invoice->total_invoice_amount = $request->grand_total;
-        $invoice->created_by     = Auth::id();
+        $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges + $request->previous_receivable) - $request->invoice_discount;
+        $invoice->invoice_remaining_amount_after_pay  =  $invoice->total_invoice_amount - $request->amount_received;
+        $invoice->service_charges      = $request->service_charges;
+        $invoice->invoice_discount     = $request->invoice_discount;
+        $invoice->cash_return          = $request->cash_return;
+        $invoice->product_net_total    = $request->product_net_total;
+        $invoice->previous_receivable  = $request->previous_receivable;
+        $invoice->is_editable          = 1; 
+        $invoice->status               = $request->status; 
+        $invoice->description          = $request->description;
+        $invoice->created_by           = Auth::id();
         if($invoice->save()){
             if(count($request->purchased_product_array) > 0){
                 foreach($request->purchased_product_array as $purchase_product){
-                    // dd($purchase_product['new_price']);
-                    $purchased   =   new ProductPurchase();
-                    if($purchase_product['new_price'] != ''){
-                        $purchased->purchase_price  = $purchase_product['new_price'];
+                          
+                    $new_ids[] = $purchase_product['product_id'];
+                    if ($purchase_product['purchase_prod_id'] > 0) { 
+                        $purchased          =  ProductPurchase::where('id', $purchase_product['purchase_prod_id'])->first(); 
                     }else{
-                        $purchased->purchase_price  = $purchase_product['old_price'];
+                        $purchased          =  new ProductPurchase();
+                    } 
+                    
+                    if($purchase_product['new_price'] != ''){
+                      
+                        $purchased->purchase_price  = $purchase_product['new_price'];
+                    }else{ 
+                        $purchased->purchase_price  = $purchase_product['old_price']; 
                     }
-                    $purchased->purchase_invoice_id = $invoice->id;
-                    $purchased->product_id      = $purchase_product['product_id'];
-                    $purchased->vendor_id       = $request->customer_id;
-                    $purchased_products_array[] = $purchased->product_id;
-                    $purchased->expiry_date     = $purchase_product['expiry_date'];
-                    $purchased->qty             = $purchase_product['qty'];
-                    $purchased->purchased_total_amount =  $purchase_product['amount'];
-                    $purchased->created_by      = Auth::id();
-                    if($purchased->save()){
-                          $product   = Product::where('id',$purchased->product_id)->first();
-                          $company_id = $product->company_id;
+
+                    $purchased->purchase_invoice_id     = $invoice->id;
+                    $purchased->product_id              = $purchase_product['product_id'];
+                    $purchased->vendor_id               = $request->customer_id;
+                    $purchased->expiry_date             = $purchase_product['expiry_date'];
+                    $purchased->purchased_total_amount  = $purchase_product['amount'];
+                    $purchased->company_id              = Product::where('id', $purchase_product['product_id'])->value('company_id');
+                    $purchased->qty                     = $purchase_product['qty'];
+                    $purchased->product_discount        = $purchase_product['prod_discount'];
+                    $purchased->created_by              = Auth::id();  
+                    //ALTER TABLE `products_purchases` ADD `company_id` INT NOT NULL AFTER `purchase_invoice_id`;
+                    $previous_qty = ProductPurchase::where('purchase_invoice_id', $request->hidden_invoice_id)
+                                                ->where('product_id', $purchased->product_id)
+                                                ->orderBy('id', 'Desc')
+                                                ->value('qty'); 
+                    if($purchased->save()){ 
+                        $purchased_products_array[] = $purchased->id;
+                        $check_stock           =  VendorStock::where('product_id', $purchased->product_id)->orderBy('id', 'DESC')->first();
+                        $balance = 0;
+                        $vendor_id = 0;
+                        if ($check_stock) {
+                            $vendor_id         =  $check_stock->vendor_id;
+                            $balance           =  $check_stock->balance;
+                        }
+                        $status = 0;
+                        // $purchased->purchased_price = $sale_product['purchased_price'];
+                        if ($request->hidden_invoice_id) {
+                            if ($previous_qty != 0) {
+                                $v          = $this->updateStock($previous_qty, $purchased, $balance, $vendor_id, 'vendor');
+                                $balance    =  $v->balance;
+                            }
+                        } 
+                        $v_stock = $this->updateStock($previous_qty = 0, $purchased, $balance, $vendor_id, 'vendor');
+
+                        if ($v_stock->save()) {
+                            $purchased->vendor_stock_id = $v_stock->id;
+                            if ($request->hidden_invoice_id) {
+                                $old =  Stock::where('purchase_invoice_id', $request->hidden_invoice_id)
+                                    ->where('product_id', $purchased->product_id)
+                                    ->where('status', 2)
+                                    ->orderBy('id', 'Desc')
+                                    ->first();
+                                if ($old) {
+                                    $v_stock = $this->updateStock($old, $purchased, $balance, $vendor_id, 'company');
+                                }
+                            }
+                            $v_stock = $this->updateStock($old = 0, $purchased, $balance, $vendor_id, 'company'); 
+                           
+                            Product::where('id', $v_stock->product_id)->update([
+                                'stock_balance' =>  $v_stock->balance,
+                            ]);
+                        }
+                        //Update Product Price
+                          $product              = Product::where('id',$purchased->product_id)->first();
+                          $company_id           = $product->company_id;
                           $product->expiry_date = $purchased->expiry_date;
-                          if($purchase_product['new_price'] != ''){
+                        if($purchase_product['new_price'] != ''){
                               $product->new_purchase_price = $purchase_product['new_price'];
                         }else{
                             $product->old_purchase_price  = $purchase_product['old_price'];
                         }
                         $product->updated_by = Auth::id();
                         $product->save();
+
+
                         $check_stock    = VendorStock::where('product_id',$purchased->product_id)->orderBy('id', 'DESC')->first();
                         if($check_stock){
                             $balance    =   $check_stock->balance;
                         }else{
                             $balance = 0;
-                        }
-                        $status      =  0;
-                        $add_stock   =  new VendorStock();
-                        if($request->hidden_invoice_id){
-                            $stock   = VendorStock::where('purchase_invoice_id',$request->hidden_invoice_id)
-                                            ->where('product_id',$purchased->product_id)->orderBy('id', 'DESC')->first();
-                            $in_hand = 0;
-                            if($stock){
-                                if($purchased->qty > $stock->qty){
-                                    $in_hand   = $purchased->qty-$stock->qty;
-                                    $balance   = $balance+$in_hand;
-                                    $status    = 1;     //in
-                                }else if($stock->qty > $purchased->qty){
-                                    $in_hand = $stock->qty-$purchased->qty;
-                                    $balance     = $balance-$in_hand;
-                                    $status      = 2;     //out
-                                }else if($purchased->qty == $stock->qty){
-                                    $in_hand     = $stock->qty;
-                                    $balance     = $stock->balance;
-                                    $status      = 1;     //in
-                                }
-                                $add_stock->qty         = $in_hand;
-                                $add_stock->status      = $status;
-                                $add_stock->balance     = $balance;
-                            }else{
-                                $add_stock->status      = 1;  //in
-                                $add_stock->balance     = $purchased->qty+$balance;
-                                $add_stock->qty         = $purchased->qty;
-                            }
-                        }else{
-                                $status      = 1;
-                                $add_stock->balance     = $purchased->qty+$balance;
-                                $add_stock->qty         = $purchased->qty;
-                                $add_stock->status      =   $status;
-                        }
-                        $add_stock->transaction_type     = 1; //Purchase
-                        $add_stock->purchase_invoice_id  = $purchased->purchase_invoice_id;
-                        $add_stock->product_unit_price   = $purchased->purchase_price;
-                        $add_stock->product_id           = $purchased->product_id;
-                        $add_stock->company_id           = $company_id;
-                        // $add_stock->expiry_date          = $purchase_product['expiry_date'];
-
-                        $add_stock->vendor_id            = $invoice->customer_id;
-                        $add_stock->date                 = $purchased->created_at;
-                        $add_stock->amount               = $purchased->purchased_total_amount;
-                        $add_stock->created_by           =  Auth::id();
-                        if($add_stock->save()){
-                            $company_stock  =   new Stock();
-                            $company_stock->vendor_stock_id      =  $add_stock->id;
-                            $company_stock->company_id           =  $company_id;
-                            $company_stock->product_id           =  $add_stock->product_id;
-                            $company_stock->amount               =  $add_stock->amount;
-                            $company_stock->purchase_invoice_id  =  $add_stock->purchase_invoice_id;
-                            $company_stock->product_unit_price   =  $add_stock->product_unit_price;
-                            $company_stock->qty                  =  $add_stock->qty;
-                            $company_stock->status               =  1; //out
-                            $company_stock->date                 =  $purchased->created_at;
-                            $company_stock->balance              =  $add_stock->balance;
-                            $company_stock->created_by           =  Auth::id();
-                            $company_stock->save();
-                            // dd($purchased_products_array);
-                                //
-                            // $deleted_product = Stock::where('purchase_invoice_id',$request->hidden_invoice_id)
-                            //                 ->whereNotIn('product_id',$purchased_products_array)->where('status',1)->orderBy('id', 'DESC')->get();
-
-                            // if($deleted_product){
-                            //     foreach($deleted_product as $prod){
-                            //     $out_stock  =   new Stock();
-                            //     $out_stock->product_id  = $prod->product_id;
-                            //     $out_stock->date        = $prod->created_at;
-                            //     $out_stock->amount      = $prod->amount;
-                            //     $out_stock->purchase_invoice_id  = $prod->purchase_invoice_id;
-                            //     $out_stock->product_unit_price   = $prod->product_unit_price;
-                            //     $out_stock->qty         = $prod->qty;
-                            //     $out_stock->status      =   2; //out
-                            //     $out_stock->balance     = $prod->balance-$prod->qty;
-                            //     $out_stock->created_by  =  Auth::id();
-                            //     $out_stock->save();
-                            //      }
-                            //     }
-                            Product::where('id',$add_stock->product_id)->update([
-                                'stock_balance' =>  $add_stock->balance,
-                            ]);
-                        }
+                        } 
+                        Product::where('id',$v_stock->product_id)->update([
+                            'stock_balance' =>  $v_stock->balance,
+                        ]);
+                        // }
                     }
                 }
-
+                if ($request->hidden_invoice_id) {  
+                   ProductPurchase::where('purchase_invoice_id', $request->hidden_invoice_id)
+                                    ->whereNotIn('id', $purchased_products_array)
+                                    ->delete(); 
+                }  
                 $customer_ledger = VendorLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
                 if($customer_ledger){
                     // $credit  = $customer_ledger->credit;  //Out from System and Paid to Vendor;
@@ -224,6 +259,8 @@ class StockController extends Controller
             return response()->json([
                 'msg'       =>  'Product has added to Stock',
                 'status'    =>  'success',
+                'invoice_id'  =>  $invoice->id,
+                'customer_id' =>  $invoice->customer_id,
             ]);
         }
     }
@@ -236,35 +273,41 @@ class StockController extends Controller
             'customers' => $customers
         ]);
     }
-    public function purchaseList(){
-        $purchases = PurchaseInvoice::selectRaw('purchase_invoices.*,
-                        (SELECT cr FROM vendor_ledger WHERE purchase_invoice_id = purchase_invoices.id) as paid_amount,
-                        (SELECT customer_name FROM customers WHERE id=purchase_invoices.customer_id) as customer_name')
-                        ->whereIn('purchase_invoices.id', function ($query) {
-                            $query->selectRaw('MAX(id)')
-                                ->from('purchase_invoices')
-                                ->whereDate('created_at', Carbon::today())
-                                ->groupBy('customer_id');
-                        })
-                        ->orderBy('id', 'desc')
-                        ->get();
+    public function purchaseList(){ 
+        $current_date   =   date('Y-m-d');
+        $purchases     =   PurchaseInvoice::selectRaw('purchase_invoices.* ,
+                                            (SELECT cr FROM vendor_ledger WHERE purchase_invoice_id = purchase_invoices.id) as paid_amount,
+                                            (SELECT customer_name FROM customers WHERE id=purchase_invoices.customer_id) as customer_name')
+                                            ->whereRaw("Date(created_at) = '$current_date'")
+                                            ->orderBy('id', 'DESC')
+                                            ->get();  
+
         return view('purchases.list',compact('purchases'));
     }
     public function editPurchase($id){
-        $customers          =   Customer::all();
-        $products           =   Product::withoutTrashed()->get();
-        $invoice            =   PurchaseInvoice::where('id',$id)->first();
-        $purchasd_products  =  ProductPurchase::where('purchase_invoice_id', $id)
-                                                ->selectRaw('(SELECT balance FROM vendor_stocks WHERE vendor_id = products_purchases.vendor_id ORDER BY id DESC LIMIT 1) as balance, products_purchases.*')
-                                                ->from('products_purchases')
-                                                ->get();
-        $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)->where('trx_type','=',1)->orderBy('id', 'DESC')->first();
 
-        return view('purchases.edit',compact('invoice','customers','products','customers','get_vendor_ledger'));
+        $customers          =     Customer::where('customer_type', 1)->select('id', 'customer_name', 'balance')->get();
+        $products           =     Product::withoutTrashed()->get();
+        $invoice            =     PurchaseInvoice::where('id',$id)->first();
+        $parts              =     explode('-', $invoice->invoice_no);
+        $invoice_first_part =     $parts[0];
+        $purchasd_products  =       ProductPurchase::where('purchase_invoice_id', $id)
+                                                ->selectRaw('products_purchases.*')
+                                                ->get();
+        $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)
+                                            ->where('trx_type','=',1)
+                                            ->where('purchase_invoice_id', $invoice->id)
+                                            ->orderBy('id', 'DESC')->first();  
+                    // dd($invoice->paid_amount);
+        return view('purchases.add',compact('invoice','customers','products','customers','get_vendor_ledger', 'invoice_first_part'));
     }
-    public function getPurchaseProduct($id){
-        $products   =   ProductPurchase::where('products_purchases.purchase_invoice_id',$id)
-                                    ->selectRaw('products_purchases.*, (SELECT product_name FROM products WHERE id=products_purchases.product_id) as product_name')->get();
+    public function getPurchaseProduct($id){ 
+
+        $products       =   ProductPurchase::where('products_purchases.purchase_invoice_id',$id)
+                                    ->selectRaw('products_purchases.*, 
+                                    (SELECT product_name FROM products WHERE id=products_purchases.product_id) as product_name,
+                                    (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=products_purchases.product_id) as purchase_price,
+                                    (SELECT stock_balance FROM products WHERE id=products_purchases.product_id) as stock_in_hand')->get();
 
         return response()->json([
             'msg'       => 'Vendor Fetched',
@@ -339,7 +382,38 @@ class StockController extends Controller
                 }
 
     }
-    //Purchase Returns
 
+    public function printInvoice($invoice_id, $customer_id, $received_amount)
+    {
+         
+        $invoiceId                  =   $invoice_id;
+        $customerId                 =   $customer_id;
+        $customer_balance           =   0;
+        $invoice                    =   PurchaseInvoice::where('id', $invoiceId)->where('customer_id', $customerId)
+                                                    ->selectRaw("purchase_invoices.*,
+                                                        (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
+                                                        (SELECT cr FROM vendor_ledger WHERE purchase_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
+                                                        ")
+                                                    ->first();
+        $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
+       
+        $products                   =   ProductPurchase::where('purchase_invoice_id', $invoice_id)
+                                                    ->selectRaw("products_purchases.*,
+                                                    (SELECT product_name FROM products WHERE id=products_purchases.product_id) as product_name")
+                                                    ->get();
+        $ledgerCount      = VendorLedger::where('customer_id', $customerId)->count();
+        $customer_balance = 0;
+        if ($ledgerCount > 1) {
+            $customer_balance = VendorLedger::where('customer_id', $customerId)
+                // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+                ->orderBy('id', 'DESC')->skip(1)->value('balance');
+        }
 
+        // $customer_balance = VendorLedger::where('customer_id', $customerId)
+        //                                     // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+        //                                     ->orderBy('id', 'DESC')->value('balance');
+
+        return view('purchases.invoice', compact('invoice', 'products', 'customer_balance'));
+    }
+    //Purchase Returns 
 }

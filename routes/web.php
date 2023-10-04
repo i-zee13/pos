@@ -67,10 +67,13 @@ Route::get('/purchases'                      ,[App\Http\Controllers\StockControl
 Route::get('/purchase-edit/{id}'             ,[App\Http\Controllers\StockController::class, 'editPurchase'])->name('purchase-edit');
 Route::get('/get-purchase-products/{id}'     ,[App\Http\Controllers\StockController::class, 'getPurchaseProduct'])->name('get-purchase-products');
 Route::delete('/delete-product-from-invoice' ,[App\Http\Controllers\StockController::class, 'deleteProduct'])->name('delete-product');
+Route::get('/print-purchase-invoice/{invoice_id}/{customer_id}/{received_amount}'       ,[App\Http\Controllers\StockController::class, 'printInvoice'])->name('print-purchase-invoice');
+
 // Purchase Returns / 
 Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
-Route::get('/purchase-return'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'purchaseReturn'])->name('purchase-return');
-Route::post('/add-purchase-return'                ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
+Route::get('/add-return'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'create'])->name('purchase-return.create');
+Route::get('/purchase-returns'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'list'])->name('purchase-return.index');
+Route::post('/add-purchase-return'                ,[App\Http\Controllers\PurchaseReturnController::class, 'store'])->name('purchase-return.store');
 
 /** sale Routes */
 Route::get('/sale-add'                    ,[App\Http\Controllers\SaleController::class, 'create'])->name('sale-add');
@@ -130,6 +133,11 @@ Route::post('/fetch-all-list-sale',[App\Http\Controllers\SaleController::class, 
 Route::get('/stock-value-report',[App\Http\Controllers\ReportsController::class, 'allStockValueReport'])->name('stock-value-report');
 Route::post('/fetch-stock-value-report',[App\Http\Controllers\ReportsController::class, 'fetchStockValueReport'])->name('fetch-stock-value-report');
 
+// Sales Replacement / 
+// Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
+Route::get('/sale-replacement-create'   ,[App\Http\Controllers\SaleReplacementController::class, 'create'])->name('salereplacement.create'); 
+Route::get('/sale-replacements'         ,[App\Http\Controllers\SaleReplacementController::class, 'index'])->name('salereplacement.index');
+ 
 
 
 });

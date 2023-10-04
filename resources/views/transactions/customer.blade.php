@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="modal-footer border-0">
-                <button type="button" class="btn btn-primary yes-btn confirm_btn" data-dismiss="modal" >Yes</button>
+                <button type="button" class="btn btn-primary yes-btn confirm_btn" data-dismiss="modal">Yes</button>
                 <button type="submit" class="btn w-btn btn-cancel cancel_delete_modal no-btn" data-dismiss="modal" aria-label="Close">No</button>
             </div>
         </div>
@@ -41,7 +41,7 @@
                                 <form style="display: flex;" id="saveTransactionForm">
                                     @csrf
                                     <input type="text" hidden value="{{$operation}}" name="operation">
-                                    <input type="text" hidden  name="action" id="action">
+                                    <input type="text" hidden name="action" id="action">
                                     <input type="text" id="customer_id" hidden name="hidden_customer_id">
                                     <input type="text" id="hidden_balance" hidden name="hidden_balance">
                                     <div id="floating-label" class="card p-20 top_border mb-3" style="width: 100%">
@@ -68,7 +68,7 @@
                                                 </div>
                                                 <div class="col-md-6 PB-10">
                                                     <div class="form-group">
-                                                        <label class="control-label mb-10">Receivable Balance</label>
+                                                        <label class="control-label mb-10">Balance</label>
                                                         <input type="text" name="balance" class="form-control customer_balnce" readonly>
                                                     </div>
                                                 </div>
@@ -120,21 +120,23 @@
                                                         <textarea name="comment" class="form-control" rows="6" tabindex="3"></textarea>
                                                     </div>
                                                 </div> -->
+
+                                                
                                                 <table class="table">
-                                                <tr style="background: #152e4d;color: white;">  
-                                                    <td style="font-family:bold" >Total:</td>
-                                                    <td colspan="2" class="total_ledger_sum"></td>
-                                                </tr>
+                                                    <tr style="background: #152e4d;color: white;">
+                                                        <td style="font-family:bold">Total:</td>
+                                                        <td colspan="2" class="total_ledger_sum"></td>
+                                                    </tr>
                                                 </table>
                                                 <h2 class="_head03 ">To <span>Print</span></h2>
-                                                    <div class="row status-sh">
-                                                        <div class="col-12">
-                                                            <div class="custom-control custom-radio">
-                                                                <input class="custom-control-input" type="checkbox"id="print-invoice" value="1" data-id="print-invoice" name="print_invoice">
-                                                                <label class="custom-control-label font13 he ad-sta" for="print-invoice">Print</label>
-                                                            </div>
+                                                <div class="row status-sh">
+                                                    <div class="col-12">
+                                                        <div class="custom-control custom-radio">
+                                                            <input class="custom-control-input" type="checkbox" id="print-invoice" value="1" data-id="print-invoice" name="print_invoice">
+                                                            <label class="custom-control-label font13 he ad-sta" for="print-invoice">Print</label>
                                                         </div>
                                                     </div>
+                                                </div>
                                                 <div class="col-md-12 ml-3" hidden>
                                                     <div class="row">
                                                         <div class="col-auto pl-0">
@@ -165,13 +167,28 @@
     <div class="_cl-bottom">
         <!-- <button type="button" id="print-invoice" class="btn btn-primary mr-2" tabindex="4">Print</button> -->
         <button type="submit" class="btn btn-primary mr-2" id="saveTransaction" tabindex="5">Save</button>
-        <button  type="button" class="btn btn-cancel mr-2" id="cancelSubCat">Cancel</button>
+        <button type="button" class="btn btn-cancel mr-2" id="cancelSubCat">Cancel</button>
     </div>
 </div>
 @endsection
 @section('content')
+<style>
+    .remove_div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-<div class="header">  
+    .remove_div ._head03 {
+        margin: 0;
+    }
+
+    .remove_div span {
+        margin-left: auto;
+        /* Pushes cust_bal to the right */
+    }
+</style>
+<div class="header">
     <!-- Body -->
     <div class="header-body">
         <div class="row  ">
@@ -195,7 +212,7 @@
     </div>
 
 
-</div> 
+</div>
 <div class="row">
     <div class="col-md-12">
         <div class="card">

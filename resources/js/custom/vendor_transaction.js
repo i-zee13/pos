@@ -222,7 +222,7 @@ $(document).ready(function() {
         }
        
     }
-    $(document).on('click', '.openDataSidebarForAddCustomerLedger', function() {
+$(document).on('click', '.openDataSidebarForAddCustomerLedger', function() {
         // $('.customer_id').children(`option`).attr('disabled', false);
         $('select option').removeAttr('disabled');
         $('.customer_id').select2();
@@ -380,6 +380,13 @@ function fetchLedgers() {
     $('.customer_id').children('option[value="' + cus_id + '"]').attr('disabled', false);
     $(".customer_id").val('0');
     $(".customer_id").select2();
+    var  total_amount = 0;
+    $('.amount').each(function(){
+        var inputValue = parseFloat($(this).val()); 
+        total_amount += inputValue; 
+    });     
+    
+    $('.total_ledger_sum').text(total_amount);
 })
  $('.close').on('click',function(){
     $(this).remove();
@@ -398,3 +405,13 @@ $(document).on('click', '.btn-cancel', function () {
 $(document).on('click', '.confirm_btn', function () {
     closeSidebar();
 });
+
+$(document).on('focusout','.amount',function(){ 
+    var total_amount = 0;
+    $('.amount').each(function(){
+        var inputValue = parseFloat($(this).val()); 
+        total_amount += inputValue; 
+    });   
+        $('.total_ledger_sum').text(total_amount);
+     
+ })   

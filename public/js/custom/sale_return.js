@@ -17330,13 +17330,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var segments = location.href.split('/');
-var invalidSave = [];
 var result = 0;
 var product_list = [];
 var vendors = [];
 var sales_product_array = [];
 var deleteRef = '';
-var flag = false;
 var previous_payable = 0;
 var amount = 0;
 var p_name = '';
@@ -17356,7 +17354,6 @@ var customer_ledger = '';
 var existing_product_ids = [];
 var service_charges = 0;
 var invoice_discount = 0;
-var previous_paid = 0;
 var data_variable = '';
 $(document).ready(function () {
   $('.parent-div').show();

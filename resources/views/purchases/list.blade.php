@@ -31,9 +31,11 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div class="header">
+            <div class="header mb-0">
                 <!-- <a class="btn add_button openDataSidebarForAddingProduct"><i class="fa fa-plus"></i> New  Product</a> -->
                 <h2>Purchase List</h2>
+              <a href="{{route('stock-add')}}" type="submit" class="btn btn-primary mr-2" style="font-size: 13px;padding: 6px 11px 4px 9px;margin-top: -10px; float: right;">Add New</a>
+
             </div>
             <!-- <div style="min-height: 400px" id="tblLoader">
                 <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
@@ -51,15 +53,20 @@
                 </thead>
             <tbody>
                 @foreach($purchases as $purchase)
-            <tr>
-
-                    <td>{{Str::limit($purchase->invoice_no, 20)}}</td>
+                @php  $parts              =     explode('-', $purchase->invoice_no);
+                      $invoice_first_part =     $parts[0];
+                       @endphp
+            <tr> 
+                  <td>{{$invoice_first_part}} ({{ $purchase->created_at->format('h:i A') }})</td>
                     <td>{{$purchase->customer_name}} </td>
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->paid_amount}} </td>
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->paid_amount ? $purchase->paid_amount : 0.00}} </td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->total_invoice_amount}} </td>
                     <td>
-                        <a id="{{$purchase->id}}" class="btn btn-default btn-line" href="{{route('purchase-edit' ,['id'=>$purchase->id])}}">Edit</a>
+                    <a id="{{$purchase->id}}" class="btn btn-default {{$purchase->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$purchase->is_editable== 1 ? route('purchase-edit' ,['id'=>$purchase->id]) : route('purchase-edit' ,['id'=>$purchase->id ,'invoice' => 'detail'])}}">{{$purchase->is_editable== 1  ? 'Edit'  : "Detail" }}</a>
+
                         <!-- <button type="button" id="{{$purchase->id}}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button> -->
+                        <button id="{{$purchase->id}}" data-invoice="{{$purchase->id}}" data-customer-id="{{$purchase->customer_id}}"
+                         paid-amount="{{$purchase->paid_amount}}" class="btn btn-default print-invoice">Print</button>
                     </td>
                 </tr>
                 @endforeach
