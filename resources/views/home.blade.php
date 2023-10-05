@@ -1,5 +1,5 @@
 @extends('layouts.app')
- 
+
 @section('data-sidebar')
 <style>
     .close-btn-pl {
@@ -69,9 +69,9 @@
     }
 
 </style>
- 
+
 @endsection
- 
+
 
 @section('content')
 <style>
@@ -294,22 +294,22 @@
           <div class="sell360report">
             <div class="row">
               <div class="col-md-4">
-                <div class="card mt-0"> 
+                <div class="card mt-0">
                   <!-- <img class="cardicon" src="images/today-order.svg" alt=""> -->
                   <h4>Total <span>Sale</span></h4>
                   <h2 class="digit"> 00 </h2>
                 </div>
-              </div> 
+              </div>
               <div class="col-md-4">
-                <div class="card mt-0"> 
+                <div class="card mt-0">
                   <!-- <img class="cardicon" src="images/today-order.svg" alt=""> -->
                   <h4>Total<span> Purchase</span></h4>
                   <h2 class="digit">00</h2>
 
                 </div>
-              </div> 
+              </div>
               <div class="col-md-4">
-                <div class="card mt-0"> 
+                <div class="card mt-0">
                   <!-- <img class="cardicon" src="images/target-monthly-icon.svg" alt=""> -->
                   <h4>Total <span>Expense</span></h4>
                   <h2 class="digit"><small></small> 00</h2>
@@ -325,7 +325,7 @@
               <div class="col-3"><a href="{{route('stock-add')}}"><img src="{{asset('images/add-teacher.svg')}}" alt="" />
                   <h2 class="HD-title">Purchase <span class="f-light">Invoice</span></h2>
                 </a> </div>
-              <div class="col-3"><a href="{{route('purchase-return')}}"><img src="{{asset('images/add-students.svg')}}" alt="" />
+              <div class="col-3"><a href="{{route('purchase-return.index')}}"><img src="{{asset('images/add-students.svg')}}" alt="" />
                   <h2 class="HD-title">Replacement <span class="f-light">Purchases</span></h2>
                 </a> </div>
                 <div class="col-3"><a href="{{route('vendor-ledgers')}}"><img src="{{asset('images/enrollments-add.svg')}}" alt="" />
@@ -334,18 +334,18 @@
                 <div class="col-3"><a href="{{route('customer-ledgers')}}"><img src="{{asset('images/quiz-list.svg')}}" alt="" />
                   <h2 class="HD-title">Customer <span class="f-light">Payments</span></h2>
                 </a> </div>
-              
+
               <div class="col-3"><a href="{{route('customer-reports')}}"><img src="{{asset('images/campaign-list.svg')}}" alt="" />
                   <h2 class="HD-title">Customer <span class="f-light">Reports </span></h2>
                 </a> </div>
               <div class="col-3"><a href="{{route('customer-reports')}}"><img src="{{asset('images/complaint-list.svg')}}" alt="" />
                   <h2 class="HD-title">Vendor <span class="f-light">Reports</span></h2>
-                </a> </div>                
+                </a> </div>
               <!-- <div class="col-3"><a href="{{route('customer-reports')}}"><img src="{{asset('images/payment-manage.svg')}}" alt=""/>
                 <h2 class="HD-title">Manage  <span class="f-light">Payments</span></h2>
               </a> </div> -->
 
             </div>
           </div>
-  
+
 @endsection

@@ -80,7 +80,7 @@ class StockController extends Controller
         }
         // $v->qty                  =  $previous_qty > 0 ? $previous_qty : ($old_record != '' ? $old_record->qty  : $sale->qty);
         // $v->balance              =  $previous_qty > 0 ? $balance + $v->qty : $balance - $sale->qty;
- 
+
         $v->purchase_invoice_id  =  $old_record != '' && !empty($old_record) ? $old_record->purchase_invoice_id  : $sale->purchase_invoice_id;
         $v->product_unit_price   =  $sale->purchase_price;
         $v->product_id           =  $old_record != '' && !empty($old_record) ? $old_record->product_id  : $sale->product_id;
@@ -91,6 +91,7 @@ class StockController extends Controller
         return $v;
     }
      Public function purchaseInvoice(Request $request){
+       
         if($request->hidden_invoice_id){
             // ProductPurchase::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
             // Stock::where('purchase_invoice_id',$request->hidden_invoice_id)->delete();
@@ -98,7 +99,7 @@ class StockController extends Controller
         }else{
             isEditable($request->customer_id);
             $invoice = new PurchaseInvoice();
-        } 
+        }
         $invoice->paid_amount          = $request->paid_amount;
         $invoice->date                 = $request->invoice_date;
         $invoice->invoice_no           = $request->invoice_no;
@@ -116,26 +117,26 @@ class StockController extends Controller
         $invoice->cash_return          = $request->cash_return;
         $invoice->product_net_total    = $request->product_net_total;
         $invoice->previous_receivable  = $request->previous_receivable;
-        $invoice->is_editable          = 1; 
-        $invoice->status               = $request->status; 
+        $invoice->is_editable          = 1;
+        $invoice->status               = $request->status;
         $invoice->description          = $request->description;
         $invoice->created_by           = Auth::id();
         if($invoice->save()){
             if(count($request->purchased_product_array) > 0){
                 foreach($request->purchased_product_array as $purchase_product){
-                          
+
                     $new_ids[] = $purchase_product['product_id'];
-                    if ($purchase_product['purchase_prod_id'] > 0) { 
-                        $purchased          =  ProductPurchase::where('id', $purchase_product['purchase_prod_id'])->first(); 
+                    if ($purchase_product['purchase_prod_id'] > 0) {
+                        $purchased          =  ProductPurchase::where('id', $purchase_product['purchase_prod_id'])->first();
                     }else{
                         $purchased          =  new ProductPurchase();
-                    } 
-                    
+                    }
+
                     if($purchase_product['new_price'] != ''){
-                      
+
                         $purchased->purchase_price  = $purchase_product['new_price'];
-                    }else{ 
-                        $purchased->purchase_price  = $purchase_product['old_price']; 
+                    }else{
+                        $purchased->purchase_price  = $purchase_product['old_price'];
                     }
 
                     $purchased->purchase_invoice_id     = $invoice->id;
@@ -146,13 +147,14 @@ class StockController extends Controller
                     $purchased->company_id              = Product::where('id', $purchase_product['product_id'])->value('company_id');
                     $purchased->qty                     = $purchase_product['qty'];
                     $purchased->product_discount        = $purchase_product['prod_discount'];
-                    $purchased->created_by              = Auth::id();  
+                    $purchased->sale_price              = $purchase_product['sale_price']; 
+                    $purchased->created_by              = Auth::id();
                     //ALTER TABLE `products_purchases` ADD `company_id` INT NOT NULL AFTER `purchase_invoice_id`;
                     $previous_qty = ProductPurchase::where('purchase_invoice_id', $request->hidden_invoice_id)
                                                 ->where('product_id', $purchased->product_id)
                                                 ->orderBy('id', 'Desc')
-                                                ->value('qty'); 
-                    if($purchased->save()){ 
+                                                ->value('qty');
+                    if($purchased->save()){
                         $purchased_products_array[] = $purchased->id;
                         $check_stock           =  VendorStock::where('product_id', $purchased->product_id)->orderBy('id', 'DESC')->first();
                         $balance = 0;
@@ -168,7 +170,7 @@ class StockController extends Controller
                                 $v          = $this->updateStock($previous_qty, $purchased, $balance, $vendor_id, 'vendor');
                                 $balance    =  $v->balance;
                             }
-                        } 
+                        }
                         $v_stock = $this->updateStock($previous_qty = 0, $purchased, $balance, $vendor_id, 'vendor');
 
                         if ($v_stock->save()) {
@@ -183,8 +185,8 @@ class StockController extends Controller
                                     $v_stock = $this->updateStock($old, $purchased, $balance, $vendor_id, 'company');
                                 }
                             }
-                            $v_stock = $this->updateStock($old = 0, $purchased, $balance, $vendor_id, 'company'); 
-                           
+                            $v_stock = $this->updateStock($old = 0, $purchased, $balance, $vendor_id, 'company');
+
                             Product::where('id', $v_stock->product_id)->update([
                                 'stock_balance' =>  $v_stock->balance,
                             ]);
@@ -193,6 +195,7 @@ class StockController extends Controller
                           $product              = Product::where('id',$purchased->product_id)->first();
                           $company_id           = $product->company_id;
                           $product->expiry_date = $purchased->expiry_date;
+                          $product->sale_price  = $purchased->sale_price;
                         if($purchase_product['new_price'] != ''){
                               $product->new_purchase_price = $purchase_product['new_price'];
                         }else{
@@ -207,18 +210,18 @@ class StockController extends Controller
                             $balance    =   $check_stock->balance;
                         }else{
                             $balance = 0;
-                        } 
+                        }
                         Product::where('id',$v_stock->product_id)->update([
                             'stock_balance' =>  $v_stock->balance,
                         ]);
                         // }
                     }
                 }
-                if ($request->hidden_invoice_id) {  
+                if ($request->hidden_invoice_id) {
                    ProductPurchase::where('purchase_invoice_id', $request->hidden_invoice_id)
                                     ->whereNotIn('id', $purchased_products_array)
-                                    ->delete(); 
-                }  
+                                    ->delete();
+                }
                 $customer_ledger = VendorLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
                 if($customer_ledger){
                     // $credit  = $customer_ledger->credit;  //Out from System and Paid to Vendor;
@@ -273,14 +276,14 @@ class StockController extends Controller
             'customers' => $customers
         ]);
     }
-    public function purchaseList(){ 
+    public function purchaseList(){
         $current_date   =   date('Y-m-d');
         $purchases     =   PurchaseInvoice::selectRaw('purchase_invoices.* ,
                                             (SELECT cr FROM vendor_ledger WHERE purchase_invoice_id = purchase_invoices.id) as paid_amount,
                                             (SELECT customer_name FROM customers WHERE id=purchase_invoices.customer_id) as customer_name')
                                             ->whereRaw("Date(created_at) = '$current_date'")
                                             ->orderBy('id', 'DESC')
-                                            ->get();  
+                                            ->get();
 
         return view('purchases.list',compact('purchases'));
     }
@@ -297,14 +300,14 @@ class StockController extends Controller
         $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)
                                             ->where('trx_type','=',1)
                                             ->where('purchase_invoice_id', $invoice->id)
-                                            ->orderBy('id', 'DESC')->first();  
+                                            ->orderBy('id', 'DESC')->first();
                     // dd($invoice->paid_amount);
         return view('purchases.add',compact('invoice','customers','products','customers','get_vendor_ledger', 'invoice_first_part'));
     }
-    public function getPurchaseProduct($id){ 
+    public function getPurchaseProduct($id){
 
         $products       =   ProductPurchase::where('products_purchases.purchase_invoice_id',$id)
-                                    ->selectRaw('products_purchases.*, 
+                                    ->selectRaw('products_purchases.*,
                                     (SELECT product_name FROM products WHERE id=products_purchases.product_id) as product_name,
                                     (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=products_purchases.product_id) as purchase_price,
                                     (SELECT stock_balance FROM products WHERE id=products_purchases.product_id) as stock_in_hand')->get();
@@ -385,7 +388,7 @@ class StockController extends Controller
 
     public function printInvoice($invoice_id, $customer_id, $received_amount)
     {
-         
+
         $invoiceId                  =   $invoice_id;
         $customerId                 =   $customer_id;
         $customer_balance           =   0;
@@ -396,7 +399,7 @@ class StockController extends Controller
                                                         ")
                                                     ->first();
         $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
-       
+
         $products                   =   ProductPurchase::where('purchase_invoice_id', $invoice_id)
                                                     ->selectRaw("products_purchases.*,
                                                     (SELECT product_name FROM products WHERE id=products_purchases.product_id) as product_name")
@@ -415,5 +418,5 @@ class StockController extends Controller
 
         return view('purchases.invoice', compact('invoice', 'products', 'customer_balance'));
     }
-    //Purchase Returns 
+    //Purchase Returns
 }

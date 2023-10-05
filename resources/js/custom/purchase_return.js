@@ -1,4 +1,4 @@
-import { filter, update } from 'lodash';
+ 
 import swal from 'sweetalert';
 
 var segments = location.href.split('/');
@@ -36,15 +36,7 @@ $(document).ready(function () {
     customer_ledger   = JSON.parse($('#customer_ledger').val());
     getProducts();
     $('.display').show();
-    if (segments[3] == "stock-add") {
-        
-        setTimeout(() => {
-            $('#customer_id').val('8').trigger('change');
-        }, 2000);
-
-        //
-        
-    } else if (segments[3] == 'edit-sale-return') {
+   if (segments[3] == 'edit-sale-return') {
         customer_id      = $('#curren_customer_id').val(); 
         var invoice_id   = $('#hidden_invoice_id').val(); 
         service_charges  = $('#service_charges').val(); 

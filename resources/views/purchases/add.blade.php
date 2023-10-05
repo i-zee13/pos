@@ -344,7 +344,7 @@
           }
 
           .inputSale {
-              width: 75;
+              width: 65;
               border-radius: 0;
               border: solid 1px #dbdbdb;
               background-color: #f6f6f6;
@@ -537,7 +537,7 @@
               .left-sidebox {
                   -ms-flex: 350px;
                   flex: 0 0 350px;
-                  max-width: 320px;
+                  max-width: 250;
               }
 
               .right-sidebox {
@@ -650,7 +650,6 @@
                                       </div>
                                   </div>
                               </div>
-
                               <h2 class="title border-bottom">Vendor <span>Ledger</span></h2>
                               <div class="row CompanyInfo">
                                   <!-- <div class="col-md-7 pr-0"><strong>Old Recived:</strong> </div>
@@ -670,7 +669,7 @@
 
                       </div>
                   </div>
-                  <div class="col-md-8 right-sid ebox" style="width: 70%;">
+                  <div class="col-md-8 right-sid ebox" style="width:78%;">
                       <div class="row">
                           <div class="col-6">
                               <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Purchase' : 'New'}} <span>Invoice</span></h2>
@@ -704,16 +703,13 @@
                           <input type="hidden" name="invoice_type" value="{{ @$invoice->invoice_type }}">
                           @endif
                       </div> -->
-                    
+
                               <div class="infoDiv">
                                   <form id="purchse-form">
                                       <div class="row">
 
                                           <input type="text" id="purchase_price" class="inputfileds  purchase_price " placeholder="" name="purchase_price" hidden>
                                           <input type="text" id="retail _price" class="inputfileds" placeholder="" name="ret ail_price" hidden>
-
-
-                                          <input id="datepicker" type="hidden" class="inputfileds new_dob new_form_field expiry_date " name="expiry_date">
 
 
                                       </div>
@@ -737,6 +733,8 @@
                                               <th class="">Select Product</th>
                                               <th style="">Old Price</th>
                                               <th style="">New Price</th>
+                                              <th style="">New R.Price</th>
+                                              <th style="">Expiry D.</th>
                                               <th style="">QTY.</th>
                                               <th style="">Discount</th>
                                               <th class="">Total</th>
@@ -748,7 +746,7 @@
                                               <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;"></td>
                                               <td>
                                                   <div class="form-s2" style="width:165px">
-                                                      <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 150;">
+                                                      <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 130;">
                                                           <option value="0">Select Product *</option>
                                                           @foreach($products as $product)
                                                           <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
@@ -756,14 +754,16 @@
                                                       </select>
                                                   </div>
                                               </td>
-                                              <td><input type="number" style="font-size: 13px;" readonly id="purchase_price" class="inputSale purchase_price" placeholder="" name="purchase_price"></td>
-                                              <td> <input type="text" id="new_purchase_price" class="inputSale" placeholder="" name="new_purchase_price " tabindex="3"></td>
-                                              <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="4" min="0"></td>
+                                              <td><input type="number" style="font-size: 13px; width: 60;" readonly id="purchase_price" class="inputSale purchase_price" placeholder="" name="purchase_price"  ></td>
+                                              <td> <input type="number" id="new_purchase_price" class="inputSale" placeholder="" name="new_purchase_price " tabindex="3" style=" width: 60;" min="0"></td>
+                                              <td> <input type="number" id="hi" class="inputSale" placeholder="" name="new_sale_price " tabindex="4" style=" width: 60;" min="0"></td>
+                                              <td> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="5" style=" width: 95;"></td>
+                                              <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="6" min="0" style=" width: 45;"></td>
 
-                                              <td><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;" tabindex="5" min="0"></td>
-                                              <td class='add- S-input '><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;"></td>
+                                              <td><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;width: 55;" tabindex="7" min="0"></td>
+                                              <td class='add- S-input '><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;width: 75;"></td>
                                               <td>
-                                                  <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="6" style="padding: 5px 15px 5px 15px; background:green">Add</button>
+                                                  <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="8" style="padding: 5px 15px 5px 15px; background:green">Add</button>
                                               </td>
                                           </tr>
 
@@ -836,7 +836,7 @@
                                               <td align="right">Cash Return</td>
                                               <td class="cash_return_amount">{{@$invoice->cash_return}}</td>
                                           </tr>
-                                        
+
                                           @if (Route::currentRouteName() == 'purchase-edit')
 
                                           <tr class="th-to-hide" hidden>

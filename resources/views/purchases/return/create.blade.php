@@ -86,7 +86,7 @@
     </div>
     @section('content')
     <style>
-       select:focus > option:checked { 
+       select:focus > option:checked {
             background: #000 !important;
             }
         .OrderWrapper {
@@ -626,22 +626,19 @@
                             <div class="form-wrap p-0">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <label class="font13 mb-5">Select Customer</label>
+                                        <label class="font13 mb-5">Vendors</label>
                                         <div class="form-s2">
-                                            <select class="form-control formselect form_clear  " placeholder="Select Customer" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
-                                                <option value="0">Select Customer</option>
+                                            <select class="form-control formselect form_clear" placeholder="Select Vendor" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                                                <option value="0">Select Vendor</option>
                                                 @foreach($customers as $customer)
-                                                <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->id}} - {{$customer->customer_name}}</option>
+                                                    <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->id}} - {{$customer->customer_name}}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-
-                            <h2 class="title border-bottom">Invoice <span>Details</span></h2>
-                            <div class="row CompanyInfo">
+                            <div class="row CompanyInfo mt-5">
                                 <!-- <div class="col-md-7 pr-0"><strong>Old Recived:</strong> </div>
                                 <div class="col-md-5"><span class=" text-red">{{@$invoice->amount_received}}</span></div>
                                 <div class="col-md-7 pr-0"><strong>Previous Paid :</strong></div>
@@ -650,12 +647,39 @@
 
                                 <div class="col-md-5"><span class="dashboard_avg_rev_perCust {{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '' }}</span></div>
                                 <!-- <div class="col-md-7 pr-0"><strong>Country:</strong></div>
-                        <div class="col-md-5"><span id="country"></span></div> -->
+                                <div class="col-md-5"><span id="country"></span></div> -->
                             </div>
-                            <!-- <h2 class="title m-0 pb-0">Shipping <span>Details</span></h2> -->
+                            {{-- <h2 class="title m-0 pb-0"> <span></span></h2> --}}
+                            <h2 class="title border-bottom">Shipping <span>Details</span></h2>
+                            <div class="form-wrap p-0">
+                                <div class="row">
+                                    <div class="col-md-12 mt-5">
+                                        <label class="font13 mb-5">Description</label>
+                                        <div class="form-s2">
+                                            <textarea rows="4" name="description" id="description">{{@$invoice->description}}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 PB-10">
+                                <label class="font13 mb-5">Bilty #</label>
+                                <div class="form-s2">
+                                    <input type="text" id="" class="form-control" value="{{@$invoice_first_part}}">
+                                    <input type="hidden" id="" class="form-control " placeholder="" name="bilty_no" value="{{@$invoice ? $invoice->bilty_no : ''}}">
+
+                                </div>
+                            </div>
+                            <div class="col-md-12 PB-10">
+                                <label class="font13 mb-5">Truck #</label>
+                                <div class="form-s2">
+                                    <input type="text" id="" class="form-control" value="{{@$invoice_first_part}}">
+                                    <input type="hidden" id="" class="form-control " placeholder="" name="truck_no" value="{{@$invoice ? $invoice->truck_no : ''}}">
+
+                                </div>
+                            </div>
                         </div>
 
-                      
+
 
 
                     </div>
@@ -667,7 +691,7 @@
                             <h2 class="title font22 PT-10 mb-10">Return <span>Invoice</span></h2>
                         </div>
 
-                      
+
                     </div>
 
                     <div class="right_Info">
@@ -679,12 +703,12 @@
                                 <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
 
                             </div>
-                            
+
 
                             <div class="infoDiv">
                                 <form id="purchse-form">
                                     <div class="row">
-                                        
+
                                         <input type="text" id="purchase_price" class="inputfileds  purchase_price " placeholder="" name="purchase_price" hidden>
                                         <input type="text" id="retail _price" class="inputfileds" placeholder="" name="ret ail_price" hidden>
 
@@ -693,7 +717,7 @@
                                         </div> -->
                                         <input id="datepicker" type="hidden" class="inputfileds new_dob new_form_field expiry_date " name="expiry_date">
 
-                                        
+
                                     </div>
                                 </form>
                             </div>
@@ -877,7 +901,7 @@
 
 </div>
 </div>
-@endsection 
+@endsection
 @push('js')
 <script>
     var clients = JSON.parse('{!! json_encode($customers)  !!}');

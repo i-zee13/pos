@@ -48,7 +48,10 @@ class PurchaseReturnController extends Controller
         $parts               =   explode('-', $invoice_no); 
         $invoice_first_part  =   $parts[0];
         $current_date        =   Carbon::today()->toDateString();
-        $products            =   Product::all();
+        $products            =   Product::selectRaw('*,
+                                                (SELCET purchase_price FROM products_purchases WHERE product_id == products.id) as unit_price
+                                                    
+                                            ')->where('stock_balance','>',0)->get();
         $customers           =   Customer::where('customer_type', 1)
                                             ->whereIn('id', function($query){
                                                 $query->select('customer_id')
