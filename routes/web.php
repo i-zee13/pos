@@ -58,8 +58,8 @@ Route::get('/get-sub-cat/{catId}' ,[App\Http\Controllers\ProductController::clas
 Route::post('/product-delete/{id}',[App\Http\Controllers\ProductController::class, 'deleteProduct'])->name('product-delete');
 // Start Shahid
 Route::get('/change-price'         ,[App\Http\Controllers\ProductController::class, 'changePrice'])->name('change-price');
-
-
+Route::post('/get-company-products',[App\Http\Controllers\ProductController::class, 'getCompanyProducts'])->name('get-company-products');
+Route::put('/update-product/{id}'  ,[App\Http\Controllers\ProductController::class, 'updateProduct'])->name('update-product');;
 
 
 //End Shahid

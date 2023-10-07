@@ -17475,12 +17475,12 @@ $('#add-product').on('click', function () {
     // $(".products").val('0');
     // $(".products").select2();
     var rowCount = $('#designationsTable tbody tr').length + 1;
-    $('#designationsTable tbody').append("\n                <tr id='tr-".concat(product_id, "'>\n                    <td>").concat(product_id, "</td>\n                    <td>").concat(p_name, "</td> \n                    <td><input type=\"number\" value=\"").concat(qty, "\"  data-retail=\"").concat(retail_price, "\" data-purchase=\"").concat(purchased_price, "\" data-stock=\"").concat(stock_in_hand, "\"  class=\"inputSale qty-input add-stock-input td-input-qty").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n                    <td><input type=\"number\" value=\"").concat(retail_price, "\" data-retail=\"").concat(retail_price, "\" data-purchase=\"").concat(purchased_price, "\" data-stock=\"").concat(stock_in_hand, "\" class=\"inputSale price-input add-stock-input td-").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n                    <td><input type=\"number\" value=\"").concat(prod_discount, "\"  class=\"inputSale discount-input add-stock-input td-").concat(prod_discount, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n                    <td class='purchase-product-amount").concat(product_id, " add- S-input ' >").concat(amount - prod_discount, "</td>\n                    <td><button type=\"button\" id=\"").concat(product_id, "\" class=\"btn smBTN red-bg remove_btn\" data-index=\"\" data-quantity=\"").concat(qty, "\">Remove</button></td>\n                    </tr>"));
+    $('#designationsTable tbody').append("\n                <tr id='tr-".concat(product_id, "'>\n                    <td>").concat(product_id, "</td>\n                    <td>").concat(p_name, "</td>\n                    <td><input type=\"number\" value=\"").concat(qty, "\"  data-retail=\"").concat(retail_price, "\" data-purchase=\"").concat(purchased_price, "\" data-stock=\"").concat(stock_in_hand, "\"  class=\"inputSale qty-input add-stock-input td-input-qty").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n                    <td><input type=\"number\" value=\"").concat(retail_price, "\" data-retail=\"").concat(retail_price, "\" data-purchase=\"").concat(purchased_price, "\" data-stock=\"").concat(stock_in_hand, "\" class=\"inputSale price-input add-stock-input td-").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n                    <td><input type=\"number\" value=\"").concat(prod_discount, "\"  class=\"inputSale discount-input add-stock-input td-").concat(prod_discount, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n                    <td class='purchase-product-amount").concat(product_id, " add- S-input ' >").concat(amount - prod_discount, "</td>\n                    <td><button type=\"button\" id=\"").concat(product_id, "\" class=\"btn smBTN red-bg remove_btn\" data-index=\"\" data-quantity=\"").concat(qty, "\">Remove</button></td>\n                    </tr>"));
     grandSum(previous_payable, service_charges);
     $('.show_existing_div').show();
 
     // var invoice_type = $('#invoice_type').val();
-    // $('#invoice_type').val(invoice_type).trigger('change'); 
+    // $('#invoice_type').val(invoice_type).trigger('change');
     p_name = '';
   }
   $('.purchase_price').val('');
@@ -17500,12 +17500,12 @@ $('#add-product').on('click', function () {
 });
 
 // $('#invoice_type').change(function(){
-//     if($(this).val()==1){ 
+//     if($(this).val()==1){
 //         $('#customer_id').removeClass('required')
 //         $('#customer_id').val('8').trigger('change');
 //     }else{
 //         $('#customer_id').addClass('required')
-//         $('#customer_id').val('0').trigger('change'); 
+//         $('#customer_id').val('0').trigger('change');
 //     }
 //     var total_paid_for_net_sale = 0;
 //     if($(this).val() == '1'){
@@ -17703,7 +17703,7 @@ $("#save").on('click', function () {
   var current_action = $(this);
   saleSave(current_action, 'save');
   current_action.text('Save');
-  // $('#hidden_btn_to_open_modal').click(); 
+  // $('#hidden_btn_to_open_modal').click();
 });
 
 $('.save_status').on('click', function () {
@@ -17843,7 +17843,7 @@ function saleSave(current_action, type) {
           window.location = "/sale-add";
         }, 1500);
         // $('#form')[0].reset();
-        // $('#client_type').val(0).trigger('change'); 
+        // $('#client_type').val(0).trigger('change');
         // $('.formselect').select2();
       } else {}
     },
@@ -18097,7 +18097,7 @@ $('#customer_id').change(function () {
         if (segments[3] == "sale-edit") {
           $('.paid_amount').text(customer_ledger['cr']);
 
-          // $('.remaning_amount').val(customer_ledger['balance'])                
+          // $('.remaning_amount').val(customer_ledger['balance'])
         }
 
         $('.display').css('display', '');
@@ -18126,7 +18126,7 @@ function grandSum() {
   sale_total_amount = sum - invoice_discount;
   $('.grand-total').text(sale_total_amount - $('.paid_amount').text());
   $('.amount_pay_input').val(sale_total_amount - $('.paid_amount').text());
-  // $('.amount_pay_input').val(sale_total_amount) ;   
+  // $('.amount_pay_input').val(sale_total_amount) ;
 
   if (parseFloat($('.amount_pay_input').val()) < 0) {
     $('.th-hide').hide();
@@ -18137,7 +18137,7 @@ function grandSum() {
   }
 
   // setTimeout(function(){ if($('.grand-total').text() == $('.paid_amount').text()){
-  //    $('.th-to-hide').hide(); 
+  //    $('.th-to-hide').hide();
   //    $('.amount_received').val($('.amount_pay_input').val());
   // }else{
   //    $('.th-to-hide').show();

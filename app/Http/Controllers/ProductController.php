@@ -122,6 +122,29 @@ public function changePrice(){
     $companies = Company::get();
     return view('product.change-price', compact('companies'));
 
-}   
+}
 
+public function getCompanyProducts(Request $request)
+{
+    $companyId = $request->input('company_id');
+    $products = Product::where('company_id', $companyId)
+    ->select('id', 'product_name', 'sale_price', 'new_purchase_price', 'old_purchase_price')
+    ->get();
+    return response()->json(['products' => $products]);
+}
+
+public function updateProduct(Request $request, $id)
+{
+    $salePrice = $request->input('salePrice');
+
+    $product = Product::find($id);
+    if ($product) {
+        $product->sale_price = $salePrice;
+        $product->save();
+
+        return response()->json(['products' => $product]);
+    }
+
+    return response()->json(['success' => false, 'message' => 'Product not found.']);
+}
 }

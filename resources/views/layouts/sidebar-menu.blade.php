@@ -100,7 +100,7 @@
               </li>
               <li class="nav-item">
                 <a href="{{route('change-price')}}" class="nav-link ">
-                  Change Pricer
+                  Change Price
                 </a>
               </li>
             </ul>

@@ -2789,6 +2789,15 @@
     ._cust_filter {
         width: 250px !important;
     }
+    .inputvalue {
+        width: 110px;
+        border-radius: 0;
+        border: solid 1px #dbdbdb;
+        background-color: #f6f6f6;
+        height: 24px;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
 </style>
 <!-- Body -->
 <div class="header-body">
@@ -2800,7 +2809,7 @@
             </h6>
             <!-- Title -->
             <h1 class="header-title">
-                <h2 class="_head01">Sales<span> Report</span></h2>
+                <h2 class="_head01">Change<span> Price</span></h2>
             </h1>
         </div>
         <div class="col-auto">
@@ -2856,7 +2865,7 @@
                             <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#152e4d !important"> Reset</button>
                         </div>
                         <div class="col-auto pl-0">
-                            <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
+                            <button type="button" style="margin-left:4px; " class="btn btn-primary search-btn"> Search</button>
                         </div>
                     </div>
                 </div>
@@ -2877,6 +2886,9 @@
             </div>
             <div class="body teacher_attendance_list">
                 <div class="col-12 pb-10">
+                    <div class="products-table">
+
+                    </div>
                     <div class="no-info">
                         <div class="m-auto"><strong> Please Filter Your Sale Record !</strong></div>
                     </div>
@@ -2887,5 +2899,6 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/product_change.js') }}"></script>
+<script src="{{asset('js/custom/product_change_price.js') }}"></script>
+
 @endpush
