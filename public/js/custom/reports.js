@@ -2,7 +2,7 @@ let deleteRef   = '';
 let batches   = [] ;
 let sessions  = [] ;
 let CurrentRef = '';
-let segments = location.href.split('/'); 
+let report_segments = location.href.split('/'); 
  $('.search-btn').on('click',function(){
   
     var start_date = $('.start_date').val();
@@ -39,7 +39,7 @@ let segments = location.href.split('/');
          url: url,
          data: {
              _token: $('meta[name="csrf_token"]').attr('content'),
-             current_url:segments[3]
+             current_url:report_segments[3]
          },
          success: function(response){
             CurrentRef.attr('disabled', false);
@@ -82,7 +82,7 @@ let segments = location.href.split('/');
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
            var title = '';
-           if(segments[3] == 'customer-reports'){
+           if(report_segments[3] == 'customer-reports'){
             title = 'Customer Report'
         }else{
             title = 'Vendor Report'

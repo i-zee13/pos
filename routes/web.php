@@ -137,5 +137,9 @@ Route::post('/fetch-stock-value-report',[App\Http\Controllers\ReportsController:
 // Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
 Route::get('/sale-replacement-create'   ,[App\Http\Controllers\SaleReplacementController::class, 'create'])->name('salereplacement.create'); 
 Route::get('/sale-replacements'         ,[App\Http\Controllers\SaleReplacementController::class, 'index'])->name('salereplacement.index');
-  
+
+// Admin Close Report Fakhar
+Route::get('/admin-sale-close'   ,[App\Http\Controllers\ReportsController::class, 'adminSaleClose'])->name('admin-sale-close'); 
+Route::get('/sale-close-record/{closing_date}'   ,[App\Http\Controllers\ReportsController::class, 'adminSaleCloseRecord'])->name('sale-close-record'); 
+
 });

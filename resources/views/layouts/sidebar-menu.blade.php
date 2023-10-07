@@ -342,7 +342,7 @@
           <div class="dropdown-menu" aria-labelledby="sidebarIconCopy">
             <a href="#" class="dropdown-item">Profile</a>
             <a href="#" class="dropdown-item">Settings</a>
-            <a href="#" class="dropdown-item">Admin Closing</a>
+            <a href="/admin-sale-close" class="dropdown-item">Admin Close</a>
             <hr class="dropdown-divider">
             <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
