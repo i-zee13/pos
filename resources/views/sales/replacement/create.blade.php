@@ -580,8 +580,7 @@
     <div class="container-fluid">
         <form id="form" enctype="multipart/form-data" class="">
             @csrf
-            <div class="row">
-@dd(343);
+            <div class="row"> 
                 <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
                 <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
                 <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
