@@ -98,6 +98,11 @@
                   Products
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{route('change-price')}}" class="nav-link ">
+                  Change Pricer
+                </a>
+              </li>
             </ul>
           </div>
         </li>

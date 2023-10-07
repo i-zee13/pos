@@ -13,7 +13,7 @@ class ProductController extends Controller
     {
         $companies       = Company::all();
         $products        = Product::all();
-        $next_product_id = Product::count() + 1; 
+        $next_product_id = Product::count() + 1;
         return view('product.products', compact('companies', 'next_product_id','products'));
     }
     public function store(Request $request)
@@ -76,7 +76,7 @@ class ProductController extends Controller
     {
         $data =  Product::selectRaw('products.* , (SELECT company_name FROM companies WHERE id = products.company_id) as company_name')
                         ->orderBy('created_at', 'DESC')->get();
-        $maxId = Product::withTrashed()->max('id'); 
+        $maxId = Product::withTrashed()->max('id');
         return response()->json([
             'msg'       =>  'Products Fetched',
             'status'    =>  'success',
@@ -97,7 +97,7 @@ class ProductController extends Controller
         ]);
     }
     public function deleteProduct(Request $request,$id)
-    {   
+    {
         if ($request->status == 'delete' && Product::where('id', $id)->delete()) {
             return response()->json([
                 'msg' => 'Product has Deleted Successfully',
@@ -114,6 +114,7 @@ class ProductController extends Controller
             'status' => 'failed'
         ]);
         }
-        
+
     }
+    
 }
