@@ -17,6 +17,7 @@ function SaleCloseRecord(close_date){
     $('.vendor_payments').text('Loading...');
     $('.total_payments').text('Loading...');
     $('.cash_in_hand').text('Loading...');
+    $('.sale-close-btn-modal').attr('disabled',true);
     $.ajax({
         url     :   `/sale-close-record/${close_date}`,
         success :   function(response){
@@ -38,7 +39,10 @@ function SaleCloseRecord(close_date){
             var total_payments          =   vendor_payment+customer_payment;
             var ttl_in_hand             =   ((total_invoice_amount+ttl_cash_recovery)-total_payments);
             var cash_in_hand            =   ((total_sales+ttl_cash_recovery)-total_payments);
-
+            if(ttl_in_hand > 0){
+                $('.sale-close-btn-modal').removeAttr('disabled');
+                $('.sale-close-btn-modal').attr('ttl_in_hand',ttl_in_hand);
+            }
             $('.ttl_sale').text(addCommas(parseFloat(total_invoice_amount).toFixed(2)));
             $('.ttl_payments').text(addCommas(parseFloat(total_payments).toFixed(2)));
             $('.ttl_received').text(addCommas(parseFloat(ttl_cash_recovery).toFixed(2)));
@@ -63,23 +67,66 @@ function SaleCloseRecord(close_date){
                 <table class="table table-hover dt-responsive nowrap" id="saleRecordTable" style="width:100%;">
                     <thead>
                         <tr>
-                            <th>SR#</th>
+                            <th>Bill#</th>
                             <th>Customer Name</th>
                             <th>Company Name</th>
                             <th>Product Name</th>
                             <th>Qty</th>
+                            <th>Discount</th>
                             <th>Amount</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             `);
-            $('#saleRecordTable tbody').append(`
-
-            `)
+            saleRecords.forEach(element => {
+                var invoice_no          = "";
+                invoice_no              = element.invoice_no.split('-');
+                $('#saleRecordTable tbody').append(`
+                    <tr>
+                    <td>${invoice_no[0]}</td>
+                    <td>${element['customer_name']}</td>
+                    <td>${element['company_name']}</td>
+                    <td>${element['product_name']}</td>
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td> 
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['product_discount']}</td> 
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['total_invoice_amount'])}</td> 
+                    </tr>
+                `)
+            });
+            $('#saleRecordTable').fadeIn();
+            $('#saleRecordTable').DataTable();
+            $('.loader').hide();
         }
     });
 }
+$(document).on('click','.sale-close-btn-modal',function(){
+    var ttl_in_hand =   $(this).attr('ttl_in_hand');
+    if(ttl_in_hand > 0){
+        $('.cash_in_hand').val(ttl_in_hand).attr('readonly',true);
+        $('.ttl_cash_in_hand').val(ttl_in_hand);
+    }
+});
+$(document).on('input','.closing_cash',function(){
+    var closing_cash    =   parseInt($(this).val());
+    var ttl_cash_in_hand=   parseInt($('.ttl_cash_in_hand').val());
+    var cash_in_hand    =   parseInt($('.cash_in_hand').val());
+    if(closing_cash){
+        if(closing_cash <= ttl_cash_in_hand){
+            cash_in_hand    =   cash_in_hand - closing_cash;
+            $('.cash_in_hand').val(cash_in_hand);
+        }else{
+            $('.cash_in_hand').val(ttl_cash_in_hand);
+            $(this).val("");
+            $('#notifDiv').fadeIn().css('background', 'red').text("Closing cash can't be greater than "+ttl_cash_in_hand);
+            $(this).focus();
+            setTimeout(() => {
+                $('#notifDiv').fadeOut();
+            }, 3000);
+            return
+        }
+    }
+});
 function addCommas(nStr) {
     nStr += "";
     x = nStr.split(".");

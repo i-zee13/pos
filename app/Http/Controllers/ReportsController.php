@@ -215,6 +215,8 @@ class ReportsController extends Controller
                                  pr.product_name,
                                  co.company_name,
                                  si.invoice_no,
+                                 si.customer_id,
+                                 IFNULL((SELECT customer_name FROM customers WHERE id = si.customer_id),'NA') as customer_name,
                                  IFNULL(si.invoice_discount,0) AS invoice_discount,
                                  si.invoice_type AS invoice_type,
                                  IFNULL(ps.sale_total_amount+IFNULL(product_discount,0),0) AS sale_total_amount,
@@ -276,7 +278,7 @@ class ReportsController extends Controller
       $records->total_product_discount =  collect($saleRecords)->SUM('product_discount');
       $records->total_net_sales        =  collect($saleRecords)->WHERE('invoice_type',1)->SUM('sale_total_amount');
       $records->total_credit_sales     =  collect($saleRecords)->WHERE('invoice_type',2)->SUM('sale_total_amount');
-      $records->customer_payment       =  collect($customer_payment)->WHERE('trx_type',3)->SUM('cr');
+      $records->customer_payment       =  collect($customer_payment)->WHERE('customer_id','!=',8)->WHERE('trx_type',3)->SUM('cr');
       $records->vendor_payment         =  collect($vendor_payment)->SUM('dr');
       $records->ttl_cash_recovery      =  collect($customer_payment)->WHERE('customer_id','!=',8)->WHERE('trx_type',3)->SUM('dr');
       $records->customer_ledger        =  $customer_payment;

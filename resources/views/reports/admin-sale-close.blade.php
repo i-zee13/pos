@@ -240,7 +240,7 @@
                     </svg>
                     <span>
                 </div>
-                <h5 class="text-muted"><span>TTL</span><br><b>Received</b></h5>
+                <h5 class="text-muted"><span>TTL</span><br><b>Cash Recovery</b></h5>
                 <h3 class="cp-stats-value ttl_received">Loading...</h3>
 
             </div>
@@ -265,7 +265,12 @@
     <div class="card" style="padding: 0px">
         <div class="header m-0">
             <h2 style="width: 100%">Sale Close <span>Detail</span>
-                <p style="text-align: right;margin:-20px 0px 0px 0px;font-size: 15px;" class="filter_name"></p>
+                <button class="btn add_button sale-close-btn-modal" data-toggle="modal" data-target="#close-modal" style="right: 0px!important;top:-2px!important">
+                    <i class="fa fa-check"></i> Sale Close
+                </button>
+                <a class="btn add_button" style="margin-right: 8%!important;top:-2px!important">
+                    <i class="fa fa-download"></i> Download PDF
+                </a>
             </h2>
 
         </div>
@@ -397,6 +402,54 @@
             </div>
         </div>
     </div>
+    {{-- Close modal --}}
+    <div class="modal fade" id="close-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content top-borderRed" style="border-top:3px solid #131d2a">
+            <div class="modal-header" style="padding:15px">
+                <h5 class="modal-title" id="exampleModalLabel">Admin Sale <span>Close</span></h5>
+            </div>
+            <div class="modal-body" style="padding:7px 15px 15px 15px">
+                <div id="col-md-12">
+                    <style>
+                        .cash_in_hand,.closing_cash{
+                            box-shadow: none!important;
+                            height: 35px!important
+                        }
+                        textarea{
+                            box-shadow: none!important;
+                            height: auto;
+                        }
+                    </style>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="font12">Cash IN Hand*</label>
+                            <input type="text" autocomplete="off" class="form-control only_decimal_numerics cash_in_hand"
+                            placeholder="Cash In Hand">
+                            <input type="hidden" value="" class="ttl_cash_in_hand">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="font12">Closing Cash*</label>
+                            <input type="text" autocomplete="off" class="form-control only_decimal_numerics closing_cash"
+                            placeholder="Closing Cash">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="font12">Closing Comment</label>
+                            <textarea class="form-control" cols="20"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0" style="padding-top:7px;padding-bottom:7px ">
+                <button type="button" class="btn btn-primary confirm_delete">Sale Close</button>
+                <button type="button" class="btn btn-cancel cancel_delete_modal" data-dismiss="modal"
+                    aria-label="Close">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <button hidden data-toggle="modal" data-target="#close-modal" id="hidden_btn_to_open_sale_close_modal"></button>
+</div>
 @endsection
 @push('js')
     <script src="{{ asset('js/custom/admin-sale-close.js') }}"></script>
