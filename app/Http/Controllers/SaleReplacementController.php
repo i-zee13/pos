@@ -27,7 +27,6 @@ class SaleReplacementController extends Controller
     }
 
     public function create(){
-
         $invoice_no          =   getSaleReturnNo();
         $parts               =   explode('-', $invoice_no);
         $invoice_first_part  =   $parts[0];
