@@ -7,6 +7,7 @@ var result = 0;
 var product_list = [];
 var vendors = [];
 var sales_product_array = [];
+var returns_product_array = [];
 var deleteRef = '';
 var flag = false;
 let previous_payable = 0;
@@ -32,7 +33,7 @@ let previous_paid = 0;
 let data_variable  = '';
 $(document).ready(function () {
    
-    $('.parent-div').show();
+    $('.parent_body-div').show();
     $('#tblLoader').hide();
     $('#bar-code').focus();
     stock_products    = JSON.parse($('#stock_products').val());
@@ -101,10 +102,8 @@ $(document).ready(function () {
     $('.add-more-btn').attr('href', '#');
     $('.new_form_field').addClass('required_client'); 
 })
-$('#add-product').on('click', function () { 
-   console.log(data_variable);
-    var is_in_array = sales_product_array.filter(x => x.product_id == data_variable);
-    console.log(sales_product_array);
+$('.add-product').on('click', function () {   
+    var is_in_array = sales_product_array.filter(x => x.product_id == data_variable); 
     if(is_in_array.length > 0){
         for(var x =1 ; x <= qty ; x++){
             is_in_array[0].qty++;
@@ -112,12 +111,11 @@ $('#add-product').on('click', function () {
         // $('.qty-input').val(sales_product_array[0].qty);
         $('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
     }else{
-        if ($('#qty').val() == '') {
-            $(this).focus();
-            $('#qty').css('border-color', 'red');
-            $('#notifDiv').fadeIn();
-            $('#notifDiv').css('background', 'red');
-            $('#notifDiv').text('Please Add Qty for Product');
+        var nearestParent = $(this).closest('.parent_body'); 
+        if (nearestParent.find('#qty').val() == '') {
+            nearestParent.find(this).focus();
+            nearestParent.find('#qty').css('border-color', 'red');
+            $('#notifDiv').fadeIn().css('background', 'red').text('Please Add Qty for Product');
             setTimeout(() => {
                 $('#notifDiv').fadeOut();
             }, 3000);
@@ -125,8 +123,8 @@ $('#add-product').on('click', function () {
         } else {
             $('#qty').css('border-color', ''); // Reset the border color
         }
-        var prod_discount = $('#discount').val();
-        expiry_date       = $('.expiry_date').val();
+        var prod_discount =  nearestParent.find('#discount').val();
+        expiry_date       =  nearestParent.find('.expiry_date').val();
         sales_product_array.push({
             'sale_prod_id'    :   '',
             'prod_discount'   :   prod_discount ? prod_discount: 0,
@@ -136,8 +134,7 @@ $('#add-product').on('click', function () {
             'amount'          :  `${amount-prod_discount}`,
             'retail_price'    :  `${retail_price}`,
             'stock_in_hand'   :   stock_in_hand,
-            'purchased_price' :   purchased_price,
-    
+            'purchased_price' :   purchased_price, 
         });
         $('.amount_received').val($('.paid_amount').text());
         setTimeout(() => {
@@ -146,8 +143,8 @@ $('#add-product').on('click', function () {
         // $('.products').children('option[value="' + product_id + '"]').attr('disabled', true);
         // $(".products").val('0');
         // $(".products").select2();
-        let rowCount = $('#designationsTable tbody tr').length + 1;
-        $('#designationsTable tbody').append(`
+        //  $('#designationsTable tbody tr').length + 1;
+         nearestParent.append(`
                 <tr id='tr-${product_id}'>
                     <td>${product_id}</td>
                     <td>${p_name}</td> 
@@ -176,35 +173,9 @@ $('#add-product').on('click', function () {
     $('#retail_price').val('');
     $('#discount').val('');
     $('#bar-code').focus();
-    data_variable = '';
-    
-});
-
-// $('#invoice_type').change(function(){
-//     if($(this).val()==1){ 
-//         $('#customer_id').removeClass('required')
-//         $('#customer_id').val('8').trigger('change');
-//     }else{
-//         $('#customer_id').addClass('required')
-//         $('#customer_id').val('0').trigger('change'); 
-//     }
-//     var total_paid_for_net_sale = 0;
-//     if($(this).val() == '1'){
-//         sales_product_array.forEach(function (data, key) {
-//             total_paid_for_net_sale += parseFloat(data.amount)
-//         });
-//     }
-//     $('.amount_pay_input').val(total_paid_for_net_sale);
-// });
-$('#datepicker , #datepicker2').datepicker({
-    autoclose: true,
-    todayHighlight: true,
-    toggleActive: true,
-    format: dateFormat
-})
-    .on('changeDate', function (ev) {
-        $(this).datepicker('hide');
-    });
+    data_variable = ''; 
+}); 
+ 
 $('.close').on('click', function () {
 
     $('.new_form_field').removeClass('required_client');
@@ -317,21 +288,22 @@ $('.products').change(function () {
         }else{
             $('.pp').text(filter_product[0].old_purchase_price);
             $('.purchase_price').val(filter_product[0].old_purchase_price);
-        }
-        $('#retail_price').val(filter_product[0].sale_price);
-
+        } 
         $('.stock_balance').text(filter_product[0].stock_balance);
         p_name          = filter_product[0].product_name;
         product_id      = filter_product[0].id;
         stock_in_hand   = filter_product[0].stock_balance;
         purchased_price = filter_product[0].old_purchase_price;
-        $('.expiry_date').val(filter_product[0].expiry_date)
-        $('.bar-code').val(filter_product[0].barcode);
-      
+        var nearestParent = $(this).closest('.parent_body');
+        nearestParent.find('.expiry_date').val(filter_product[0].expiry_date);
+        nearestParent.find('.bar-code').val(filter_product[0].barcode);
+        nearestParent.find('#retail_price').val(filter_product[0].sale_price); 
+        
     }
 
 });
 $(document).on('focusout', '.bar-code', function () {
+
      data_variable = $(this).val(); 
     $('.purchase_price').val('');
     $('#product-name').val('');
@@ -339,14 +311,15 @@ $(document).on('focusout', '.bar-code', function () {
     $('#amount').val('');
     var filter_product = product_list.filter(x => x.barcode == data_variable);
     if(filter_product.length > 0){
-        $('#products').val(filter_product[0].id).trigger('change');
-        // $('.retail_price').text(filter_product[0].sale_price);
-        $('.purchase_price').val(filter_product[0].old_purchase_price);
-        $('.stock_balance').text(filter_product[0].stock_balance);
+        var parent = $(this).closest('#productGrid');  
+        parent.find('.products').val(filter_product[0].id).trigger('change');
+        // parent.find('.retail_price').text(filter_product[0].sale_price);
+        parent.find('.purchase_price').val(filter_product[0].old_purchase_price);
+        parent.find('.stock_balance').text(filter_product[0].stock_balance);
         p_name      = filter_product[0].product_name;
         product_id  = filter_product[0].id;
     }else{
-        $('#products').val('0').trigger('change');
+        $('.products').val('0').trigger('change');
         $('#retail_price').val('');
         $('.expiry_date ').val(''); 
         if(data_variable){
@@ -360,10 +333,9 @@ $(document).on('focusout', '.bar-code', function () {
     } 
         return 0 ;  
     
-});
-    
+}); 
 $('#qty').on('input', function () {
-    qty          = $(this).val();
+    qty     = $(this).val();
     if(qty > stock_in_hand){
         $(this).val('')
         $('#qty').css('border-color', 'red');
@@ -376,7 +348,7 @@ $('#qty').on('input', function () {
         }, 3000);
         return;
     }
-    productRetailAmount();
+    productRetailAmount($(this));
    
 });
 $("#save").on('click', function () {
@@ -733,10 +705,10 @@ $(document).on('input', '.discount-input', function () {
 })
 
 function getProducts() {
-        $("#products").empty();  
-        $("#products").append(`<option value="0">Select Product</option>`)
+        $(".products").empty();  
+        $(".products").append(`<option value="0">Select Product</option>`)
         stock_products.forEach(data => { 
-            $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name}</option>`)
+            $(".products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name}</option>`)
             product_list.push(data);
         }); 
 }
@@ -809,9 +781,10 @@ function grandSum(previous_payable=0,service_charges=0,discount=0){
        //console.log(data);
         sum += parseFloat(data.amount)
     });
-    $('.product_net_total').val(sum);
-    // sale_total_amount = sum-invoice_discount;
-    sum -= parseFloat(previous_payable)  // sum -= parseFloat(previous_payable ? previous_payable : 0); 
+    // $('.product_net_total').val(sum);
+    $('.return_total').val(sum);
+    
+    sum -= parseFloat(previous_payable)  
     // previous_payable >= 0 ? sum -= parseFloat(previous_payable ? previous_payable : 0) : sum += parseFloat(previous_payable);
   
     sum += parseFloat(service_charges ? service_charges : 0);  
@@ -838,8 +811,8 @@ function grandSum(previous_payable=0,service_charges=0,discount=0){
     //    $('.th-to-hide').show();
     // }}, 300);
 }
-function productRetailAmount(){
-    retail_price = $('#retail_price').val();
+function productRetailAmount($this){ 
+    retail_price = $this.closest('.parent_body').find('#retail_price').val();
     amount       =  qty * retail_price ;
     // console.log(retail_price,qty)
     $('#amount').val(amount);
@@ -862,8 +835,7 @@ $('#invoice_discount').on('input',function(){
         $('.amount_received').trigger('input');
     }, 500);
     grandSum(previous_payable,service_charges,$(this).val());
-  })
-
+  }) 
   $('#add-product').on('focus', function() {
     $(this).css('background','#152e4d ');
   });
@@ -875,5 +847,17 @@ $('#invoice_discount').on('input',function(){
   }).on('mouseleave', '.show_purchase', function() {
     $('.pp').hide();
   });
-  
- 
+  $('.replacement_checbox').on('click', function() {
+     
+    if (sales_product_array.length === 0) {
+        $('#notifDiv').fadeIn()
+            .css('background', 'red')
+            .text('Please add Product for Replacement');
+            $(this).prop('checked', false);
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+    } else {
+        returns_product_array = sales_product_array;
+    }
+});

@@ -581,7 +581,7 @@
         <form id="form" enctype="multipart/form-data" class="">
             @csrf
             <div class="row">
-
+@dd(343);
                 <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
                 <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
                 <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
@@ -625,7 +625,7 @@
                                     <div class="col-md-12">
                                         <label class="font13 mb-5">Select Customer</label>
                                         <div class="form-s2">
-                                            <select class="form-control formselect form_clear  " placeholder="Select Customer" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                                            <select class="form-control formselect form_clear" placeholder="Select Customer" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
                                                 <option value="0">Select Customer</option>
                                                 @foreach($customers as $customer)
                                                 <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->id}} - {{$customer->customer_name}}</option>
@@ -649,10 +649,10 @@
                                 <!-- <div class="col-md-7 pr-0"><strong>Country:</strong></div>
                         <div class="col-md-5"><span id="country"></span></div> -->
                             </div>
-                          
+
                         </div>
 
-                    
+
 
 
                     </div>
@@ -664,7 +664,7 @@
                             <h2 class="title font22 PT-10 mb-10">Replacement <span>Invoice</span></h2>
                         </div>
 
-                     
+
                     </div>
 
                     <div class="right_Info">
@@ -672,8 +672,8 @@
                             <div class="row CompanyInfo">
                                 <div class="col-md-3"><strong class="show_purchase">P.P:</strong> <span class="pp" style="display:none"></span></div>
                                 <div class="col-md-5"><strong>Retail Price:</strong> <span class="retail_price ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
-
                                 <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
+                                <!-- <div class="col-md-3 pr-0"><strong>Replace:</strong><input type="checkbox" name="replacement_checbox" class="replacement_checbox"></div> -->
 
                             </div>
                             <!-- <div class="col-auto pr-0">Invoice #
@@ -695,16 +695,7 @@
                     </div> -->
 
                             <div class="infoDiv">
-                                <form id="purchse-form">
-                                    <div class="row">
-                                       
-                                        <input type="text" id="purchase_price" class="inputfileds  purchase_price " placeholder="" name="purchase_price" hidden>
-                                        <input type="text" id="retail _price" class="inputfileds" placeholder="" name="ret ail_price" hidden>
- 
-                                        <input id="datepicker" type="hidden" class="inputfileds new_dob new_form_field expiry_date " name="expiry_date">
- 
-                                    </div>
-                                </form>
+
                             </div>
 
                         </div>
@@ -717,7 +708,7 @@
                         </style>
                         <div class="row">
                             <div class="col-12" id="table-container">
-                                <table class="ProductTable table  " id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <table class="ProductTable table designationsTable" id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <thead>
                                         <tr>
                                             <th class="">ID</th>
@@ -729,12 +720,12 @@
                                             <th style="">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="productGrid">
+                                    <tbody id="productGrid" class="parent_body">
                                         <tr>
-                                            <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;"></td>
+                                            <td><input type="text" id="bar-code1" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;"></td>
                                             <td>
                                                 <div class="form-s2" style="width:165px">
-                                                    <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 150;">
+                                                    <select class="inputfileds formselect products" name="product_name" id="products1" tabindex="2" style="width: 150;">
                                                         <option value="0">Select Product *</option>
                                                         @foreach($products as $product)
                                                         <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
@@ -742,23 +733,23 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td> <input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
-                                            <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" readonly></td>
-                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" tabindex="4" min="0"></td>
-                                            <td class='add- S-input '><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;"></td>
+                                            <!-- Assigning tabindex for the input fields -->
+                                            <td><input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
+                                            <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" readonly tabindex="4"></td>
+                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" tabindex="5" min="0"></td>
+                                            <td class='add-S-input'><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;" tabindex="6"></td>
                                             <td>
-                                                <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5" style="padding: 5px 15px 5px 15px; background:green">Add</button>
+                                                <button type="button" id="add-product" class="btn btn-primary smBTN mr-2 add-product" tabindex="7" style="padding: 5px 15px 5px 15px; background:green">Add</button>
                                             </td>
                                         </tr>
-
                                     </tbody>
                                 </table>
-
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-12" id="table-container">
-                                <table class="ProductTable table  " id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <table class="ProductTable table designationsTable" id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <thead>
                                         <tr>
                                             <th class="">ID</th>
@@ -770,12 +761,12 @@
                                             <th style="">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="productGrid">
+                                    <tbody id="productGrid" class="parent_body">
                                         <tr>
-                                            <td><input type="text" id="bar-code-replace" class="inputSale bar-code-replace" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;"></td>
+                                            <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="8" style="width: 50;"></td>
                                             <td>
                                                 <div class="form-s2" style="width:165px">
-                                                    <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 150;">
+                                                    <select class="inputfileds formselect products" data-btn="replacement" name="product_name" id="products" tabindex="9" style="width: 150;">
                                                         <option value="0">Select Product *</option>
                                                         @foreach($products as $product)
                                                         <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
@@ -783,26 +774,34 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td> <input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
-                                            <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" readonly></td>
-                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" tabindex="4" min="0"></td>
-                                            <td class='add- S-input '><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;"></td>
+                                            <!-- Assigning tabindex for the input fields -->
+                                            <td><input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="10" min="0"></td>
+                                            <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" readonly tabindex="11"></td>
+                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" tabindex="12" min="0"></td>
+                                            <td class='add-S-input'><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;" tabindex="13"></td>
                                             <td>
-                                                <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5" style="padding: 5px 15px 5px 15px; background:green">Add</button>
+                                               <button type="button" id="add-product"  data-btn="replacement" class="btn btn-primary smBTN mr-2 add-product" tabindex="7" style="padding: 5px 15px 5px 15px; background:green">Add</button>
+
                                             </td>
                                         </tr>
-
                                     </tbody>
                                 </table>
-
                             </div>
                         </div>
- 
+
+
 
                         <div class="row">
                             <div class="col-12">
                                 <table class="totalValues" width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tbody>
+                                        <tr class="th-to-hide">
+                                            <td></td>
+                                            <td></td>
+                                            <td align="right">Return Total</td>
+
+                                            <td> <input type="number" class="inputvalue return_total" name="return_total" style="font-size: 13px" placeholder="0.00" readonly></td>
+                                        </tr>
                                         <tr class="th-to-hide">
                                             <td></td>
                                             <td></td>
@@ -848,7 +847,7 @@
                                             <td></td>
                                             <td></td>
                                             <td align="right" class="cash-return">Cash Recived </td>
-                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00"  value="{{@$invoice->amount_received ?? 0}}"></td>
+                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" value="{{@$invoice->amount_received ?? 0}}"></td>
                                         </tr>
 
 
@@ -894,7 +893,7 @@
                             </div>
                         </div>
 
-                        
+
 
                         <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
                             @if(request()->query('invoice') == 'detail')

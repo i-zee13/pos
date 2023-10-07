@@ -12,7 +12,7 @@ use Auth;
 
 class SaleReplacementController extends Controller
 {
-    
+
     public function index()
     {
         $current_date   =   date('Y-m-d');
@@ -22,47 +22,21 @@ class SaleReplacementController extends Controller
                                         ->whereRaw("Date(created_at) = '$current_date'")
                                         ->orderBy('id', 'DESC')
                                         ->get();
-                                        
+
         return view('sales.replacement.index', compact('sales'));
     }
 
     public function create(){
-       
+
         $invoice_no          =   getSaleReturnNo();
-        $parts               =   explode('-', $invoice_no); 
+        $parts               =   explode('-', $invoice_no);
         $invoice_first_part  =   $parts[0];
         $current_date        =   Carbon::today()->toDateString();
-        $customers           =   Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get(); 
-        $products            =   Product::get(); 
-        
+        $customers           =   Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
+        $products            =   Product::where('stock_balance','!=',0)->get();
+
         return view('sales.replacement.create',compact('customers','current_date','invoice_first_part','products'));
     }
- 
-    public function store(Request $request)
-    {
-        //
-    }
- 
-    public function show(SaleReplacement $saleReplacement)
-    {
-        //
-    }
 
-     
-    public function edit(SaleReplacement $saleReplacement)
-    {
-        //
-    }
 
-     
-    public function update(Request $request, SaleReplacement $saleReplacement)
-    {
-        //
-    }
-
-    
-    public function destroy(SaleReplacement $saleReplacement)
-    {
-        //
-    }
 }
