@@ -129,6 +129,36 @@ $(document).on('input','.closing_cash',function(){
         $('.cash_in_hand').val(ttl_cash_in_hand);
     }
 });
+$(document).on('click','.sale_open',function(){
+    var currentRef = $(this);
+    currentRef.text("Processing...");
+    currentRef.attr('disabled',true);
+    $.ajax({
+        type    :   'POST',
+        url     :   '/update-closing-cash',
+        data    :   {
+            _token      :   $('[name="csrf_token"]').attr('content'),
+            close_date  :   $('.close_date').val(),
+        },
+        success :   function(response){
+            currentRef.text("Open Sale");
+            currentRef.attr('disabled',false);
+            if(response.status == "success"){
+                $('#notifDiv').fadeIn().css('background', 'green').text("Sale open successfully");
+                setTimeout(() => {
+                    window.location.reload();
+                    $('#notifDiv').fadeOut();
+                }, 3000);
+                $('.cancel_sale_close_modal').click();
+            }else{
+                $('#notifDiv').fadeIn().css('background', 'red').text("Sale not open at this moment");
+                setTimeout(() => {
+                    $('#notifDiv').fadeOut();
+                }, 3000);
+            }
+        }
+    });
+});
 $(document).on('click','.sale_close',function(){
     var ttl_cash_in_hand=   $('.ttl_cash_in_hand').val();
     var closing_cash    =   $('.closing_cash').val();
@@ -140,8 +170,9 @@ $(document).on('click','.sale_close',function(){
         }, 3000);
         return;
     }
-    $(this).text("Processing...");
-    $(this).attr('disabled',true);
+    var currentRef = $(this);
+    currentRef.text("Processing...");
+    currentRef.attr('disabled',true);
     $.ajax({
         type    :   'POST',
         url     :   '/save-closing-cash',
@@ -153,11 +184,13 @@ $(document).on('click','.sale_close',function(){
             closing_comment     :   $('.closing_comment').val(),
         },
         success :   function(response){
+            currentRef.text("Close Sale");
+            currentRef.attr('disabled',false);
             if(response.status == "success"){
                 $('#notifDiv').fadeIn().css('background', 'green').text("Sale close successfully");
                 setTimeout(() => {
                     $('#notifDiv').fadeOut();
-                    window.reload();
+                    window.location.reload();
                 }, 3000);
                 $('.cancel_sale_close_modal').click();
             }else if(response.closing_cash_null_0){

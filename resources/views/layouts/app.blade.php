@@ -111,8 +111,9 @@
     <!-- Title -->
     <title>Store</title>
 </head>
-
 <body style="display: block;">
+    @php $close_routes  = closeRoute() @endphp
+    @php $is_close      = isClose() @endphp
     <div id="notifDiv">
     </div>
 
@@ -234,11 +235,11 @@
             // alert($(window).width());
             closeSubNav();
         });
-    if(action != 'customer-ledger-jama' && action != 'customer-ledger-banam' && action != 'vendor-ledger-jama' && action != 'vendor-ledger-banam'  ){
-        $(document).on("click", "#SN-close, .overlay-for-sidebar", function () {
-            closeSidebar();
-        });
-    }
+        if(action != 'customer-ledger-jama' && action != 'customer-ledger-banam' && action != 'vendor-ledger-jama' && action != 'vendor-ledger-banam'  ){
+            $(document).on("click", "#SN-close, .overlay-for-sidebar", function () {
+                closeSidebar();
+            });
+        }
         // $(document).on("click", "#SN-close, .overlay-for-sidebar", function() {
         //     closeSidebar();
         // });
@@ -286,6 +287,23 @@
     @push('js')
     <script src="{{asset('js/custom/master.js')}}"> </script>
     @endpush
+    <script>
+            var is_close        =   '{!! $is_close !!}';
+            if(is_close == 1){
+                let page_route  =   location.href.split('/'); 
+                var close_routes=   JSON.parse('{!! json_encode($close_routes) !!}');
+                for (var key in close_routes) {
+                    if (close_routes.hasOwnProperty(key)) {
+                        var value   =   close_routes[key];
+                        $(`.${key}`).hide().attr('disabled',true);
+                        if(page_route[3] == value){
+                            alert("Can't access because sale is close");
+                            window.location.href = "/home";
+                        }
+                    }
+                }
+            }
+    </script>
 </body>
 
 </html>

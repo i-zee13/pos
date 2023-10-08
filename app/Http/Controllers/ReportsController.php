@@ -246,7 +246,7 @@ class ReportsController extends Controller
    }
    public function adminSaleCloseRecord($closing_date){
       $request                         =  "";
-      $closing_date                    =  "2023-10-07";
+      // $closing_date                    =  "2023-10-07";
       $saleRecords                     =  $this->SaleReportRecords($request,$closing_date);
       $customer_payment                =  DB::table("customer_ledger")->selectRaw("
                                              customer_id,
@@ -255,8 +255,6 @@ class ReportsController extends Controller
                                              trx_type
                                           ")
                                           ->whereRaw("
-                                             trx_type = 3
-                                             AND
                                              DATE(created_at) = '$closing_date'
                                           ")->get();
       $vendor_payment                  =  DB::table("vendor_ledger")->selectRaw("
@@ -266,8 +264,6 @@ class ReportsController extends Controller
                                              trx_type
                                           ")
                                           ->whereRaw("
-                                             trx_type = 3
-                                             AND
                                              DATE(created_at) = '$closing_date'
                                           ")->get();
       

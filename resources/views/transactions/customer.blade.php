@@ -217,7 +217,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="header mb-0">
-                <a class="btn add_button openDataSidebarForAddCustomerLedger"><i class="fa fa-plus"></i> Add New</a>
+                <a class="btn add_button openDataSidebarForAddCustomerLedger customer-ledger-jama-banam"><i class="fa fa-plus"></i> Add New</a>
                 <h2>Customer Areas</h2>
             </div>
             <div style="min-height: 400px" id="tblLoader">
