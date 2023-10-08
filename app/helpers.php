@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AdminSaleClose;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\CustomerLedger;
@@ -310,5 +311,12 @@ if(!function_exists('isEditable'))
                     ->update(['is_editable' => 0]);
         
             return true;
+    }
+}
+if(!function_exists('isClose')){
+    function isClose(){
+        $closing_date   =   date('Y-m-d');   
+        $is_close       =   AdminSaleClose::selectRaw("is_closed")->whereRaw("closing_date = '$closing_date'")->value('is_closed');
+        return $is_close;
     }
 }

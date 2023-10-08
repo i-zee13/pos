@@ -63,10 +63,6 @@
 
                     <div class="col pr-0">
 
-                        <!-- <div class="CL-Product"><i class="fa fa-search"></i>
-                        <input type="text" class="search form-control" placeholder="Search">
-                    </div> -->
-
                         <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
                             <input type="text" autocomplete="off" class="form-control datepicker start_date" placeholder="Start Date" name="start_date">
                         </div>

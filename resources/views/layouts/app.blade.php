@@ -210,7 +210,9 @@
         $(document).on('input', '.only_alphabets', function() {
             this.value = this.value.replace(/[^a-z]/gi, '');
         })
-
+        $(document).on('input', '.only_decimal_numerics', function () {
+            this.value = this.value.replace(/[^0-9.:]|(\.[0-9]{10,})/g,'');
+        })
         $('#productlist01').click(function() {
             if ($('#product-cl-sec').hasClass('active')) {
                 closeSidebar()
