@@ -266,7 +266,15 @@
         <div class="header m-0">
             <h2 style="width: 100%">Sale Close <span>Detail</span>
                 <button class="btn add_button sale-close-btn-modal" data-toggle="modal" data-target="#close-modal" style="right: 0px!important;top:-2px!important">
-                    <i class="fa fa-check"></i> Sale Close
+                    <i class="fa fa-check"></i> 
+                @php 
+                    $is_close   =   isClose();
+                @endphp
+                @if($is_close == 1)
+                Sale Open
+                @else
+                Sale Close
+                @endif
                 </button>
                 <a class="btn add_button" style="margin-right: 8%!important;top:-2px!important">
                     <i class="fa fa-download"></i> Download PDF
@@ -427,7 +435,7 @@
                             <label class="font12">Cash IN Hand*</label>
                             <input type="text" autocomplete="off" class="form-control only_decimal_numerics cash_in_hand"
                             placeholder="Cash In Hand">
-                            <input type="hidden" value="" class="ttl_cash_in_hand">
+                            <input type="hidden" value="" class="ttl_cash_in_hand" name="ttl_cash_in_hand">
                         </div>
                         <div class="col-md-6">
                             <label class="font12">Closing Cash*</label>
@@ -436,14 +444,21 @@
                         </div>
                         <div class="col-md-12">
                             <label class="font12">Closing Comment</label>
-                            <textarea class="form-control" cols="20"></textarea>
+                            <textarea class="form-control closing_comment" name="closing_comment" cols="20"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer border-0" style="padding-top:7px;padding-bottom:7px ">
-                <button type="button" class="btn btn-primary confirm_delete">Sale Close</button>
-                <button type="button" class="btn btn-cancel cancel_delete_modal" data-dismiss="modal"
+                @php 
+                    $is_close   =   isClose();
+                @endphp
+                @if($is_close == 1)
+                <button type="button" class="btn btn-primary sale_close">Sale Open</button>
+                @else
+                <button type="button" class="btn btn-primary sale_close">Sale Close</button>
+                @endif
+                <button type="button" class="btn btn-cancel cancel_sale_close_modal" data-dismiss="modal"
                     aria-label="Close">Cancel</button>
             </div>
         </div>

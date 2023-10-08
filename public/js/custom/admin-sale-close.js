@@ -108,12 +108,12 @@ $(document).on('click','.sale-close-btn-modal',function(){
     }
 });
 $(document).on('input','.closing_cash',function(){
-    var closing_cash    =   parseInt($(this).val());
-    var ttl_cash_in_hand=   parseInt($('.ttl_cash_in_hand').val());
-    var cash_in_hand    =   parseInt($('.cash_in_hand').val());
+    var closing_cash    =   ($(this).val());
+    var ttl_cash_in_hand=   ($('.ttl_cash_in_hand').val());
+    var cash_in_hand    =   ($('.cash_in_hand').val());
     if(closing_cash){
         if(closing_cash <= ttl_cash_in_hand){
-            cash_in_hand    =   cash_in_hand - closing_cash;
+            cash_in_hand    =   ttl_cash_in_hand - closing_cash;
             $('.cash_in_hand').val(cash_in_hand);
         }else{
             $('.cash_in_hand').val(ttl_cash_in_hand);
@@ -125,7 +125,55 @@ $(document).on('input','.closing_cash',function(){
             }, 3000);
             return
         }
+    }else{
+        $('.cash_in_hand').val(ttl_cash_in_hand);
     }
+});
+$(document).on('click','.sale_close',function(){
+    var ttl_cash_in_hand=   $('.ttl_cash_in_hand').val();
+    var closing_cash    =   $('.closing_cash').val();
+    if(!closing_cash || closing_cash == ""){
+        $('#notifDiv').fadeIn().css('background', 'red').text("Please fill out closing cash");
+        $('.closing_cash').focus();
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    }
+    $(this).text("Processing...");
+    $(this).attr('disabled',true);
+    $.ajax({
+        type    :   'POST',
+        url     :   '/save-closing-cash',
+        data    :   {
+            _token              :   $('[name="csrf_token"]').attr('content'),
+            close_date          :   $('.close_date').val(),
+            ttl_cash_in_hand    :   $('.ttl_cash_in_hand').val(),
+            closing_cash        :   $('.closing_cash').val(),
+            closing_comment     :   $('.closing_comment').val(),
+        },
+        success :   function(response){
+            if(response.status == "success"){
+                $('#notifDiv').fadeIn().css('background', 'green').text("Sale close successfully");
+                setTimeout(() => {
+                    $('#notifDiv').fadeOut();
+                    window.reload();
+                }, 3000);
+                $('.cancel_sale_close_modal').click();
+            }else if(response.closing_cash_null_0){
+                $('#notifDiv').fadeIn().css('background', 'red').text("Closing cash can't be 0 or empty");
+                setTimeout(() => {
+                    $('#notifDiv').fadeOut();
+                }, 3000);
+            }else{
+                $('#notifDiv').fadeIn().css('background', 'red').text("Sale not close at this moment");
+                setTimeout(() => {
+                    $('#notifDiv').fadeOut();
+                }, 3000);
+            }
+        }
+    });
+
 });
 function addCommas(nStr) {
     nStr += "";
