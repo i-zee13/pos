@@ -120,20 +120,18 @@ class TransactionController extends Controller
       } else {
          
          foreach ($request->hidden_cust_id as $key => $customer) { 
-          
-          
             $balance                =   $request->hidden_cust_balance[$key];
             if($request->operation == 'vendor'){
                $ledger              =   new VendorLedger(); 
                isEditable($customer);
-               if ($request->amount_to == 1) {  //1 = CR Ledger-jama
+               if ($request->amount_to == 1) {  //1 = DR Ledger-jama
                   $ledger->crv_no   =  getVendorCrvNo();
                   $ledger->balance  =  $balance - $request->amount[$key]; // minus jo mny dena hy .
-                  $ledger->cr       =  $request->amount[$key];  
-               } else { // DR Ledger-banam
+                  $ledger->dr       =  $request->amount[$key];  
+               } else { // CR  Ledger-banam
                   $ledger->cpv_no   =  getVendorCpvNo(); 
                   $ledger->balance  =  $balance + $request->amount[$key];  // plus jo mny lena hy
-                  $ledger->dr       =  $request->amount[$key];
+                  $ledger->cr       =  $request->amount[$key];
                }
             }else{
                if($request->action == 'edit'){

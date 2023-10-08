@@ -79,7 +79,7 @@ class SaleController extends Controller
     }
     public function saleInvoice(Request $request)
     {
-        // dd($request->all());
+       
         if ($request->hidden_invoice_id) {
             $invoice = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
             // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received;

@@ -121,6 +121,8 @@ class StockController extends Controller
         $invoice->status               = $request->status;
         $invoice->description          = $request->description;
         $invoice->created_by           = Auth::id();
+        
+        
         if($invoice->save()){
             if(count($request->purchased_product_array) > 0){
                 foreach($request->purchased_product_array as $purchase_product){
@@ -242,14 +244,15 @@ class StockController extends Controller
                 $customer_ledger->purchase_invoice_id= $invoice->id;
                 $customer_ledger->trx_type   = 1 ; //Purchase inc
                 $customer_ledger->customer_id= $request->customer_id;
-                $customer_ledger->dr         = $invoice->total_invoice_amount;
-                $customer_ledger->cr         = $invoice->paid_amount;
-                $customer_ledger->balance    = ($request->grand_total-$request->amount_paid); //+balance
+                $customer_ledger->cr         = $invoice->total_invoice_amount;
+                $customer_ledger->dr         = $invoice->paid_amount;
+                $customer_ledger->balance    = $invoice->total_invoice_amount- $request->amount_received; //+balance
+
                 $customer_ledger->created_by = Auth::id();
                 $customer_ledger->save();
-                Customer::where('id',$request->customer_id)->update([
-                    'balance' => $customer_ledger->balance,
-                ]);
+                // Customer::where('id',$request->customer_id)->update([
+                //     'balance' => $customer_ledger->balance,
+                // ]);
                 // $vendor          =  Customer::where('id',$request->customer_id)->first();
                 // if($vendor){
                 //     $vendor->credit     = $request->grand_total-$request->amount_paid;
