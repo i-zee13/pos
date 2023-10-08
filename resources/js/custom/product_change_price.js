@@ -92,7 +92,7 @@ $('.company_id').on('change', function () {
 
 })
 
-$(document).on('keyup', 'input[name="sale_price"]', function() {
+$(document).on('input', 'input[name="sale_price"]', function() {
     var dataId = $(this).data('id');
     var salePrice = parseFloat($(this).val());
     var purchasePrice = parseFloat($(this).data('purchase'));

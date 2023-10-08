@@ -2890,7 +2890,7 @@
 
                     </div>
                     <div class="no-info">
-                        <div class="m-auto"><strong> Please Filter Your Sale Record !</strong></div>
+                        <div class="m-auto"><strong> Please Filter Your Product Record !</strong></div>
                     </div>
                 </div>
             </div>
