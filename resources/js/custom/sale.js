@@ -212,15 +212,7 @@ $('#add-product').on('click', function () {
 //     }
 //     $('.amount_pay_input').val(total_paid_for_net_sale);
 // });
-$('#datepicker , #datepicker2').datepicker({
-    autoclose: true,
-    todayHighlight: true,
-    toggleActive: true,
-    format: dateFormat
-})
-    .on('changeDate', function (ev) {
-        $(this).datepicker('hide');
-    });
+
 $('.close').on('click', function () {
 
     $('.new_form_field').removeClass('required_client');

@@ -135,7 +135,8 @@ Route::post('/fetch-stock-value-report',[App\Http\Controllers\ReportsController:
 
 // Sales Replacement / 
 // Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
-Route::get('/sale-replacement-create'   ,[App\Http\Controllers\SaleReplacementController::class, 'create'])->name('salereplacement.create'); 
-Route::get('/sale-replacements'         ,[App\Http\Controllers\SaleReplacementController::class, 'index'])->name('salereplacement.index');
+Route::get('/sale-replacement-create'       ,[App\Http\Controllers\SaleReplacementController::class, 'create'])->name('salereplacement.create'); 
+Route::get('/sale-replacements'             ,[App\Http\Controllers\SaleReplacementController::class, 'index'])->name('salereplacement.index');
+Route::post('/store-sale-replacement-invoice'  ,[App\Http\Controllers\SaleReplacementController::class, 'store'])->name('salereplacement.store');
   
 });
