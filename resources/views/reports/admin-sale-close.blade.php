@@ -101,7 +101,10 @@
             font-size: 16px;
         }
         #contentContainerDiv{
-            height: 1000px!important;
+            height: 930px!important;
+        }
+        .c-address-info{
+            height: 470px;
         }
         .form-control:disabled, .form-control[readonly]{
             background-color: #fff !important;
