@@ -115,7 +115,7 @@
           <div class="collapse " id="sidebarStock">
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
-                <a href="{{route('stock-add')}}" class="nav-link ">
+                <a href="{{route('stock-add')}}" class="nav-link add-new-purchase">
                   Add New
                 </a>
               </li>
@@ -131,12 +131,12 @@
                 <div class="collapse" id="sidebarPurchaseReturnDropDown" style="">
                   <ul class="nav nav-sm flex-column">
                     <li class="nav-item">
-                      <a href="{{route('purchase-return.create')}}" class="nav-link ">
+                      <a href="{{route('purchase-return.create')}}" class="nav-link add-purchase-return">
                         Add New
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a href="{{route('purchase-return.index')}}" class="nav-link ">
+                      <a href="{{route('purchase-return.index')}}" class="nav-link">
                         List
                       </a>
                     </li>
@@ -157,7 +157,7 @@
           <div class="collapse " id="salesStock">
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
-                <a href="{{route('sale-add')}}" class="nav-link ">
+                <a href="{{route('sale-add')}}" class="nav-link add-new-sale">
                   Add New
                 </a>
               </li>
@@ -178,7 +178,7 @@
                 <div class="collapse" id="sidebarSaleReturnDropDown" style="">
                   <ul class="nav nav-sm flex-column">
                     <li class="nav-item">
-                      <a href="{{route('salereturn.create')}}" class="nav-link ">
+                      <a href="{{route('salereturn.create')}}" class="nav-link add-sale-return">
                         Add New
                       </a>
                     </li>
@@ -198,7 +198,7 @@
                 <div class="collapse" id="sidebarProductReplacementDropDown" style="">
                   <ul class="nav nav-sm flex-column">
                     <li class="nav-item">
-                      <a href="{{route('ProductReplacement.create')}}" class="nav-link ">
+                      <a href="{{route('ProductReplacement.create')}}" class="nav-link add-replacement">
                         Add New
                       </a>
                     </li>

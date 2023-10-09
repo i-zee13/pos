@@ -33,7 +33,7 @@
             <div class="header mb-0">
                 <!-- <a class="btn add_button openDataSidebarForAddingProduct"><i class="fa fa-plus"></i> New  Product</a> -->
                 <h2>Sale Returns List</h2>
-              <a href="{{route('salereturn.create')}}" type="submit" class="btn btn-primary mr-2" style="font-size: 13px;padding: 6px 11px 4px 9px;margin-top: -10px; float: right;">Add New</a>
+              <a href="{{route('salereturn.create')}}" type="submit" class="btn btn-primary mr-2 add-replacement" style="font-size: 13px;padding: 6px 11px 4px 9px;margin-top: -10px; float: right;">Add New</a>
 
             </div>
             <!-- <div style="min-height: 400px" id="tblLoader">

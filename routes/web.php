@@ -152,5 +152,6 @@ Route::get('/get-products-replacements/{id}'      ,[App\Http\Controllers\Product
 Route::get('/admin-sale-close'   ,[App\Http\Controllers\ReportsController::class, 'adminSaleClose'])->name('admin-sale-close'); 
 Route::get('/sale-close-record/{closing_date}'   ,[App\Http\Controllers\ReportsController::class, 'adminSaleCloseRecord'])->name('sale-close-record'); 
 Route::post('/save-closing-cash'   ,[App\Http\Controllers\AdminSaleCloseController::class, 'saveAdminSaleCloseRecord'])->name('save-closing-cash'); 
+Route::post('/update-closing-cash'   ,[App\Http\Controllers\AdminSaleCloseController::class, 'updateAdminSaleCloseRecord'])->name('update-closing-cash'); 
 
 });

@@ -337,3 +337,17 @@ if(!function_exists('isClose')){
         return $is_close;
     }
 }
+if(!function_exists('closeRoute')){
+    function closeRoute(){
+        $close_routes   =   [ //index is class name and value is route
+            'add-new-purchase'              =>  'stock-add',
+            'add-purchase-return'           =>  'add-return',
+            'add-new-sale'                  =>  'sale-add',
+            'add-sale-return'               =>  'sale-return',
+            'add-replacement'               =>  'sale-replacement-create',
+            'customer-ledger-jama-banam'    =>  'NA',
+            'vendor-ledger-jama-banam'      =>  'NA',
+        ];
+        return $close_routes;
+    }
+}

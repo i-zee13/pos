@@ -255,8 +255,6 @@ class ReportsController extends Controller
                                              trx_type
                                           ")
                                           ->whereRaw("
-                                             trx_type = 3
-                                             AND
                                              DATE(created_at) = '$closing_date'
                                           ")->get();
       $vendor_payment                  =  DB::table("vendor_ledger")->selectRaw("
@@ -266,8 +264,6 @@ class ReportsController extends Controller
                                              trx_type
                                           ")
                                           ->whereRaw("
-                                             trx_type = 3
-                                             AND
                                              DATE(created_at) = '$closing_date'
                                           ")->get();
       
