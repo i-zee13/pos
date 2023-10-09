@@ -732,7 +732,7 @@
                                         <th style="">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="productGrid" class="parent_body">
+                                <tbody id="productGrid" class="parent_body in_table">
                                     <tr>
                                         <td><input type="text" id="bar-code1" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;"></td>
                                         <td>
@@ -793,7 +793,7 @@
                                         <th style="">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="productGrid" class="parent_body">
+                                <tbody id="productGrid" class="parent_body out_table">
                                     <tr>
                                         <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="8" style="width: 50;"></td>
                                         <td>

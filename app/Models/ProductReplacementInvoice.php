@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SaleReplacement extends Model
+class ProductReplacementInvoice extends Model
 {
     use HasFactory;
+    protected $table    =  'product_replacment_invoices';
+    protected $guarded  =   [];
 }

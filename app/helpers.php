@@ -5,10 +5,12 @@ use App\Models\City;
 use App\Models\Country;
 use App\Models\CustomerLedger;
 use App\Models\PostalCode;
+use App\Models\ProductReplacementInvoice;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseReturn;
 use App\Models\State;
 use App\Models\Sale as SaleInvoice;
+use App\Models\SaleReplacement;
 use App\Models\SaleReturn;
 use App\Models\Stock;
 use App\Models\Student;
@@ -179,7 +181,18 @@ if(!function_exists('getPurchaseInvoice'))
  
     }
 }
-
+if(!function_exists('getProductReplacementNo'))
+{
+    function getProductReplacementNo()
+    { 
+        $invoice_no    = 1;
+        $lastinvoice   = ProductReplacementInvoice::where('date',Carbon::today())->count();
+       
+        $invoice_no    = ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+      
+        return $invoice_no; 
+    }
+}
 if(!function_exists('getSaleReturnNo'))
 {
     function getSaleReturnNo()
@@ -306,6 +319,10 @@ if(!function_exists('isEditable'))
                     ->where('is_editable', 1) 
                     ->update(['is_editable' => 0]);
         PurchaseReturn::where('customer_id',$customer_id)
+                    ->whereDate('created_at', Carbon::today()) 
+                    ->where('is_editable', 1) 
+                    ->update(['is_editable' => 0]);
+        ProductReplacementInvoice::where('customer_id',$customer_id)
                     ->whereDate('created_at', Carbon::today()) 
                     ->where('is_editable', 1) 
                     ->update(['is_editable' => 0]);

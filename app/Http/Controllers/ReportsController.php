@@ -246,7 +246,7 @@ class ReportsController extends Controller
    }
    public function adminSaleCloseRecord($closing_date){
       $request                         =  "";
-      $closing_date                    =  "2023-10-07";
+      // $closing_date                    =  "2023-10-07";
       $saleRecords                     =  $this->SaleReportRecords($request,$closing_date);
       $customer_payment                =  DB::table("customer_ledger")->selectRaw("
                                              customer_id,

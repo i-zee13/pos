@@ -109,7 +109,7 @@ Route::get('/print-sale-invoice/{invoice_id}/{customer_id}/{received_amount}'   
 //Transactions
     Route::get('/customer-ledger-jama'      ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledger-jama');
     Route::get('/customer-ledger-banam'     ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledger-banam');
-Route::post('/get-ledgers-list'         ,[App\Http\Controllers\TransactionController::class, 'getCustomerLedgers'])->name('get-customer-ledger-list');
+    Route::post('/get-ledgers-list'         ,[App\Http\Controllers\TransactionController::class, 'getCustomerLedgers'])->name('get-customer-ledger-list');
 //Vendor Transcations
     Route::get('/vendor-ledger-jama'      ,[App\Http\Controllers\TransactionController::class, 'vendorLedger'])->name('vendor-ledger-jama');
     Route::get('/vendor-ledger-banam'     ,[App\Http\Controllers\TransactionController::class, 'vendorLedger'])->name('vendor-ledger-banam');
@@ -142,9 +142,11 @@ Route::post('/fetch-stock-value-report',[App\Http\Controllers\ReportsController:
 
 // Sales Replacement /
 // Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
-Route::get('/sale-replacement-create'       ,[App\Http\Controllers\SaleReplacementController::class, 'create'])->name('salereplacement.create'); 
-Route::get('/sale-replacements'             ,[App\Http\Controllers\SaleReplacementController::class, 'index'])->name('salereplacement.index');
-Route::post('/store-sale-replacement-invoice'  ,[App\Http\Controllers\SaleReplacementController::class, 'store'])->name('salereplacement.store'); 
+Route::get('/product-replacement-create'          ,[App\Http\Controllers\ProductReplacementController::class, 'create'])->name('ProductReplacement.create'); 
+Route::get('/product-replacement-edit/{id}'       ,[App\Http\Controllers\ProductReplacementController::class, 'edit'])->name('ProductReplacement.edit'); 
+Route::get('/product-replacements'                ,[App\Http\Controllers\ProductReplacementController::class, 'index'])->name('ProductReplacement.index');
+Route::post('/store-product-replacement-invoice'  ,[App\Http\Controllers\ProductReplacementController::class, 'store'])->name('ProductReplacement.store'); 
+Route::get('/get-products-replacements/{id}'      ,[App\Http\Controllers\ProductReplacementController::class, 'getReplacmentProduct'])->name('ProductReplacement.get');
 
 // Admin Close Report Fakhar
 Route::get('/admin-sale-close'   ,[App\Http\Controllers\ReportsController::class, 'adminSaleClose'])->name('admin-sale-close'); 

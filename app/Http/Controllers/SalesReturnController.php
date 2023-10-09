@@ -39,6 +39,46 @@ class SalesReturnController extends Controller
         
         return view('sales.return.create',compact('customers','current_date','invoice_first_part','products'));
     }
+    public function updateStock($previous_qty, $sale, $balance, $vendor_id, $type)
+    {
+        $old_record = '';
+        if ($type == 'company') {
+            $old_record         =  $previous_qty;
+            $previous_qty = 0;
+          
+            $v                   =  new Stock();
+            $v->vendor_stock_id  =  $old_record->vendor_stock_id ?? $sale->vendor_stock_id;
+            $v->status           =  $old_record != '' && !empty($old_record)  ? 1 : 2;
+            $v->transaction_type =  $old_record != '' && !empty($old_record) ? 4 : 2; //4 = Edit , 2= Sale
+        } else {
+            $v                   =  new VendorStock();
+            $v->vendor_id        =  $vendor_id;
+            $v->status           =  $previous_qty > 0 ? 1 : 2;
+            $v->transaction_type =  $previous_qty > 0 ? 4 : 2; //4 = Edit , 2= Sale
+        }
+
+        if($previous_qty > 0){
+            $v->qty     =  $previous_qty;
+            $v->balance = $balance + $v->qty;
+
+        }else if($old_record != '' && !empty($old_record) ){
+            $v->qty =  $old_record->qty;
+        }else{
+            $v->qty     = $sale->qty;
+            $v->balance = $balance - $sale->qty;
+        }
+        // $v->qty                  =  $previous_qty > 0 ? $previous_qty : ($old_record != '' && !empty($old_record) ? $old_record->qty  : $sale->qty);
+        // $v->balance              =  $previous_qty > 0 ? $balance + $v->qty : $balance - $sale->qty;
+
+        $v->sale_invoice_id      =  $old_record != '' && !empty($old_record) ? $old_record->sale_invoice_id  : $sale->sale_invoice_id;
+        $v->product_unit_price   =  $sale->purchased_price;
+        $v->product_id           =  $old_record != '' && !empty($old_record) ? $old_record->product_id  : $sale->product_id;
+        $v->date                 =  $old_record != '' && !empty($old_record) ? $old_record->date  : $sale->created_at;
+        $v->amount               =  $old_record != '' && !empty($old_record) ? $old_record->amount  : $sale->sale_total_amount;
+        $v->created_by           =  Auth::id();
+        $v->save();
+        return $v;
+    }
     public function store(Request $request)
     { 
        

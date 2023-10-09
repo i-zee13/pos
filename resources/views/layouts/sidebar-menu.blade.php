@@ -192,18 +192,18 @@
 
               </li>
               <li class="nav-item">
-                <a href="#sidebarSaleReplacementDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSaleReplacementDropDown">
+                <a href="#sidebarProductReplacementDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProductReplacementDropDown">
                   Replacements
                 </a>
-                <div class="collapse" id="sidebarSaleReplacementDropDown" style="">
+                <div class="collapse" id="sidebarProductReplacementDropDown" style="">
                   <ul class="nav nav-sm flex-column">
                     <li class="nav-item">
-                      <a href="{{route('salereplacement.create')}}" class="nav-link ">
+                      <a href="{{route('ProductReplacement.create')}}" class="nav-link ">
                         Add New
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a href="{{route('salereplacement.index')}}" class="nav-link ">
+                      <a href="{{route('ProductReplacement.index')}}" class="nav-link ">
                         List
                       </a>
                     </li>

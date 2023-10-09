@@ -64,7 +64,7 @@
                     <!-- <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td> -->
                     <td>
                         
-                        <a id="{{$sale->id}}" class="btn btn-default {{$sale->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$sale->is_editable== 1 ? route('salereturn-edit' ,['id'=>$sale->id]) : route('salereturn-edit' ,['id'=>$sale->id ,'invoice' => 'detail'])}}">{{$sale->is_editable== 1  ? 'Edit'  : "Detail" }}</a>
+                        <a id="{{$sale->id}}" class="btn btn-default {{$sale->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$sale->is_editable== 1 ? route('ProductReplacement.edit' ,['id'=>$sale->id]) : route('ProductReplacement.edit' ,['id'=>$sale->id ,'invoice' => 'detail'])}}">{{$sale->is_editable== 1  ? 'Edit'  : "Detail" }}</a>
                         <!-- <a id="{{$sale->id}}" class="btn btn-default " href="{{route('sale-detail' ,['id'=>$sale->id])}}">Detail</a> -->
                         <button id="{{$sale->id}}" data-invoice="{{$sale->id}}" data-customer-id="{{$sale->customer_id}}"
                          paid-amount="{{$sale->paid_amount > 0 ? $sale->paid_amount  : 0}}" class="btn btn-default print-invoice">Print</button>
