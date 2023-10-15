@@ -601,7 +601,7 @@
                 <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
                 <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
                 <input type="hidden" id="" value="1" name="form_status">
-                <input type="hidden" id="stock_products" name="stock_products" value="{{json_encode($products)}}">
+                <input type="hidden" id="stock_products"   value="{{json_encode($products)}}">
                 <div class="col-md-4 left-sidebox">
                     <div class="sidebox-content">
                         <div class="CT_sec">

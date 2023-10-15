@@ -589,7 +589,7 @@
                 <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
 
                 <input type="hidden" id="" value="1" name="form_status">
-                <input type="hidden" id="stock_products" name="stock_products" value="{{json_encode($products)}}">
+                <input type="hidden" id="stock_products"   value="{{json_encode($products)}}">
                 <div class="col-md-4 left-sidebox">
                     <div class="sidebox-content">
                         <div class="CT_sec">
@@ -830,6 +830,7 @@
                                         <tr>
                                             <th class="">ID</th>
                                             <th class="">Select Product</th>
+                                            <th class="">Exp. Date</th>
                                             <th style="">QTY.</th>
                                             <th style="">Unit Price</th>
                                             <th style="">Discount</th>
@@ -839,10 +840,10 @@
                                     </thead>
                                     <tbody id="productGrid">
                                         <tr>
-                                            <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;"></td>
+                                            <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 40;"></td>
                                             <td>
                                                 <div class="form-s2" style="width:165px">
-                                                    <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 150;">
+                                                    <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 140;">
                                                         <option value="0">Select Product *</option>
                                                         @foreach($products as $product)
                                                         <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
@@ -850,10 +851,11 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td> <input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
-                                            <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" readonly></td>
-                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" tabindex="4" min="0"></td>
-                                            <td class='add- S-input '><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;"></td>
+                                            <td> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="5" style=" width: 95;"></td>
+                                            <td> <input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0" style="width: 50;"></td>
+                                            <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px" readonly></td>
+                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;width: 50;" tabindex="4" min="0"></td>
+                                            <td class='add- S-input '><input type="number" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;width: 65;"></td>
                                             <td>
                                                 <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5" style="padding: 5px 15px 5px 15px; background:green">Add</button>
                                             </td>
@@ -869,100 +871,102 @@
                         <div class="col-12"><button id="productlist01" class="btn add-product-line list-customer-products"><i class="fa fa-plus"> </i> Add a Product</button></div>
                     </div> -->
 
-                        <div class="row">
-                            <div class="col-12">
-                                <table class="totalValues" width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tbody>
-                                        <tr class="th-to-hide">
-                                            <td></td>
-                                            <td></td>
-                                            <td align="right">Net Total</td>
+                        
+                    <div class="row">
+                              <div class="col-12">
+                                  <table class="totalValues" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                      <tbody>
+                                          <tr class="th-to-hide">
+                                              <td></td>
+                                              <td></td>
+                                              <td align="right">Net Total</td>
 
-                                            <td> <input type="number" class="inputvalue product_net_total" name="product_net_total" style="font-size: 13px" placeholder="0.00" readonly></td>
-                                        </tr>
-                                        <tr class="th-to-hide">
-                                            <td></td>
-                                            <td></td>
-                                            <td align="right">Service charges </td>
-                                            <td style="width:112px"><input type="number" name="discount" id="discount" class="inputvalue service_charges_input" style="font-size: 13px" value="{{@$invoice->service_charges}}" placeholder="0.00" onkeypress="return isNumber(event)" data-id="" data-value="" min="0"></td>
-                                        </tr>
-                                        <tr class="previous_payable_tr" style="display:none">
-                                            <td></td>
-                                            <td></td>
-                                            <td align="right" class="previous_payable_heading">Previous Receivable</td>
-                                            <td class="{{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '0' }}</td>
-                                        </tr>
+                                              <td> <input type="number" class="inputvalue product_net_total" name="product_net_total" style="font-size: 13px" placeholder="0.00" readonly></td>
+                                          </tr>
+                                          <tr class="th-to-hide">
+                                              <td></td>
+                                              <td></td>
+                                              <td align="right">Service charges </td>
+                                              <td style="width:112px"><input type="number" name="discount" id="discount" class="inputvalue service_charges_input" style="font-size: 13px" value="{{@$invoice->service_charges}}" placeholder="0.00" data-id="" data-value="" min="0"></td>
+                                          </tr>
+                                          <tr class="previous_payable_tr" style="display:none">
+                                              <td></td>
+                                              <td></td>
+                                              <td align="right" class="previous_payable_heading">Previous Receivable</td>
+                                              <td class="{{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '0' }}</td>
+                                          </tr>
 
-                                        <tr class="th-to-hide">
-                                            <td></td>
-                                            <td></td>
-                                            <td align="right">Disscount</td>
-                                            <td> <input type="number" class="inputvalue " id="invoice_discount" name="invoice_discount" style="font-size: 13px" placeholder="0.00" min="0" value="{{@$invoice->invoice_discount}}"></td>
+                                          <tr class="th-to-hide">
+                                              <td></td>
+                                              <td></td>
+                                              <td align="right">Disscount</td>
+                                              <td> <input type="number" class="inputvalue " id="invoice_discount" name="invoice_discount" style="font-size: 13px" placeholder="0.00" min="0" value="{{@$invoice->invoice_discount}}"></td>
 
-                                        </tr>
-                                        <tr class="th-to-hide">
-                                            <td></td>
-                                            <td></td>
-                                            <td align="right">Net Amount</td>
+                                          </tr>
+                                          <tr class="th-to-hide">
+                                              <td></td>
+                                              <td></td>
+                                              <td align="right">Net Amount</td>
 
-                                            <td>
-                                                @if(request()->query('invoice') == 'detail')
-                                                {{$invoice->invoice_remaining_amount_after_pay}}
-                                                @else
-                                                <input type="number" class="inputvalue  remaning_amount amount_pay_input " id="amount_ to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly value="{{@$invoice->paid_amount}}">
-                                                @endif
-                                            </td>
-                                        </tr>
+                                              <td>
+                                                  @if(request()->query('invoice') == 'detail')
+                                                  {{$invoice->invoice_remaining_amount_after_pay}}
+                                                  @else
+                                                  <input type="number" class="inputvalue  remaning_amount amount_pay_input " id="amount_ to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly value="{{@$invoice->paid_amount}}">
+                                                  @endif
+                                              </td>
+                                          </tr>
 
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td align="right" class="cash-return">Cash Recived </td>
-                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00"  value="{{@$invoice->amount_received ?? 0}}"></td>
-                                        </tr>
+                                          <tr>
+                                              <td></td>
+                                              <td></td>
+                                              <td align="right" class="cash-return">Cash To Pay </td>
+                                              <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00"  value="{{@$invoice->paid_amount}}"></td>
+                                          </tr>
 
 
-                                        <tr class="cash_return_tr" style="display:none">
-                                            <td></td>
-                                            <td></td>
-                                            <td align="right">Cash Return</td>
-                                            <td class="cash_return">{{@$invoice->cash_return}}</td>
-                                        </tr>
-                                        @if (Route::currentRouteName() == 'salereturn-edit')
+                                          <tr class="cash_return_tr" style="display:none">
+                                              <td></td>
+                                              <td></td>
+                                              <td align="right">Cash Return</td>
+                                              <td class="cash_return">{{@$invoice->cash_return}}</td>
+                                          </tr>
 
-                                        <tr class="th-to-hide" hidden>
-                                            <td></td>
-                                            <td></td>
-                                            <td align="right">Paid</td>
-                                            <td class="paid_amount">{{@$invoice->paid_amount}}</td>
-                                        </tr>
-                                        @endif
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                        <tr style="border:solid 1px #dbdbdb">
-                                            <td class="font18" align="right">Grand Total:</td>
-                                            <td class="totalNo" align="right">
-                                                <!-- <span id="total_ctn">0</span><small>CTNS</small> -->
-                                            </td>
-                                            <td class="totalNo" align="right"></td>
-                                            <td class="totalNo" align="right"><small>Pkr.</small>
-                                                @if(request()->query('invoice') == 'detail')
-                                                <span>{{$invoice->invoice_remaining_amount_after_pay}}</span>
-                                                @else
-                                                <span class="grand-total">0</span>
-                                                @endif
-                                            </td>
+                                          @if (Route::currentRouteName() == 'purchase-edit')
 
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                          <tr class="th-to-hide" hidden>
+                                              <td></td>
+                                              <td></td>
+                                              <td align="right">Paid</td>
+                                              <td class="paid_amount">{{@$invoice->paid_amount ? @$invoice->paid_amount : 0 }}</td>
+                                          </tr>
+                                          @endif
+                                          <tr>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+                                          </tr>
+                                          <tr style="border:solid 1px #dbdbdb">
+                                              <td class="font18" align="right">Grand Total:</td>
+                                              <td class="totalNo" align="right">
+                                                  <!-- <span id="total_ctn">0</span><small>CTNS</small> -->
+                                              </td>
+                                              <td class="totalNo" align="right"></td>
+                                              <td class="totalNo" align="right"><small>Pkr.</small>
+                                                  @if(request()->query('invoice') == 'detail')
+                                                  <span>{{$invoice->invoice_remaining_amount_after_pay}}</span>
+                                                  @else
+                                                  <span class="grand-total">0</span>
+                                                  @endif
+                                              </td>
 
-                            </div>
-                        </div>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+
+                              </div>
+                          </div>
 
                         <!-- <div class="row _notesTER">
                         <div class="col-md-6">

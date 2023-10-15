@@ -57,7 +57,7 @@
                       $invoice_first_part =     $parts[0];
                        @endphp
             <tr> 
-                  <td>{{$invoice_first_part}} ({{ $purchase->created_at->format('h:i A') }})</td>
+                    <td>{{$invoice_first_part}} ({{ $purchase->created_at->format('h:i A') }})</td>
                     <td>{{$purchase->customer_name}} </td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->paid_amount ? $purchase->paid_amount : 0.00}} </td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->total_invoice_amount}} </td>
@@ -78,5 +78,17 @@
 </div>
 @endsection
 @push('js')
-<!-- <script src="{{asset('js/custom/product.js')}}"> </script> -->
+    <script>
+        $('.print-invoice').on('click', function() {
+            var invoice_id = $(this).attr('data-invoice');
+            var customer_id = $(this).attr('data-customer-id');
+            var invoice_id = $(this).attr('data-invoice');
+            var paid_amount = $(this).attr('paid-amount');
+            var printWindow = window.open("/print-purchase-invoice/" + invoice_id + '/' + customer_id + '/'+paid_amount);
+            printWindow.onload = function() {
+                printWindow.print();
+                // printWindow.close();
+            };
+        })
+    </script>
 @endpush

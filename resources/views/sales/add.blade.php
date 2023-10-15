@@ -215,8 +215,7 @@
     text-overflow: ellipsis;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
-    font-size: 13px;
-    font-: ;
+    font-size: 13px; 
     weight: normal;
     margin-bottom: 0px
   }
@@ -441,7 +440,7 @@
   <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
   <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
   <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
-  <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
+  <input type="hidden"   id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
   <div class="row">
     <div class="col-md-12">
       <div class="card">
@@ -558,7 +557,7 @@
           </div>
           <div class="row display" style="display: none;">
             <input type="hidden" id="" value="1" name="form_status">
-            <input type="hidden" id="stock_products" name="stock_products" value="{{json_encode($products)}}">
+            <input type="hidden" id="stock_products"   value="{{json_encode($products)}}">
 
             <div class="col-12">
               <div class="property_info">

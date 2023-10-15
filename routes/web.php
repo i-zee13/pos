@@ -59,9 +59,7 @@ Route::post('/product-delete/{id}',[App\Http\Controllers\ProductController::clas
 // Start Shahid
 Route::get('/change-price'         ,[App\Http\Controllers\ProductController::class, 'changePrice'])->name('change-price');
 Route::post('/get-company-products',[App\Http\Controllers\ProductController::class, 'getCompanyProducts'])->name('get-company-products');
-Route::put('/update-product/{id}'  ,[App\Http\Controllers\ProductController::class, 'updateProduct'])->name('update-product');;
-
-
+Route::put('/update-product/{id}'  ,[App\Http\Controllers\ProductController::class, 'updateProduct'])->name('update-product');
 //End Shahid
 /** Stock Routes */
 Route::get('/stock-add'                 ,[App\Http\Controllers\StockController::class, 'create'])->name('stock-add');
@@ -77,10 +75,10 @@ Route::delete('/delete-product-from-invoice' ,[App\Http\Controllers\StockControl
 Route::get('/print-purchase-invoice/{invoice_id}/{customer_id}/{received_amount}'       ,[App\Http\Controllers\StockController::class, 'printInvoice'])->name('print-purchase-invoice');
 
 // Purchase Returns /
-Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
-Route::get('/add-return'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'create'])->name('purchase-return.create');
+Route::get('/get-customer-balance-products/{id}'   ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
+Route::get('/add-return'                           ,[App\Http\Controllers\PurchaseReturnController::class, 'create'])->name('purchase-return.create');
 Route::get('/purchase-returns'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'list'])->name('purchase-return.index');
-Route::post('/add-purchase-return'                ,[App\Http\Controllers\PurchaseReturnController::class, 'store'])->name('purchase-return.store');
+Route::post('/add-purchase-return'                 ,[App\Http\Controllers\PurchaseReturnController::class, 'store'])->name('purchase-return.store');
 
 /** sale Routes */
 Route::get('/sale-add'                    ,[App\Http\Controllers\SaleController::class, 'create'])->name('sale-add');
@@ -102,24 +100,23 @@ Route::get('/edit-sale-return/{id}'        ,[App\Http\Controllers\SalesReturnCon
 Route::get('/get-sale-return-products/{id}',[App\Http\Controllers\SalesReturnController::class, 'getReturnProduct'])->name('get-salereturn-products');
 Route::get('/print-salereturn-invoice/{invoice_id}/{customer_id}/{received_amount}'  ,[App\Http\Controllers\SalesReturnController::class, 'printInvoice'])->name('print-salereturn-invoice');
 
-// Route::post('/add-purchase-return'                ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
+// Route::post('/add-purchase-return'   ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
 
 //Genrate invoice
 Route::get('/print-sale-invoice/{invoice_id}/{customer_id}/{received_amount}'       ,[App\Http\Controllers\SaleController::class, 'printInvoice'])->name('print-sale-invoice');
 //Transactions
-    Route::get('/customer-ledger-jama'      ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledger-jama');
-    Route::get('/customer-ledger-banam'     ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledger-banam');
-    Route::post('/get-ledgers-list'         ,[App\Http\Controllers\TransactionController::class, 'getCustomerLedgers'])->name('get-customer-ledger-list');
+    Route::get('/customer-ledger-jama'  ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledger-jama');
+    Route::get('/customer-ledger-banam' ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledger-banam');
+    Route::post('/get-ledgers-list'     ,[App\Http\Controllers\TransactionController::class, 'getCustomerLedgers'])->name('get-customer-ledger-list');
 //Vendor Transcations
-    Route::get('/vendor-ledger-jama'      ,[App\Http\Controllers\TransactionController::class, 'vendorLedger'])->name('vendor-ledger-jama');
-    Route::get('/vendor-ledger-banam'     ,[App\Http\Controllers\TransactionController::class, 'vendorLedger'])->name('vendor-ledger-banam');
+    Route::get('/vendor-ledger-jama'    ,[App\Http\Controllers\TransactionController::class, 'vendorLedger'])->name('vendor-ledger-jama');
+    Route::get('/vendor-ledger-banam'   ,[App\Http\Controllers\TransactionController::class, 'vendorLedger'])->name('vendor-ledger-banam');
 
 Route::post('/transaction-store'        ,[App\Http\Controllers\TransactionController::class, 'store'])->name('transaction-store');
-Route::post('/get-customer-transactions' ,[App\Http\Controllers\TransactionController::class, 'getCustomerTransactions'])->name('getCustomerTransactions');
+Route::post('/get-customer-transactions',[App\Http\Controllers\TransactionController::class, 'getCustomerTransactions'])->name('getCustomerTransactions');
 Route::get('/vendor-ledgers'            ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('vendor-ledgers');
 Route::get('/customer-ledgers'          ,[App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledgers');
 Route::get('/print-transaction-invoice/{invoice_id}/{customer_id}/{operation}/{type}' ,[App\Http\Controllers\TransactionController::class, 'printInvoice'])->name('print-salereturn-invoice');
-
 //Reports
 Route::get('/customer-reports'          ,[App\Http\Controllers\ReportsController::class, 'customerReport'])->name('customer-reports');
 Route::get('/vendor-reports'            ,[App\Http\Controllers\ReportsController::class, 'vendorReport'])->name('vendor-reports');
@@ -147,6 +144,8 @@ Route::get('/product-replacement-edit/{id}'       ,[App\Http\Controllers\Product
 Route::get('/product-replacements'                ,[App\Http\Controllers\ProductReplacementController::class, 'index'])->name('ProductReplacement.index');
 Route::post('/store-product-replacement-invoice'  ,[App\Http\Controllers\ProductReplacementController::class, 'store'])->name('ProductReplacement.store'); 
 Route::get('/get-products-replacements/{id}'      ,[App\Http\Controllers\ProductReplacementController::class, 'getReplacmentProduct'])->name('ProductReplacement.get');
+Route::delete('/delete-product-replacement'       ,[App\Http\Controllers\ProductReplacementController::class, 'deleteProduct'])->name('ProductReplacement.delete');
+Route::get('/get-customer-balance-for-product-replacement/{id}'  ,[App\Http\Controllers\ProductReplacementController::class, 'getCustomerBalance'])->name('ProductReplacement.get-customer-balance');
 
 // Admin Close Report Fakhar
 Route::get('/admin-sale-close'   ,[App\Http\Controllers\ReportsController::class, 'adminSaleClose'])->name('admin-sale-close'); 

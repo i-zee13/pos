@@ -27,7 +27,6 @@ let total_return_qty = 0;
 let paid_amount = 0;
 let stock_in_hand = '';
 let purchase_total_amount = 0;
-let total_invoice_amount_after_paid = 0;
 let vendor_ledger = 0;
 let service_charges = 0;
 let invoice_discount = 0;
@@ -59,6 +58,7 @@ $(document).ready(function () {
             url: '/get-purchase-products/' + invoice_id,
             type: 'get',
             success: function (response) {
+                console.log(response.products)
                 response.products.forEach(function (product) {
                     total_return_qty        += product.return_qty * product.purchase_price;
                     p_name                   = product.product_name;
@@ -86,17 +86,14 @@ $(document).ready(function () {
                 $('.show_existing_div').show();
                 var x = 0
                 purchased_product_array.forEach(function (product, key) {
-
                     x++;
                     $('#designationsTable tbody').append(`
                         <tr id='tr-${product.product_id}'>
                             <td>${product.product_id}</td>
-                            <td colspan="2">${p_name}</td>
+                            <td colspan="2">${product.p_name}</td>
                             <td ><input type="number" value="${product.old_price}" data-purchase="${product.old_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${amount}" data-quantity="${product.qty}"  style="font-size: 13px" min="0"></td>
                             <td ><input type="number" value="${product.sale_price}" data-purchase="${product.sale_price}" data-stock="${stock_in_hand}" class="inputSale sale_price_input td-${product_id}"  data-id="${product_id}"   style="font-size: 13px;width:60" min="0"></td>
-
                              <td><input type="date" value="${product.expiry_date}" class="inputSale expiry_date expiry_input"  data-id="${product.product_id}" style="font-size: 13px;width: 95;" min="0" ></td>
-
                             <td>
                                 <input type="number" value="${product.qty}" data-purchase="${product.old_price}" data-stock="${product.stock_in_hand}"
                                 class="inputSale qty-input add-stock-input td-input-qty${product.product_id}"  data-id="${product.product_id}" data-value="${amount}" data-quantity="${product.qty}"
@@ -198,14 +195,7 @@ $(document).on('click', '.remove_btn', function () {
         $(".products").select2();
 
         grandSum(previous_payable);
-    }
-    // this.parentNode.removeChild(this);
-
-    //purchased_product_array.splice(purchased_product_array.indexOf(this),1);
-    // $('#products').children('option[value="' + id + '"]').attr('disabled', false);
-    // $(".existing_client").select2();
-
-
+    } 
 })
 $('#add-product').on('click', function () {
 
@@ -214,7 +204,6 @@ $('#add-product').on('click', function () {
         for (var x = 1; x <= qty; x++) {
             is_in_array[0].qty++;
         }
-        // $('.qty-input').val(purchased_product_array[0].qty);
         $('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
         $('#tr-' + data_variable).css('background', '#152e4d').addClass('text-white');
         var ss = data_variable
@@ -235,14 +224,7 @@ $('#add-product').on('click', function () {
         } else {
             $('#qty').css('border-color', ''); // Reset the border color
         }
-        if ($('.expiry_date').val() == '') {
-            // $('#notifDiv').fadeIn();
-            // $('#notifDiv').css('background', 'red');
-            // $('#notifDiv').text('Please Add Expiry Date of Product');
-            // setTimeout(() => {
-            //     $('#notifDiv').fadeOut();
-            // }, 3000);
-            // return;
+        if ($('.expiry_date').val() == '') { 
         } else {
             expiry_date   = $('.expiry_date').val();
         }
@@ -345,42 +327,7 @@ $(document).on('focusout', '.bar-code', function () {
     }
     return 0;
 
-});
-// $(document).on('focusout', '.bar-code', function () {
-//     var data_variable = $(this).val();
-
-//     $('#purchase_price').val('');
-//     $('#product-name').val('');
-//     $('#qty').val('');
-//     $('#amount').val('');
-//     if(data_variable){
-//         var filter_product = product_list.filter(x => x.barcode == data_variable)
-//         $('#products').val(filter_product[0].id).trigger('change');
-//         $('.retail_price').text(filter_product[0].sale_price);
-//         $('#purchase_price').val(filter_product[0].old_purchase_price);
-//         retail_price =  filter_product[0].sale_price ;
-//         $('.stock_balance').text(filter_product[0].stock_balance);
-//         p_name = filter_product[0].product_name;
-//         product_id = filter_product[0].id;
-//         $('.expiry_date').val(filter_product[0].expiry_date)
-//     }
-//     // $.ajax({
-//     //     url   : `/get-product`,
-//     //     type  : 'post',
-//     //     data : {
-//     //         _token: $('meta[name="csrf_token"]').attr('content'),
-//     //         get_result_for:get_result_for,
-//     //         data_variable :data_variable
-//     //     },
-//     //     success : function(response) {
-//     //      $('#purchase_price').val(response.product.purchase_price);
-//     //          $('#product-name').val(response.product.product_name);
-//     //         p_name      = response.product.product_name;
-//     //         product_id  = response.product.id;
-//     //     }
-
-//     // })
-// })
+}); 
 $('#qty').on('input', function () {
     new_price = $('#new_purchase_price').val();
     old_price = $('#purchase_price').val();
@@ -393,7 +340,7 @@ $('#qty').on('input', function () {
     }
     $('#amount').val(amount);
 })
-//Saving Intake Client
+ 
 $("#save").on('click', function () {
     var current_action = $(this);
     saleSave(current_action,'save');
@@ -504,12 +451,12 @@ function saleSave(current_action,type){
         url     : '/add-purchase-invoice',
         type    : 'post',
         data    : {
-                    'cash_return'               :   result,
+                    'cash_return'               :   $('.cash_return').text(),
                     'description'               :   $('#description').val(),
                     'service_charges'           :   $('.service_charges_input').val(),
                     'grand_total'               :   $('.grand-total').text(),
                     'purchased_total'           :   purchased_total,
-                    'status'                    :   1, //status
+                    'status'                    :   2, //status
                     'purchased_product_array'   :   purchased_product_array,
                     'existing_product_ids'      :   existing_product_ids
             },
@@ -724,63 +671,8 @@ $('.products').change(function () {
         $('.bar-code').val(filter_product[0].barcode);
     }
 
-});
-function getPurchases() {
-    $.ajax({
-        url: 'get-purchase-list',
-        type: 'get',
-        success: function (response) {
-            $('.body').empty();
-            $('.body').append(`
-            <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;">
-                <thead>
-                    <tr>
-                        <th>S.No</th>
-                        <th>Company</th>
-                        <th>Bar Code</th>
-                        <th>Product</th>
-                        <th>Size</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-            <tbody></tbody>
-            </table>`);
-            $('.subCatsListTable tbody').empty();
-            var sNo = 1;
-            response.data.forEach((element, key) => {
-                $('.subCatsListTable tbody').append(`
-                <tr>
-                    <td>${key + 1}</td>
-                    <td> ${element['company_name']}</td>
-                    <td>${element['barcode']} </td>
-                    <td> <img src="${element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png'}"  style="height:25px; width:25px;"> ${element['product_name']}</td>
-                    <td>${element['size']} </td>
-                    <td>
-                        <button id="${element['id']}" class="btn btn-default btn-line openDataSidebarForUpdateProduct">Edit</button>
-                        <button type="button" id="${element['id']}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button>
-                    </td>
-                </tr>`);
-            });
-            $('#tblLoader').hide();
-            $('.body').fadeIn();
-            $('.subCatsListTable').DataTable();
-        }
-    })
-
-}
-// function grandSum(previous_payable){
-//     var sum = 0;
-//     purchased_product_array.forEach(function (data, key) {
-//         sum += parseFloat(data.amount)
-//     })
-//         purchased_total = sum;
-
-//         sum += parseFloat(previous_payable)
-
-//     $('.grand-total').text(sum);
-// }
-$(document).on('input', '.price-input', function () {
-
+}); 
+$(document).on('input', '.price-input', function () { 
     $('.amount_received').val($('.paid_amount').text());
     setTimeout(() => {
         $('.amount_received').trigger('input');
@@ -846,9 +738,7 @@ $('#invoice_discount').on('input', function () {
     var service = 0;
     invoice_discount = $(this).val();
     $('.amount_received').val($('.paid_amount').text());
-    setTimeout(() => {
-        $('.amount_received').trigger('input');
-    }, 500);
+    
     grandSum(previous_payable, service_charges, $(this).val());
 })
 $('.service_charges_input').on('input', function () {
@@ -862,22 +752,17 @@ $(document).on('input','.amount_received',function(){
     }
 })
 function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
-
     var sum = 0;
     purchased_product_array.forEach(function (data, key) {
-
         sum += parseFloat(data.amount)
     });
     $('.product_net_total').val(sum);
     // sale_total_amount = sum-invoice_discount;
     sum += parseFloat(previous_payable ? previous_payable : 0);
     sum += parseFloat(service_charges ? service_charges : 0);
-    console.log(service_charges);
-    sale_total_amount = sum - invoice_discount;
-    console.log($('.paid_amount').text())
+    sale_total_amount = sum - invoice_discount; 
     $('.grand-total').text(sale_total_amount - $('.paid_amount').text());
-    $('.amount_pay_input').val(sale_total_amount - $('.paid_amount').text());
-    // $('.amount_pay_input').val(sale_total_amount) ;
+    $('.amount_pay_input').val(sale_total_amount - $('.paid_amount').text()); 
     purchased_total = sum;
     if (parseFloat($('.amount_pay_input').val()) < 0) {
         $('.th-hide').hide();
@@ -885,14 +770,10 @@ function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
     } else {
         $('.th-hide').show();
         $('.cash-return').text('Cash Received');
-    }
-
-    // setTimeout(function(){ if($('.grand-total').text() == $('.paid_amount').text()){
-    //    $('.th-to-hide').hide();
-    //    $('.amount_received').val($('.amount_pay_input').val());
-    // }else{
-    //    $('.th-to-hide').show();
-    // }}, 300);
+    } 
+    setTimeout(() => {
+        $('.amount_received').trigger('input');
+    }, 500);
 }
 $(document).on('mouseenter', '.show_purchase', function() {
     $('.pp').show();

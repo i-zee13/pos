@@ -3,8 +3,12 @@
 use App\Models\AdminSaleClose;
 use App\Models\City;
 use App\Models\Country;
+use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\PostalCode;
+use App\Models\Product;
+use App\Models\ProductPurchase;
+use App\Models\ProductReplacement;
 use App\Models\ProductReplacementInvoice;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseReturn;
@@ -210,10 +214,8 @@ if(!function_exists('getPurchaseReturnNo'))
     function getPurchaseReturnNo()
     { 
         $invoice_no    = 1;
-        $lastinvoice   = PurchaseReturn::where('date',Carbon::today())->count();
-       
-        $invoice_no    = ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
-      
+        $lastinvoice   = PurchaseReturn::where('date',Carbon::today())->count(); 
+        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
         return $invoice_no; 
     }
 }
@@ -266,31 +268,24 @@ if(!function_exists('getVendorCpvNo'))
 if(!function_exists('updateStock')){
     function updateStock($previous_qty, $sale, $balance, $vendor_id, $type)
     {
-       
-        $old_record = '' ;
-        if ($type == 'company') {
-           //
-        } else {
-            $v                   =  new VendorStock();
-        } 
-        if($previous_qty > 0){ 
-            $v->qty     =  $previous_qty;
-            $v->balance = $balance - $v->qty;
-            
+        $v                   =  new VendorStock();
+        $v->vendor_id        =  $vendor_id ?  $vendor_id  : 0; 
+        $v->transaction_type =  3;  //Purchase
+        if($previous_qty > 0){
+            $v->qty         =  $previous_qty;
+            $v->status      =   2 ;   //Out
+            $v->balance     =   $balance - $v->qty;
         }else{
-            $v->qty     = $sale->qty;
-            $v->balance = $balance + $sale->qty;
-        }
-      
-        $v->vendor_id            =  $vendor_id;
-        $v->transaction_type     =  $previous_qty > 0 ? 4 : 3; //4 = Edit , 2= Return
-        $v->status               =  $previous_qty > 0 ? 2 : 1;
-        $v->sale_return_id       =  $sale->sale_invoice_id;
-        $v->product_unit_price   =  $sale->purchased_price;
-        $v->product_id           =  $sale->product_id;
+            $v->status      =    1;   // IN
+            $v->qty         =   $sale->qty;
+            $v->balance     =   $balance +  $v->qty;
+        } 
+        $v->sale_return_id       =  $sale->sale_return_invoice_id;
+        $v->product_unit_price   =  $sale->purchase_price;
         $v->company_id           =  $sale->company_id;
+        $v->product_id           =  $sale->product_id;
         $v->date                 =  $sale->created_at;
-        $v->amount               =  $sale->sale_total_amount;
+        $v->amount               =  $sale->return_total_amount;
         $v->created_by           =  Auth::id();
         $v->save();
         return $v;
@@ -349,5 +344,66 @@ if(!function_exists('closeRoute')){
             'vendor-ledger-jama-banam'      =>  'NA',
         ];
         return $close_routes;
+    }
+}  
+if(!function_exists('deleteProduct')){
+     function deleteProduct($request){
+        
+         $prod  = VendorStock::where('product_replacement_invoice_id',$request->product_replacement_invoice_id)
+                      ->where('product_id',$request->product_id);
+        $request->prod_type == 1 ?  $prod->where('status',1) : $prod->where('status',2);
+        $prod = $prod->orderBy('id', 'DESC')->first(); 
+          if($prod){
+                  $out_stock              = new VendorStock();
+                  $out_stock->vendor_id   = $prod->vendor_id;
+                  $out_stock->product_id  = $prod->product_id;
+                  $out_stock->date        = $prod->created_at;
+                  $out_stock->amount      = $prod->amount;
+                  $out_stock->qty         = $prod->qty;
+                  $out_stock->status      = $request->prod_type == 1 ?  2 : 1; // 1- In , 2 - Out
+                  $out_stock->balance     = $request->prod_type == 1 ? $prod->balance-$prod->qty : $prod->balance+$prod->qty; 
+                  $out_stock->created_by  = Auth::id();
+                  $out_stock->product_replacement_invoice_id  = $prod->product_replacement_invoice_id;
+                  $out_stock->product_unit_price   = $prod->product_unit_price;
+                  if($out_stock->save()){ 
+                      Product::where('id',$out_stock->product_id)->update([
+                          'stock_balance' =>  $out_stock->balance,
+                      ]);
+                     ProductReplacement::where('product_replacement_invoice_id',$request->product_replacement_invoice_id)
+                                       ->where('product_id',$request->product_id)->delete();
+                      return response()->json([
+                          'msg'       => 'product removed',
+                          'status'    => 'success',
+                      ]);
+                  }
+              }else{
+                  return response()->json([
+                      'msg'       => 'not remove',
+                      'status'    => 'failed',
+                  ]);
+              } 
+  }
+}
+if(!function_exists('getCustomerBalance')){
+     function getCustomerBalance($request, $id)
+    {
+        if ($request->segment == 'product-replacement-edit') {
+            $customer_count     =  CustomerLedger::where('customer_id', $id)->count();
+            if ($customer_count > 1) {
+                $customer_balance = CustomerLedger::where('customer_id', $id)
+                    // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+                    ->orderBy('id', 'DESC')->skip(1)->value('balance');
+            } else {
+                $customer_balance = 0;
+            }
+        } else {
+            $customer_balance = Customer::where('id', $id)->value('balance');
+        }
+
+        return response()->json([
+            'msg'               =>  'Vendor fetched',
+            'status'            =>  'success',
+            'customer_balance'  => $customer_balance
+        ]);
     }
 }

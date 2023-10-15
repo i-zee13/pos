@@ -1,15 +1,23 @@
 jin s leny wo DR  jin ko deny wo CR
   
 
-// INVOICES
 TRUNCATE `purchase_invoices` ; 
 TRUNCATE `products_purchases` ;
 
 TRUNCATE `sale_invoices` ; 
 TRUNCATE `products_sales` ;
 
-TRUNCATE products_returns;
+TRUNCATE purchase_invoices; 
+TRUNCATE products_purchases; 
+
 TRUNCATE return_invoices; 
+TRUNCATE products_returns;
+
+TRUNCATE sale_return_invoices; 
+TRUNCATE sale_return_products; 
+
+TRUNCATE product_replacment_invoices; 
+TRUNCATE product_replacements; 
 
 TRUNCATE stocks;
 TRUNCATE vendor_stocks; 
@@ -20,7 +28,4 @@ TRUNCATE vendor_ledger;
 
 UPDATE `customers` SET `balance` = '0';
 UPDATE `customers` SET `balance` = '0' where customer_type = 2; 
-UPDATE `products` SET `stock_balance` = '0';
-ALTER TABLE `customers` ADD `address` TEXT NULL AFTER `customer_name`;
-ALTER TABLE `customers` ADD `phone_no` VARCHAR(100) NULL AFTER `address`;
-
+UPDATE `products` SET `stock_balance` = '0';  

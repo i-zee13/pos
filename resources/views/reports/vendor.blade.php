@@ -64,11 +64,11 @@
                     <div class="col pr-0">
 
                         <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
-                            <input type="text" autocomplete="off" class="form-control datepicker start_date" placeholder="Start Date" name="start_date">
+                            <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
                         </div>
 
                         <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
-                            <input type="text" autocomplete="off" class="form-control datepicker end_date" placeholder="End Date" name="end_date">
+                            <input type="date" autocomplete="off" class="form-control end_date" placeholder="End Date" name="end_date" value="">
                         </div>
                         <div class="_cust_filter col-4">
                             <div class="form-s2">
@@ -99,7 +99,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="header m-0">
-                <h2>Vendor <span>Ledger</span></h2>
+                <h2>Customer <span>Ledger</span></h2>
             </div>
             <div style="min-height: 400px; display: none;" class="loader">
                 <img src="images/loading.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
@@ -107,7 +107,7 @@
             <div class="body teacher_attendance_list">
             <div class="col-12 pb-10">
                     <div class="no-info">
-                        <div class="m-auto"><strong> Please Filter Your Attendance Record !</strong></div>
+                        <div class="m-auto"><strong> Please Filter Your Ledger !</strong></div>
                     </div>
                 </div>
             </div>

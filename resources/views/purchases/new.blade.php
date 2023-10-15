@@ -3,87 +3,7 @@
     <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
 </div>
 <div class="parent-div" style="display:none">
-    <div id="product-cl-sec"> <a href="#" id="pl-close" class="close-btn-pl"></a>
-        <div class="pro-header-text">Add <span>Product</span></div>
-        <div class="se_cus-type form-wrap p-15">
-            <div class="row">
-                <div class="col-12">
-                    <div class="productSearch"><i class="fa fa-search"></i>
-                        <input type="text" class="form-control" id="" placeholder="Search">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="pc-cartlist">
-            <div class="overflow-plist">
-                <div class="plist-content">
-                    <div class="_left-filter pt-0">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card top_border p-15">
-                                        <table class="AddProductTable" width="100%">
-                                            <tbody>
-                                                {{--<tr>
-                                            <td width="80%"><div class="ProListDiv"><img class="PrList_img" src="images/product-img-005.jpg"  alt=""/>
-                                                    <div class="PR_Name">3D CAR RALLY</div>
-                                                </div></td>
-                                            <td><button data-toggle="modal" data-target="#exampleModal123" class="btn btn-default mb-0">Add</button></td>
-                                        </tr>--}}
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="_cl-bottom">
-            <button type="submit" class="btn btn-primary mr-2 btnAddProducts">Add</button>
-            <button id="pl-close" type="submit" class="btn btn-cancel mr-2">Cancel</button>
-        </div>
-    </div>
-    <div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content  top_border">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add Detail <span></span></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
-                </div>
-                <div class="modal-body AddDetailPR">
-
-                    <input type="hidden" id="product_id">
-                    <div class="row">
-                        <div class="col-md-4 PT-8 mb-15">Select Item: </div>
-                        <div class="col-md-8 mb-15">
-                            <div class="form-s2">
-                                <select class="form-control formselect" id="productItems" onchange="itemUnitPrice(this);" placeholder="Select Item" style="width:100%">
-                                    <option selected>Select Item</option>
-
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4 PT-8 mb-15">Add Quantity: </div>
-                        <div class="col-md-8 mb-15">
-                            <input type="number" id="itemQty" class="form-control" placeholder="" style="font-size:13px">
-                        </div>
-                        <div class="col-md-4 PT-8" style="padding-top: 2px">Unit Price:</div>
-                        <div class="col-md-8">
-                            <input type="text" id="itemUnitPrice" class="form-control" placeholder="" style="font-size:13px">
-                        </div>
-                    </div>
-
-                </div>
-                <div class="modal-footer border-0" style="background-color: #f6f6f6">
-                    <button type="button" class="btn btn-primary confirmItemAdd">Confirm</button>
-                    <button type="submit" class="btn btn-cancel" data-dismiss="modal" aria-label="Close">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
+     
     @section('content')
     <style>
        select:focus > option:checked { 
@@ -588,11 +508,11 @@
                 <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
                 <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
                 <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
-                <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
+                <input type="hidden"   id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
                 <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
 
                 <input type="hidden" id="" value="1" name="form_status">
-                <input type="hidden" id="stock_products" name="stock_products" value="{{json_encode($products)}}">
+                <input type="hidden" id="stock_products"   value="{{json_encode($products)}}">
                 <div class="col-md-4 left-sidebox ">
                     <div class="sidebox-content text-white"  style="background-color: #152e4d">
                         <div class="CT_sec">

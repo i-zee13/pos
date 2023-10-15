@@ -559,7 +559,7 @@
           </div>
           <div class="row display" style="display: none;">
             <input type="hidden" id=""   value="1" name="form_status" >
-            <input type="hidden" id="stock_products"  name="stock_products" value="{{json_encode($products)}}">
+            <input type="hidden" id="stock_products"    value="{{json_encode($products)}}">
 
             <div class="col-12">
               <div class="property_info">

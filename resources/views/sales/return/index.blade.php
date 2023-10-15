@@ -43,8 +43,8 @@
             <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;" id="example">
                 <thead>
                     <tr>
-                        <th>Customer Name</th>
                         <th>Invoice #</th>
+                        <th>Customer Name</th>
                         <th>Paid</th>
                         <th>Product Net Total</th>
                         <!-- <th>Invoice Total</th> -->

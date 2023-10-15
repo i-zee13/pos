@@ -595,13 +595,13 @@
             <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
             <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
             <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
-            <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
+            <input type="hidden" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
             <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
 
             <input type="hidden" id="" value="1" name="form_status">
             <input type="hidden" id="stock_products" value="{{json_encode($products)}}">
             <div class="col-md-4 left-sidebox">
-                <div class="sidebox-content">
+                <div class="sidebox-content text-white" style="background-color: #152e4d">
                     <div class="CT_sec">
                         <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
                         <div class="col-md-12 PB-10">
@@ -747,7 +747,7 @@
                                         </td>
                                         <td> <input type="date" id="expiry_date" class="inputSale p_expiry_date  expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="5" style=" width: 95;"></td>
                                         <!-- Assigning tabindex for the input fields -->
-                                        <td><input type="number" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="3" min="0" style=" width: 50;"></td>
+                                        <td><input type="number" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="3" min="0" style=" width: 50;" data-product-type="1"></td>
                                         <td><input type="number" id="retail_price" class="inputSale retail_price" placeholder="" name="retail_price" style="font-size: 13px;" readonly tabindex="4"></td>
                                         <td><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;width: 50;" tabindex="5" min="0"></td>
                                         <td class='add-S-input'><input type="text" id="amount" class="inputSale amount" placeholder="" name="amount" style="font-size: 13px;" tabindex="6"></td>
@@ -809,7 +809,7 @@
                                         <td> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="5" style=" width: 95;"></td>
 
                                         <!-- Assigning tabindex for the input fields -->
-                                        <td><input type="number" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="10" min="0" style=" width:50;"></td>
+                                        <td><input type="number" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="10" min="0" style=" width:50;" data-product-type="2"></td>
                                         <td><input type="number" id="retail_price" class="inputSale retail_price" placeholder="" name="retail_price" style="font-size: 13px;" readonly tabindex="11"></td>
                                         <td><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;width: 50;" tabindex="12" min="0"></td>
                                         <td class='add-S-input'><input type="text" id="amount" class="inputSale  amount" placeholder="" name="amount" style="font-size: 13px;" tabindex="13"></td>
@@ -931,11 +931,11 @@
 
                     <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
                         @if(request()->query('invoice') == 'detail')
-                        <a href="{{route('salereturn.index')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
+                        <a href="{{route('ProductReplacement.index')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
                         @else
                         <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
                         <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>
-                        <a href="{{route('salereturn.index')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                        <a href="{{route('ProductReplacement.index')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                         @endif
                     </div>
                 </div>

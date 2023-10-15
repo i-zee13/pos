@@ -592,7 +592,7 @@
                 <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
 
                 <input type="hidden" id="" value="1" name="form_status">
-                <input type="hidden" id="stock_products" name="stock_products" value="{{json_encode($products)}}">
+                <input type="hidden" id="stock_products"   value="{{json_encode($products)}}">
                 <div class="col-md-4 left-sidebox ">
                     <div class="sidebox-content text-white"  style="background-color: #152e4d">
                         <div class="CT_sec">

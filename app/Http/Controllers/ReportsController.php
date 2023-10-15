@@ -36,9 +36,9 @@ class ReportsController extends Controller
       }
 
       if ($request->current_url == 'vendor-reports') {
-         $query      =  VendorLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->get();
+         $query      =  VendorLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id") ->orderBy('id', 'DESC')->get();
       } else {
-         $query      =  CustomerLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->get();
+         $query      =  CustomerLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id") ->orderBy('id', 'DESC')->get();
       }
       return response()->json([
          'msg'       => 'Vendor reports list fetched',
