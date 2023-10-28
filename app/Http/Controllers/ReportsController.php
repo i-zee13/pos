@@ -17,7 +17,6 @@ use stdClass;
 class ReportsController extends Controller
 {
 
-
    public function customerReport()
    {
       $vendors   =   Customer::where('customer_type', 2)->get();
@@ -28,24 +27,7 @@ class ReportsController extends Controller
       $vendors   =   Customer::where('customer_type', 1)->get();
       return view('reports.vendor', compact('vendors'));
    }
-   public function reportList(Request $request)
-   {
-      $dateFilter    =  " 1=1";
-      if ($request->start_date != '' && $request->end_date != '') {
-         $dateFilter = " Date(created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
-      }
-
-      if ($request->current_url == 'vendor-reports') {
-         $query      =  VendorLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id") ->orderBy('id', 'DESC')->get();
-      } else {
-         $query      =  CustomerLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id") ->orderBy('id', 'DESC')->get();
-      }
-      return response()->json([
-         'msg'       => 'Vendor reports list fetched',
-         'status'    => 'success',
-         'vendor'    => $query
-      ]);
-   }
+  
    public function stockReport()
    {
       $companies  =   Company::select('id', 'company_name')->get();
@@ -274,9 +256,9 @@ class ReportsController extends Controller
       $records->total_product_discount =  collect($saleRecords)->SUM('product_discount');
       $records->total_net_sales        =  collect($saleRecords)->WHERE('invoice_type',1)->SUM('sale_total_amount');
       $records->total_credit_sales     =  collect($saleRecords)->WHERE('invoice_type',2)->SUM('sale_total_amount');
-      $records->customer_payment       =  collect($customer_payment)->WHERE('customer_id','!=',8)->WHERE('trx_type',3)->SUM('cr');
+      $records->customer_payment       =  collect($customer_payment)->WHERE('customer_id','!=',8)->WHERE('trx_type',3)->SUM('dr');
       $records->vendor_payment         =  collect($vendor_payment)->SUM('dr');
-      $records->ttl_cash_recovery      =  collect($customer_payment)->WHERE('customer_id','!=',8)->WHERE('trx_type',3)->SUM('dr');
+      $records->ttl_cash_recovery      =  collect($customer_payment)->WHERE('customer_id','!=',8)->WHERE('trx_type',3)->SUM('cr');
       $records->customer_ledger        =  $customer_payment;
       $records->vendor_ledger          =  $vendor_payment;
       $records->saleRecords            =  $saleRecords;

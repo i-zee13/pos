@@ -256,7 +256,7 @@ class StockController extends Controller
         $invoice            =     PurchaseInvoice::where('id',$id)->first();
         $parts              =     explode('-', $invoice->invoice_no);
         $invoice_first_part =     $parts[0];
-        $purchasd_products  =       ProductPurchase::where('purchase_invoice_id', $id)
+        $purchasd_products  =     ProductPurchase::where('purchase_invoice_id', $id)
                                                 ->selectRaw('products_purchases.*')
                                                 ->get();
         $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)

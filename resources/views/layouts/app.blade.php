@@ -119,7 +119,8 @@
 
     @if(request()->segment(1) != 'stock-add'  && request()->segment(1) != 'purchase-edit'  &&  request()->segment(1) != 'sale-add' 
         && request()->segment(1) != 'sale-edit'  && request()->segment(1) != 'sale-return'  && request()->segment(1) != 'add-return'  
-        && request()->segment(1) != 'edit-sale-return' && request()->segment(1) != 'product-replacement-create' && request()->segment(1) != 'product-replacement-edit')
+        && request()->segment(1) != 'edit-sale-return' && request()->segment(1) != 'product-replacement-create' && request()->segment(1) != 'product-replacement-edit'
+        && request()->segment(1) != 'detail')
             @include('layouts.sidebar-menu')
     @endif
 

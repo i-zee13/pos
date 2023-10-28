@@ -10,8 +10,7 @@ use App\Models\Sale as SaleInvoice;
 use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Auth;
-use Laravel\Ui\Presets\React;
+use Auth; 
 class SaleController extends Controller
 {
 
