@@ -14,12 +14,12 @@
                 </h6>
                 <!-- Title -->
                 <h1 class="header-title">
-                    <h2 class="_head01">Purchase <span>Management</span></h2>
+                    <h2 class="_head01">Return <span>Management</span></h2>
                 </h1>
             </div>
             <div class="col-auto">
                 <ol class="breadcrumb">
-                    <li><a href="#"><span>Purchase</span></a></li>
+                    <li><a href="#"><span>Returns</span></a></li>
                     <li><span>Active</span></li>
                 </ol>
             </div>
@@ -62,7 +62,7 @@
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->paid_amount ? $purchase->paid_amount : 0.00}} </td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->total_invoice_amount}} </td>
                     <td>
-                    <a id="{{$purchase->id}}" class="btn btn-default {{$purchase->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$purchase->is_editable== 1 ? route('purchase-edit' ,['id'=>$purchase->id]) : route('purchase-edit' ,['id'=>$purchase->id ,'invoice' => 'detail'])}}">{{$purchase->is_editable== 1  ? 'Edit'  : "Detail" }}</a>
+                    <a id="{{$purchase->id}}" class="btn btn-default {{$purchase->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$purchase->is_editable== 1 ? route('purchase-return-edit' ,['id'=>$purchase->id]) : route('purchase-edit' ,['id'=>$purchase->id ,'invoice' => 'detail'])}}">{{$purchase->is_editable== 1  ? 'Edit'  : "Detail" }}</a>
 
                         <!-- <button type="button" id="{{$purchase->id}}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button> -->
                         <button id="{{$purchase->id}}" data-invoice="{{$purchase->id}}" data-customer-id="{{$purchase->customer_id}}"
@@ -85,7 +85,7 @@
             var customer_id = $(this).attr('data-customer-id');
             var invoice_id = $(this).attr('data-invoice');
             var paid_amount = $(this).attr('paid-amount');
-            var printWindow = window.open("/print-purchase-invoice/" + invoice_id + '/' + customer_id + '/'+paid_amount);
+            var printWindow = window.open("/print-purchase-return-invoice/" + invoice_id + '/' + customer_id + '/'+paid_amount);
             printWindow.onload = function() {
                 printWindow.print();
                 // printWindow.close();

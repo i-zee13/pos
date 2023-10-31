@@ -476,7 +476,6 @@
                   flex: 0 0 380px;
                   max-width: 380px;
               }
-
               .right-sidebox {
                   -ms-flex: 0 0 1044px;
                   flex: 0 0 1044px;
@@ -484,22 +483,20 @@
               }
 
           }
-
           .form-s2 .select2-container .select2-selection--single {
               height: 30px !important;
               border: solid 1px #dbdbdb;
               background-color: #ffffff;
           }
-
           .form-s2 .select2-container--default .select2-selection--single .select2-selection__rendered {
               line-height: 30px !important;
               font-size: 13px;
           }
-
           .select2-container--default .select2-selection--single .select2-selection__arrow {
               top: 0px !important;
           }
       </style>
+       
       <div class="container-fluid">
           <form id="form" enctype="multipart/form-data" class="">
               @csrf
@@ -509,9 +506,7 @@
                   <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
                   <input type="hidden" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
                   <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
-
                   <input type="hidden" id="" value="1" name="form_status">
-
                   <div class="col-md-4 left-sidebox ">
                       <div class="sidebox-content text-white" style="background-color: #152e4d">
                           <div class="CT_sec">
@@ -533,13 +528,12 @@
                                   <div class="form-s2">
                                       <input type="text" id="" class="form-control" value="{{@$invoice->first_part}}">
                                       <input type="hidden" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
-
                                   </div>
                               </div>
                               <div class="col-md-12 PB-10">
                                   <label class="font13 mb-5">Date</label>
                                   <div class="form-s2">
-                                      <input type="Date" name="invoice_date" class="form-control new_dob new_form_field " value="{{ @$invoice ? $invoice->date : $current_date }}">
+                                      <input type="Date" name="invoice_date" class="form-control new_dob new_form_field " value="{{$invoice->date}}">
                                   </div>
                               </div>
                               <div class="form-wrap p-0">
@@ -583,19 +577,13 @@
                               <div class="row CompanyInfo">
                                   <div class="col-md-3"><strong class="show_purchase">P.P:</strong> <span class="pp" style="display:none"></span></div>
                                   <div class="col-md-5"><strong>Retail Price:</strong> <span class="retail_price ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
-
                                   <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
-
                               </div>
-
                               <div class="infoDiv">
                                   <form id="purchse-form">
                                       <div class="row">
-
                                           <input type="text" id="purchase_price" class="inputfileds  purchase_price " placeholder="" name="purchase_price" hidden>
                                           <input type="text" id="retail _price" class="inputfileds" placeholder="" name="ret ail_price" hidden>
-
-
                                       </div>
                                   </form>
                               </div>
@@ -604,7 +592,6 @@
                           <style>
                               .ProductTable tbody tr:hover td {
                                   background: #152e4d !important;
-
                                   color: white !important;
                               }
                           </style>
@@ -622,37 +609,43 @@
                                               <th style="">QTY.</th>
                                               <th style="">Discount</th>
                                               <th class="">Total</th>
-
                                           </tr>
                                       </thead>
                                       <tbody id="productGrid">
-
                                           @foreach($invoice->invoice_products as $product)
+                                          <?php
+                                                $url                    = ''; 
+                                                $product_total_amount   = 0;
+                                                if ($invoice->status == 'sale') {
+                                                    $url = 'sale'; 
+                                                    $product_total_amount =   $product->sale_total_amount;
+                                                } else if ($invoice->status == 'sale-return') {
+                                                    $url = 'salereturn';
+                                                    $product_total_amount =  $product->return_total_amount;
+                                                } else if ($invoice->status == 'product-replacement') {
+                                                    $url = 'sale';
+                                                    $product_total_amount =    $product->return_total_amount;
+                                                } else if ($invoice->status == 'purchase') {
+                                                    $url = 'purchase';
+                                                    $product_total_amount =  $product->purchased_total_amount;
+                                                } else if ($invoice->status == 'purchase-return') {
+                                                    $url = 'sale';
+                                                    $product_total_amount = $product->product_return_total_amount ;
+                                                } else if ($invoice->status == 'product-replacement') {
+                                                    $url = 'sale';
+                                                    $product_total_amount =  0 ;
+                                                }
+                                            ?>
                                           <tr id='tr-{{ $product->product_id }}'>
                                               <td>{{ $product->product_id }}</td>
                                               <td>{{ $product->product_name }}</td>
-                                              <td><input readonly type="number" value="{{ $product->sale_price }}" class="inputSale price-input add-stock-input td-{{ $product->product_id }}" min="0"></td>
+                                              <td> <input readonly type="number" value="" class="inputSale price-input add-stock-input td-{{ $product->product_id }}" min="0"></td>
                                               <td> <input readonly type="number" class="inputSale" name="new_purchase_price " tabindex="3" style=" width: 60;" min="0"></td>
-                                              <td><input readonly type="number" value="{{ $product->sale_price }}" class="inputSale price-input add-stock-input td-{{ $product->product_id }}" min="0"></td>
+                                              <td> <input readonly type="number" value="{{ $product->sale_price }}" class="inputSale price-input add-stock-input td-{{ $product->product_id }}" min="0"></td>
                                               <td> <input readonly type="date" id="expiry_date" class="inputSale expiry_date" value="{{ $product->expiry_date }}" name="expiry_date " tabindex="5" style=" width: 95;"></td>
-                                              <td><input readonly type="number" value="{{$product->qty}}" class="inputSale qty-input add-stock-input td-input-qty{{ $product->product_id }}" min="0"></td>
-                                              <td><input readonly type="number" value="{{ $product->product_discount }}" class="inputSale discount-input add-stock-input td-{{ $product->product_id }}" style="font-size: 13px" min="0"></td>
-                                              <td class='purchase-product-amount{{ $product->product_id }} add-S-input'><?php
-                                                
-                                                if($invoice->status == 'sale'){
-                                                    $product->sale_total_amount;
-                                                }else if($invoice->status == 'sale-return'){
-                                                    $product->return_total_amount;
-                                                }else if($invoice->status == 'purchase'){ 
-                                                    
-                                                }else if($invoice->status == 'purchase-return'){ 
-                                                    
-                                                }else if($invoice->status == 'product-replacement'){ 
-                                                    
-                                                } 
-                                            
-                                            
-                                            ?></td>
+                                              <td> <input readonly type="number" value="{{$product->qty}}" class="inputSale qty-input add-stock-input td-input-qty{{ $product->product_id }}" min="0"></td>
+                                              <td> <input readonly type="number" value="{{ $product->product_discount }}" class="inputSale discount-input add-stock-input td-{{ $product->product_id }}" style="font-size: 13px" min="0"></td>
+                                              <td class='purchase-product-amount{{ $product->product_id }} add-S-input'>{{$product_total_amount}}</td>
 
                                           </tr>
                                           @endforeach
@@ -670,7 +663,6 @@
                                               <td></td>
                                               <td></td>
                                               <td align="right">Net Total</td>
-
                                               <td> <input readonly type="number" class="inputvalue product_net_total" name="product_net_total" style="font-size: 13px" value="{{$invoice->total_invoice_amount}}" readonly></td>
                                           </tr>
                                           <tr class="th-to-hide">
@@ -679,11 +671,11 @@
                                               <td align="right">Service charges </td>
                                               <td style="width:112px"><input readonly type="number" name="discount" id="discount" class="inputvalue service_charges_input" style="font-size: 13px" value="{{@$invoice->service_charges}}" placeholder="0.00" data-id="" data-value="" min="0"></td>
                                           </tr>
-                                          <tr class="previous_payable_tr" style="display:none">
+                                          <tr class="previous_payable_tr" @if ($invoice->invoice_type != 2) style="display:none" @endif >
                                               <td></td>
                                               <td></td>
-                                              <td align="right" class="previous_payable_heading">Previous Receivable</td>
-                                              <td class=" ">{{ $invoice->previous_receivable }}</td>
+                                              <td align="right" class="previous_payable_heading">{{ $invoice->previous_receivable > 0 ? 'Previous Payable' : 'Previous Receivable' }}</td>
+                                              <td class=" ">{{ $invoice->previous_receivable }} {{$invoice->previous_receivable > 0 ? 'DR' : 'CR'}}</td>
                                           </tr>
 
                                           <tr class="th-to-hide">
@@ -733,7 +725,7 @@
                           </div>
                           <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
                               <a href="#" type="submit" class="btn btn-primary" id="backButton">Back</a>
-                              <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>
+                              <button type="button" id="{{$invoice->id}}" data-invoice="{{$invoice->id}}" data-customer-id="{{$invoice->customer_id}}" paid-amount="{{$invoice->paid_amount}}" class="btn btn-primary print-invoice">Print</button>
                           </div>
                       </div>
                   </div>
@@ -743,17 +735,28 @@
       </div>
   </div>
   </div>
+
   @endsection
   @push('js')
   <script>
       $(document).ready(function() {
           $('.parent-div').show();
           $('#tblLoader').hide();
-
-
           document.getElementById('backButton').addEventListener('click', function() {
-          window.history.back();
-    });
+              window.history.back();
+          });
+          $('.print-invoice').on('click', function() {
+              var print_url = $('.print_url').val();
+              var invoice_id = $(this).attr('data-invoice');
+              var customer_id = $(this).attr('data-customer-id');
+              var invoice_id = $(this).attr('data-invoice');
+              var paid_amount = $(this).attr('paid-amount');
+              var printWindow = window.open("/print-{{$url}}-invoice/" + invoice_id + '/' + customer_id + '/' + paid_amount);
+              printWindow.onload = function() {
+                  printWindow.print();
+                  // printWindow.close();
+              };
+          })
       });
   </script>
   @endpush

@@ -81,11 +81,13 @@ $('.search-btn').on('click', function () {
                 console.log(element);
                 var label = 'N/A';
                 var inv_id = '';
+                var flag = false;
                 trx_inv = false;
                 if (element['sale_invoice_id'] != null && element['sale_invoice_id'] != 0) {
                     label = 'Sale Inv';
                     inv_id = element['sale_invoice_id'];
                 } else if (element['purchase_invoice_id'] != null && element['purchase_invoice_id'] != 0) {
+                    flag = true;
                     label = 'Purchase Inv';
                     inv_id = element['purchase_invoice_id'];
                 } else if (element['sale_return_invoice_id'] != null && element['sale_return_invoice_id'] != 0) {
@@ -94,9 +96,10 @@ $('.search-btn').on('click', function () {
                 } else if (element['product_replacement_invoice_id'] != null && element['product_replacement_invoice_id'] != 0) {
                     label = 'Product Replacement Inv';
                     inv_id = element['product_replacement_invoice_id'];
-                } else if (element['return_invoice_id'] != null && element['return_invoice_id'] != 0) {
+                } else if (element['purchase_return_invoice_id'] != null && element['purchase_return_invoice_id'] != 0) {
+                    flag = true;
                     label = 'Return Inv';
-                    inv_id = element['return_invoice_id'];
+                    inv_id = element['purchase_return_invoice_id'];
                 } else if (element['crv_no'] != null && element['crv_no'] != 0) {
                     trx_inv = true;
                     label = 'Cash Receiving Voucher ( ' + element['comment'] + ' )';
@@ -106,8 +109,7 @@ $('.search-btn').on('click', function () {
                     label = 'Cash Payment Voucher ( ' + element['comment'] + ' )';
                     inv_id = element['id'];
                 }
-                var date = new Date(element.created_at);
-
+                var date = new Date(element.created_at); 
                 function formatAMPM(date) {
                     var hours   = date.getHours();
                     var minutes = date.getMinutes();
@@ -119,13 +121,18 @@ $('.search-btn').on('click', function () {
                     return timeStr;
                 }
                 var formattedDate = `${date.toDateString()} ${formatAMPM(date)}`; 
+                if(flag){
+                    var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'] + ' DR' : element['balance'] + ' CR') : '0';
+                }else{
+                    var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'] + ' CR' : element['balance'] + ' DR') : '0';
+                }
                 $('.TeacherAttendanceListTable tbody').append(`
                     <tr>
                         <td>${formattedDate}</td>
                         <td>${label}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['cr'] ? element['cr'] : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['dr'] ? element['dr'] : '0'}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['balance'] ? (element['balance'] < 0 ? element['balance'] + ' CR' : element['balance'] + ' DR') : '0'}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${ledger_bal}</td>
                         <td><a class="btn btn-default open-modal btn-line" 
                                 data-inv-id="${inv_id}"
                                 data-label="${label}"

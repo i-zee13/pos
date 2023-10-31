@@ -17394,7 +17394,7 @@ $(document).ready(function () {
             'stock_in_hand': "".concat(product.stock_in_hand),
             'purchased_price': "".concat(product.purchase_price),
             'p_name': "".concat(product.product_name),
-            'product_replacement_invoice_id': "".concat(product.product_replacement_invoice_id),
+            'product_replacement_invoice_id': "".concat(product.id),
             'prod_type': "".concat(product.product_type)
           });
         });
@@ -17824,7 +17824,7 @@ function saleSave(current_action, type) {
         $('#notifDiv').text('Added successfully');
         var received_amount = $('.amount_received').val().trim() > 0 ? $('.amount_received').val().trim() : 0;
         if (type == 'print') {
-          var printWindow = window.open("/print-salereturn-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
+          var printWindow = window.open("/print-replacement-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
           printWindow.onload = function () {
             printWindow.print();
           };
@@ -17998,7 +17998,7 @@ $('#customer_id').change(function () {
       success: function success(response) {
         previous_payable = response.customer_balance;
         $('#previous_receivable').val(previous_payable);
-        var previous_payable_text = previous_payable >= 0 ? previous_payable + " CR" : previous_payable < 0 ? -previous_payable + " DR" : previous_payable;
+        var previous_payable_text = previous_payable >= 0 ? previous_payable + " DR" : previous_payable < 0 ? -previous_payable + " CR" : previous_payable;
         $('.previous_payable_heading').empty();
         $('.previous_payable_heading').text(previous_payable >= 0 ? 'Previous Payable' : 'Previous Receivable');
         $('.previous_payable').text(previous_payable_text);

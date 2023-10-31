@@ -599,8 +599,9 @@
 
                     <input type="hidden" id="" value="1" name="form_status">
                     <input type="hidden" id="stock_products" value="{{ json_encode($products) }}">
+                    <input type="hidden" id="vendors" value="{{ json_encode($customers) }}">
                     <div class="col-md-4 left-sidebox">
-                        <div class="sidebox-content">
+                        <div class="sidebox-content text-white" style="background-color: #152e4d">
                             <div class="CT_sec">
                                 <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
                                 <div class="col-md-12 PB-10">
@@ -627,7 +628,7 @@
                                             value="{{ @$invoice_first_part }}">
                                         <input type="hidden" id="" class="form-control required"
                                             placeholder="" name="invoice_no"
-                                            value="{{ @$invoice ? @$invoice->invoice_no : $invoice_first_part }}">
+                                            value="{{ @$invoice ? @$invoice->invoice_no : $invoice_no }}">
 
                                     </div>
                                 </div>
@@ -898,12 +899,12 @@
                             <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px"
                                 id="btns_div">
                                 @if (request()->query('invoice') == 'detail')
-                                    <a href="{{ route('salereturn.index') }}" type="submit" class="btn btn-primary"
+                                    <a href="{{ route('purchase-return.index') }}" type="submit" class="btn btn-primary"
                                         id="cancel">Back</a>
                                 @else
                                     <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
                                     <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>
-                                    <a href="{{ route('salereturn.index') }}" type="submit" class="btn btn-cancel"
+                                    <a href="{{ route('purchase-return.index') }}" type="submit" class="btn btn-cancel"
                                         id="cancel">Cancel</a>
                                 @endif
                             </div>

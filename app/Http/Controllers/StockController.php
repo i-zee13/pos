@@ -102,9 +102,7 @@ class StockController extends Controller
         
         if($invoice->save()){
             if(count($request->purchased_product_array) > 0){
-                foreach($request->purchased_product_array as $purchase_product){
-
-                    $new_ids[] = $purchase_product['product_id'];
+                foreach($request->purchased_product_array as $purchase_product){ 
                     if ($purchase_product['purchase_prod_id'] > 0) {
                         $purchased          =  ProductPurchase::where('id', $purchase_product['purchase_prod_id'])->first();
                     }else{

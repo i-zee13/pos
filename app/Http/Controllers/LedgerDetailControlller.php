@@ -50,13 +50,14 @@ class LedgerDetailControlller extends Controller
       }elseif ($label == 'sale_return_inv') {
          $invoice     = getSaleReturnInv($id);
       } else if ($label == 'purchase_inv') {
-         // 'Sale Return Inv'
+         $invoice     = getPurchaseInv($id);
       } elseif ($label == 'return_inv') {
-         // 'Product Replace'
+         $invoice     = getPurchaseReturnInv($id);
       } elseif ($label == 'product_replacement_inv') {
-         // 'Return Inv'
-       }
-     
+         $invoice     = getProductReplacementInv($id);  
+       
+         return view('reports.replacement-detail',compact('invoice'));
+       } 
       return view('reports.detail',compact('invoice'));
-   }
+   } 
 }

@@ -41,7 +41,6 @@ class ProductReplacementController extends Controller
     }
     public function store(Request $request)
     {
-    //    dd($request->all());
         if ($request->hidden_invoice_id) {
             $invoice = ProductReplacementInvoice::where('id', $request->hidden_invoice_id)->first();
             // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received;
@@ -77,8 +76,8 @@ class ProductReplacementController extends Controller
                 $old_ids        = $request->existing_product_ids;
                 foreach ($request->sales_product_array as $key => $sale_product) {
                     $new_ids[]  = $sale_product['product_id'];
-                    if ($sale_product['sale_prod_id'] > 0) {
-                        $sale          =  ProductReplacement::where('id', $sale_product['sale_prod_id'])->first();
+                    if ($sale_product['product_replacement_invoice_id'] > 0) {
+                        $sale          =  ProductReplacement::where('id', $sale_product['product_replacement_invoice_id'])->first();
                     } else {
                         $sale          =  new ProductReplacement();
                     }
@@ -134,10 +133,10 @@ class ProductReplacementController extends Controller
                 }
                
                 if ($request->hidden_invoice_id) {
+                 
                     ProductReplacement::where('product_replacement_invoice_id', $request->hidden_invoice_id)
                                     ->whereNotIn('id', $sale_products_array)
-                                    ->delete();
-                    
+                                    ->delete(); 
                 }
 
                 $customer_ledger       =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->first();
@@ -240,5 +239,36 @@ class ProductReplacementController extends Controller
     public function getCustomerBalance(Request $request, $id){
         return  getCustomerBalance($request, $id);
     }
+    public function printInvoice($invoice_id, $customer_id, $received_amount)
+    {
+          
+        $invoiceId                  =   $invoice_id;
+        $customerId                 =   $customer_id;
+        $customer_balance           =   0;
+        $invoice                    =   ProductReplacementInvoice::where('id', $invoiceId)->where('customer_id', $customerId)
+                                                    ->selectRaw("product_replacment_invoices.*,
+                                                        (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
+                                                        (SELECT cr FROM customer_ledger WHERE product_replacement_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
+                                                        ")
+                                                    ->first(); 
+        $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
+        $products                   =   ProductReplacement::where('product_replacement_invoice_id', $invoice_id)
+                                                    ->selectRaw("product_replacements.*,
+                                                    (SELECT product_name FROM products WHERE id=product_replacements.product_id) as product_name")
+                                                    ->get();
+        $ledgerCount      = CustomerLedger::where('customer_id', $customerId)->count();
+      
+        $customer_balance = 0;
+        if ($ledgerCount > 1) {
+            $customer_balance = CustomerLedger::where('customer_id', $customerId)
+                // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+                ->orderBy('id', 'DESC')->skip(1)->value('balance');
+        }
 
+        // $customer_balance = CustomerLedger::where('customer_id', $customerId)
+        //                                     // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+        //                                     ->orderBy('id', 'DESC')->value('balance'); 
+
+        return view('sales.replacement.print', compact('invoice', 'products', 'customer_balance'));
+    }
 }

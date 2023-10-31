@@ -191,7 +191,7 @@
                     @endphp
                     <td class="bot-1-table-td">Voucher No: <b>{{$invoice_first_part}}</b></td>
                     <td class="bot-1-table-td">Date: {{date('d-m-Y',strtotime($invoice->date))}}</td>
-                    <td class="bot-1-table-td">Time: {{ date('h:i A') }}</td>
+                    <td class="bot-1-table-td">Time: {{ date('h:i A', strtotime($invoice->created_at)) }}</td>
                 </tr>
             </table>
             <table class="bot-2-table">

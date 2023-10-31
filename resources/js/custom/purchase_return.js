@@ -34,9 +34,10 @@ $(document).ready(function () {
     $('#bar-code').focus();
     stock_products    = JSON.parse($('#stock_products').val());
     customer_ledger   = JSON.parse($('#customer_ledger').val());
+    vendors = JSON.parse($('#vendors').val());
     getProducts();
     $('.display').show();
-   if (segments[3] == 'edit-purchase-return') {
+   if (segments[3] == 'purchase-return-edit') {
         customer_id      = $('#curren_customer_id').val();
         var invoice_id   = $('#hidden_invoice_id').val();
         service_charges  = $('#service_charges').val();
@@ -47,6 +48,7 @@ $(document).ready(function () {
             type: 'get',
             success: function (response) {
                 response.products.forEach(function (product) {
+
                     existing_product_ids.push(product.product_id);
                     p_name = product.product_name;
                     returns_product_array.push({
@@ -54,12 +56,12 @@ $(document).ready(function () {
                         'prod_discount'      : `${product.product_discount}`,
                         'expiry_date'        : `${product.expiry_date}`,
                         'qty'                : `${product.qty}`,
-                        'amount'             : `${product.sale_total_amount}`,
+                        'amount'             : `${product.product_return_total_amount}`,
                         'retail_price'       : `${product.sale_price}`,
                         'stock_in_hand'      : `${product.stock_in_hand}`,
                         'purchased_price'    : `${product.purchase_price}`,
                         'p_name'             : `${product.product_name}`,
-                        'return_invoice_id'    : `${product.return_invoice_id}`,
+                        'return_invoice_id'  : `${product.return_invoice_id}`,
                     });
                 })
                 $('.display').show();
@@ -432,7 +434,7 @@ function saleSave(current_action,type){
                 }
                 setTimeout(() => {
                     $('#notifDiv').fadeOut();
-                    window.location     = "/purchase-return";
+                    window.location     = "/add-return";
                 }, 1500);
             }else{
                 current_action.removeAttr('disabled');
@@ -518,7 +520,7 @@ $(document).on('input', '.price-input', function () {
         }
     })
 
-})
+})  
 $(document).on('input', '.discount-input', function () {
     var p_discount            = $(this).val();
     var current_product_id    = $(this).attr('data-id');
@@ -550,20 +552,17 @@ function getProducts() {
         });
 }
 function getvendors() {
-    $("#customer_id").empty();
-    $.ajax({
-        url : `/get-customer`,
-        type: 'get',
-        success: function (response) {
-            $("#customer_id").append(`<option value="0">Select Customer</option>`)
-            response.customers.forEach(data => {
-                $("#customer_id").append(`<option value="${data.id}" data-name="${data.customer_name}" ${data.id == customer_id ? 'seleced' : ''}>${data.id}-${data.customer_name}</option>`)
-                vendors.push(data);
-            });
-            $("#customer_id").val(customer_id).trigger('change');
-        }
-    })
-}
+  
+    $("#customer_id").empty(); 
+        $("#customer_id").append("<option value=\"0\">Select Customer</option>");
+        console.log(vendors)
+       vendors.forEach(function (data) {
+        console.log(data);
+        $("#customer_id").append(`<option value="${data.id}" data-name="${data.customer_name}" ${data.id == customer_id ? 'seleced' : ''}>${data.id}-${data.customer_name}</option>`)
+
+        $("#customer_id").val(customer_id).trigger('change');
+      }) 
+  }
 $('#customer_id').change(function () {
     var total_paid_for_net_sale = 0;
     if($(this).val()==6){
@@ -624,10 +623,10 @@ function grandSum(previous_payable=0,service_charges=0,discount=0){
     }, 500);
     if(parseFloat($('.amount_pay_input').val()) < 0) {
       $('.th-hide').hide();
-      $('.cash-return').text('Cash Return');
+      $('.cash-return').text('Cash Pay');
     }else{
         $('.th-hide').show();
-        $('.cash-return').text('Cash Received');
+        $('.cash-return').text('Cash Pay');
     }
 }
 function productRetailAmount(){

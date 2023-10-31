@@ -86,7 +86,7 @@
             var customer_id = $(this).attr('data-customer-id');
             var invoice_id = $(this).attr('data-invoice');
             var paid_amount = $(this).attr('paid-amount');
-            var printWindow = window.open("/print-salereturn-invoice/" + invoice_id + '/' + customer_id + '/' +
+            var printWindow = window.open("/print-replacement-invoice/" + invoice_id + '/' + customer_id + '/' +
                 paid_amount);
             printWindow.onload = function() {
                 printWindow.print();

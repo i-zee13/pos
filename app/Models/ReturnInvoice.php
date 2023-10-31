@@ -9,5 +9,5 @@ class ReturnInvoice extends Model
 {
     use HasFactory;
     protected $guarded  =    [];
-    protected $table    =   'return_invoices';
+    protected $table    =   'purchase_return_invoices';
 }

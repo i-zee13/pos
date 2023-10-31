@@ -72,19 +72,22 @@ Route::get('/purchases'                      ,[App\Http\Controllers\StockControl
 Route::get('/purchase-edit/{id}'             ,[App\Http\Controllers\StockController::class, 'editPurchase'])->name('purchase-edit');
 Route::get('/get-purchase-products/{id}'     ,[App\Http\Controllers\StockController::class, 'getPurchaseProduct'])->name('get-purchase-products');
 Route::delete('/delete-product-from-invoice' ,[App\Http\Controllers\StockController::class, 'deleteProduct'])->name('delete-product');
-Route::get('/print-purchase-invoice/{invoice_id}/{customer_id}/{received_amount}'       ,[App\Http\Controllers\StockController::class, 'printInvoice'])->name('print-purchase-invoice');
+Route::get('/print-purchase-invoice/{invoice_id}/{customer_id}/{received_amount}'    ,[App\Http\Controllers\StockController::class, 'printInvoice'])->name('print-purchase-invoice');
 
 // Purchase Returns /
 Route::get('/get-customer-balance-products/{id}'   ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
 Route::get('/add-return'                           ,[App\Http\Controllers\PurchaseReturnController::class, 'create'])->name('purchase-return.create');
 Route::get('/purchase-returns'                     ,[App\Http\Controllers\PurchaseReturnController::class, 'list'])->name('purchase-return.index');
-Route::post('/add-purchase-return'                 ,[App\Http\Controllers\PurchaseReturnController::class, 'store'])->name('purchase-return.store');
+Route::post('/add-purchase-return-invoice'         ,[App\Http\Controllers\PurchaseReturnController::class, 'store'])->name('purchase-return.store');
 Route::get('/get-vendor-balance-for-purchase-return/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalnce'])->name('purchase-return.get-vendor-balance');
 Route::delete('/delete-product-from-purchase-return' ,[App\Http\Controllers\PurchaseReturnController::class, 'deleteProduct'])->name('purchase-return.delete-product');
+Route::get('/purchase-return-edit/{id}'              ,[App\Http\Controllers\PurchaseReturnController::class, 'edit'])->name('purchase-return-edit');
+Route::get('/get-purchase-return-products/{id}'      ,[App\Http\Controllers\PurchaseReturnController::class, 'getPurchaseReturnProduct'])->name('get-purchase-return-products');
+Route::get('/print-purchase-return-invoice/{invoice_id}/{customer_id}/{received_amount}'    ,[App\Http\Controllers\PurchaseReturnController::class, 'printInvoice'])->name('print-purchase-return-invoice');
 
 /** sale Routes */
 Route::get('/sale-add'                    ,[App\Http\Controllers\SaleController::class, 'create'])->name('sale-add');
-Route::get('/get-customer'                ,[App\Http\Controllers\SaleController::class, 'getVendors'])->name('get-vendors');
+Route::get('/get-customer'                ,[App\Http\Controllers\SaleController::class, 'getVendors'])->name('get-customer');
 Route::post('/add-sale-invoice'           ,[App\Http\Controllers\SaleController::class, 'saleInvoice'])->name('add-sale-invoice');
 Route::get('/sales'                       ,[App\Http\Controllers\SaleController::class, 'saleList'])->name('sales');
 Route::get('/sale-edit/{id}'              ,[App\Http\Controllers\SaleController::class, 'editsale'])->name('sale-edit');
@@ -122,8 +125,7 @@ Route::get('/print-transaction-invoice/{invoice_id}/{customer_id}/{operation}/{t
 //Reports
 Route::get('/customer-reports'          ,[App\Http\Controllers\LedgerDetailControlller::class, 'customerReport'])->name('customer-reports');
 Route::get('/vendor-reports'            ,[App\Http\Controllers\LedgerDetailControlller::class, 'vendorReport'])->name('vendor-reports');
-Route::get('/detail/{id}/{label}'             ,[App\Http\Controllers\LedgerDetailControlller::class, 'ledgerDetail'])->name('ledger.detail');
-
+Route::get('/detail/{id}/{label}'       ,[App\Http\Controllers\LedgerDetailControlller::class, 'ledgerDetail'])->name('ledger.detail');
 Route::post('/report-list'              ,[App\Http\Controllers\LedgerDetailControlller::class, 'reportList'])->name('report-list');
 
 Route::get('/stock-reports'             ,[App\Http\Controllers\ReportsController::class, 'stockReport'])->name('stock-reports');
@@ -149,17 +151,16 @@ Route::get('/product-replacements'                ,[App\Http\Controllers\Product
 Route::post('/store-product-replacement-invoice'  ,[App\Http\Controllers\ProductReplacementController::class, 'store'])->name('ProductReplacement.store');
 Route::get('/get-products-replacements/{id}'      ,[App\Http\Controllers\ProductReplacementController::class, 'getReplacmentProduct'])->name('ProductReplacement.get');
 Route::delete('/delete-product-replacement'       ,[App\Http\Controllers\ProductReplacementController::class, 'deleteProduct'])->name('ProductReplacement.delete');
-Route::get('/get-customer-balance-for-product-replacement/{id}'  ,[App\Http\Controllers\ProductReplacementController::class, 'getCustomerBalance'])->name('ProductReplacement.get-customer-balance');
+Route::get('/get-customer-balance-for-product-replacement/{id}'                       ,[App\Http\Controllers\ProductReplacementController::class, 'getCustomerBalance'])->name('ProductReplacement.get-customer-balance');
+Route::get('/print-replacement-invoice/{invoice_id}/{customer_id}/{received_amount}'  ,[App\Http\Controllers\ProductReplacementController::class, 'printInvoice'])->name('print-replacement-invoice');
 
 // Admin Close Report Fakhar
 Route::get('/admin-sale-close'   ,[App\Http\Controllers\ReportsController::class, 'adminSaleClose'])->name('admin-sale-close');
 Route::get('/sale-close-record/{closing_date}'   ,[App\Http\Controllers\ReportsController::class, 'adminSaleCloseRecord'])->name('sale-close-record');
 Route::post('/save-closing-cash'   ,[App\Http\Controllers\AdminSaleCloseController::class, 'saveAdminSaleCloseRecord'])->name('save-closing-cash');
 Route::post('/update-closing-cash'   ,[App\Http\Controllers\AdminSaleCloseController::class, 'updateAdminSaleCloseRecord'])->name('update-closing-cash');
+ 
+ 
 
-
-
-//Rerturn Back 
-Route::get('/return-back'   ,[App\Http\Controllers\ReportsController::class, 'return-back'])->name('return-back');
 
 });

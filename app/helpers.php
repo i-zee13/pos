@@ -12,6 +12,7 @@ use App\Models\ProductReplacement;
 use App\Models\ProductReplacementInvoice;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseReturn;
+use App\Models\ReturnInvoice;
 use App\Models\State;
 use App\Models\Sale as SaleInvoice;
 use App\Models\SaleReplacement;
@@ -313,7 +314,7 @@ if(!function_exists('isEditable'))
                     ->whereDate('created_at', Carbon::today()) 
                     ->where('is_editable', 1) 
                     ->update(['is_editable' => 0]);
-        PurchaseReturn::where('customer_id',$customer_id)
+        ReturnInvoice::where('customer_id',$customer_id)
                     ->whereDate('created_at', Carbon::today()) 
                     ->where('is_editable', 1) 
                     ->update(['is_editable' => 0]);

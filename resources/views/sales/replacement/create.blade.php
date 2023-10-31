@@ -620,7 +620,7 @@
                             <label class="font13 mb-5">Invoice #</label>
                             <div class="form-s2">
                                 <input type="text" id="" class="form-control" value="{{@$invoice_first_part}}">
-                                <input type="hidden" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? @$invoice->invoice_no : $invoice_first_part}}">
+                                <input type="hidden" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? @$invoice->invoice_no : $iinvoice_no}}">
 
                             </div>
                         </div>

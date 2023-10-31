@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{{$invoice->customer_name}} {{date('d-m-Y',strtotime($invoice->date))}} {{request()->segment(1) == 'print-salereturn-invoice' ? 'Return' : 'Sale'}} Invoice</title>
+    <title>{{$invoice->customer_name}} {{date('d-m-Y',strtotime($invoice->date))}} {{request()->segment(1) == 'print-sale-invoice' ? 'Return' : 'Sale'}} Invoice</title>
     <style>
         @media print {
             .page-break {
@@ -177,7 +177,7 @@
         </center><!--End InvoiceTop-->
         <div id="mid">
             <div class="info">
-            {{request()->segment(1) == 'print-salereturn-invoice' ? 'Return' : 'Sale'}} Invoice
+            {{request()->segment(1) == 'print-sale-invoice' ? 'Sale' : 'Return'}} Invoice
             </div>
         </div><!--End Invoice Mid--> 
         <div id="bot">
@@ -189,7 +189,7 @@
                     @endphp
                     <td class="bot-1-table-td">Bill No: <b>{{$invoice_first_part}}</b></td>
                     <td class="bot-1-table-td">Date: {{date('d-m-Y',strtotime($invoice->date))}}</td>
-                    <td class="bot-1-table-td">Time: {{ date('h:i A') }}</td>
+                    <td class="bot-1-table-td">Time: {{ date('h:i A', strtotime($invoice->created_at)) }}</td>
                 </tr>
             </table>
             <table class="bot-2-table">
@@ -235,14 +235,14 @@
                     <td>{{number_format($invoice->invoice_discount)}}</td>
                 </tr>
               
-                @if(request()->segment(1) == 'print-salereturn-invoice')
+                @if(request()->segment(1) == 'print-sale-invoice')
                     @if($invoice->invoice_type == 2)
                     <!-- <tr>
                         <td class="payable-heading">Previous Paid :</td>
                         <td>{{number_format($invoice->invoice_discount)}}</td>
                     </tr> -->
                     <tr>
-                        <td class="payable-heading">Previous {{$invoice->previous_receivable >= 0 ? 'Receivable' : 'Payable' }} :</td>
+                        <td class="payable-heading">Previous {{$invoice->previous_receivable >= 0 ? 'Payable' : 'Receivable' }} :</td>
                         <td>{{number_format($invoice->previous_receivable)}}</td>
                     </tr>
                     <!-- <tr>
@@ -250,7 +250,7 @@
                         <td>{{number_format($invoice->total_invoice_amount)}}</td>
                     </tr> -->
                     <tr>
-                        <td class="payable-heading">{{$invoice->previous_receivable > 0 ? 'Total Receivable'  : 'Total Payable'}} :</td>
+                        <td class="payable-heading">{{$invoice->previous_receivable >= 0 ? 'Total Payable'  : 'Total Receivable'}} :</td>
                         <td>{{number_format($invoice->invoice_remaining_amount_after_pay)}}</td>
                     </tr>
                     <tr>
@@ -262,7 +262,7 @@
                         // $difference = abs($difference);
                     ?>
                     <tr>
-                        <td class="payable-heading">{{$invoice->previous_receivable > 0 ? 'Remaining Receivable'  : 'Remaining Payable'}} :</td>
+                        <td class="payable-heading">{{$invoice->previous_receivable > 0 ? 'Remaining Payable'  : 'Remaining Receivable'}} :</td>
                         <td>{{number_format($invoice->invoice_remaining_amount_after_pay,2)}}</td>
                     </tr>
                     @else

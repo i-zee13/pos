@@ -99,7 +99,7 @@ class SalesReturnController extends Controller
         }
 
         $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges) - $request->invoice_discount;
-        $total_cr       =   $invoice->total_invoice_amount +  $invoice->paid_amount  - $request->service_charges;
+        $total_cr                      =   $invoice->total_invoice_amount +  $invoice->paid_amount  - $request->service_charges;
        
         $invoice->invoice_remaining_amount_after_pay  = $request->previous_receivable - $invoice->total_invoice_amount - $invoice->paid_amount; 
         $invoice->service_charges      = $request->service_charges;

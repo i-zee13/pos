@@ -7,6 +7,7 @@ use App\Models\VendorLedger;
 use App\Models\Product;
 use App\Models\ProductPurchase;
 use App\Models\ProductReturns;
+use App\Models\PurchaseReturn;
 use App\Models\ReturnInvoice;
 use App\Models\Stock;
 use App\Models\VendorStock;
@@ -14,7 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Auth;
-
+use Mockery\Undefined;
 
 class PurchaseReturnController extends Controller
 {
@@ -53,13 +54,16 @@ class PurchaseReturnController extends Controller
                                                     ->from('purchase_invoices')
                                                     ->groupBy('customer_id');
                                             })->get();
+                                             
         return view('purchases.return.create',compact('customers','current_date','invoice_first_part','products','invoice_no'));
     }
-    Public function store(Request $request){
+    Public function store(Request $request){ 
+        
         if($request->hidden_invoice_id){
             $invoice = ReturnInvoice::where('id',$request->hidden_invoice_id)->first();
         }else{
             $invoice = new ReturnInvoice();
+            isEditable($request->customer_id);
         }
         $invoice->date                 = $request->invoice_date;
         $invoice->invoice_no           = $request->invoice_no;
@@ -86,16 +90,14 @@ class PurchaseReturnController extends Controller
         $invoice->created_by           = Auth::id();
         if($invoice->save()){
             if(count($request->returns_product_array) > 0){
-                foreach($request->returns_product_array as $purchase_product){
-
-                    $new_ids[] = $purchase_product['product_id'];
-                    if ($purchase_product['purchase_prod_id'] > 0) {
+                foreach($request->returns_product_array as $purchase_product){ 
+                    if ($purchase_product['return_invoice_id'] > 0 && $purchase_product['return_invoice_id'] !=  "undefined") {
                         $purchased          =  ProductReturns::where('id', $purchase_product['return_invoice_id'])->first();
                     }else{
                         $purchased          =  new ProductReturns();
                     }
                     $purchased->purchase_price          = $purchase_product['purchased_price'];
-                    $purchased->return_invoice_id     = $invoice->id;
+                    $purchased->purchase_return_invoice_id     = $invoice->id;
                     $purchased->product_id              = $purchase_product['product_id'];
                     $purchased->vendor_id               = $request->customer_id;
                     $purchased->expiry_date             = $purchase_product['expiry_date'];
@@ -105,7 +107,7 @@ class PurchaseReturnController extends Controller
                     $purchased->product_discount        = $purchase_product['prod_discount'];
                     $purchased->sale_price              = $purchase_product['retail_price'];
                     $purchased->created_by              = Auth::id();
-                    $previous_qty = ProductReturns::where('return_invoice_id', $request->hidden_invoice_id)
+                    $previous_qty = ProductReturns::where('purchase_return_invoice_id', $request->hidden_invoice_id)
                                                     ->where('product_id', $purchased->product_id)
                                                     ->orderBy('id', 'Desc')
                                                     ->value('qty');
@@ -144,7 +146,7 @@ class PurchaseReturnController extends Controller
                     }
                 }
                 if ($request->hidden_invoice_id) {
-                    ProductReturns::where('return_invoice_id', $request->hidden_invoice_id)
+                    ProductReturns::where('purchase_return_invoice_id', $request->hidden_invoice_id)
                                     ->whereNotIn('id', $purchased_products_array)
                                     ->delete();
                 }
@@ -155,12 +157,12 @@ class PurchaseReturnController extends Controller
                     $balance =   0;
                 }
                 if($request->hidden_invoice_id){
-                    $customer_ledger   =  VendorLedger::where('return_invoice_id',$request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
+                    $customer_ledger   =  VendorLedger::where('purchase_return_invoice_id',$request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
                 }else{
                     $customer_ledger   =  new  VendorLedger();
                 }
                 $customer_ledger->date       = $request->invoice_date;
-                $customer_ledger->return_invoice_id= $invoice->id;
+                $customer_ledger->purchase_return_invoice_id= $invoice->id;
                 $customer_ledger->trx_type   =  2; //Rerurn inv
                 $customer_ledger->customer_id= $request->customer_id;
                 $customer_ledger->dr         = $total_dr;
@@ -199,7 +201,7 @@ class PurchaseReturnController extends Controller
             $v->qty         =   $return->qty;
             $v->balance     =   $balance - $v->qty;
         }
-        $v->return_invoice_id    =  $return->return_invoice_id;
+        $v->purchase_return_invoice_id =  $return->purchase_return_invoice_id;
         $v->product_unit_price   =  $return->purchase_price;
         $v->company_id           =  $return->company_id;
         $v->product_id           =  $return->product_id;
@@ -210,7 +212,7 @@ class PurchaseReturnController extends Controller
         return $v;
     }
     public function getVendorBalnce(Request $request,$id){
-        if ($request->segment == 'edit-purchase-return') {
+        if ($request->segment == 'purchase-return-edit') {
             $customer_count     =  VendorLedger::where('customer_id', $id)->count();
             if ($customer_count > 1) {
                 $customer_balance = VendorLedger::where('customer_id', $id)
@@ -272,4 +274,81 @@ class PurchaseReturnController extends Controller
                 }
         }
     }
+
+    public function list()
+    {   $current_date   =   date('Y-m-d');
+        $purchases      =   ReturnInvoice::selectRaw('
+                                                purchase_return_invoices.id ,
+                                                purchase_return_invoices.invoice_no ,
+                                                purchase_return_invoices.total_invoice_amount ,
+                                                purchase_return_invoices.is_editable ,
+                                                purchase_return_invoices.paid_amount ,
+                                                purchase_return_invoices.date ,
+                                                purchase_return_invoices.customer_id ,
+                                                purchase_return_invoices.created_at ,
+                                                purchase_return_invoices.paid_amount,
+                                                (SELECT customer_name FROM customers WHERE id=purchase_return_invoices.customer_id) as customer_name')
+                                            ->whereRaw("Date(created_at) = '$current_date'")
+                                            ->orderBy('id', 'DESC')
+                                            ->get(); 
+        return view('purchases.return.list', compact('purchases'));
+                                        
+    } 
+    public function edit($id){
+
+        $customers          =     Customer::where('customer_type', 1)->select('id', 'customer_name', 'balance')->get();
+        $products           =     Product::withoutTrashed()->get();
+        $invoice            =     ReturnInvoice::where('id',$id)->first();
+        $parts              =     explode('-', $invoice->invoice_no);
+        $invoice_first_part =     $parts[0];
+        $purchasd_products  =     ProductReturns::where('purchase_return_invoice_id', $id)
+                                                ->selectRaw('products_returns.*')
+                                                ->get();
+        $get_vendor_ledger  = VendorLedger::where('customer_id', $invoice->customer_id)
+                                            ->where('trx_type','=',1)
+                                            ->where('purchase_invoice_id', $invoice->id)
+                                            ->orderBy('id', 'DESC')->first();
+                    // dd($invoice->paid_amount);
+        return view('purchases.return.create',compact('invoice','customers','products','customers','get_vendor_ledger', 'invoice_first_part'));
+    }
+    public function getPurchaseReturnProduct($id){
+
+        $products       =   ProductReturns::where('products_returns.purchase_return_invoice_id',$id)
+                                    ->selectRaw('products_returns.*,
+                                    (SELECT product_name FROM products WHERE id=products_returns.product_id) as product_name,
+                                    (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=products_returns.product_id) as purchase_price,
+                                    (SELECT stock_balance FROM products WHERE id=products_returns.product_id) as stock_in_hand')->get();
+
+        return response()->json([
+            'msg'       => 'Vendor Fetched',
+            'status'    => 'success',
+            'products'  => $products
+        ]);
+    }
+    public function printInvoice($invoice_id, $customer_id, $received_amount){
+       
+        $invoiceId                  =   $invoice_id;
+        $customerId                 =   $customer_id;
+        $customer_balance           =   0;
+       
+        $invoice                    =   ReturnInvoice::where('id', $invoiceId)->where('customer_id', $customerId)
+                                                    ->selectRaw("purchase_return_invoices.*,
+                                                        (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name
+                                                        ")
+                                                    ->first();
+        $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
+
+        $products                   =   ProductReturns::where('purchase_return_invoice_id', $invoice_id)
+                                                    ->selectRaw("products_returns.*,
+                                                          (SELECT product_name FROM products WHERE id=products_returns.product_id) as product_name")
+                                                    ->get();
+        $ledgerCount      = VendorLedger::where('customer_id', $customerId)->count();
+        $customer_balance = 0;
+        if ($ledgerCount > 1) {
+            $customer_balance = VendorLedger::where('customer_id', $customerId) 
+                ->orderBy('id', 'DESC')->skip(1)->value('balance');
+        } 
+
+        return view('purchases.return.invoice', compact('invoice', 'products', 'customer_balance'));
+    } 
 }
