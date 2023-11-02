@@ -67,6 +67,7 @@ class ProductReplacementController extends Controller
         $invoice->product_return_total = $request->return_total;
         $invoice->product_net_total    = $request->product_net_total;
         $invoice->previous_receivable  = $request->previous_receivable;
+        $invoice->description          = $request->description;
         $invoice->is_editable          = 1;
         $invoice->status               = $request->status;
         $invoice->created_by           = Auth::id();

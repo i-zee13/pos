@@ -221,8 +221,7 @@
         background-color: #fff;
         -webkit-transition: all 0.15s;
         -moz-transition: all 0.15s;
-        transition: all 0.15s;
-        s
+        transition: all 0.15s; 
       }
 
       .h_dash a::before {
@@ -325,7 +324,7 @@
               <div class="col-3"><a href="{{route('stock-add')}}"><img src="{{asset('images/add-teacher.svg')}}" alt="" />
                   <h2 class="HD-title">Purchase <span class="f-light">Invoice</span></h2>
                 </a> </div>
-              <div class="col-3"><a href="{{route('purchase-return.index')}}"><img src="{{asset('images/add-students.svg')}}" alt="" />
+              <div class="col-3"><a href="{{route('ProductReplacement.create')}}"><img src="{{asset('images/add-students.svg')}}" alt="" />
                   <h2 class="HD-title">Replacement <span class="f-light">Purchases</span></h2>
                 </a> </div>
                 <div class="col-3"><a href="{{route('vendor-ledgers')}}"><img src="{{asset('images/enrollments-add.svg')}}" alt="" />

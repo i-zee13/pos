@@ -512,7 +512,7 @@ function saleSave(current_action, type) {
         $('#notifDiv').text('Added successfully');
         var received_amount = $('.amount_received').val().trim() > 0 ? $('.amount_received').val().trim() : 0;
         if (type == 'print') {
-          var printWindow = window.open("/print-purchasereturn-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
+          var printWindow = window.open("/print-purchase-return-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
           printWindow.onload = function () {
             printWindow.print();
           };
@@ -664,7 +664,7 @@ $('#customer_id').change(function () {
       success: function success(response) {
         previous_payable = response.customer_balance;
         $('#previous_receivable').val(previous_payable);
-        var previous_payable_text = previous_payable >= 0 ? previous_payable + " CR" : previous_payable < 0 ? -previous_payable + " DR" : previous_payable;
+        var previous_payable_text = previous_payable >= 0 ? previous_payable.toLocaleString('en-US') + " CR" : previous_payable < 0 ? -previous_payable.toLocaleString('en-US') + " DR" : previous_payable.toLocaleString('en-US');
         $('.previous_payable_heading').empty();
         $('.previous_payable_heading').text(previous_payable >= 0 ? 'Previous Receivable' : 'Previous Payable');
         $('.previous_payable').text(previous_payable_text);
@@ -710,7 +710,7 @@ function productRetailAmount() {
   retail_price = $('#retail_price').val();
   amount = qty * retail_price;
   // console.log(retail_price,qty)
-  $('#amount').val(amount.toLocaleString('en-US'));
+  $('#amount').val(amount);
 }
 $(document).on('input', '.amount_received', function () {
   if ($(this).val()) {

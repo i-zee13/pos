@@ -18124,7 +18124,7 @@ function productRetailAmount() {
 $(document).on('input', '.amount_received', function () {
   if ($(this).val()) {
     result = $(this).val() - $('.amount_pay_input').val();
-    $('.cash_return').text(result);
+    $('.cash_return_amount').text(result);
   }
 });
 $('.service_charges_input').on('input', function () {

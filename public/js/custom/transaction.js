@@ -188,6 +188,7 @@ $(document).ready(function () {
             console.log($('.voucher_no').val());
             $('.voucher_no').empty().val(response.voucher);
             closeSidebar();
+            location.reload();
             fetchLedgers();
             $('#saveTransaction').removeAttr('disabled').text('Save');
             $('#cancelSubCat').removeAttr('disabled');

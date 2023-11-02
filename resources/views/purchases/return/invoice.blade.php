@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{{$invoice->customer_name}} {{date('d-m-Y',strtotime($invoice->date))}} {{request()->segment(1) == 'print-sale-invoice' ? 'Return' : 'Sale'}} Invoice</title>
+    <title>{{$invoice->customer_name}} {{date('d-m-Y',strtotime($invoice->date))}} Purchase Return Invoice</title>
     <style>
         @media print {
             .page-break {
@@ -164,6 +164,20 @@
             font-size: 10px;
             color: #232323;
         }
+        #invoice-POS .bot-3-table .body-description-tr {
+            border-bottom: 1px solid #444444;
+            border-bottom-style: dashed;
+            color: #000000;
+        }
+
+        #invoice-POS .bot-3-table .body-description-tr .tableitem {
+            text-transform: uppercase;
+            width: 30mm;
+        }
+
+        #invoice-POS .bot-3-table .body-description-tr .other-des-td {
+            vertical-align: text-top;
+        }
     </style>
 </head>
 
@@ -177,7 +191,7 @@
         </center><!--End InvoiceTop-->
         <div id="mid">
             <div class="info">
-            {{request()->segment(1) == 'print-sale-invoice' ? 'Sale' : 'Sale Return'}} Invoice
+           Purchase Return Invoice
             </div>
         </div><!--End Invoice Mid--> 
         <div id="bot">
@@ -323,6 +337,17 @@
                     @endif
                 @endif
             </table>
+            @if($invoice->description)
+            <table class="bot-3-table w-50">
+                <tr class="tabletitle">
+                    <th>Remarks :</th>
+                </tr>
+                <tr class="body-description-tr">
+                    <td class=" tableitem">{{$invoice->description}}</td>
+                </tr>
+               
+            </table>
+            @endif
             <table class="footer">
                 <tr class="thankyou">
                     <td>Thank for your kind visit </td>

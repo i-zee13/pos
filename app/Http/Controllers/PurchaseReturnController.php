@@ -44,7 +44,7 @@ class PurchaseReturnController extends Controller
         $parts               =   explode('-', $invoice_no);
         $invoice_first_part  =   $parts[0];
         $current_date        =   Carbon::today()->toDateString();
-        $products            =   Product::selectRaw('products.*, (SELECT purchase_price FROM products_purchases WHERE product_id = products.id) as unit_price')
+        $products            =   Product::selectRaw('products.*, (SELECT purchase_price FROM products_purchases WHERE product_id = products.id LIMIT 1) as unit_price')
                                                                     ->where('stock_balance', '>', 0)
                                                                     ->get();
  

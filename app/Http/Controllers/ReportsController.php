@@ -246,7 +246,7 @@ class ReportsController extends Controller
                                              trx_type
                                           ")
                                           ->whereRaw("
-                                             DATE(created_at) = '$closing_date'
+                                             DATE(created_at) = '$closing_date' AND trx_type = 3   
                                           ")->get();
       
       $records                         =  new stdClass();

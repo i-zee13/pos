@@ -659,6 +659,16 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="form-wrap p-0">
+                                  <div class="row">
+                                      <div class="col-md-12 mt-5">
+                                          <label class="font13 mb-5">Description</label>
+                                          <div class="form-s2">
+                                              <textarea rows="4" name="description" id="description">{{@$invoice->description}}</textarea>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div> 
                                 <h2 class="title border-bottom">Invoice <span>Details</span></h2>
                                 <div class="row CompanyInfo">
                                     <div class="col-md-7 pr-0"><strong class="previous_payable_heading">Previous

@@ -11,7 +11,20 @@
                 page-break-before: always;
             }
         }
+        #invoice-POS .bot-3-table .body-description-tr {
+            border-bottom: 1px solid #444444;
+            border-bottom-style: dashed;
+            color: #000000;
+        }
 
+        #invoice-POS .bot-3-table .body-description-tr .tableitem {
+            text-transform: uppercase;
+            width: 30mm;
+        }
+
+        #invoice-POS .bot-3-table .body-description-tr .other-des-td {
+            vertical-align: text-top;
+        }
         body {
             margin: 0;
             padding: 0;
@@ -389,6 +402,17 @@
                 @endif
                 @endif
             </table>
+            @if($invoice->description)
+            <table class="bot-3-table w-50">
+                <tr class="tabletitle">
+                    <th>Remarks :</th>
+                </tr>
+                <tr class="body-description-tr">
+                    <td class=" tableitem">{{$invoice->description}}</td>
+                </tr>
+               
+            </table>
+            @endif
             <table class="footer">
                 <tr class="thankyou">
                     <td>Thank for your kind visit </td>

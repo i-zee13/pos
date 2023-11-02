@@ -245,8 +245,7 @@ $(document).ready(function() {
                 current_url:action,
             },
             success: function(response) {
-                if (response.status == "success") {
-
+                if (response.status == "success") { 
                     if($("#print-invoice").prop("checked")){
                         var zz = 0;
                         if(action == operation+'-ledger-jama') {
@@ -260,11 +259,12 @@ $(document).ready(function() {
                         };
                         location.reload();
                     }
-
+                  
                     $('#saveTransactionForm')[0].reset();
                     console.log($('.voucher_no').val())
                     $('.voucher_no').empty().val(response.voucher)
                     closeSidebar();
+                    location.reload();
                     fetchLedgers();
                     $('#saveTransaction').removeAttr('disabled').text('Save');
                     $('#cancelSubCat').removeAttr('disabled');

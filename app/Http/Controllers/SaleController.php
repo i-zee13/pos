@@ -84,6 +84,7 @@ class SaleController extends Controller
         $invoice->previous_receivable  = $request->previous_receivable;
         $invoice->is_editable          = 1;
         $invoice->status               = $request->invoice_type;
+        $invoice->description          = $request->description;
         $invoice->created_by           = Auth::id();
         if ($invoice->save()) {
             if (count($request->sales_product_array) > 0) {

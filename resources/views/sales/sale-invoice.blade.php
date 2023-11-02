@@ -164,6 +164,20 @@
             font-size: 10px;
             color: #232323;
         }
+        #invoice-POS .bot-3-table .body-description-tr {
+            border-bottom: 1px solid #444444;
+            border-bottom-style: dashed;
+            color: #000000;
+        }
+
+        #invoice-POS .bot-3-table .body-description-tr .tableitem {
+            text-transform: uppercase;
+            width: 30mm;
+        }
+
+        #invoice-POS .bot-3-table .body-description-tr .other-des-td {
+            vertical-align: text-top;
+        }
     </style>
 </head>
 
@@ -299,8 +313,7 @@
                         <td class="payable-heading">Cash Received :</td>
                         <td>{{number_format($invoice->amount_received)}}</td>
                     </tr>
-                    <?php
-                    dd($invoice->received_amount);
+                    <?php 
                         $difference = $invoice->total_invoice_amount - $invoice->received_amount;
                         // $difference = abs($difference);
                     ?>
@@ -321,6 +334,17 @@
                     @endif
                 @endif
             </table>
+            @if($invoice->description)
+            <table class="bot-3-table w-50">
+                <tr class="tabletitle">
+                    <th>Remarks :</th>
+                </tr>
+                <tr class="body-description-tr">
+                    <td class=" tableitem">{{$invoice->description}}</td>
+                </tr>
+               
+            </table>
+            @endif
             <table class="footer">
                 <tr class="thankyou">
                     <td>Thank for your kind visit </td>
