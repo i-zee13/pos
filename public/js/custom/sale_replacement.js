@@ -18034,7 +18034,7 @@ function grandSum() {
   grandtotal(new_sum - return_sum);
 }
 function grandtotal(sum) {
-  sum -= parseFloat(previous_payable);
+  sum += parseFloat(previous_payable);
   // previous_payable >= 0 ? sum -= parseFloat(previous_payable ? previous_payable : 0) : sum += parseFloat(previous_payable);
 
   sum += parseFloat(service_charges ? service_charges : 0);

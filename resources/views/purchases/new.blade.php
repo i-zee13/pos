@@ -6,6 +6,9 @@
      
     @section('content')
     <style>
+    .container{
+        max-width: 1370px;
+    }
        select:focus > option:checked { 
             background: #000 !important;
             }

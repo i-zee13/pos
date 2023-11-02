@@ -60,7 +60,7 @@
 
         #invoice-POS #top {
             /* Targets all id with 'col-' */
-            border-bottom: 1px solid #EEE;
+            border-bottom: 1px solid black;
             width: 74mm;
         }
 
@@ -110,7 +110,7 @@
         }
 
         #invoice-POS .bot-3-table .body-description-tr {
-            border-bottom: 1px solid #444444;
+            border-bottom: 2px solid black;
             border-bottom-style: dashed;
             color: #000000;
         }
@@ -147,13 +147,13 @@
         }
 
         #invoice-POS .footer {
-            border-top: 1px solid #1b1b1b;
+            border-top: 1px solid black;
             margin-top: 3mm;
             width: 76mm;
         }
 
         #invoice-POS .footer tr {
-            border-bottom: 1px solid #1b1b1b;
+            border-bottom: 1px solid black;
         }
 
         #invoice-POS .footer-copyright {
@@ -232,7 +232,7 @@
 
                 .bot-3-table td,
                 .bot-3-table th {
-                    border: 1px solid #ddd;
+                    border: 1px solid black;
                     padding: 8px;
                     text-align: left;
                 }
@@ -249,8 +249,8 @@
                     <th>Disc</th>
                     <th>Total</th>
                 </tr>
-                <tr class="in-table-title">
-                    <th colspan="6">IN</th>
+                <tr class="in-table-title"> 
+                    <th colspan="6"  style=" background-color: black;color: white;">IN</th>
                 </tr @foreach ($products as $key=> $item)
                 @if ($item->product_type == 1)
                 <tr class="body-description-tr">
@@ -268,7 +268,7 @@
             <!-- OUT Table -->
             <table class="bot-3-table">
                 <tr class="out-table-title">
-                    <th colspan="6">OUT</th>
+                    <th colspan="6"  style=" background-color: black;color: white;">OUT</th>
                 </tr>
                 @foreach ($products as $key => $item)
                 @if ($item->product_type == 2)

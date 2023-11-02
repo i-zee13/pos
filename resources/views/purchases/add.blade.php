@@ -86,6 +86,9 @@
       </div>
       @section('content')
       <style>
+      .container{
+        max-width: 1370px;
+    }
           select:focus>option:checked {
               background: #000 !important;
           }
@@ -669,7 +672,7 @@
 
                       </div>
                   </div>
-                  <div class="col-md-8 right-sid ebox" style="width:78%;">
+                  <div class="col-md-8 right-sid ebox" >
                       <div class="row">
                           <div class="col-6">
                               <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Purchase' : 'New'}} <span>Invoice</span></h2>

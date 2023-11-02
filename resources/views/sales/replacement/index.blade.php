@@ -13,12 +13,12 @@
                     </h6>
                     <!-- Title -->
                     <h1 class="header-title">
-                        <h2 class="_head01">Return <span>Management</span></h2>
+                        <h2 class="_head01">Replacement <span>Management</span></h2>
                     </h1>
                 </div>
                 <div class="col-auto">
                     <ol class="breadcrumb">
-                        <li><a href="#"><span>Return</span></a></li>
+                        <li><a href="#"><span>Replacement</span></a></li>
                         <li><span>Active</span></li>
                     </ol>
                 </div>
@@ -32,7 +32,7 @@
         <div class="card">
             <div class="header mb-0">
                 <!-- <a class="btn add_button openDataSidebarForAddingProduct"><i class="fa fa-plus"></i> New  Product</a> -->
-                <h2>Sale Returns List</h2>
+                <h2>Sale Replacement List</h2>
               <a href="{{route('ProductReplacement.create')}}" type="submit" class="btn btn-primary mr-2 add-replacement" style="font-size: 13px;padding: 6px 11px 4px 9px;margin-top: -10px; float: right;">Add New</a>
 
             </div>

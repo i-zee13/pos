@@ -600,7 +600,7 @@ function getProducts() {
     success: function success(response) {
       $("#products").append("<option value=\"0\">Select Product</option>");
       response.data.forEach(function (data) {
-        $("#products").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.product_name, "\">").concat(data.product_name, "</option>"));
+        $("#products").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.product_name, "\">").concat(data.id, "- ").concat(data.product_name, "</option>"));
         product_list.push(data);
       });
     }

@@ -710,7 +710,7 @@ function grandSum(previous_payable = 0, service_charges = 0, prod_type = 0) {
     grandtotal(new_sum - return_sum)
 }
 function grandtotal(sum) {
-    sum -= parseFloat(previous_payable)
+    sum += parseFloat(previous_payable)
     // previous_payable >= 0 ? sum -= parseFloat(previous_payable ? previous_payable : 0) : sum += parseFloat(previous_payable);
 
     sum += parseFloat(service_charges ? service_charges : 0);

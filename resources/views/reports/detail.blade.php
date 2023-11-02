@@ -565,7 +565,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-md-8 right-sid ebox" style="width:78%;">
+                  <div class="col-md-8 right-sid ebox" >
                       <div class="row">
                           <div class="col-6">
                               <h2 class="title font22 PT-10 mb-10">{{$invoice->customer_name}} <span>Invoice</span></h2>

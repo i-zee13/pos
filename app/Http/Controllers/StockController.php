@@ -20,7 +20,7 @@ class StockController extends Controller
         $invoice_first_part   = $parts[0];
         $current_date =   Carbon::today()->toDateString();
         $customers    =   Customer::all();
-        $products     =   Product::get('id');
+        $products     =   Product::get();
         return view('purchases.add',compact('customers','current_date','products','invoice_no','invoice_first_part'));
     }
     public function getProduct(Request $request){

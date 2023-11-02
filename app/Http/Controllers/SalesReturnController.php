@@ -37,7 +37,7 @@ class SalesReturnController extends Controller
         $customers           =   Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get(); 
         $products            =   Product::get(); 
         
-        return view('sales.return.create',compact('customers','current_date','invoice_first_part','products'));
+        return view('sales.return.create',compact('customers','current_date','invoice_first_part','products','invoice_no'));
     }
     public function updateStock($previous_qty, $sale, $balance, $vendor_id, $type)
     {

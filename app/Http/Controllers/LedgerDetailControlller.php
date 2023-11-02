@@ -6,12 +6,12 @@ use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\VendorLedger;
 use Illuminate\Http\Request; 
-use App\Invoice_helper;
+require app_path('Invoice_helper.php');
 
 class LedgerDetailControlller extends Controller
 {
    public function customerReport()
-   {
+   { 
       $vendors   =   Customer::where('customer_type', 2)->get();
       return view('reports.vendor', compact('vendors'));
    }
@@ -48,7 +48,7 @@ class LedgerDetailControlller extends Controller
       if ($label === 'sale_inv') { 
          $invoice     = getSaleInv($id);  
       }elseif ($label == 'sale_return_inv') {
-         $invoice     = getSaleReturnInv($id);
+         $invoice     = Invoice_helper::getSaleReturnInv($id);
       } else if ($label == 'purchase_inv') {
          $invoice     = getPurchaseInv($id);
       } elseif ($label == 'return_inv') {

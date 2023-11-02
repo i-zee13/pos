@@ -42,13 +42,13 @@ $('.search-btn').on('click', function () {
     }
     CurrentRef = $(this);
     CurrentRef.attr('disabled', 'disabled');
-    url = '/report-list';
+    url = '/report-list'; 
     $(`#search-form`).ajaxSubmit({
         type: 'POST',
         url: url,
         data: {
             _token: $('meta[name="csrf_token"]').attr('content'),
-            current_url: report_segments[3]
+            current_url: report_segments[3].replace(/[#?]+$/, '')
         },
         success: function (response) {
             CurrentRef.attr('disabled', false);
@@ -122,16 +122,16 @@ $('.search-btn').on('click', function () {
                 }
                 var formattedDate = `${date.toDateString()} ${formatAMPM(date)}`; 
                 if(flag){
-                    var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'] + ' DR' : element['balance'] + ' CR') : '0';
+                    var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
                 }else{
-                    var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'] + ' CR' : element['balance'] + ' DR') : '0';
+                    var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' CR' : element['balance'].toLocaleString('en-US') + ' DR') : '0';
                 }
                 $('.TeacherAttendanceListTable tbody').append(`
                     <tr>
                         <td>${formattedDate}</td>
                         <td>${label}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['cr'] ? element['cr'] : '0'}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['dr'] ? element['dr'] : '0'}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['cr'] ? element['cr'].toLocaleString('en-US') : '0'}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['dr'] ? element['dr'].toLocaleString('en-US') : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${ledger_bal}</td>
                         <td><a class="btn btn-default open-modal btn-line" 
                                 data-inv-id="${inv_id}"

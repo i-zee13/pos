@@ -36,6 +36,8 @@
         }
     }
 </style>
+<?php   
+$ledger_for  = request()->segment(1) == 'customer-reports' ? 'Customer' : 'Vendor' ;  ?>
  
     <div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
@@ -128,7 +130,7 @@
                         <div class="_cust_filter col-4">
                             <div class="form-s2">
                                 <select class="form-control formselect vendor_id" name="vendor_id">
-                                    <option value="">Select Vendor</option>
+                                    <option value="">Select {{$ledger_for}}</option>
                                     @foreach($vendors as $vendor)
                                     <option value="{{$vendor->id}}">{{$vendor->customer_name}}</option>
                                     @endforeach
@@ -154,7 +156,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="header m-0">
-                <h2>Customer <span>Ledger</span></h2>
+                <h2>{{$ledger_for}} <span>Ledger</span></h2>
             </div>
             <div style="min-height: 400px; display: none;" class="loader">
                 <img src="images/loading.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
@@ -162,7 +164,7 @@
             <div class="body teacher_attendance_list">
                 <div class="col-12 pb-10">
                     <div class="no-info">
-                        <div class="m-auto"><strong> Please Filter Your Ledger !</strong></div>
+                        <div class="m-auto"><strong> Please Filter Your {{$ledger_for}} Ledger !</strong></div>
                     </div>
                 </div>
             </div>

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{{$invoice->customer_name}} {{date('d-m-Y',strtotime($invoice->date))}} Return Invoice</title>
+    <title>{{$invoice->customer_name}} {{date('d-m-Y',strtotime($invoice->date))}} {{request()->segment(1) == 'print-sale-invoice' ? 'Return' : 'Sale'}} Invoice</title>
     <style>
         @media print {
             .page-break {
@@ -177,7 +177,7 @@
         </center><!--End InvoiceTop-->
         <div id="mid">
             <div class="info">
-            Return Invoice
+            {{request()->segment(1) == 'print-sale-invoice' ? 'Sale' : 'Sale Return'}} Invoice
             </div>
         </div><!--End Invoice Mid--> 
         <div id="bot">
@@ -207,23 +207,23 @@
                     <th>Total</th>
                 </tr>
                 @foreach ($products as $key=>$item) 
-              
                 <tr class="body-description-tr">
                     <td class="other-des-td">{{$key+1}}</td>
                     <td class="tableitem">{{$item->product_name}}</td>
                     <td class="other-des-td">{{$item->qty}}</td>
-                    <td class="other-des-td">{{$item->purchase_price}}</td>
-                    <td class="other-des-td">{{$item->product_discount}}</td>
-                    <td class="other-des-td">{{$item->product_return_total_amount}}</td>
+                    <td class="other-des-td">{{$item->sale_price}}</td>
+                    <td class="other-des-td">{{$item->product_discount}}</td>      
+                    <td class="other-des-td">{{$item->sale_total_amount ?? $item->return_total_amount}}</td>
+
                 </tr>
                 @endforeach
             </table>
-           
             <table class="bot-4-table">
                 <tr>
                     <td>T Item: {{count($products)}}</td>
                     <td>T Qty: {{collect($products)->sum('qty')}}</td>
-                    <td class="net-total">Net Total {{collect($products)->sum('product_return_total_amount')}}</td>
+                                       <td class="net-total">Net Total {{ request()->segment(1) == 'print-sale-invoice' ? collect($products)->sum('sale_total_amount') : collect($products)->sum('return_total_amount') }}</td>
+
                 </tr>
             </table>
             <table class="bot-5-table">
@@ -237,14 +237,14 @@
                     <td>{{number_format($invoice->invoice_discount)}}</td>
                 </tr>
               
-                @if(request()->segment(1) == 'print-purchase-return-invoice')
+                @if(request()->segment(1) == 'print-sale-invoice')
                     @if($invoice->invoice_type == 2)
                     <!-- <tr>
                         <td class="payable-heading">Previous Paid :</td>
                         <td>{{number_format($invoice->invoice_discount)}}</td>
                     </tr> -->
                     <tr>
-                        <td class="payable-heading">Previous {{$invoice->previous_receivable >= 0 ? 'Payable' : 'Receivable' }} :</td>
+                        <td class="payable-heading">Previous {{$invoice->previous_receivable >= 0 ? 'Receivable' : 'Payable' }} :</td>
                         <td>{{number_format($invoice->previous_receivable)}}</td>
                     </tr>
                     <!-- <tr>
@@ -252,7 +252,7 @@
                         <td>{{number_format($invoice->total_invoice_amount)}}</td>
                     </tr> -->
                     <tr>
-                        <td class="payable-heading">{{$invoice->previous_receivable > 0 ?  'Total Payable' : 'Total Receivable' }} :</td>
+                        <td class="payable-heading">Total Return :</td>
                         <td>{{number_format($invoice->invoice_remaining_amount_after_pay)}}</td>
                     </tr>
                     <tr>
@@ -264,7 +264,7 @@
                         // $difference = abs($difference);
                     ?>
                     <tr>
-                        <td class="payable-heading">{{$invoice->previous_receivable > 0 ? 'Remaining Payable'  : 'Remaining Receivable'}} :</td>
+                        <td class="payable-heading">{{$invoice->previous_receivable > 0 ? 'Remaining Receivable'  : 'Remaining Payable'}} :</td>
                         <td>{{number_format($invoice->invoice_remaining_amount_after_pay,2)}}</td>
                     </tr>
                     @else
@@ -278,14 +278,14 @@
                         </td>
                     </tr>
                     @endif
-                @else 
+                 @else 
                     @if($invoice->invoice_type == 2)
                     <!-- <tr>
                         <td class="payable-heading">Previous Paid :</td>
                         <td>{{number_format($invoice->invoice_discount)}}</td>
                     </tr> -->
                     <tr>
-                        <td class="payable-heading">Previous {{$customer_balance >= 0 ? 'Receivable' : 'Payable' }} :</td>
+                        <td class="payable-heading">Previous {{$invoice->previous_receivable >= 0 ? 'Receivable' : 'Payable' }} :</td>
                         <td>{{number_format($customer_balance)}}</td>
                     </tr>
                     <!-- <tr>
@@ -293,15 +293,17 @@
                         <td>{{number_format($invoice->total_invoice_amount)}}</td>
                     </tr> -->
                     <tr>
-                        <td class="payable-heading">Total Receivable :</td>
+                    <td class="payable-heading">Total Return :</td>
+
                         <td>{{number_format($invoice->total_invoice_amount)}}</td>
                     </tr>
                     <tr>
-                        <td class="payable-heading">Cash Paid :</td>
-                        <td>{{number_format($invoice->received_amount)}}</td>
+                        <td class="payable-heading">Cash Received :</td>
+                        <td>{{number_format($invoice->amount_received)}}</td>
                     </tr>
-                    <?php
-                        $difference = $invoice->total_invoice_amount - $invoice->received_amount;
+                    <?php 
+                       
+                        $difference = $invoice->previous_receivable - $invoice->total_invoice_amount ;
                         // $difference = abs($difference);
                     ?>
                     <tr>
@@ -310,8 +312,8 @@
                     </tr>
                     @else
                     <tr>
-                        <td class="payable-heading">Cash Paid :</td>
-                        <td>{{number_format($invoice->received_amount)}}</td>
+                        <td class="payable-heading">Cash Received :</td>
+                        <td>{{number_format($invoice->amount_received)}}</td>
                     </tr>
                     <tr>
                         <td class="payable-heading">Cash Return :</td>

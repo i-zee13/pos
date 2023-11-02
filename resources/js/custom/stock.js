@@ -559,7 +559,7 @@ function getProducts() {
         success: function (response) {
             $("#products").append(`<option value="0">Select Product</option>`)
             response.data.forEach(data => {
-                $("#products").append(`<option value="${data.id}" data-name="${data.product_name}">${data.product_name}</option>`)
+                $("#products").append(`<option value="${data.id}" data-name="${data.product_name}">${data.id}- ${data.product_name}</option>`)
                 product_list.push(data);
             });
         }

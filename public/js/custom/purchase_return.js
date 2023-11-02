@@ -695,7 +695,7 @@ function grandSum() {
   sum += parseFloat(service_charges ? service_charges : 0);
   sale_total_amount = sum - invoice_discount;
   setTimeout(function () {
-    $('.grand-total').text(sale_total_amount - $('.paid_amount').text());
+    $('.grand-total').text(sale_total_amount - $('.paid_amount').text()).toLocaleString('en-US');
     $('.amount_pay_input').val(sale_total_amount - $('.paid_amount').text());
   }, 500);
   if (parseFloat($('.amount_pay_input').val()) < 0) {
@@ -710,12 +710,12 @@ function productRetailAmount() {
   retail_price = $('#retail_price').val();
   amount = qty * retail_price;
   // console.log(retail_price,qty)
-  $('#amount').val(amount);
+  $('#amount').val(amount.toLocaleString('en-US'));
 }
 $(document).on('input', '.amount_received', function () {
   if ($(this).val()) {
     result = $(this).val() - $('.amount_pay_input').val();
-    $('.cash_return').text(result);
+    $('.cash_return').text(result.toLocaleString('en-US'));
   }
 });
 $('.service_charges_input').on('input', function () {
