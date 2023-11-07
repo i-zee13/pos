@@ -38,15 +38,13 @@ class ReportsController extends Controller
    {
       $select_expiry       =  "";
       $query_expiry        =  "";
-      $where               =  " DATE(vs.created_at) BETWEEN '$request->start_date' AND '$request->end_date' AND vs.transaction_type != 4";
+      $where               =  " vs.transaction_type != 4";
       $group_order_by      =   "ORDER BY vs.balance DESC";
       if (isset($request->company_id)) {
-         $query      = " vs.company_id =  $request->company_id AND $where";
-      }
-      else if (isset($request->product_id)) {
+         $query      = " vs.company_id =  $request->company_id AND $where"; 
+      } else if (isset($request->product_id)) {
          $query      = " vs.product_id = $request->product_id AND $where";
-      }
-      else if (isset($request->expiry)) {
+      } else if(isset($request->expiry)) {
          $current_date        =   date('Y-m-d');
          $dateTime            =   new DateTime($current_date);
          if($request->expiry == '1'){
@@ -62,9 +60,10 @@ class ReportsController extends Controller
                                  vs.product_id = pp.product_id 
                                  AND 
                                  pp.expiry_date BETWEEN '$current_date' AND '$expiry_limit_date'";
+       
       }else{
          $query      =  $where;
-      }
+      } 
       $records       =  DB::select("
                            SELECT 
                               vs.balance AS balance,
@@ -99,8 +98,7 @@ class ReportsController extends Controller
          'status'  =>   'success',
          'records' =>   $records
       ]);
-   }
-
+   } 
    public function allStockValueReport(){
       $companies  =   Company::select('id', 'company_name')->get();
       $products   =   Product::select('id', 'product_name')->get();
@@ -108,11 +106,12 @@ class ReportsController extends Controller
    }
    public function fetchStockValueReport(Request $request){
       if($request->filter_by_value == '2'){
-         $where            =  " DATE(vs.created_at) BETWEEN '$request->start_date' AND '$request->end_date' AND vs.transaction_type != 4 ";
+         // $where            =  " DATE(vs.created_at) BETWEEN '$request->start_date' AND '$request->end_date' AND vs.transaction_type != 4 ";
+         $where            =  "DATE(vs.created_at) <= '$request->end_date' AND vs.transaction_type != 4"; 
          $group_order_by   =   "GROUP BY vs.product_id ORDER BY vs.id DESC";
       }else{
-         $where            =  " DATE(vs.created_at) BETWEEN '$request->start_date' AND '$request->end_date' AND vs.transaction_type = 1 ";
-         $group_order_by   =   "";
+         $where            =  " DATE(vs.created_at) <= '$request->end_date' "; 
+         $group_order_by   =   "ORDER BY vs.id DESC";
       }
       if (isset($request->company_id)) {
          $query            = " vs.company_id =  $request->company_id AND $where";
@@ -150,14 +149,15 @@ class ReportsController extends Controller
                                  $query
                                  $group_order_by
                               ");
+                              dd($query,
+                              $group_order_by);
+                              
       return response()->json([
          'msg'     =>   'Stock reports list fetched',
          'status'  =>   'success',
          'records' =>   $records
       ]);
-   }
-
-   
+   } 
    //Sales Reports 
 
    public function saleReport(){

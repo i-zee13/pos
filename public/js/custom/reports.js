@@ -127,9 +127,9 @@ $('.search-btn').on('click', function () {
                     var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' CR' : element['balance'].toLocaleString('en-US') + ' DR') : '0';
                 }
                 $('.TeacherAttendanceListTable tbody').append(`
-                    <tr>
+                    <tr> 
                         <td>${formattedDate}</td>
-                        <td>${label}</td>
+                        <td>${key} - ${label}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['cr'] ? element['cr'].toLocaleString('en-US') : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['dr'] ? element['dr'].toLocaleString('en-US') : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${ledger_bal}</td>

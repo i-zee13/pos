@@ -643,10 +643,10 @@
                                 <div class="form-wrap p-0">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <label class="font13 mb-5">Select Customer</label>
+                                            <label class="font13 mb-5">Select Vendor</label>
                                             <div class="form-s2">
                                                 <select class="form-control formselect form_clear  "
-                                                    placeholder="Select Customer" name="customer_id" id="customer_id"
+                                                    placeholder="Select Vendor" name="customer_id" id="customer_id"
                                                     {{ @$invoice->customer_id ? 'disabled' : '' }}>
                                                     <option value="0">Select Customer</option>
                                                     @foreach ($customers as $customer)
@@ -684,7 +684,7 @@
                         <div class="row">
                             <div class="col-6">
                                 <h2 class="title font22 PT-10 mb-10">
-                                    {{ Route::currentRouteName() == 'sale-edit' ? 'Sale' : 'Return' }} <span>Invoice</span>
+                                   Purchase<span> Return Invoice</span>
                                 </h2>
                             </div>
                         </div>

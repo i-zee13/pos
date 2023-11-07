@@ -29,8 +29,9 @@ class LedgerDetailControlller extends Controller
 
       if ($request->current_url == 'vendor-reports') {
          $query      =  VendorLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
-      } else {
-         $query      =  CustomerLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
+      } else { 
+         $query = CustomerLedger::selectRaw('*, DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at')->whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
+         // $query      =  CustomerLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
       }
       return response()->json([
          'msg'       => 'Vendor reports list fetched',
@@ -48,7 +49,7 @@ class LedgerDetailControlller extends Controller
       if ($label === 'sale_inv') { 
          $invoice     = getSaleInv($id);  
       }elseif ($label == 'sale_return_inv') {
-         $invoice     = Invoice_helper::getSaleReturnInv($id);
+         $invoice     = getSaleReturnInv($id);
       } else if ($label == 'purchase_inv') {
          $invoice     = getPurchaseInv($id);
       } elseif ($label == 'return_inv') {

@@ -157,7 +157,7 @@ class ProductReplacementController extends Controller
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
                 $customer_ledger->trx_type    = 1;  //Sale
-                $customer_ledger->dr          = $invoice->total_invoice_amount;
+                $customer_ledger->dr          = $invoice->total_invoice_amount -  $balance;
                 $customer_ledger->balance     = ($invoice->total_invoice_amount - $customer_ledger->cr); //balance
                 $customer_ledger->created_by  = Auth::id();
                 $customer_ledger->product_replacement_invoice_id = $invoice->id;

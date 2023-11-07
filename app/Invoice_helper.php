@@ -97,7 +97,6 @@ if (!function_exists('getPurchaseInv')) {
             $invoice->invoice_products  =    ProductPurchase::where('purchase_invoice_id', $id)
                                                     ->selectRaw('products_purchases.*, 
                                                         (SELECT product_name FROM products WHERE id = products_purchases.product_id) as product_name')
-
                                                     ->get();  
                 return $invoice;
     }

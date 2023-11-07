@@ -589,7 +589,7 @@
                 <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
 
                 <input type="hidden" id="" value="1" name="form_status">
-                <input type="hidden" id="stock_products"   value="{{json_encode($products)}}">
+                <input type="hidden" id="stock_products" value="{{json_encode($products)}}">
                 <div class="col-md-4 left-sidebox">
                     <div class="sidebox-content">
                         <div class="CT_sec">
@@ -637,15 +637,15 @@
                                 </div>
                             </div>
                             <div class="form-wrap p-0">
-                                  <div class="row">
-                                      <div class="col-md-12 mt-5">
-                                          <label class="font13 mb-5">Description</label>
-                                          <div class="form-s2">
-                                              <textarea rows="4" name="description" id="description">{{@$invoice->description}}</textarea>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div> 
+                                <div class="row">
+                                    <div class="col-md-12 mt-5">
+                                        <label class="font13 mb-5">Description</label>
+                                        <div class="form-s2">
+                                            <textarea rows="4" name="description" id="description">{{@$invoice->description}}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <h2 class="title border-bottom">Invoice <span>Details</span></h2>
                             <div class="row CompanyInfo">
                                 <!-- <div class="col-md-7 pr-0"><strong>Old Recived:</strong> </div>
@@ -736,9 +736,9 @@
                 <div class="col-md-8 right-sid ebox">
 
                     <div class="row">
-                        <div class="col-6">
-                            <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'sale-edit' ? 'Sale' : 'Return'}} <span>Invoice</span></h2>
-                        </div>
+                        <h2 class="title font22 PT-10 mb-10">
+                            Sale<span> Return Invoice</span>
+                        </h2>
 
                         <!-- <div class="col p-0 text-right">
                     <select class="custom-select custom-select-sm custom-select-cs" id="currencySelector">
@@ -880,102 +880,102 @@
                         <div class="col-12"><button id="productlist01" class="btn add-product-line list-customer-products"><i class="fa fa-plus"> </i> Add a Product</button></div>
                     </div> -->
 
-                        
-                    <div class="row">
-                              <div class="col-12">
-                                  <table class="totalValues" width="100%" border="0" cellspacing="0" cellpadding="0">
-                                      <tbody>
-                                          <tr class="th-to-hide">
-                                              <td></td>
-                                              <td></td>
-                                              <td align="right">Net Total</td>
 
-                                              <td> <input type="number" class="inputvalue product_net_total" name="product_net_total" style="font-size: 13px" placeholder="0.00" readonly></td>
-                                          </tr>
-                                          <tr class="th-to-hide">
-                                              <td></td>
-                                              <td></td>
-                                              <td align="right">Service charges </td>
-                                              <td style="width:112px"><input type="number" name="discount" id="discount" class="inputvalue service_charges_input" style="font-size: 13px" value="{{@$invoice->service_charges}}" placeholder="0.00" data-id="" data-value="" min="0"></td>
-                                          </tr>
-                                          <tr class="previous_payable_tr" style="display:none">
-                                              <td></td>
-                                              <td></td>
-                                              <td align="right" class="previous_payable_heading">Previous Receivable</td>
-                                              <td class="{{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '0' }}</td>
-                                          </tr>
+                        <div class="row">
+                            <div class="col-12">
+                                <table class="totalValues" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                        <tr class="th-to-hide">
+                                            <td></td>
+                                            <td></td>
+                                            <td align="right">Net Total</td>
 
-                                          <tr class="th-to-hide">
-                                              <td></td>
-                                              <td></td>
-                                              <td align="right">Disscount</td>
-                                              <td> <input type="number" class="inputvalue " id="invoice_discount" name="invoice_discount" style="font-size: 13px" placeholder="0.00" min="0" value="{{@$invoice->invoice_discount}}"></td>
+                                            <td> <input type="number" class="inputvalue product_net_total" name="product_net_total" style="font-size: 13px" placeholder="0.00" readonly></td>
+                                        </tr>
+                                        <tr class="th-to-hide">
+                                            <td></td>
+                                            <td></td>
+                                            <td align="right">Service charges </td>
+                                            <td style="width:112px"><input type="number" name="discount" id="discount" class="inputvalue service_charges_input" style="font-size: 13px" value="{{@$invoice->service_charges}}" placeholder="0.00" data-id="" data-value="" min="0"></td>
+                                        </tr>
+                                        <tr class="previous_payable_tr" style="display:none">
+                                            <td></td>
+                                            <td></td>
+                                            <td align="right" class="previous_payable_heading">Previous Receivable</td>
+                                            <td class="{{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '0' }}</td>
+                                        </tr>
 
-                                          </tr>
-                                          <tr class="th-to-hide">
-                                              <td></td>
-                                              <td></td>
-                                              <td align="right">Net Amount</td>
+                                        <tr class="th-to-hide">
+                                            <td></td>
+                                            <td></td>
+                                            <td align="right">Disscount</td>
+                                            <td> <input type="number" class="inputvalue " id="invoice_discount" name="invoice_discount" style="font-size: 13px" placeholder="0.00" min="0" value="{{@$invoice->invoice_discount}}"></td>
 
-                                              <td>
-                                                  @if(request()->query('invoice') == 'detail')
-                                                  {{$invoice->invoice_remaining_amount_after_pay}}
-                                                  @else
-                                                  <input type="number" class="inputvalue  remaning_amount amount_pay_input " id="amount_ to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly value="{{@$invoice->paid_amount}}">
-                                                  @endif
-                                              </td>
-                                          </tr>
+                                        </tr>
+                                        <tr class="th-to-hide">
+                                            <td></td>
+                                            <td></td>
+                                            <td align="right">Net Amount</td>
 
-                                          <tr>
-                                              <td></td>
-                                              <td></td>
-                                              <td align="right" class="cash-return">Cash To Pay </td>
-                                              <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00"  value="{{@$invoice->paid_amount}}"></td>
-                                          </tr>
+                                            <td>
+                                                @if(request()->query('invoice') == 'detail')
+                                                {{$invoice->invoice_remaining_amount_after_pay}}
+                                                @else
+                                                <input type="number" class="inputvalue  remaning_amount amount_pay_input " id="amount_ to_pay" name="amount_to_pay" style="font-size: 13px" placeholder="0.00" readonly value="{{@$invoice->paid_amount}}">
+                                                @endif
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td align="right" class="cash-return">Cash To Pay </td>
+                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" value="{{@$invoice->paid_amount}}"></td>
+                                        </tr>
 
 
-                                          <tr class="cash_return_tr" style="display:none">
-                                              <td></td>
-                                              <td></td>
-                                              <td align="right">Cash Return</td>
-                                              <td class="cash_return">{{@$invoice->cash_return}}</td>
-                                          </tr>
+                                        <tr class="cash_return_tr" style="display:none">
+                                            <td></td>
+                                            <td></td>
+                                            <td align="right">Cash Return</td>
+                                            <td class="cash_return">{{@$invoice->cash_return}}</td>
+                                        </tr>
 
-                                          @if (Route::currentRouteName() == 'purchase-edit')
+                                        @if (Route::currentRouteName() == 'purchase-edit')
 
-                                          <tr class="th-to-hide" hidden>
-                                              <td></td>
-                                              <td></td>
-                                              <td align="right">Paid</td>
-                                              <td class="paid_amount">{{@$invoice->paid_amount ? @$invoice->paid_amount : 0 }}</td>
-                                          </tr>
-                                          @endif
-                                          <tr>
-                                              <td></td>
-                                              <td></td>
-                                              <td></td>
-                                              <td></td>
-                                          </tr>
-                                          <tr style="border:solid 1px #dbdbdb">
-                                              <td class="font18" align="right">Grand Total:</td>
-                                              <td class="totalNo" align="right">
-                                                  <!-- <span id="total_ctn">0</span><small>CTNS</small> -->
-                                              </td>
-                                              <td class="totalNo" align="right"></td>
-                                              <td class="totalNo" align="right"><small>Pkr.</small>
-                                                  @if(request()->query('invoice') == 'detail')
-                                                  <span>{{$invoice->invoice_remaining_amount_after_pay}}</span>
-                                                  @else
-                                                  <span class="grand-total">0</span>
-                                                  @endif
-                                              </td>
+                                        <tr class="th-to-hide" hidden>
+                                            <td></td>
+                                            <td></td>
+                                            <td align="right">Paid</td>
+                                            <td class="paid_amount">{{@$invoice->paid_amount ? @$invoice->paid_amount : 0 }}</td>
+                                        </tr>
+                                        @endif
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr style="border:solid 1px #dbdbdb">
+                                            <td class="font18" align="right">Grand Total:</td>
+                                            <td class="totalNo" align="right">
+                                                <!-- <span id="total_ctn">0</span><small>CTNS</small> -->
+                                            </td>
+                                            <td class="totalNo" align="right"></td>
+                                            <td class="totalNo" align="right"><small>Pkr.</small>
+                                                @if(request()->query('invoice') == 'detail')
+                                                <span>{{$invoice->invoice_remaining_amount_after_pay}}</span>
+                                                @else
+                                                <span class="grand-total">0</span>
+                                                @endif
+                                            </td>
 
-                                          </tr>
-                                      </tbody>
-                                  </table>
+                                        </tr>
+                                    </tbody>
+                                </table>
 
-                              </div>
-                          </div>
+                            </div>
+                        </div>
 
                         <!-- <div class="row _notesTER">
                         <div class="col-md-6">

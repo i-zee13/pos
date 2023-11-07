@@ -70,8 +70,7 @@ class StockController extends Controller
         $v->save();
         return $v;
     }
-     Public function purchaseInvoice(Request $request){
-       
+     Public function purchaseInvoice(Request $request){ 
         if($request->hidden_invoice_id){ 
             $invoice = PurchaseInvoice::where('id',$request->hidden_invoice_id)->first();
         }else{
@@ -200,7 +199,7 @@ class StockController extends Controller
                 $customer_ledger->purchase_invoice_id= $invoice->id;
                 $customer_ledger->trx_type   = 1 ; //Purchase inc
                 $customer_ledger->customer_id= $request->customer_id;
-                $customer_ledger->cr         = $invoice->total_invoice_amount;
+                $customer_ledger->cr         = $invoice->total_invoice_amount - $balance;
                 $customer_ledger->dr         = $invoice->paid_amount;
                 $customer_ledger->balance    = $invoice->total_invoice_amount- $request->amount_received; //+balance
 
@@ -282,9 +281,10 @@ class StockController extends Controller
         if($request->segment == 'purchase-edit'){
             $customer_count     =  VendorLedger::where('customer_id',$id)->count();
            if($customer_count > 1){
-               $customer_balance = VendorLedger::where('customer_id',$id)
-                                                ->where('created_at','!=',Carbon::today()->toDateString())
-                                                ->orderBy('id', 'DESC')->value('balance');
+            $customer_balance = VendorLedger::where('customer_id', $id)
+                            ->whereDate('date', '!=', Carbon::today())
+                            ->orderBy('id', 'DESC')
+                            ->value('balance');
            }else{
                 $customer_balance = 0;
            }

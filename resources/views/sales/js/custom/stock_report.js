@@ -60,15 +60,6 @@ let segments = location.href.split('/');
                 </tbody>
                 </table>`);
             $('.TeacherAttendanceListTable tbody').empty();
-            if(response.stocks.length == 0){
-                $('#notifDiv').fadeIn();
-                $('#notifDiv').css('background', 'green');
-                $('#notifDiv').text('No data available');
-                setTimeout(() => {
-                    $('#notifDiv').fadeOut();
-                }, 3000);
-            }
-          
             response.stocks.forEach((element, key) => { 
                 console.log(element.expire_date)
                 var date = new Date(element.expire_date);
@@ -80,10 +71,7 @@ let segments = location.href.split('/');
                         <td>${element['product_name'] }</td>
                         <td>${date.toDateString()}</td>
                         <td>${element['stock_count']   ? element['stock_count']   : 'N/A'}</td> 
-                        <td>${element['p_price'] }</td> 
-
-
-                         
+                        <td>${element['p_price'] }</td>  
                     </tr>`);
             });
             $('.TeacherAttendanceListTable').fadeIn();

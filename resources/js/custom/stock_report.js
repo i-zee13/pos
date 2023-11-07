@@ -30,7 +30,7 @@ let segments = location.href.split('/');
         return
     }
     CurrentRef = $(this);
-    CurrentRef.attr('disabled', 'disabled');
+    // CurrentRef.attr('disabled', 'disabled');
      url = '/stocks';
      $(`#search-form`).ajaxSubmit({
          type: 'POST',
@@ -51,16 +51,17 @@ let segments = location.href.split('/');
                             <th>#</th>
                             <th>Company Name</th>
                             <th>Product Name</th>
+                            <th>Purchase Price</th>  
                             <th>Expire Date</th> 
                             <th>Qty</th> 
-                            <th>Purchase Price</th>  
+                            <th>Balance</th> 
 
                         </tr>
                     </thead><tbody>
                 </tbody>
                 </table>`);
             $('.TeacherAttendanceListTable tbody').empty();
-            if(response.stocks.length == 0){
+            if(response.records.length == 0){
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'green');
                 $('#notifDiv').text('No data available');
@@ -69,7 +70,7 @@ let segments = location.href.split('/');
                 }, 3000);
             }
           
-            response.stocks.forEach((element, key) => { 
+            response.records.forEach((element, key) => { 
                 console.log(element.expire_date)
                 var date = new Date(element.expire_date);
                 var formattedDate = date.toDateString();
@@ -78,24 +79,20 @@ let segments = location.href.split('/');
                         <td>${key+1}</td>
                         <td>${element['company_name'] }</td>
                         <td>${element['product_name'] }</td>
-                        <td>${date.toDateString()}</td>
-                        <td>${element['stock_count']   ? element['stock_count']   : 'N/A'}</td> 
                         <td>${element['p_price'] }</td> 
-
-
-                         
+                        <td>${date.toDateString()}</td>
+                        <td>${element['qty']   ? element['qty']   : 'N/A'}</td> 
+                        <td>${element['balance']}</td> 
                     </tr>`);
             });
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
            var title = '';
            if(segments[3] == 'customer-reports'){
-            title = 'Customer Report'
-        }else{
-            title = 'Vendor Report'
-
-            
-        }
+                title = 'Customer Report'
+            }else{
+                title = 'Vendor Report'
+            }
             
     if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
         $('.TeacherAttendanceListTable').DataTable().clear().destroy();

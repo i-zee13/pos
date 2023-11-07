@@ -1,5 +1,7 @@
 jin s leny wo DR  jin ko deny wo CR
-  
+
+ git archive --format=zip -o zee.zip HEAD $(git diff --name-only 285e08ce4aeedf55daa865661cc55b3d12ac3252) 
+
 
 TRUNCATE `purchase_invoices` ; 
 TRUNCATE `products_purchases` ;
