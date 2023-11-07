@@ -148,10 +148,7 @@ class ReportsController extends Controller
                                  WHERE
                                  $query
                                  $group_order_by
-                              ");
-                              dd($query,
-                              $group_order_by);
-                              
+                              "); 
       return response()->json([
          'msg'     =>   'Stock reports list fetched',
          'status'  =>   'success',
