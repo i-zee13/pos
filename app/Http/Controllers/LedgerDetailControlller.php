@@ -30,7 +30,7 @@ class LedgerDetailControlller extends Controller
       if ($request->current_url == 'vendor-reports') {
          $query      =  VendorLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
       } else { 
-         $query = CustomerLedger::selectRaw('*, DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at')->whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
+         $query = CustomerLedger::selectRaw('*, DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at')->whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'ASC')->get();
          // $query      =  CustomerLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
       }
       return response()->json([
@@ -41,8 +41,8 @@ class LedgerDetailControlller extends Controller
    }
    public function ledgerDetail($id)
    {
-      $url = request()->url();
-      $parts = explode('/', $url);
+      $url     = request()->url();
+      $parts   = explode('/', $url);
       $lastParameter = end($parts);
 
       $label = str_replace([' ', '%20'], '_', strtolower($lastParameter)); 
@@ -55,8 +55,7 @@ class LedgerDetailControlller extends Controller
       } elseif ($label == 'return_inv') {
          $invoice     = getPurchaseReturnInv($id);
       } elseif ($label == 'product_replacement_inv') {
-         $invoice     = getProductReplacementInv($id);  
-       
+         $invoice     = getProductReplacementInv($id); 
          return view('reports.replacement-detail',compact('invoice'));
        } 
       return view('reports.detail',compact('invoice'));

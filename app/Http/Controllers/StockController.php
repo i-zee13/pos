@@ -71,6 +71,7 @@ class StockController extends Controller
         return $v;
     }
      Public function purchaseInvoice(Request $request){ 
+    
         if($request->hidden_invoice_id){ 
             $invoice = PurchaseInvoice::where('id',$request->hidden_invoice_id)->first();
         }else{

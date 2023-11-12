@@ -129,7 +129,7 @@ $('.search-btn').on('click', function () {
                 $('.TeacherAttendanceListTable tbody').append(`
                     <tr> 
                         <td>${formattedDate}</td>
-                        <td>${key} - ${label}</td>
+                        <td>${label}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['cr'] ? element['cr'].toLocaleString('en-US') : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['dr'] ? element['dr'].toLocaleString('en-US') : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${ledger_bal}</td>

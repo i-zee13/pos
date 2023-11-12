@@ -21,6 +21,7 @@ function SaleCloseRecord(close_date){
     $.ajax({
         url     :   `/sale-close-record/${close_date}`,
         success :   function(response){
+            console.log(response.records)
             var records                 =   response.records;
             var saleRecords             =   records.saleRecords;
             var vendor_ledger           =   records.vendor_payment;

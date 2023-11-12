@@ -301,6 +301,7 @@ $('#add-product').on('click', function () {
       expiry_date = $('.expiry_date').val();
     }
     var prod_discount = $('.discount').val();
+    sale_price = $('#new_sale_price').val();
     purchased_product_array.push({
       'prod_discount': prod_discount ? prod_discount : 0,
       'purchase_prod_id': "",

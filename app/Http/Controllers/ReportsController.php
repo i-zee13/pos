@@ -210,7 +210,7 @@ class ReportsController extends Controller
                               LEFT JOIN sale_invoices si ON si.id = ps.sale_invoice_id 
                               LEFT JOIN products pr ON pr.id = ps.product_id 
                               LEFT JOIN companies co ON co.id = ps.company_id 
-                              WHERE 
+                              WHERE invoice_type = 1 AND
                               $query
                               ORDER BY si.invoice_no DESC
                         ");

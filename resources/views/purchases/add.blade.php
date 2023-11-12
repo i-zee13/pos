@@ -759,7 +759,7 @@
                                               </td>
                                               <td><input type="number" style="font-size: 13px; width: 60;" readonly id="purchase_price" class="inputSale purchase_price" placeholder="" name="purchase_price"  ></td>
                                               <td> <input type="number" id="new_purchase_price" class="inputSale" placeholder="" name="new_purchase_price " tabindex="3" style=" width: 60;" min="0"></td>
-                                              <td> <input type="number" id="hi" class="inputSale" placeholder="" name="new_sale_price " tabindex="4" style=" width: 60;" min="0"></td>
+                                              <td> <input type="number" id="new_sale_price" class="inputSale" placeholder="" name="new_sale_price " tabindex="4" style=" width: 60;" min="0"></td>
                                               <td> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="5" style=" width: 95;"></td>
                                               <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="6" min="0" style=" width: 45;"></td>
 

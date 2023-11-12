@@ -97,6 +97,13 @@
         .select2 {
             width: 100% !important;
         }
+
+        .loader{
+            display: block;
+            -webkit-user-select: none;
+            margin: auto;
+            background-color: hsl(0, 0%, 90%);
+        }
     </style>
     <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('/css/jquery.steps.css')}}" rel="stylesheet">
@@ -111,17 +118,18 @@
     <!-- Title -->
     <title>Store</title>
 </head>
+
 <body style="display: block;">
-    @php $close_routes  = closeRoute() @endphp
-    @php $is_close      = isClose() @endphp
+    @php $close_routes = closeRoute() @endphp
+    @php $is_close = isClose() @endphp
     <div id="notifDiv">
     </div>
 
-    @if(request()->segment(1) != 'stock-add'  && request()->segment(1) != 'purchase-edit'  &&  request()->segment(1) != 'sale-add' 
-        && request()->segment(1) != 'sale-edit'  && request()->segment(1) != 'sale-return'  && request()->segment(1) != 'add-return'  
-        && request()->segment(1) != 'edit-sale-return' && request()->segment(1) != 'product-replacement-create' && request()->segment(1) != 'product-replacement-edit'
-        && request()->segment(1) != 'detail' && request()->segment(1) != 'purchase-return-edit')
-            @include('layouts.sidebar-menu')
+    @if(request()->segment(1) != 'stock-add' && request()->segment(1) != 'purchase-edit' && request()->segment(1) != 'sale-add'
+    && request()->segment(1) != 'sale-edit' && request()->segment(1) != 'sale-return' && request()->segment(1) != 'add-return'
+    && request()->segment(1) != 'edit-sale-return' && request()->segment(1) != 'product-replacement-create' && request()->segment(1) != 'product-replacement-edit'
+    && request()->segment(1) != 'detail' && request()->segment(1) != 'purchase-return-edit')
+    @include('layouts.sidebar-menu')
     @endif
 
 
@@ -171,13 +179,13 @@
     <script>
         let dateFormat = "yyyy-mm-dd";
         var segments = location.href.split('/');
-         var action = segments[3];
+        var action = segments[3];
         $(document).ready(function() {
             $("#contentContainerDiv").removeClass("blur-div");
             $('.dropify').dropify();
             $(".formselect").select2();
             $('#example').DataTable({
-                "bSort" : false
+                "bSort": false
             });
 
             $(".form-control").on("focus blur", function(e) {
@@ -212,8 +220,8 @@
         $(document).on('input', '.only_alphabets', function() {
             this.value = this.value.replace(/[^a-z]/gi, '');
         })
-        $(document).on('input', '.only_decimal_numerics', function () {
-            this.value = this.value.replace(/[^0-9.:]|(\.[0-9]{10,})/g,'');
+        $(document).on('input', '.only_decimal_numerics', function() {
+            this.value = this.value.replace(/[^0-9.:]|(\.[0-9]{10,})/g, '');
         })
         $('#productlist01').click(function() {
             if ($('#product-cl-sec').hasClass('active')) {
@@ -236,8 +244,8 @@
             // alert($(window).width());
             closeSubNav();
         });
-        if(action != 'customer-ledger-jama' && action != 'customer-ledger-banam' && action != 'vendor-ledger-jama' && action != 'vendor-ledger-banam'  ){
-            $(document).on("click", "#SN-close, .overlay-for-sidebar", function () {
+        if (action != 'customer-ledger-jama' && action != 'customer-ledger-banam' && action != 'vendor-ledger-jama' && action != 'vendor-ledger-banam') {
+            $(document).on("click", "#SN-close, .overlay-for-sidebar", function() {
                 closeSidebar();
             });
         }
@@ -270,12 +278,12 @@
             $(".overlay-for-sidebar").css("display", "block");
         }
         $('#datepicker,.datepicker , #datepicker2').datepicker({
-            autoclose: true,
-            todayHighlight: true,
-            toggleActive: true,
-            format: dateFormat
-        })
-            .on('changeDate', function (ev) {
+                autoclose: true,
+                todayHighlight: true,
+                toggleActive: true,
+                format: dateFormat
+            })
+            .on('changeDate', function(ev) {
                 $(this).datepicker('hide');
             });
     </script>
@@ -289,21 +297,21 @@
     <script src="{{asset('js/custom/master.js')}}"> </script>
     @endpush
     <script>
-            var is_close        =   '{!! $is_close !!}';
-            if(is_close == 1){
-                let page_route  =   location.href.split('/'); 
-                var close_routes=   JSON.parse('{!! json_encode($close_routes) !!}');
-                for (var key in close_routes) {
-                    if (close_routes.hasOwnProperty(key)) {
-                        var value   =   close_routes[key];
-                        $(`.${key}`).hide().attr('disabled',true);
-                        if(page_route[3] == value){
-                            alert("Can't access because sale is close");
-                            window.location.href = "/home";
-                        }
+        var is_close = '{!! $is_close !!}';
+        if (is_close == 1) {
+            let page_route = location.href.split('/');
+            var close_routes = JSON.parse('{!! json_encode($close_routes) !!}');
+            for (var key in close_routes) {
+                if (close_routes.hasOwnProperty(key)) {
+                    var value = close_routes[key];
+                    $(`.${key}`).hide().attr('disabled', true);
+                    if (page_route[3] == value) {
+                        alert("Can't access because sale is close");
+                        window.location.href = "/home";
                     }
                 }
             }
+        }
     </script>
 </body>
 

@@ -229,6 +229,7 @@ $('#add-product').on('click', function () {
             expiry_date   = $('.expiry_date').val();
         }
         var prod_discount = $('.discount').val();
+        sale_price = $('#new_sale_price').val(); 
         purchased_product_array.push({
             'prod_discount'     : prod_discount ? prod_discount : 0,
             'purchase_prod_id'  : ``,
@@ -664,7 +665,7 @@ $('.products').change(function () {
         p_name          = filter_product[0].product_name;
         product_id      = filter_product[0].id;
         stock_in_hand   = filter_product[0].stock_balance; 
-        sale_price   = filter_product[0].sale_price; 
+        sale_price      = filter_product[0].sale_price; 
 
         $('#new_sale_price').val(filter_product[0].sale_price) 
         $('#expiry_date').val(filter_product[0].expiry_date)
