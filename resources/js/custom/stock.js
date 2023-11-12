@@ -291,7 +291,7 @@ $('#add-product').on('click', function () {
     data_variable   = '';
     $('.retail_price').text(0.0);
     $('.pp').text(0.0);
-
+    $('.new_sale_price').val('');
     $('.stock_balance').text(0);
     // $('#purchse-form')[0].reset();
 })

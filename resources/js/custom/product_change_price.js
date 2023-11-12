@@ -44,6 +44,7 @@ function ProductTable(filtered_Array) {
                     <th>Profit</th>
                     <th>Action</th>
                 </tr>
+                
             </thead>
             <tbody></tbody>
         </table>
