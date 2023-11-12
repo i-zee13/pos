@@ -128,8 +128,8 @@ public function getCompanyProducts(Request $request)
 {
     $companyId = $request->input('company_id');
     $products = Product::where('company_id', $companyId)
-    ->select('id', 'product_name', 'sale_price', 'new_purchase_price', 'old_purchase_price')
-    ->get();
+                        ->select('id', 'product_name', 'sale_price', 'new_purchase_price', 'old_purchase_price')
+                        ->get();
     return response()->json(['products' => $products]);
 }
 

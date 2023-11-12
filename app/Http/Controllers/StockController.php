@@ -71,7 +71,6 @@ class StockController extends Controller
         return $v;
     }
      Public function purchaseInvoice(Request $request){ 
-    dd($request->all());
         if($request->hidden_invoice_id){ 
             $invoice = PurchaseInvoice::where('id',$request->hidden_invoice_id)->first();
         }else{
@@ -109,8 +108,7 @@ class StockController extends Controller
                         $purchased          =  new ProductPurchase();
                     }
 
-                    if($purchase_product['new_price'] != ''){
-
+                    if($purchase_product['new_price'] != ''){ 
                         $purchased->purchase_price  = $purchase_product['new_price'];
                     }else{
                         $purchased->purchase_price  = $purchase_product['old_price'];

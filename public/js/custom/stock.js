@@ -734,7 +734,7 @@ $(document).on('input', '.price-input', function () {
       data.qty = current_product_qty;
       new_amount_of_sale_product = current_product_qty * retail_price;
       data.amount = new_amount_of_sale_product - data.prod_discount;
-      data.retail_price = retail_price;
+      data.new_price = retail_price;
       getStockRetail(data.product_id);
       $(".purchase-product-amount".concat(current_product_id)).text(data.amount);
       grandSum(previous_payable, service_charges);

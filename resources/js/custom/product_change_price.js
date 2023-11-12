@@ -44,13 +44,13 @@ function ProductTable(filtered_Array) {
                     <th>Profit</th>
                     <th>Action</th>
                 </tr>
-                
+
             </thead>
             <tbody></tbody>
         </table>
     `);
 
-    filtered_Array.forEach((element, key) => {
+    filtered_Array.forEach((element, key) => { 
         $('.productTable tbody').append(`
             <tr data-product-id="${element.id}">
                 <td>${key + 1}</td>
