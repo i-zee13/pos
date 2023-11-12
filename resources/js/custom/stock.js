@@ -91,7 +91,7 @@ $(document).ready(function () {
                         <tr id='tr-${product.product_id}'>
                             <td>${product.product_id}</td>
                             <td colspan="2">${product.p_name}</td>
-                            <td ><input type="number" value="${product.old_price}" data-purchase="${product.old_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${amount}" data-quantity="${product.qty}"  style="font-size: 13px" min="0"></td>
+                            <td ><input type="number" value="${product.purchased_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${amount}" data-quantity="${product.qty}"  style="font-size: 13px" min="0"></td>
                             <td ><input type="number" value="${product.sale_price}" data-purchase="${product.sale_price}" data-stock="${stock_in_hand}" class="inputSale sale_price_input td-${product.product_id}"  data-id="${product.product_id}"   style="font-size: 13px;width:60" min="0"></td>
                              <td><input type="date" value="${product.expiry_date}" class="inputSale expiry_date expiry_input"  data-id="${product.product_id}" style="font-size: 13px;width: 95;" min="0" ></td>
                             <td>
@@ -547,12 +547,10 @@ $(document).on('input', '.sale_price_input', function () {
      
     var update_price          = $(this).val();
     var current_product_id   = $(this).attr('data-id');
-    console.log(current_product_id)
     purchased_product_array.filter(function (data) {
         if (data.product_id == current_product_id) {
             data.sale_price = update_price;
-        }
-        console.log(data)
+        } 
     })
 })
 function getProducts() {
@@ -691,8 +689,9 @@ $(document).on('input', '.price-input', function () {
         if (data.product_id == current_product_id) {
             data.qty            = current_product_qty
             new_amount_of_sale_product = current_product_qty * retail_price;
-            data.amount         = new_amount_of_sale_product - data.prod_discount;
-            data.new_price   = retail_price;
+            data.amount             = new_amount_of_sale_product - data.prod_discount;
+            data.new_price          = retail_price;
+            data.purchased_price   = retail_price;
             getStockRetail(data.product_id)
             $(`.purchase-product-amount${current_product_id}`).text(data.amount)
             grandSum(previous_payable, service_charges);

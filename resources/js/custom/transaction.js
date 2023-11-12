@@ -371,6 +371,7 @@ function fetchLedgers() {
                         console.log(element);
                         var total_cr_dr = 0;
                         var voucher = '';
+                        alert(operation)
                         if(operation == 'vendor'){
                          total_cr_dr    =    action == 'vendor-ledger-jama'? element.rec[0].total_cr ?? '0' :  element.rec[0].total_dr ?? '0';
                          voucher        =    action == 'vendor-ledger-jama'? element.crv_no ?? '0' :  element.cpv_no ?? '0'

@@ -98,13 +98,13 @@ class TransactionController extends Controller
             if($request->operation == 'vendor'){
                $ledger              =   new VendorLedger(); 
                if ($request->amount_to == 1) {  //1 = CR Ledger-jama
-                  $ledger->crv_no   =  getVendorCrvNo();
+                  $ledger->cpv_no   =  getVendorCpvNo();
                   $ledger->balance  =  $balance - $request->amount[$key]; // minus jo mny dena hy .
-                  $ledger->cr       =  $request->amount[$key];  
+                  $ledger->dr       =  $request->amount[$key];  
                } else { // DR Ledger-banam  
-                  $ledger->cpv_no   =  getVendorCpvNo(); 
+                  $ledger->crv_no   =  getVendorCrvNo(); 
                   $ledger->balance  =  $balance + $request->amount[$key];  // plus jo mny lena hy
-                  $ledger->dr       =  $request->amount[$key];
+                  $ledger->cr       =  $request->amount[$key];
                }
             }
             $ledger->customer_id    =   $customer;

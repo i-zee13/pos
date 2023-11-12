@@ -6,13 +6,19 @@ let report_segments = location.href.split('/');
 let trx_inv = false;
 $(document).ready(function () {
     var currentDate = new Date();
+    
+    // Set start date to one month before the current date
     var startDate = new Date();
     startDate.setMonth(currentDate.getMonth() - 1);
+    
+    // Format dates to YYYY-MM-DD
     var formattedStartDate = startDate.toISOString().split('T')[0];
-    $('.start_date').val(formattedStartDate);
     var formattedEndDate = currentDate.toISOString().split('T')[0];
+    
+    // Set default values for the date inputs
+    $('.start_date').val(formattedStartDate);
     $('.end_date').val(formattedEndDate);
-})
+});
 $('.search-btn').on('click', function () {
     var start_date = $('.start_date').val();
     var end_date = $('.end_date').val();

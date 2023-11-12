@@ -107,7 +107,6 @@ class StockController extends Controller
                     }else{
                         $purchased          =  new ProductPurchase();
                     }
-
                     if($purchase_product['new_price'] != ''){ 
                         $purchased->purchase_price  = $purchase_product['new_price'];
                     }else{
@@ -200,7 +199,7 @@ class StockController extends Controller
                 $customer_ledger->customer_id= $request->customer_id;
                 $customer_ledger->cr         = $invoice->total_invoice_amount - $balance;
                 $customer_ledger->dr         = $invoice->paid_amount;
-                $customer_ledger->balance    = $invoice->total_invoice_amount- $request->amount_received; //+balance
+                $customer_ledger->balance    = $invoice->total_invoice_amount- $invoice->paid_amount; //+balance
 
                 $customer_ledger->created_by = Auth::id();
                 $customer_ledger->save();  
@@ -232,6 +231,7 @@ class StockController extends Controller
                                                 purchase_invoices.id ,
                                                 purchase_invoices.invoice_no ,
                                                 purchase_invoices.total_invoice_amount ,
+                                                purchase_invoices.product_net_total ,
                                                 purchase_invoices.is_editable ,
                                                 purchase_invoices.paid_amount ,
                                                 purchase_invoices.date ,
