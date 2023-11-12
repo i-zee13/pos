@@ -667,15 +667,12 @@
                               </div>
                               <!-- <h2 class="title m-0 pb-0">Shipping <span>Details</span></h2> -->
                           </div>
-
-
-
                       </div>
                   </div>
                   <div class="col-md-8 right-sid ebox" >
                       <div class="row">
                           <div class="col-6">
-                              <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Purchase' : 'New'}} <span>Invoice</span></h2>
+                              <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Update' : 'New'}} Purchase<span>Invoice</span></h2>
                           </div>
 
                       </div>
@@ -759,7 +756,7 @@
                                               </td>
                                               <td><input type="number" style="font-size: 13px; width: 60;" readonly id="purchase_price" class="inputSale purchase_price" placeholder="" name="purchase_price"  ></td>
                                               <td> <input type="number" id="new_purchase_price" class="inputSale" placeholder="" name="new_purchase_price " tabindex="3" style=" width: 60;" min="0"></td>
-                                              <td> <input type="number" id="new_sale_price" class="inputSale" placeholder="" name="new_sale_price " tabindex="4" style=" width: 60;" min="0"></td>
+                                              <td> <input type="number"   class="inputSale new_sale_price" placeholder="" name="new_sale_price " tabindex="4" style=" width: 60;" min="0"></td>
                                               <td> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="5" style=" width: 95;"></td>
                                               <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="6" min="0" style=" width: 45;"></td>
 

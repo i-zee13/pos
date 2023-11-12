@@ -54,7 +54,7 @@ function ProductTable(filtered_Array) {
             <tr data-product-id="${element.id}">
                 <td>${key + 1}</td>
                 <td>${element.product_name}</td>
-                <td class="${key + 1}-purchase-price">${element.old_purchase_price}</td>
+                <td class="${key + 1}-purchase-price">${element.new_purchase_price ? element.new_purchase_price : element.old_purchase_price }</td>
                 <td><input type="number" min='0' class="inputvalue only_numerics" value="${element.sale_price}"  data-purchase="${element.old_purchase_price}"  data-id="${key + 1}" name="sale_price" tabindex="3" min="0"></td>
                 <td class="${key + 1}-profit"></td>
                 <td><button type="button" class="btn btn-primary smBTN mr-2 add-new-price" tabindex="8" style="padding: 5px 15px 5px 15px; background:green" data-id="${key + 1}">Add</button></td>

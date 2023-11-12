@@ -301,7 +301,7 @@ $('#add-product').on('click', function () {
       expiry_date = $('.expiry_date').val();
     }
     var prod_discount = $('.discount').val();
-    sale_price = $('#new_sale_price').val();
+    sale_price = $('.new_sale_price').val();
     purchased_product_array.push({
       'prod_discount': prod_discount ? prod_discount : 0,
       'purchase_prod_id': "",
@@ -363,7 +363,7 @@ $(document).on('focusout', '.bar-code', function () {
       // $('.retail_price').text(filter_product[0].sale_price);
       $('.purchase_price').val(filter_product[0].old_purchase_price);
       $('.stock_balance').text(filter_product[0].stock_balance);
-      $('#new_sale_price').val(filter_product[0].sale_price);
+      $('.new_sale_price').val(filter_product[0].sale_price);
       p_name = filter_product[0].product_name;
       product_id = filter_product[0].id;
       retail_price = filter_product[0].sale_price;
@@ -711,7 +711,7 @@ $('.products').change(function () {
     product_id = filter_product[0].id;
     stock_in_hand = filter_product[0].stock_balance;
     sale_price = filter_product[0].sale_price;
-    $('#new_sale_price').val(filter_product[0].sale_price);
+    $('.new_sale_price').val(filter_product[0].sale_price);
     $('#expiry_date').val(filter_product[0].expiry_date);
     $('.bar-code').val(filter_product[0].barcode);
   }

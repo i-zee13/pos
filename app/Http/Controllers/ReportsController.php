@@ -210,7 +210,7 @@ class ReportsController extends Controller
                               LEFT JOIN sale_invoices si ON si.id = ps.sale_invoice_id 
                               LEFT JOIN products pr ON pr.id = ps.product_id 
                               LEFT JOIN companies co ON co.id = ps.company_id 
-                              WHERE invoice_type = 1 AND
+                              WHERE  
                               $query
                               ORDER BY si.invoice_no DESC
                         ");
@@ -245,7 +245,6 @@ class ReportsController extends Controller
                                           ->whereRaw("
                                              DATE(created_at) = '$closing_date' AND trx_type = 3   
                                           ")->get();
-      
       $records                         =  new stdClass();
       $records->total_invoice_amount   =  collect($saleRecords)->SUM('total_invoice_amount');
       $records->total_invoice_discount =  collect($saleRecords)->SUM('invoice_discount');

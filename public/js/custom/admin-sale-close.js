@@ -38,13 +38,13 @@ function SaleCloseRecord(close_date){
             var customer_payment        =   records.customer_payment;
             var ttl_cash_recovery       =   records.ttl_cash_recovery;
             var total_payments          =   vendor_payment+customer_payment;
-            var ttl_in_hand             =   ((total_invoice_amount+ttl_cash_recovery)-total_payments);
-            var cash_in_hand            =   ((total_sales+ttl_cash_recovery)-total_payments);
+            var ttl_in_hand             =   ((total_net_sales+ttl_cash_recovery)-total_payments);
+            var cash_in_hand            =   ((total_net_sales+ttl_cash_recovery)-total_payments);
             if(ttl_in_hand > 0){
                 $('.sale-close-btn-modal').removeAttr('disabled');
                 $('.sale-close-btn-modal').attr('ttl_in_hand',ttl_in_hand);
             }
-            $('.ttl_sale').text(addCommas(parseFloat(total_invoice_amount).toFixed(2)));
+            $('.ttl_sale').text(addCommas(parseFloat(total_sales).toFixed(2)));
             $('.ttl_payments').text(addCommas(parseFloat(total_payments).toFixed(2)));
             $('.ttl_received').text(addCommas(parseFloat(ttl_cash_recovery).toFixed(2)));
             $('.ttl_in_hand').text(addCommas(parseFloat(ttl_in_hand).toFixed(2)));
