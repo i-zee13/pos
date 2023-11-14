@@ -301,6 +301,10 @@ if(!function_exists('isEditable'))
                         ->whereDate('created_at', Carbon::today()) 
                         ->where('is_editable', 1) 
                         ->update(['is_editable' => 0]);
+        VendorLedger::where('customer_id',$customer_id)
+                        ->whereDate('created_at', Carbon::today()) 
+                        ->where('is_editable', 1) 
+                        ->update(['is_editable' => 0]);
         //Sales
         SaleInvoice::where('customer_id',$customer_id)
                     ->whereDate('created_at', Carbon::today()) 

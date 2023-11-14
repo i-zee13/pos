@@ -172,6 +172,8 @@
 </div>
 @endsection
 @section('content')
+<?php $transc_for  = request()->segment(1) == 'customer-reports' ? 'Customer' : 'Vendor' ;  ?>
+
 <style>
     .remove_div {
         display: flex;

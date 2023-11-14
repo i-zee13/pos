@@ -218,7 +218,7 @@
                     </tr> -->
                 <tr>
                     <td class="payable-heading">{{$type == 1 ? ' Received'  : ' Paid'}} :</td>
-                    <td>{{number_format($type == 1 ? $invoice->dr : $invoice->cr)}}</td>
+                    <td>{{number_format($type == 2 ? $invoice->dr : $invoice->cr)}}</td>
                 </tr>
                 <tr>
                     <td class="payable-heading">{{$invoice->balance > 0 ? 'Remaining Payable'  : 'Remaining Receivable'}} :</td>

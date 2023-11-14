@@ -184,9 +184,9 @@ class StockController extends Controller
                 }
                 $customer_ledger = VendorLedger::where('customer_id',$request->customer_id)->orderBy('id', 'DESC')->first();
                 if($customer_ledger){
-                    $balance = $customer_ledger->balance;
+                    $balance           =   $customer_ledger->balance;
                 }else{
-                    $balance        =   0;
+                    $balance           =   0;
                 }
                 if($request->hidden_invoice_id){
                     $customer_ledger   =  VendorLedger::where('purchase_invoice_id',$request->hidden_invoice_id)->orderBy('id', 'DESC')->first();

@@ -48,16 +48,16 @@ $(document).ready(function () {
         $('#transactionTable tbody').empty();
         $('.customer_balnce').val(response.customer.balance);
         response.transactions.forEach(function (data) {
+          console.log(data);
           balance_sum += data.balance;
           cr_sum += data.cr;
           dr_sum += data.dr;
           if (action == operation + '-ledger-jama' && data.cr > 0) {
-            console.log(data);
-            $('#transactionTable tbody').append("\n                                <tr id='tr-".concat(data.id, "'>\n                                    <td>").concat(action == operation + '-ledger-jama' ? data.crv_no : data.cpv_no, "</td>\n                                    <td>").concat(action == operation + '-ledger-jama' ? data.cr : data.dr, "</td>\n                                    <td>").concat(data.comment ? data.comment : 'NA', "</td>\n                                </tr>"));
+            $('#transactionTable tbody').append("\n                                <tr id='tr-".concat(data.id, "'>\n                                    <td>").concat(data.crv_no, "</td>\n                                    <td>").concat(data.cr, "</td>\n                                    <td>").concat(data.comment ? data.comment : 'NA', "</td>\n                                </tr>"));
           }
           if (action == operation + '-ledger-banam' && data.dr > 0) {
             console.log(data);
-            $('#transactionTable tbody').append("\n                            <tr id='tr-".concat(data.id, "'>\n                                <td>").concat(action == operation + '-ledger-jama' ? data.crv_no : data.cpv_no, "</td>\n                                <td>").concat(action == operation + '-ledger-jama' ? data.cr : data.dr, "</td>\n                                <td>").concat(data.comment ? data.comment : 'NA', "</td>\n                            </tr>"));
+            $('#transactionTable tbody').append("\n                            <tr id='tr-".concat(data.id, "'>\n                                <td>").concat(data.cpv_no, "</td>\n                                <td>").concat(data.dr, "</td>\n                                <td>").concat(data.comment ? data.comment : 'NA', "</td>\n                            </tr>"));
           }
         });
         $('#transactionTable tbody').append("\n                <tr style=\"background: #152e4d;color: white;\">\n                    <td style=\"font-family:bold\" >Total:</td>\n                    <td colspan=\"2\">".concat(action == operation + '-ledger-jama' ? cr_sum : dr_sum, "</td>\n                </tr>\n            "));
@@ -272,10 +272,8 @@ function fetchLedgers() {
       var sNo = 1;
       response.customers.forEach(function (element, key) {
         var _element$comment;
-        console.log(element);
         var total_cr_dr = 0;
         var voucher = '';
-        alert(operation);
         if (operation == 'vendor') {
           var _element$rec$0$total_, _element$rec$0$total_2, _element$crv_no, _element$cpv_no;
           total_cr_dr = action == 'vendor-ledger-jama' ? (_element$rec$0$total_ = element.rec[0].total_cr) !== null && _element$rec$0$total_ !== void 0 ? _element$rec$0$total_ : '0' : (_element$rec$0$total_2 = element.rec[0].total_dr) !== null && _element$rec$0$total_2 !== void 0 ? _element$rec$0$total_2 : '0';
@@ -287,7 +285,7 @@ function fetchLedgers() {
           voucher = action == 'customer-ledger-jama' ? (_element$crv_no2 = element.crv_no) !== null && _element$crv_no2 !== void 0 ? _element$crv_no2 : '0' : (_element$cpv_no2 = element.cpv_no) !== null && _element$cpv_no2 !== void 0 ? _element$cpv_no2 : '0';
           ledger_balance = element['balance'] >= 0 ? element['balance'] + ' DR' : -element['balance'] + ' CR';
         }
-        $('.subCatsListTable tbody').append("\n                        <tr>\n                        <!-- <td> ".concat(voucher, "</td>--!>\n                            <td> ").concat(element['customer_name'], "</td>\n                            <!-- <td class='total_balance'>").concat(ledger_balance, "</td> --!>\n                            <td>").concat(total_cr_dr, "</td>\n                            <td> ").concat((_element$comment = element['comment']) !== null && _element$comment !== void 0 ? _element$comment : 'NA', "</td>\n                            <td> ").concat(moment(element['date']).format('D MMM YYYY'), "</td>\n                            <td>\n                                <button  class=\"btn btn-default btn-line openDataSidebarForEditCustomerLedger ").concat(element.is_editable == 1 ? '' : 'd-none', "\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['balance'], "\"\n                                    >Edit</button>\n                                    <button  class=\"btn btn-default btn-line openDataSidebarForUpdateCustomerLedger\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['balance'], "\"\n                                    >Add Payment</button>\n                            </td>\n                        </tr>"));
+        $('.subCatsListTable tbody').append("\n                        <tr>\n                        <!-- <td> ".concat(voucher, "</td>--!>\n                            <td> ").concat(element['customer_name'], "</td>\n                            <!-- <td class='total_balance'>").concat(ledger_balance, "</td> --!>\n                            <td>").concat(total_cr_dr, "</td>\n                            <td> ").concat((_element$comment = element['comment']) !== null && _element$comment !== void 0 ? _element$comment : 'NA', "</td>\n                            <td> ").concat(moment(element['date']).format('D MMM YYYY'), "</td>\n                            <td>\n                                <button  class=\"btn btn-default btn-line openDataSidebarForEditCustomerLedger ").concat(element.is_editable == 1 ? '' : 'd-none', "\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Edit</button>\n                                    <button  class=\"btn btn-default btn-line openDataSidebarForUpdateCustomerLedger\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Add Payment</button>\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();
@@ -319,7 +317,6 @@ $(document).on('click', ".remove", function () {
   // $(`.remove_btn_${cus_id}`).parent().parent().remove();
   $(this).closest('.remove_div').remove();
   // customer_transaction_array = customer_transaction_array.filter(x => x.customer_id != $(this).attr('data-customer_id'));
-  // console.log(customer_transaction_array)
   n--;
   $('.customer_id').children('option[value="' + cus_id + '"]').attr('disabled', false);
   $(".customer_id").val('0');

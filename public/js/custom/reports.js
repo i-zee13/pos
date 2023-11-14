@@ -3,6 +3,7 @@ let batches = [];
 let sessions = [];
 let CurrentRef = '';
 let report_segments = location.href.split('/');
+let current_url = report_segments[3].replace(/[#?]+$/, '');
 let trx_inv = false;
 $(document).ready(function () {
     var currentDate = new Date();
@@ -56,7 +57,7 @@ $('.search-btn').on('click', function () {
             _token: $('meta[name="csrf_token"]').attr('content'),
             current_url: report_segments[3].replace(/[#?]+$/, '')
         },
-        success: function (response) {
+        success: function (response) { 
             CurrentRef.attr('disabled', false);
             $('.loader').show();
             $('.teacher_attendance_list').empty();
@@ -84,7 +85,6 @@ $('.search-btn').on('click', function () {
                 }, 3000);
             }
             response.vendor.forEach((element, key) => {
-                console.log(element);
                 var label = 'N/A';
                 var inv_id = '';
                 var flag = false;
@@ -127,10 +127,18 @@ $('.search-btn').on('click', function () {
                     return timeStr;
                 }
                 var formattedDate = `${date.toDateString()} ${formatAMPM(date)}`; 
-                if(flag){
-                    var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
+                if(current_url == 'vendor-reports'){
+                    if(flag){
+                        var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
+                    }else{
+                        var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
+                    }
                 }else{
-                    var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' CR' : element['balance'].toLocaleString('en-US') + ' DR') : '0';
+                    if(flag){
+                        var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
+                    }else{
+                        var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' CR' : element['balance'].toLocaleString('en-US') + ' DR') : '0';
+                    }
                 }
                 $('.TeacherAttendanceListTable tbody').append(`
                     <tr> 

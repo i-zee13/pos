@@ -32,6 +32,7 @@
         }
 }
 </style>
+<?php   dd(request()->segment(1)); $transc_for  = request()->segment(1) == 'customer-reports' ? 'Customer' : 'Vendor' ;  ?>
 <!-- Body -->
 <div class="header-body">
         <div class="row  ">
@@ -77,7 +78,7 @@
                         <div class="_cust_filter col-4">
                             <div class="form-s2">
                                 <select class="form-control formselect vendor_id" name="vendor_id">
-                                    <option value="">Select Customer</option>
+                                    <option value="">Select {{$transc_fo}}</option>
                                     @foreach($customers as $vendor)
                                     <option value="{{$vendor->id}}">{{$vendor->customer_name}}</option>
                                     @endforeach

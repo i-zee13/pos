@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('data-sidebar')
 {{-- Confirmation Modal --}}
+
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content top-borderRed">
@@ -41,6 +42,7 @@
                                 <form style="display: flex;" id="saveTransactionForm">
                                     @csrf
                                     <input type="text" hidden value="{{$operation}}" name="operation">
+                                    <input type="text" hidden name="action" id="action">
                                     <input type="text" id="customer_id" hidden name="hidden_customer_id">
                                     <input type="text" id="hidden_balance" hidden name="hidden_balance">
                                     <div id="floating-label" class="card p-20 top_border mb-3" style="width: 100%">
@@ -51,7 +53,7 @@
                                                     <label class="font12 mb-0">Vendors *</label>
                                                     <div class="form-s2 ">
                                                         <select class="form-control formselect field-required customer_id" name="customer_id" tabindex="1">
-                                                            <option value="0" selected> Select Customer</option>
+                                                            <option value="0" selected> Select Vendor</option>
                                                             @foreach($customers as $customer)
                                                             <option value="{{ $customer->id }}" balance='{{$customer->balance}}' cus_name='{{$customer->customer_name}}'>{{$customer->id}}-{{$customer->customer_name}}</option>
                                                             @endforeach

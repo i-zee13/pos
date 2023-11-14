@@ -44,16 +44,16 @@ $(document).ready(function() {
                 $('#transactionTable tbody').empty()
                 $('.customer_balnce').val(response.customer.balance);
                 response.transactions.forEach(data => {
-                  
+                  console.log(data)
                     balance_sum += data.balance;
                     cr_sum += data.cr;
                     dr_sum += data.dr;
                     if(action == operation+'-ledger-jama' &&  data.cr > 0){
-                        console.log(data)
+                       
                         $('#transactionTable tbody').append(`
                                 <tr id='tr-${data.id}'>
-                                    <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td>
-                                    <td>${action == operation+'-ledger-jama' ? data.cr : data.dr}</td>
+                                    <td>${data.crv_no}</td>
+                                    <td>${data.cr}</td>
                                     <td>${data.comment ? data.comment : 'NA'}</td>
                                 </tr>`
                         );
@@ -62,8 +62,8 @@ $(document).ready(function() {
                         console.log(data)
                         $('#transactionTable tbody').append(`
                             <tr id='tr-${data.id}'>
-                                <td>${action == operation+'-ledger-jama' ? data.crv_no : data.cpv_no}</td>
-                                <td>${action == operation+'-ledger-jama' ? data.cr : data.dr}</td>
+                                <td>${data.cpv_no}</td>
+                                <td>${data.dr}</td>
                                 <td>${data.comment ? data.comment : 'NA'}</td>
                             </tr>`
                         );
@@ -368,10 +368,8 @@ function fetchLedgers() {
                     $('.subCatsListTable tbody').empty();
                     var sNo = 1;
                     response.customers.forEach((element,key) => {
-                        console.log(element);
                         var total_cr_dr = 0;
                         var voucher = '';
-                        alert(operation)
                         if(operation == 'vendor'){
                          total_cr_dr    =    action == 'vendor-ledger-jama'? element.rec[0].total_cr ?? '0' :  element.rec[0].total_dr ?? '0';
                          voucher        =    action == 'vendor-ledger-jama'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
@@ -396,14 +394,14 @@ function fetchLedgers() {
                                             customer_name="${element['customer_name']}"
                                             cr="${element['cr']}"
                                             dr="${element['dr']}"
-                                            balance="${element['balance']}"
+                                            balance="${element['customer_balance']}"
                                     >Edit</button>
                                     <button  class="btn btn-default btn-line openDataSidebarForUpdateCustomerLedger"
                                             customer-id="${element['customer_id']}"
                                             customer_name="${element['customer_name']}"
                                             cr="${element['cr']}"
                                             dr="${element['dr']}"
-                                            balance="${element['balance']}"
+                                            balance="${element['customer_balance']}"
                                     >Add Payment</button>
                             </td>
                         </tr>`);
@@ -469,7 +467,6 @@ function fetchLedgers() {
     // $(`.remove_btn_${cus_id}`).parent().parent().remove();
     $(this).closest('.remove_div').remove();
     // customer_transaction_array = customer_transaction_array.filter(x => x.customer_id != $(this).attr('data-customer_id'));
-    // console.log(customer_transaction_array)
     n--;
     $('.customer_id').children('option[value="' + cus_id + '"]').attr('disabled', false);
     $(".customer_id").val('0');
