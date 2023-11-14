@@ -648,7 +648,7 @@
                                                 <select class="form-control formselect form_clear  "
                                                     placeholder="Select Vendor" name="customer_id" id="customer_id"
                                                     {{ @$invoice->customer_id ? 'disabled' : '' }}>
-                                                    <option value="0">Select Customer</option>
+                                                    <option value="0">Select Vendor</option>
                                                     @foreach ($customers as $customer)
                                                         <option value="{{ $customer->id }}"
                                                             {{ $customer->id == @$invoice->customer_id ? 'selected' : '' }}>

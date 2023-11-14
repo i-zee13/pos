@@ -554,7 +554,7 @@ function getProducts() {
 function getvendors() {
   
     $("#customer_id").empty(); 
-        $("#customer_id").append("<option value=\"0\">Select Customer</option>");
+        $("#customer_id").append("<option value=\"0\">Select Vendor</option>");
         console.log(vendors)
        vendors.forEach(function (data) {
         console.log(data);

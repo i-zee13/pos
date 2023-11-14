@@ -151,6 +151,9 @@ $('.search-btn').on('click', function () {
                                 data-inv-id="${inv_id}"
                                 data-label="${label}"
                                 data-id="${element['id']}"
+                                data-commit = ${element['comment'] ?? 'NA'}
+                                data-cr = ${element['cr']}
+                                data-dr = ${element['dr']}
                                 href="#">Detail </a> </td>                       
                     </tr>`);
             });
@@ -215,16 +218,13 @@ $('.search-btn').on('click', function () {
     });
 });
 $(document).on('click','.open-modal', function (event) {
-    var invId = $(this).data('inv-id');
-    var id    = $(this).data('id');
-    var label = $(this).data('label');
-    var label = label.replace(/ /g, '_');
-    if(trx_inv) {
-        $('#itemModal').modal('show');
+     
+    $('.cr').val($(this).data('cr'))
+    $('.dr').val($(this).data('dr')) 
+    $('.comment').val($(this).data('label')) 
+     $('#itemModal').modal('show');
         event.preventDefault();
-    }else{
-        window.location.href = `/detail/${invId}/${label}`;
-    }
+    
 });
 $('.reset-btn').on('click', function () {
     $('.vendor_id').val('').trigger('change');
