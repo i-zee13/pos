@@ -25,12 +25,24 @@ class LedgerDetailControlller extends Controller
       $dateFilter    =  " 1=1";
       if ($request->start_date != '' && $request->end_date != '') {
          $dateFilter = " Date(created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
-      }
-
-      if ($request->current_url == 'vendor-reports') {
-         $query      =  VendorLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
+      } 
+      if (str_contains($request->current_url, 'vendor-reports')) {
+         $query      =  VendorLedger::selectRaw('vendor_ledger.*,  DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at,
+                                      IFNULL( CONCAT("PI ", (SELECT invoice_no FROM purchase_invoices WHERE purchase_invoices.id = vendor_ledger.purchase_invoice_id)) ,
+                                             CONCAT("PR ", (SELECT invoice_no FROM purchase_return_invoices WHERE purchase_return_invoices.id = vendor_ledger.purchase_return_invoice_id))) AS invoice_no
+                                       ')
+                                       ->whereRaw("$dateFilter AND customer_id = $request->vendor_id")
+                                      
+                                       ->get();
+     
       } else { 
-         $query = CustomerLedger::selectRaw('*, DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at')->whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'ASC')->get();
+         $query      = CustomerLedger::selectRaw('*, DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at,
+                                                   COALESCE( CONCAT("SI ", (SELECT invoice_no FROM sale_invoices WHERE sale_invoices.id = customer_ledger.sale_invoice_id)) ,
+                                                   CONCAT("SR ", (SELECT invoice_no FROM sale_return_invoices WHERE sale_return_invoices.id = customer_ledger.sale_return_invoice_id)),
+                                                   CONCAT("SR ", (SELECT invoice_no FROM product_replacment_invoices WHERE product_replacment_invoices.id = customer_ledger.product_replacement_invoice_id))
+                                                   ) AS invoice_no
+                              
+                                       ')->whereRaw("$dateFilter AND customer_id = $request->vendor_id")->get();
          // $query      =  CustomerLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
       }
       return response()->json([

@@ -90,7 +90,7 @@ $ledger_for  = request()->segment(1) == 'customer-reports' ? 'Customer' : 'Vendo
         <div class="col">
             <!-- Pretitle -->
             <h6 class="header-pretitle">
-                Overview
+            {{$ledger_for}}
             </h6>
             <!-- Title -->
             <h1 class="header-title">
@@ -99,7 +99,7 @@ $ledger_for  = request()->segment(1) == 'customer-reports' ? 'Customer' : 'Vendo
         </div>
         <div class="col-auto">
             <ol class="breadcrumb">
-                <li><a href="#"><span>Vendors</span></a></li>
+                <li><a href="#"><span>{{$ledger_for}}</span></a></li>
                 <li><span>Active</span></li>
             </ol>
         </div>
@@ -127,7 +127,7 @@ $ledger_for  = request()->segment(1) == 'customer-reports' ? 'Customer' : 'Vendo
                                 <select class="form-control formselect vendor_id" name="vendor_id">
                                     <option value="">Select {{$ledger_for}}</option>
                                     @foreach($vendors as $vendor)
-                                    <option value="{{$vendor->id}}">{{$vendor->customer_name}}</option>
+                                    <option value="{{$vendor->id}}">{{$vendor->id}} - {{$vendor->customer_name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -151,7 +151,7 @@ $ledger_for  = request()->segment(1) == 'customer-reports' ? 'Customer' : 'Vendo
     <div class="col-md-12">
         <div class="card">
             <div class="header m-0">
-                <h2>{{$ledger_for}} <span>Ledger</span></h2>
+                <h2>{{$ledger_for}} <span>Area</span></h2>
             </div>
             <div style="min-height: 400px; display: none;" class="loader">
                 <img src="images/loading.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">

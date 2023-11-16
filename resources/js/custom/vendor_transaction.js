@@ -365,7 +365,7 @@ function fetchLedgers() {
                 var voucher = '';
                 if (operation == 'vendor') {
                     total_cr_dr = action == 'vendor-ledger-banam' ? element.rec[0].total_dr ?? '0' : element.rec[0].total_cr ?? '0';
-                    voucher     = action == 'vendor-ledger-banam' ? element.crv_no ?? '0' : element.cpv_no ?? '0'
+                    voucher     = action == 'vendor-ledger-banam' ? element.cpv_no ?? '0' : element.crv_no ?? '0'
                     ledger_balance = element['balance'] >= 0 ? element['balance'] + ' CR' : (-element['balance']) + ' DR'
                 }
 

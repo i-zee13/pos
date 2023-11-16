@@ -354,7 +354,7 @@ function fetchLedgers() {
                     <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;">
                         <thead>
                             <tr>
-                            <!-- <th>Voucher #</th>  --!>
+                               <th>Voucher #</th>   
                                 <th>Name</th>
                               <!--  <th>Balance</th> --!>
                                 <th>Total </th>
@@ -382,7 +382,7 @@ function fetchLedgers() {
                         
                         $('.subCatsListTable tbody').append(`
                         <tr>
-                        <!-- <td> ${voucher}</td>--!>
+                         <td> ${voucher}</td> 
                             <td> ${element['customer_name']}</td>
                             <!-- <td class='total_balance'>${ledger_balance}</td> --!>
                             <td>${total_cr_dr}</td>

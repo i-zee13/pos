@@ -43,7 +43,7 @@ class TransactionController extends Controller
                                        ->groupby('customer_id')
                                        ->orderBy('vendor_ledger.id', 'DESC')
                                        ;
-         if($request->current_url == 'vendor-ledger-jama'){
+         if(str_contains($request->current_url , 'vendor-ledger-jama')){
             $customers = $customers->where('cr','>',0)->where('crv_no','!=','')->get();
          }else{ 
             $customers = $customers->where('dr','>',0)->get();
@@ -68,7 +68,7 @@ class TransactionController extends Controller
                                           ->whereDate('created_at', Carbon::today())
                                           ->groupby('customer_id')
                                           ->orderBy('customer_ledger.id', 'DESC');  
-         if($request->current_url == 'customer-ledger-jama'){
+         if(str_contains($request->current_url,'customer-ledger-jama')){
             $customers = $customers->where('cr','>',0)->where('crv_no','!=','')->get();
          }else{ 
             $customers = $customers->where('dr','>',0)->get();

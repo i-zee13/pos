@@ -7,15 +7,15 @@ let current_url = report_segments[3].replace(/[#?]+$/, '');
 let trx_inv = false;
 $(document).ready(function () {
     var currentDate = new Date();
-    
+
     // Set start date to one month before the current date
     var startDate = new Date();
     startDate.setMonth(currentDate.getMonth() - 1);
-    
+
     // Format dates to YYYY-MM-DD
     var formattedStartDate = startDate.toISOString().split('T')[0];
     var formattedEndDate = currentDate.toISOString().split('T')[0];
-    
+
     // Set default values for the date inputs
     $('.start_date').val(formattedStartDate);
     $('.end_date').val(formattedEndDate);
@@ -49,7 +49,7 @@ $('.search-btn').on('click', function () {
     }
     CurrentRef = $(this);
     CurrentRef.attr('disabled', 'disabled');
-    url = '/report-list'; 
+    url = '/report-list';
     $(`#search-form`).ajaxSubmit({
         type: 'POST',
         url: url,
@@ -57,7 +57,7 @@ $('.search-btn').on('click', function () {
             _token: $('meta[name="csrf_token"]').attr('content'),
             current_url: report_segments[3].replace(/[#?]+$/, '')
         },
-        success: function (response) { 
+        success: function (response) {
             CurrentRef.attr('disabled', false);
             $('.loader').show();
             $('.teacher_attendance_list').empty();
@@ -65,10 +65,9 @@ $('.search-btn').on('click', function () {
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Invoice</th>
-                            <th>CR</th>
-                            <th>DR</th> 
+                            <th>Invoice #</th> 
+                            <th>Debit</th> 
+                            <th>Credit</th>
                             <th>Balance</th>
                             <th>Action</th>
                         </tr>
@@ -83,70 +82,83 @@ $('.search-btn').on('click', function () {
                 setTimeout(() => {
                     $('#notifDiv').fadeOut();
                 }, 3000);
-            }
+            } let totalCR = 0;
+            let totalDR = 0;
             response.vendor.forEach((element, key) => {
+                console.log(element)
                 var label = 'N/A';
                 var inv_id = '';
+                var inv_no = '';
                 var flag = false;
                 trx_inv = false;
+                totalCR += element['cr'] || 0;
+                totalDR += element['dr'] || 0;
                 if (element['sale_invoice_id'] != null && element['sale_invoice_id'] != 0) {
+                    inv_no = element['invoice_no'];
                     label = 'Sale Inv';
                     inv_id = element['sale_invoice_id'];
                 } else if (element['purchase_invoice_id'] != null && element['purchase_invoice_id'] != 0) {
                     flag = true;
+                     inv_no = element['invoice_no'];
                     label = 'Purchase Inv';
                     inv_id = element['purchase_invoice_id'];
                 } else if (element['sale_return_invoice_id'] != null && element['sale_return_invoice_id'] != 0) {
+                     inv_no = element['invoice_no'];
                     label = 'Sale Return Inv';
                     inv_id = element['sale_return_invoice_id'];
                 } else if (element['product_replacement_invoice_id'] != null && element['product_replacement_invoice_id'] != 0) {
+                     inv_no = element['invoice_no'];
                     label = 'Product Replacement Inv';
                     inv_id = element['product_replacement_invoice_id'];
                 } else if (element['purchase_return_invoice_id'] != null && element['purchase_return_invoice_id'] != 0) {
                     flag = true;
+                     inv_no = element['invoice_no'];
                     label = 'Return Inv';
                     inv_id = element['purchase_return_invoice_id'];
                 } else if (element['crv_no'] != null && element['crv_no'] != 0) {
                     trx_inv = true;
+                     inv_no = element['crv_no'];
                     label = 'Cash Receiving Voucher ( ' + element['comment'] + ' )';
                     inv_id = element['id'];
                 } else if (element['cpv_no'] != null && element['cpv_no'] != 0) {
-                    trx_inv = true; 
+                    trx_inv = true;
+                     inv_no = element['cpv_no'];
                     label = 'Cash Payment Voucher ( ' + element['comment'] + ' )';
                     inv_id = element['id'];
                 }
-                var date = new Date(element.created_at); 
+                var date = new Date(element.created_at);
                 function formatAMPM(date) {
-                    var hours   = date.getHours();
+                    var hours = date.getHours();
                     var minutes = date.getMinutes();
-                    var ampm    = hours >= 12 ? 'PM' : 'AM';
+                    var ampm = hours >= 12 ? 'PM' : 'AM';
                     hours = hours % 12;
                     hours = hours ? hours : 12; // Handle midnight (0 hours)
                     minutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero for single digit minutes
                     var timeStr = ' (' + hours + ':' + minutes + ' ' + ampm + ')';
                     return timeStr;
                 }
-                var formattedDate = `${date.toDateString()} ${formatAMPM(date)}`; 
-                if(current_url == 'vendor-reports'){
-                    if(flag){
+                var formattedDate = `${date.toDateString()} ${formatAMPM(date)}`;
+                if (current_url == 'vendor-reports') {
+                    if (flag) {
                         var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
-                    }else{
+                    } else {
                         var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
                     }
-                }else{
-                    if(flag){
+                } else {
+                    if (flag) {
                         var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
-                    }else{
+                    } else {
                         var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' CR' : element['balance'].toLocaleString('en-US') + ' DR') : '0';
                     }
                 }
+                ledger_bal = ledger_bal.replace('-', '');
                 $('.TeacherAttendanceListTable tbody').append(`
                     <tr> 
-                        <td>${formattedDate}</td>
-                        <td>${label}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['cr'] ? element['cr'].toLocaleString('en-US') : '0'}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${element['dr'] ? element['dr'].toLocaleString('en-US') : '0'}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">${ledger_bal}</td>
+                        <td>${inv_no}</td> 
+                        
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element['dr'] ? element['dr'].toLocaleString('en-US') : '0'}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element['cr'] ? element['cr'].toLocaleString('en-US') : '0'}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${ledger_bal}</td>
                         <td><a class="btn btn-default open-modal btn-line" 
                                 data-inv-id="${inv_id}"
                                 data-label="${label}"
@@ -214,17 +226,31 @@ $('.search-btn').on('click', function () {
                 ],
 
             })
+             
+            $('.TeacherAttendanceListTable tbody').append(` 
+                <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+                    <td  class="font18" align="right"></td>
+                    <td  class="font18" align="right"></td>
+                    <td   class="font18" align="center">Grand Total :</td>
+                    <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${totalDR.toLocaleString('en-US')}</td>
+                    <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${totalCR.toLocaleString('en-US')} </td>
+                    <td class="totalNo" colspan="2"> 
+                        <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${(totalCR - totalDR).toFixed(2).toLocaleString('en-US').replace('-', '') } ${(totalCR - totalDR) > 0 ? 'CR' : 'DR'}</span>
+                    </td>
+                   
+                </tr>   
+            `);
         }
     });
 });
-$(document).on('click','.open-modal', function (event) {
-     
+$(document).on('click', '.open-modal', function (event) {
+
     $('.cr').val($(this).data('cr'))
-    $('.dr').val($(this).data('dr')) 
-    $('.comment').val($(this).data('label')) 
-     $('#itemModal').modal('show');
-        event.preventDefault();
-    
+    $('.dr').val($(this).data('dr'))
+    $('.comment').val($(this).data('label'))
+    $('#itemModal').modal('show');
+    event.preventDefault();
+
 });
 $('.reset-btn').on('click', function () {
     $('.vendor_id').val('').trigger('change');
