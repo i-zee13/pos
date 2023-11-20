@@ -8,7 +8,7 @@ let operation = '';
 let  total_amount = 0;
 $(document).ready(function() {
     var segments = location.href.split('/');
-     action      = segments[3];
+     action      = segments[3].replace(/[#?]+$/, '');
      operation   = action.split('-')[0];
      ledger_type = action.split('-')[2];
         fetchLedgers();
@@ -49,7 +49,6 @@ $(document).ready(function() {
                     cr_sum += data.cr;
                     dr_sum += data.dr;
                     if(action == operation+'-ledger-jama' &&  data.cr > 0){
-                       
                         $('#transactionTable tbody').append(`
                                 <tr id='tr-${data.id}'>
                                     <td>${data.crv_no}</td>
@@ -193,21 +192,12 @@ $(document).ready(function() {
         $('input[name="balance"]').focus().val(balance >= 0 ? balance + ' DR' : (-balance) + ' CR').blur();
 
         openSidebar();
-    });
-    // $("#print-invoice").on('click',function(){
-    //     var current_action = $(this);
-    //     saveTransaction(current_action,'print');
-    //     current_action.text('Print')
-    // })
-
+    }); 
     $("#saveTransaction").on('click', function () {
         var current_action = $(this);
         saveTransaction(current_action,'save');
-        current_action.text('Save')
-        // $('#hidden_btn_to_open_modal').click();
-    });
-
-   
+        current_action.text('Save') 
+    }); 
     function saveTransaction(current_action,type){
          var dirty = true;
         if (n == 0) {
@@ -369,17 +359,11 @@ function fetchLedgers() {
                     var sNo = 1;
                     response.customers.forEach((element,key) => {
                         var total_cr_dr = 0;
-                        var voucher = '';
-                        if(operation == 'vendor'){
-                         total_cr_dr    =    action == 'vendor-ledger-jama'? element.rec[0].total_cr ?? '0' :  element.rec[0].total_dr ?? '0';
-                         voucher        =    action == 'vendor-ledger-jama'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
-                         ledger_balance =   element['balance'] >= 0 ? element['balance'] + ' CR' : (-element['balance']) + ' DR'
-                        }else{
+                        var voucher = ''; 
                          total_cr_dr    =    action == 'customer-ledger-jama'? element.rec[0].total_cr ?? '0' :  element.rec[0].total_dr ?? '0';
                          voucher        =    action == 'customer-ledger-jama'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
                          ledger_balance =    element['balance'] >= 0 ? element['balance'] + ' DR' : (-element['balance']) + ' CR'
-                        }
-                        
+                      
                         $('.subCatsListTable tbody').append(`
                         <tr>
                          <td> ${voucher}</td> 

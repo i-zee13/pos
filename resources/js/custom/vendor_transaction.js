@@ -368,7 +368,6 @@ function fetchLedgers() {
                     voucher     = action == 'vendor-ledger-banam' ? element.cpv_no ?? '0' : element.crv_no ?? '0'
                     ledger_balance = element['balance'] >= 0 ? element['balance'] + ' CR' : (-element['balance']) + ' DR'
                 }
-
                 $('.subCatsListTable tbody').append(`
                                 <tr>
                                     <td>${voucher}</td> 
@@ -395,10 +394,7 @@ function fetchLedgers() {
                                         >Add Payment</button>
                                     </td>
                                 </tr>
-                            `);
-
-
-
+                            `); 
             });
             $('#tblLoader').hide();
             $('.body').fadeIn();

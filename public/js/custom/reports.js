@@ -65,6 +65,8 @@ $('.search-btn').on('click', function () {
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
                     <thead>
                         <tr>
+                            <th hidden>Invoice #</th> 
+                            <th>Invoice #</th> 
                             <th>Invoice #</th> 
                             <th>Debit</th> 
                             <th>Credit</th>
@@ -151,10 +153,13 @@ $('.search-btn').on('click', function () {
                         var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' CR' : element['balance'].toLocaleString('en-US') + ' DR') : '0';
                     }
                 }
+                 
                 ledger_bal = ledger_bal.replace('-', '');
                 $('.TeacherAttendanceListTable tbody').append(`
                     <tr> 
-                        <td>${inv_no}</td> 
+                        <td hidden> ${element['id']}</td> 
+                        <td> ${inv_no}</td> 
+                        <td>${formattedDate}</td> 
                         
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element['dr'] ? element['dr'].toLocaleString('en-US') : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element['cr'] ? element['cr'].toLocaleString('en-US') : '0'}</td>
@@ -229,7 +234,6 @@ $('.search-btn').on('click', function () {
              
             $('.TeacherAttendanceListTable tbody').append(` 
                 <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
-                    <td  class="font18" align="right"></td>
                     <td  class="font18" align="right"></td>
                     <td   class="font18" align="center">Grand Total :</td>
                     <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${totalDR.toLocaleString('en-US')}</td>

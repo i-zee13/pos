@@ -13,7 +13,7 @@ var operation = '';
 var total_amount = 0;
 $(document).ready(function () {
   var segments = location.href.split('/');
-  action = segments[3];
+  action = segments[3].replace(/[#?]+$/, '');
   operation = action.split('-')[0];
   ledger_type = action.split('-')[2];
   fetchLedgers();
@@ -120,19 +120,11 @@ $(document).ready(function () {
     $('input[name="balance"]').focus().val(balance >= 0 ? balance + ' DR' : -balance + ' CR').blur();
     openSidebar();
   });
-  // $("#print-invoice").on('click',function(){
-  //     var current_action = $(this);
-  //     saveTransaction(current_action,'print');
-  //     current_action.text('Print')
-  // })
-
   $("#saveTransaction").on('click', function () {
     var current_action = $(this);
     saveTransaction(current_action, 'save');
     current_action.text('Save');
-    // $('#hidden_btn_to_open_modal').click();
   });
-
   function saveTransaction(current_action, type) {
     var dirty = true;
     if (n == 0) {
@@ -271,20 +263,12 @@ function fetchLedgers() {
       $('.subCatsListTable tbody').empty();
       var sNo = 1;
       response.customers.forEach(function (element, key) {
-        var _element$comment;
+        var _element$rec$0$total_, _element$rec$0$total_2, _element$crv_no, _element$cpv_no, _element$comment;
         var total_cr_dr = 0;
         var voucher = '';
-        if (operation == 'vendor') {
-          var _element$rec$0$total_, _element$rec$0$total_2, _element$crv_no, _element$cpv_no;
-          total_cr_dr = action == 'vendor-ledger-jama' ? (_element$rec$0$total_ = element.rec[0].total_cr) !== null && _element$rec$0$total_ !== void 0 ? _element$rec$0$total_ : '0' : (_element$rec$0$total_2 = element.rec[0].total_dr) !== null && _element$rec$0$total_2 !== void 0 ? _element$rec$0$total_2 : '0';
-          voucher = action == 'vendor-ledger-jama' ? (_element$crv_no = element.crv_no) !== null && _element$crv_no !== void 0 ? _element$crv_no : '0' : (_element$cpv_no = element.cpv_no) !== null && _element$cpv_no !== void 0 ? _element$cpv_no : '0';
-          ledger_balance = element['balance'] >= 0 ? element['balance'] + ' CR' : -element['balance'] + ' DR';
-        } else {
-          var _element$rec$0$total_3, _element$rec$0$total_4, _element$crv_no2, _element$cpv_no2;
-          total_cr_dr = action == 'customer-ledger-jama' ? (_element$rec$0$total_3 = element.rec[0].total_cr) !== null && _element$rec$0$total_3 !== void 0 ? _element$rec$0$total_3 : '0' : (_element$rec$0$total_4 = element.rec[0].total_dr) !== null && _element$rec$0$total_4 !== void 0 ? _element$rec$0$total_4 : '0';
-          voucher = action == 'customer-ledger-jama' ? (_element$crv_no2 = element.crv_no) !== null && _element$crv_no2 !== void 0 ? _element$crv_no2 : '0' : (_element$cpv_no2 = element.cpv_no) !== null && _element$cpv_no2 !== void 0 ? _element$cpv_no2 : '0';
-          ledger_balance = element['balance'] >= 0 ? element['balance'] + ' DR' : -element['balance'] + ' CR';
-        }
+        total_cr_dr = action == 'customer-ledger-jama' ? (_element$rec$0$total_ = element.rec[0].total_cr) !== null && _element$rec$0$total_ !== void 0 ? _element$rec$0$total_ : '0' : (_element$rec$0$total_2 = element.rec[0].total_dr) !== null && _element$rec$0$total_2 !== void 0 ? _element$rec$0$total_2 : '0';
+        voucher = action == 'customer-ledger-jama' ? (_element$crv_no = element.crv_no) !== null && _element$crv_no !== void 0 ? _element$crv_no : '0' : (_element$cpv_no = element.cpv_no) !== null && _element$cpv_no !== void 0 ? _element$cpv_no : '0';
+        ledger_balance = element['balance'] >= 0 ? element['balance'] + ' DR' : -element['balance'] + ' CR';
         $('.subCatsListTable tbody').append("\n                        <tr>\n                         <td> ".concat(voucher, "</td> \n                            <td> ").concat(element['customer_name'], "</td>\n                            <!-- <td class='total_balance'>").concat(ledger_balance, "</td> --!>\n                            <td>").concat(total_cr_dr, "</td>\n                            <td> ").concat((_element$comment = element['comment']) !== null && _element$comment !== void 0 ? _element$comment : 'NA', "</td>\n                            <td> ").concat(moment(element['date']).format('D MMM YYYY'), "</td>\n                            <td>\n                                <button  class=\"btn btn-default btn-line openDataSidebarForEditCustomerLedger ").concat(element.is_editable == 1 ? '' : 'd-none', "\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Edit</button>\n                                    <button  class=\"btn btn-default btn-line openDataSidebarForUpdateCustomerLedger\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Add Payment</button>\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
