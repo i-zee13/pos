@@ -293,9 +293,7 @@
     <!-- Theme JS -->
     <script src="{{asset('/assets/js/theme.bundle.js')}}"></script><input type="file" multiple="multiple" class="dz-hidden-input" tabindex="-1" style="visibility: hidden; position: absolute; top: 0px; left: 0px; height: 0px; width: 0px;">
     @stack('js')
-    @push('js')
-    <script src="{{asset('js/custom/master.js')}}"> </script>
-    @endpush
+    
     <script>
         var is_close = '{!! $is_close !!}';
         if (is_close == 1) {
@@ -312,7 +310,8 @@
                 }
             }
         }
-    </script>
+    </script> 
+    <script src="{{asset('/js/custom/master.js')}}"> </script> 
 </body>
 
 </html>

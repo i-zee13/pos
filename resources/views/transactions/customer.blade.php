@@ -220,7 +220,7 @@
         <div class="card">
             <div class="header mb-0">
                 <a class="btn add_button openDataSidebarForAddCustomerLedger customer-ledger-jama-banam"><i class="fa fa-plus"></i> Add New</a>
-                <h2>Customer {{request()->segment(1) == 'customer-ledger-jama' ? ' Jama ( جمع )' : ' Banam ( بنام )'}}</h2>
+                <h2>Customer Cash {{request()->segment(1) == 'customer-ledger-jama' ? ' Jama ( جمع )' : ' Banam ( بنام )'}}</h2>
             </div>
             <div style="min-height: 400px" id="tblLoader">
                 <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">

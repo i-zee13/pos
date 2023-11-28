@@ -74,7 +74,7 @@ $('.search-btn').on('click', function () {
             var ttl_quantity            = 0;
             var ttl_product_discount    = 0;
             var ttl_invoice_discount    = 0;
-            response.stocks.forEach((element, key) => {
+            response.stocks.sales.forEach((element, key) => {
                 total_sales             += element['total_invoice_amount'] ? element['total_invoice_amount'] : 0;
                 ttl_quantity            += element['qty'] ? element['qty'] : 0;
                 ttl_product_discount    += element['product_discount'] ? element['product_discount'] : 0;
@@ -102,7 +102,7 @@ $('.search-btn').on('click', function () {
             $('.ttl_discount').html(addCommas(parseInt(ttl_invoice_discount) + parseInt(ttl_product_discount)));
             $('.TeacherAttendanceListTable').fadeIn();
             $('.TeacherAttendanceListTable tbody').append(`
-                <tr style="background-color: #f6f6f6">
+                <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white"">
                     <th></th>
                     <th></th>
                     <th></th>

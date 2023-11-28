@@ -2865,22 +2865,21 @@
                 <div class="row" style="margin-bottom: 10px;">
                     <div class="col-auto" style="padding: 0px">
                         <div class="CL-Product inputmonth" style="width:250px;margin-left:11px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
-                            <input type="date" autocomplete="off" class="form-control " placeholder="Start Date" name="start_date">
+                            <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
                         </div>
                         <div class="CL-Product inputmonth" style="width:250px;margin-left: 0px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
-                            <input type="date" autocomplete="off" class="form-control" placeholder="End Date" name="end_date">
+                            <input type="date" autocomplete="off" class="form-control end_date" placeholder="End Date" name="end_date">
                         </div>
                     </div>
                     
                     <div class="col-auto p-0">
                         <style>
-                            .reset-btn{
-            ;
-            box-shadow: none;
-        }
-        .reset-btn:hover{
-            color: white !important;
-        }
+                            .reset-btn{ 
+                                box-shadow: none;
+                            }
+                            .reset-btn:hover{
+                                color: white !important;
+                            }
                         </style>
                         <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#152e4d !important"> Reset</button>
                     </div>

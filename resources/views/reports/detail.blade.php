@@ -602,9 +602,8 @@
                                           <tr>
                                               <th class="">ID</th>
                                               <th class="">Product Name</th>
-                                              <th style="">Old Price</th>
-                                              <th style="">New Price</th>
-                                              <th style="">New R.Price</th>
+                                              <th style="">P.Price</th>
+                                              <th style="">R.Price</th>
                                               <th style="">Expiry D.</th>
                                               <th style="">QTY.</th>
                                               <th style="">Discount</th>
@@ -639,8 +638,7 @@
                                           <tr id='tr-{{ $product->product_id }}'>
                                               <td>{{ $product->product_id }}</td>
                                               <td>{{ $product->product_name }}</td>
-                                              <td> <input readonly type="number" value="" class="inputSale price-input add-stock-input td-{{ $product->product_id }}" min="0"></td>
-                                              <td> <input readonly type="number" class="inputSale" name="new_purchase_price " tabindex="3" style=" width: 60;" min="0"></td>
+                                              <td> <input readonly type="number" value="{{ $product->purchase_price }}" class="inputSale" name="new_purchase_price " tabindex="3"  min="0"></td>
                                               <td> <input readonly type="number" value="{{ $product->sale_price }}" class="inputSale price-input add-stock-input td-{{ $product->product_id }}" min="0"></td>
                                               <td> <input readonly type="date" id="expiry_date" class="inputSale expiry_date" value="{{ $product->expiry_date }}" name="expiry_date " tabindex="5" style=" width: 95;"></td>
                                               <td> <input readonly type="number" value="{{$product->qty}}" class="inputSale qty-input add-stock-input td-input-qty{{ $product->product_id }}" min="0"></td>

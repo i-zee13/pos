@@ -740,7 +740,7 @@
 
                     <div class="row">
                         <div class="col-6">
-                            <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'sale-edit' ? 'Sale' : 'New'}} <span>Invoice</span></h2>
+                            <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'sale-edit' ? 'Update' : 'New'}} <span>Sale Invoice</span></h2>
                         </div>
 
                         <!-- <div class="col p-0 text-right">

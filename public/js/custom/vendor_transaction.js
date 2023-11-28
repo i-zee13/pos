@@ -243,7 +243,7 @@ $(document).ready(function () {
     $('.pc-cartlist').show();
     $('input[id="customer_id"]').val(id);
     $('input[id="hidden_balance"]').val(balance);
-    $('.customer_name').text(customer_name !== null && customer_name !== void 0 ? customer_name : 'Customer' + ' Details');
+    $('.customer_name').text(customer_name !== null && customer_name !== void 0 ? customer_name : 'Vendor' + ' Details');
     $('input[name="cr"]').focus().val(cr).blur();
     $('input[name="dr"]').focus().val(dr).blur();
     $('input[name="balance"]').focus().val(balance >= 0 ? balance + ' DR' : -balance + ' CR').blur();

@@ -6,19 +6,7 @@ let report_segments = location.href.split('/');
 let current_url = report_segments[3].replace(/[#?]+$/, '');
 let trx_inv = false;
 $(document).ready(function () {
-    var currentDate = new Date();
-
-    // Set start date to one month before the current date
-    var startDate = new Date();
-    startDate.setMonth(currentDate.getMonth() - 1);
-
-    // Format dates to YYYY-MM-DD
-    var formattedStartDate = startDate.toISOString().split('T')[0];
-    var formattedEndDate = currentDate.toISOString().split('T')[0];
-
-    // Set default values for the date inputs
-    $('.start_date').val(formattedStartDate);
-    $('.end_date').val(formattedEndDate);
+    
 });
 $('.search-btn').on('click', function () {
     var start_date = $('.start_date').val();
@@ -101,7 +89,7 @@ $('.search-btn').on('click', function () {
                     inv_id = element['sale_invoice_id'];
                 } else if (element['purchase_invoice_id'] != null && element['purchase_invoice_id'] != 0) {
                     flag = true;
-                     inv_no = element['invoice_no'];
+                    inv_no = element['invoice_no'];
                     label = 'Purchase Inv';
                     inv_id = element['purchase_invoice_id'];
                 } else if (element['sale_return_invoice_id'] != null && element['sale_return_invoice_id'] != 0) {
@@ -164,14 +152,15 @@ $('.search-btn').on('click', function () {
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element['dr'] ? element['dr'].toLocaleString('en-US') : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element['cr'] ? element['cr'].toLocaleString('en-US') : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${ledger_bal}</td>
-                        <td><a class="btn btn-default open-modal btn-line" 
+                        <td><a class="btn btn-default btn-detail  btn-line" 
                                 data-inv-id="${inv_id}"
+                                data-inv_no="${inv_no}"
                                 data-label="${label}"
                                 data-id="${element['id']}"
                                 data-commit = ${element['comment'] ?? 'NA'}
                                 data-cr = ${element['cr']}
                                 data-dr = ${element['dr']}
-                                href="#">Detail </a> </td>                       
+                                href="javascript:void(0)">Detail </a> </td>                       
                     </tr>`);
             });
             $('.TeacherAttendanceListTable').fadeIn();
@@ -247,13 +236,24 @@ $('.search-btn').on('click', function () {
         }
     });
 });
-$(document).on('click', '.open-modal', function (event) {
+$(document).on('click', '.btn-detail', function (event) {
 
-    $('.cr').val($(this).data('cr'))
-    $('.dr').val($(this).data('dr'))
-    $('.comment').val($(this).data('label'))
-    $('#itemModal').modal('show');
-    event.preventDefault();
+    var invoice_id = $(this).data('inv-id');
+    var label      = $(this).data('label');
+    var inv_no      = $(this).data('inv_no');
+
+    if(inv_no.includes("Crv") || inv_no.includes("Cpv")){
+        $('.cr').val($(this).data('cr'))
+        $('.dr').val($(this).data('dr'))
+        $('.comment').val($(this).data('label'))
+        $('#itemModal').modal('show');
+        event.preventDefault();
+    }else{ 
+        window.location = `/detail/${invoice_id}/${label}`;
+    }
+    
+   
+      
 
 });
 $('.reset-btn').on('click', function () {

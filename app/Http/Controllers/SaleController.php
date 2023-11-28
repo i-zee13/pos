@@ -110,7 +110,6 @@ class SaleController extends Controller
                                                             ->where('product_id', $sale->product_id)
                                                             ->orderBy('id', 'Desc')
                                                             ->value('qty');
-                                                          
                     if ($sale->save()) {
                         $sale_products_array[] = $sale->id;
                         $check_stock           =  VendorStock::where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
@@ -135,7 +134,6 @@ class SaleController extends Controller
                         }
                     }
                 }
-               
                 if ($request->hidden_invoice_id) {
                     ProductSale::where('sale_invoice_id', $request->hidden_invoice_id)
                         ->whereNotIn('id', $sale_products_array)
