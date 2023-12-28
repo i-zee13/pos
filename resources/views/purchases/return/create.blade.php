@@ -611,7 +611,7 @@
                                             id="invoice_type" value="{{ @$invoice->invoice_type }}"
                                             {{ @$invoice->customer_id ? 'disabled' : '' }}>
                                             <option value="1" {{ @$invoice->invoice_type == 1 ? 'selected' : '' }}>Net
-                                                Sale</option>
+                                                Return</option>
                                             <option value="2" {{ @$invoice->invoice_type == 2 ? 'selected' : '' }}>Add
                                                 To Ledger</option>
                                         </select>
@@ -924,7 +924,6 @@
                 </div>
             </form>
         </div>
-
     </div>
     </div>
 @endsection

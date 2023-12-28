@@ -134,6 +134,12 @@ Route::post('/stocks'                   ,[App\Http\Controllers\ReportsController
 //Sale Report
 Route::get('/sale-report'               ,[App\Http\Controllers\ReportsController::class, 'saleReport'])->name('sale-reports');
 Route::post('/sales-list'               ,[App\Http\Controllers\ReportsController::class, 'saleReportList'])->name('stock-report-list');
+//Purchase Report
+Route::get('/purchase-report'           ,[App\Http\Controllers\ReportsController::class, 'purchaseReport'])->name('purchase-reports');
+Route::post('/purchase-list'            ,[App\Http\Controllers\ReportsController::class, 'purchaseReportList'])->name('purchase-report-list');
+//Profit Report
+Route::get('/profit-report'              ,[App\Http\Controllers\ReportsController::class, 'profitReport'])->name('profit-reports');
+Route::post('/sales-profit-list'         ,[App\Http\Controllers\ReportsController::class, 'saleProfitReportList'])->name('profit-report-list');
 
 // All Sales List Fakahr
 Route::get('/all-sales-list',[App\Http\Controllers\SaleController::class, 'allSalesList'])->name('all-sales-list');

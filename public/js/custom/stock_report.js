@@ -48,7 +48,7 @@ $('.search-btn').on('click', function () {
       CurrentRef.attr('disabled', false);
       $('.loader').show();
       $('.teacher_attendance_list').empty();
-      $('.teacher_attendance_list').append("\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th>Company Name</th>\n                            <th>Product Name</th>\n                            <th>Purchase Price</th>  \n                            <th>Expire Date</th> \n                            <th>Qty</th> \n                            <th>Balance</th> \n\n                        </tr>\n                    </thead><tbody>\n                </tbody>\n                </table>");
+      $('.teacher_attendance_list').append("\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th hidden>id</th>\n                            <th>#</th>\n                            <th>Company Name</th>\n                            <th>Product Name</th>\n                            <th>Purchase Price</th>  \n                            <th>Expire Date</th> \n                            <th>Qty</th> \n                            <th>Balance</th> \n                        </tr>\n                    </thead><tbody>\n                </tbody>\n                </table>");
       $('.TeacherAttendanceListTable tbody').empty();
       if (response.records.length == 0) {
         $('#notifDiv').fadeIn();
@@ -59,10 +59,10 @@ $('.search-btn').on('click', function () {
         }, 3000);
       }
       response.records.forEach(function (element, key) {
-        console.log(element.expire_date);
+        console.log(element);
         var date = new Date(element.expire_date);
         var formattedDate = date.toDateString();
-        $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td>".concat(key + 1, "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat(element['product_name'], "</td>\n                        <td>").concat(element['p_price'], "</td> \n                        <td>").concat(date.toDateString(), "</td>\n                        <td>").concat(element['qty'] ? element['qty'] : 'N/A', "</td> \n                        <td>").concat(element['balance'], "</td> \n                    </tr>"));
+        $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td hidden>".concat(element['id'], "</td>\n                        <td>").concat(key + 1, "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat(element['product_name'], "</td>\n                        <td>").concat(element['p_price'], "</td> \n                        <td>").concat(element.expire_date ? date.toDateString() : 'NA', "</td>\n                        <td>").concat(element['qty'] ? element['qty'] : 'N/A', " percentageValue > 0 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger';</td> \n                        <td>").concat(element['balance'], "</td> \n                    </tr>"));
       });
       $('.TeacherAttendanceListTable').fadeIn();
       $('.loader').hide();

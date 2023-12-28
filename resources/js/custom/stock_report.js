@@ -48,6 +48,7 @@ let segments = location.href.split('/');
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
                     <thead>
                         <tr>
+                            <th hidden>id</th>
                             <th>#</th>
                             <th>Company Name</th>
                             <th>Product Name</th>
@@ -55,7 +56,6 @@ let segments = location.href.split('/');
                             <th>Expire Date</th> 
                             <th>Qty</th> 
                             <th>Balance</th> 
-
                         </tr>
                     </thead><tbody>
                 </tbody>
@@ -71,17 +71,18 @@ let segments = location.href.split('/');
             }
           
             response.records.forEach((element, key) => { 
-                console.log(element.expire_date)
+                console.log(element)
                 var date = new Date(element.expire_date);
                 var formattedDate = date.toDateString();
                 $('.TeacherAttendanceListTable tbody').append(`
                     <tr>
+                        <td hidden>${element['id']}</td>
                         <td>${key+1}</td>
                         <td>${element['company_name'] }</td>
                         <td>${element['product_name'] }</td>
                         <td>${element['p_price'] }</td> 
-                        <td>${date.toDateString()}</td>
-                        <td>${element['qty']   ? element['qty']   : 'N/A'}</td> 
+                        <td>${element.expire_date ? date.toDateString() : 'NA'}</td>
+                        <td>${element['qty']   ? element['qty']   : 'N/A'} percentageValue > 0 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger';</td> 
                         <td>${element['balance']}</td> 
                     </tr>`);
             });

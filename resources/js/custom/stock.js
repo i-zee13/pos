@@ -195,7 +195,7 @@ $(document).on('click', '.remove_btn', function () {
         $(".products").select2();
 
         grandSum(previous_payable);
-    } 
+    }
 })
 $('#add-product').on('click', function () {
 
@@ -224,12 +224,12 @@ $('#add-product').on('click', function () {
         } else {
             $('#qty').css('border-color', ''); // Reset the border color
         }
-        if ($('.expiry_date').val() == '') { 
+        if ($('.expiry_date').val() == '') {
         } else {
             expiry_date   = $('.expiry_date').val();
         }
         var prod_discount = $('.discount').val();
-        sale_price = $('.new_sale_price').val(); 
+        sale_price = $('.new_sale_price').val();
         purchased_product_array.push({
             'prod_discount'     : prod_discount ? prod_discount : 0,
             'purchase_prod_id'  : ``,
@@ -308,10 +308,10 @@ $(document).on('focusout', '.bar-code', function () {
             // $('.retail_price').text(filter_product[0].sale_price);
             $('.purchase_price').val(filter_product[0].old_purchase_price);
             $('.stock_balance').text(filter_product[0].stock_balance);
-            $('.new_sale_price').val(filter_product[0].sale_price) 
+            $('.new_sale_price').val(filter_product[0].sale_price)
             p_name = filter_product[0].product_name;
             product_id = filter_product[0].id;
-            retail_price = filter_product[0].sale_price; 
+            retail_price = filter_product[0].sale_price;
         } else {
             $('#products').val('0').trigger('change');
             $('#retail_price').val('');
@@ -328,7 +328,7 @@ $(document).on('focusout', '.bar-code', function () {
     }
     return 0;
 
-}); 
+});
 $('#qty').on('input', function () {
     new_price = $('#new_purchase_price').val();
     old_price = $('#purchase_price').val();
@@ -341,7 +341,7 @@ $('#qty').on('input', function () {
     }
     $('#amount').val(amount);
 })
- 
+
 $("#save").on('click', function () {
     var current_action = $(this);
     saleSave(current_action,'save');
@@ -544,13 +544,13 @@ $(document).on('input', '.expiry_input', function () {
 })
 
 $(document).on('input', '.sale_price_input', function () {
-     
+
     var update_price          = $(this).val();
     var current_product_id   = $(this).attr('data-id');
     purchased_product_array.filter(function (data) {
         if (data.product_id == current_product_id) {
             data.sale_price = update_price;
-        } 
+        }
     })
 })
 function getProducts() {
@@ -665,16 +665,16 @@ $('.products').change(function () {
         $('.stock_balance').text(filter_product[0].stock_balance);
         p_name          = filter_product[0].product_name;
         product_id      = filter_product[0].id;
-        stock_in_hand   = filter_product[0].stock_balance; 
-        sale_price      = filter_product[0].sale_price; 
+        stock_in_hand   = filter_product[0].stock_balance;
+        sale_price      = filter_product[0].sale_price;
 
-        $('.new_sale_price').val(filter_product[0].sale_price) 
+        $('.new_sale_price').val(filter_product[0].sale_price)
         $('#expiry_date').val(filter_product[0].expiry_date)
         $('.bar-code').val(filter_product[0].barcode);
     }
 
-}); 
-$(document).on('input', '.price-input', function () { 
+});
+$(document).on('input', '.price-input', function () {
     $('.amount_received').val($('.paid_amount').text());
     setTimeout(() => {
         $('.amount_received').trigger('input');
@@ -741,7 +741,7 @@ $('#invoice_discount').on('input', function () {
     var service = 0;
     invoice_discount = $(this).val();
     $('.amount_received').val($('.paid_amount').text());
-    
+
     grandSum(previous_payable, service_charges, $(this).val());
 })
 $('.service_charges_input').on('input', function () {
@@ -763,9 +763,9 @@ function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
     // sale_total_amount = sum-invoice_discount;
     sum += parseFloat(previous_payable ? previous_payable : 0);
     sum += parseFloat(service_charges ? service_charges : 0);
-    sale_total_amount = sum - invoice_discount; 
+    sale_total_amount = sum - invoice_discount;
     $('.grand-total').text(sale_total_amount - $('.paid_amount').text());
-    $('.amount_pay_input').val(sale_total_amount - $('.paid_amount').text()); 
+    $('.amount_pay_input').val(sale_total_amount - $('.paid_amount').text());
     purchased_total = sum;
     if (parseFloat($('.amount_pay_input').val()) < 0) {
         $('.th-hide').hide();
@@ -773,7 +773,7 @@ function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
     } else {
         $('.th-hide').show();
         $('.cash-return').text('Cash Received');
-    } 
+    }
     setTimeout(() => {
         $('.amount_received').trigger('input');
     }, 500);

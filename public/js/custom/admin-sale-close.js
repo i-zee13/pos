@@ -23,7 +23,7 @@ function SaleCloseRecord(close_date){
         success :   function(response){
             console.log(response.records)
             var records                 =   response.records;
-            var saleRecords             =   records.saleRecords;
+            var saleRecords             =   records.saleRecords.sales;
             var vendor_ledger           =   records.vendor_payment;
             var customer_ledger         =   records.customer_payment;
             var total_invoice_amount    =   records.total_invoice_amount;
@@ -89,9 +89,9 @@ function SaleCloseRecord(close_date){
                     <td>${element['customer_name']}</td>
                     <td>${element['company_name']}</td>
                     <td>${element['product_name']}</td>
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td> 
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['product_discount']}</td> 
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['total_invoice_amount'])}</td> 
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td>
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['product_discount']}</td>
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['total_invoice_amount'])}</td>
                     </tr>
                 `)
             });

@@ -32,7 +32,7 @@ $('.search-btn').on('click', function () {
     CurrentRef = $(this);
     CurrentRef.text('Fetching...')
     CurrentRef.attr('disabled', 'disabled');
-    url = '/sales-list';
+    url = '/sales-profit-list';
     $(`#search-form`).ajaxSubmit({
         type: 'POST',
         url: url,
@@ -54,18 +54,16 @@ $('.search-btn').on('click', function () {
                             <th>Company Name</th>
                             <th>Product Name</th>
                             <th>Qty</th>
-                            <th>Discount</th>
-                            <th>Amount</th>
-
+                            <th>Cost Price</th>
+                            <th>Sale Price</th>
+                            <th>Profit</th>
                         </tr>
                     </thead><tbody>
                 </tbody>
                 </table>`);
 
-
-
             $('.TeacherAttendanceListTable tbody').empty();
-            if (response.stocks.length == 0) {
+            if (response.sales.length == 0) {
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'green');
                 $('#notifDiv').text('No data available');
@@ -73,19 +71,20 @@ $('.search-btn').on('click', function () {
                     $('#notifDiv').fadeOut();
                 }, 3000);
             }
-            var total_sales             = 0;
+            var total_profit            = 0;
             var ttl_quantity            = 0;
             var ttl_product_discount    = 0;
             var ttl_invoice_discount    = 0;
-            //Sale Return Variables
-            var total_returns                  = 0;
-            var ttl_return_quantity            = 0;
-            var ttl_return_product_discount    = 0;
-            var ttl_return_invoice_discount    = 0;
-            response.stocks.sales.forEach((element, key) => {
-                total_sales             += element['total_invoice_amount'] ? element['total_invoice_amount'] : 0;
+            var ttl_cost_product        = 0;
+            var ttl_sale_product        = 0;
+            var purchase_price          = 0 ;
+            response.sales.forEach((element, key) => {
+                element['old_purchase_price']  = element['new_purchase_price'] ?? element['old_purchase_price'];
+                element['sale_price']  = element['sale_price'] - element['old_purchase_price'];
+                total_profit            += (element['sale_price'] - element['old_purchase_price'] ) * element['qty'] ;
                 ttl_quantity            += element['qty'] ? element['qty'] : 0;
-                ttl_product_discount    += element['product_discount'] ? element['product_discount'] : 0;
+                ttl_cost_product        += element['old_purchase_price'] ? element['old_purchase_price'] : 0;
+                ttl_sale_product        += element['sale_price'] ? element['sale_price'] : 0;
                 ttl_invoice_discount    += element['invoice_discount'] ? element['invoice_discount'] : 0;
                 var date                = new Date(element.expire_date);
                 var formattedDate       = date.toDateString();
@@ -94,19 +93,13 @@ $('.search-btn').on('click', function () {
                 reportTable(invoice_no[0],element)
             });
             $('.TeacherAttendanceListTable').fadeIn();
-            sale_return_total(ttl_quantity,ttl_product_discount,total_sales,'Sale')
-           if( response.stocks.sale_returns.length > 0 ){
-               //Sale Returns
-               response.stocks.sale_returns.forEach((element, key) => {
-                   total_returns                  += element['total_invoice_amount'] ? element['total_invoice_amount'] : 0;
-                   ttl_return_quantity            += element['qty'] ? element['qty'] : 0;
-                   ttl_return_product_discount    += element['product_discount'] ? element['product_discount'] : 0;
-                   ttl_return_invoice_discount    += element['invoice_discount'] ? element['invoice_discount'] : 0;
-                   var invoice_no                 = "";
-                   invoice_no                     = element.invoice_no.split('-');
-                   reportTable(invoice_no[0],element);
-                });
-             sale_return_total(ttl_return_quantity,ttl_return_product_discount,total_returns,'Return');
+            // sale_return_total(ttl_quantity,ttl_product_discount,total_profit,'Sale')
+            $('.filter_name').empty();
+            if($('.product_id').val() != ''){
+                $('.filter_name').html('Product: <span>'+$('.product_id option:selected').text()+'</span>');
+            } else if($('.company_id').val() != '' && $('.product_id').val() == ''){
+                $('.filter_name').html('Company: <span>'+$('.company_id option:selected').text()+'</span>');
+
             }
             //Grand Total
             $('.TeacherAttendanceListTable tbody').append(`
@@ -115,30 +108,31 @@ $('.search-btn').on('click', function () {
                 <td></td>
                 <td></td>
                 <td class="font18">Grand Total :</td>
-                <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> - </td>
-                <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${addCommas(parseInt(ttl_product_discount - ttl_return_product_discount))} </td>
+                <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${ttl_quantity}</td>
+                <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${addCommas(ttl_cost_product)}</td>
+                <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${addCommas(ttl_sale_product)}</td>
                 <td class="totalNo" colspan="2">
-                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(parseInt(total_sales - total_returns))}</span>
+                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(total_profit)}</span>
                 </td>
             </tr>
         `);
 
 
-            $('.ttl_sales').html('<span>Rs.</span>'+ addCommas(total_sales - total_returns));
-            // $('.ttl_payment').html(total_sales ? addCommas(addCommas(parseInt(total_sales + ttl_invoice_discount + ttl_product_discount))) : 0);
-            $('.ttl_payment').html(total_sales ? addCommas(total_sales) : 0);
+            $('.ttl_sales').html('<span>Rs.</span>'+ addCommas(total_profit));
+            // $('.ttl_payment').html(total_profit ? addCommas(addCommas(parseInt(total_profit + ttl_invoice_discount + ttl_product_discount))) : 0);
+            $('.ttl_payment').html(ttl_cost_product ? addCommas(ttl_cost_product) : 0);
             $('.ttl_quantity').html(ttl_quantity ? addCommas(ttl_quantity) : 0);
-            $('.ttl_product_discount').html(ttl_product_discount ? addCommas(ttl_product_discount) : 0);
+            $('.ttl_product_discount').html(ttl_sale_product ? addCommas(ttl_sale_product) : 0);
             $('.ttl_invoice_discount').html(ttl_invoice_discount ? addCommas(ttl_invoice_discount) : 0);
-            $('.ttl_discount').html(total_returns ? addCommas(total_returns) : 0);
+            // $('.ttl_discount').html(ttl_sale_product ? addCommas(ttl_sale_product) : 0);
 
             $('.loader').hide();
-            var title = '';
-            if (segments[3] == 'customer-reports') {
-                title = 'Customer Report'
-            } else {
-                title = 'Vendor Report'
-            }
+            var title = 'Profit Report';
+            // if (segments[3] == 'customer-reports') {
+            //     title = 'Customer Report'
+            // } else {
+            //     title = 'Vendor Report'
+            // }
 
             if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
                 $('.TeacherAttendanceListTable').DataTable().clear().destroy();
@@ -153,7 +147,7 @@ $('.search-btn').on('click', function () {
                 buttons: [
                     {
                         extend: 'pdfHtml5',
-                        title: `Sale Report`,
+                        title:title,
                         orientation: 'landscape',
                         header: true,
                         exportOptions: {
@@ -163,7 +157,7 @@ $('.search-btn').on('click', function () {
                         customize: function (doc) {
                             doc.content.splice(0, 1, {
                                 text: [{
-                                  text: `Sale Report`,
+                                  text:title,
                                   bold: true,
                                   fontSize: 14,
                                   alignment: 'left'
@@ -231,7 +225,7 @@ $('.search-btn').on('click', function () {
                         }
                     },
                     {
-                        title: 'Stock Report',
+                        title: title,
                         extend: 'excelHtml5',
                         exportOptions: {
 
@@ -270,12 +264,13 @@ function reportTable(invoice_no,element){
     $('.TeacherAttendanceListTable tbody').append(`
                     <tr>
                         <td>${invoice_no}</td>
-                        <td>${element['created']}</td>
+                        <td>${element['created']}</td> 
                         <td>${element['company_name']}</td>
                         <td>${element['product_name']}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['product_discount'] ? element['product_discount'] : 0}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['total_invoice_amount'])}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['old_purchase_price']}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['sale_price']}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;"><i  class="${ (element['sale_price'] - element['old_purchase_price'] ) > 0 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger'}"></i>  <strong>${addCommas((element['sale_price'] -  element['old_purchase_price']) * element['qty'] ) } </strong></td>
                     </tr>`);
 }
 function sale_return_total(ttl_quantity,ttl_product_discount,total,flag){
@@ -308,20 +303,22 @@ $('.company_id').on('change', function () {
 
 $('.reset-btn').on('click', function () {
     $('.company_id').val('').trigger('change');
-  $('.product_id').val('').trigger('change');
-  $('.customer_id').val('').trigger('change');
-  $('input[name="bill_no"]').val('');
-  $('.ttl_sales').html('<span>Rs.</span> 0');
-  $('.ttl_payment').html(0);
-  $('.ttl_quantity').html(0);
-  $('.ttl_product_discount').html(0);
-  $('.ttl_invoice_discount').html(0);
+    $('.product_id').val('').trigger('change');
+    $('.customer_id').val('').trigger('change');
+    $('input[name="bill_no"]').val('');
+
+
+    $('.ttl_sales').html('<span>Rs.</span> 0');
+    $('.ttl_payment').html(0);
+    $('.ttl_quantity').html(0);
+    $('.ttl_product_discount').html(0);
+    $('.ttl_invoice_discount').html(0);
     // $('#search-form')[0].reset();
     $('.teacher_attendance_list').empty();
     $('.teacher_attendance_list').append(`
             <div class="col-12 pb-10">
             <div class="no-info">
-                <div class="m-auto"><strong>Please Filter Your Sale Record !</strong></div>
+                <div class="m-auto"><strong>Please Filter Your Stock Record !</strong></div>
             </div>
         </div>
         `);

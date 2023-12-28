@@ -9,6 +9,8 @@
     "/js/custom/vendor_customer_report.js": "/js/custom/vendor_customer_report.js",
     "/js/custom/stock_report.js": "/js/custom/stock_report.js",
     "/js/custom/sale_report.js": "/js/custom/sale_report.js",
+    "/js/custom/purchase_report.js": "/js/custom/purchase_report.js",
+    "/js/custom/profit_report.js": "/js/custom/profit_report.js",
     "/js/custom/sale_return.js": "/js/custom/sale_return.js",
     "/js/custom/vendor_transaction.js": "/js/custom/vendor_transaction.js",
     "/js/custom/purchase_return.js": "/js/custom/purchase_return.js",

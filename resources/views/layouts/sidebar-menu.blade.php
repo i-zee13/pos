@@ -315,6 +315,16 @@
                   Sale
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{route('purchase-reports')}}" class="nav-link ">
+                  Purchase
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('profit-reports')}}" class="nav-link ">
+                  Profit
+                </a>
+              </li>
 
             </ul>
           </div>

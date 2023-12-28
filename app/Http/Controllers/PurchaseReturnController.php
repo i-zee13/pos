@@ -167,7 +167,7 @@ class PurchaseReturnController extends Controller
                 $customer_ledger->customer_id= $request->customer_id;
                 $customer_ledger->dr         = $total_dr;
                 $customer_ledger->cr         = $request->service_charges ?? 0;
-                if($invoice->invoice_type == 1 && $invoice->invoice_remaining_amount_after_pay == $invoice->amount_received){
+                if($invoice->invoice_type ==  1 && $invoice->invoice_remaining_amount_after_pay == $invoice->amount_received){
                     $customer_ledger->balance     =  0; //balance
                 }else{
                     $customer_ledger->balance     =  $request->previous_receivable - $total_dr +  $customer_ledger->cr; //balance

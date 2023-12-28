@@ -169,8 +169,7 @@ if(!function_exists('getInvoice'))
     // Increment the invoice number and append the year
     $invoice_no = ($lastinvoice ? $lastinvoice+1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
     return $invoice_no;
-}
-
+} 
 }
 
 if(!function_exists('getPurchaseInvoice'))

@@ -108,7 +108,7 @@ function percentage(dataId, salePrice = 0, purchasePrice = 0) {
     var result = percentageValue < 0 ? 1 : 0;
     var iconClass = percentageValue > 0 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger';
 
-    $('.' + dataId + '-profit').html('<i class="' + iconClass + '"></i> ' + parseFloat(percentageValue).toFixed(2) + '%');
+    $('.' + dataId + '-profit').html('<i  class="' + iconClass + '"></i> ' + parseFloat(percentageValue).toFixed(2) + '%');
 }
 
 

@@ -32,7 +32,7 @@ $('.search-btn').on('click', function () {
     CurrentRef = $(this);
     CurrentRef.text('Fetching...')
     CurrentRef.attr('disabled', 'disabled');
-    url = '/sales-list';
+    url = '/purchase-list';
     $(`#search-form`).ajaxSubmit({
         type: 'POST',
         url: url,
@@ -49,14 +49,13 @@ $('.search-btn').on('click', function () {
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
                     <thead>
                         <tr>
-                            <th>Bill #</th>
+                            <th></th>
                             <th>Date</th>
                             <th>Company Name</th>
                             <th>Product Name</th>
+                            <th>P.Price</th>
                             <th>Qty</th>
-                            <th>Discount</th>
                             <th>Amount</th>
-
                         </tr>
                     </thead><tbody>
                 </tbody>
@@ -94,7 +93,7 @@ $('.search-btn').on('click', function () {
                 reportTable(invoice_no[0],element)
             });
             $('.TeacherAttendanceListTable').fadeIn();
-            sale_return_total(ttl_quantity,ttl_product_discount,total_sales,'Sale')
+            sale_return_total(ttl_quantity,ttl_product_discount,total_sales,'Purchase')
            if( response.stocks.sale_returns.length > 0 ){
                //Sale Returns
                response.stocks.sale_returns.forEach((element, key) => {
@@ -129,8 +128,8 @@ $('.search-btn').on('click', function () {
             $('.ttl_payment').html(total_sales ? addCommas(total_sales) : 0);
             $('.ttl_quantity').html(ttl_quantity ? addCommas(ttl_quantity) : 0);
             $('.ttl_product_discount').html(ttl_product_discount ? addCommas(ttl_product_discount) : 0);
-            $('.ttl_invoice_discount').html(ttl_invoice_discount ? addCommas(ttl_invoice_discount) : 0);
-            $('.ttl_discount').html(total_returns ? addCommas(total_returns) : 0);
+            $('.ttl_discount').html(ttl_invoice_discount ? addCommas(ttl_invoice_discount) : 0);
+            $('.ttl_invoice_discount').html(total_returns ? addCommas(total_returns) : 0);
 
             $('.loader').hide();
             var title = '';
@@ -218,7 +217,7 @@ $('.search-btn').on('click', function () {
                             })
                             doc.content[1].table.body.forEach((element) => {
                                 element.forEach((el) => {
-                                    if (el.text == "Sale Total" || el.text == "Return Total") {
+                                    if (el.text == "Purchase Total" || el.text == "Return Total") {
                                         element.forEach((cell) => {
                                             cell.fillColor = '#F2F2F2';
                                             cell.fontSize = '9';
@@ -269,12 +268,12 @@ $('.search-btn').on('click', function () {
 function reportTable(invoice_no,element){
     $('.TeacherAttendanceListTable tbody').append(`
                     <tr>
-                        <td>${invoice_no}</td>
+                        <td></td>
                         <td>${element['created']}</td>
                         <td>${element['company_name']}</td>
                         <td>${element['product_name']}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['purchase_price'] ? element['purchase_price'] : 0}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['product_discount'] ? element['product_discount'] : 0}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['total_invoice_amount'])}</td>
                     </tr>`);
 }
@@ -285,9 +284,8 @@ function sale_return_total(ttl_quantity,ttl_product_discount,total,flag){
         <th></th>
         <th></th>
         <th class="font18" align="center">${flag} Total</th>
+        <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> - </th>
         <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${ttl_quantity ? addCommas(ttl_quantity) : 0}</th>
-        <th></th>
-        <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${ttl_product_discount ? addCommas(ttl_product_discount) : 0}</th>
         <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${total ? addCommas(total) : 0}</th>
     </tr>
 `);
@@ -308,20 +306,20 @@ $('.company_id').on('change', function () {
 
 $('.reset-btn').on('click', function () {
     $('.company_id').val('').trigger('change');
-  $('.product_id').val('').trigger('change');
-  $('.customer_id').val('').trigger('change');
-  $('input[name="bill_no"]').val('');
-  $('.ttl_sales').html('<span>Rs.</span> 0');
-  $('.ttl_payment').html(0);
-  $('.ttl_quantity').html(0);
-  $('.ttl_product_discount').html(0);
-  $('.ttl_invoice_discount').html(0);
+    $('.product_id').val('').trigger('change');
+    $('.customer_id').val('').trigger('change');
+    $('input[name="bill_no"]').val('');
+    $('.ttl_sales').html('<span>Rs.</span> 0');
+    $('.ttl_payment').html(0);
+    $('.ttl_quantity').html(0);
+    $('.ttl_product_discount').html(0);
+    $('.ttl_invoice_discount').html(0);
     // $('#search-form')[0].reset();
     $('.teacher_attendance_list').empty();
     $('.teacher_attendance_list').append(`
             <div class="col-12 pb-10">
             <div class="no-info">
-                <div class="m-auto"><strong>Please Filter Your Sale Record !</strong></div>
+                <div class="m-auto"><strong>Please Filter Your Purchase Record !</strong></div>
             </div>
         </div>
         `);

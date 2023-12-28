@@ -65,6 +65,7 @@ class StockController extends Controller
         $v->company_id           =  $sale->company_id;
         $v->product_id           =  $sale->product_id;
         $v->date                 =  $sale->created_at;
+        $v->date                 =  $sale->created_at;
         $v->amount               =   $sale->purchased_total_amount;
         $v->created_by           =  Auth::id();
         $v->save();

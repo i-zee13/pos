@@ -6,7 +6,7 @@ let report_segments = location.href.split('/');
 let current_url = report_segments[3].replace(/[#?]+$/, '');
 let trx_inv = false;
 $(document).ready(function () {
-    
+
 });
 $('.search-btn').on('click', function () {
     var start_date = $('.start_date').val();
@@ -53,10 +53,10 @@ $('.search-btn').on('click', function () {
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
                     <thead>
                         <tr>
-                            <th hidden>Invoice #</th> 
-                            <th>Invoice #</th> 
-                            <th>Invoice #</th> 
-                            <th>Debit</th> 
+                            <th hidden>Invoice #</th>
+                            <th>Invoice #</th>
+                            <th>Invoice #</th>
+                            <th>Debit</th>
                             <th>Credit</th>
                             <th>Balance</th>
                             <th>Action</th>
@@ -141,18 +141,18 @@ $('.search-btn').on('click', function () {
                         var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' CR' : element['balance'].toLocaleString('en-US') + ' DR') : '0';
                     }
                 }
-                 
+
                 ledger_bal = ledger_bal.replace('-', '');
                 $('.TeacherAttendanceListTable tbody').append(`
-                    <tr> 
-                        <td hidden> ${element['id']}</td> 
-                        <td> ${inv_no}</td> 
-                        <td>${formattedDate}</td> 
-                        
+                    <tr>
+                        <td hidden> ${element['id']}</td>
+                        <td> ${inv_no}</td>
+                        <td>${formattedDate}</td>
+
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element['dr'] ? element['dr'].toLocaleString('en-US') : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element['cr'] ? element['cr'].toLocaleString('en-US') : '0'}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${ledger_bal}</td>
-                        <td><a class="btn btn-default btn-detail  btn-line" 
+                        <td><a class="btn btn-default btn-detail  btn-line"
                                 data-inv-id="${inv_id}"
                                 data-inv_no="${inv_no}"
                                 data-label="${label}"
@@ -160,7 +160,7 @@ $('.search-btn').on('click', function () {
                                 data-commit = ${element['comment'] ?? 'NA'}
                                 data-cr = ${element['cr']}
                                 data-dr = ${element['dr']}
-                                href="javascript:void(0)">Detail </a> </td>                       
+                                href="javascript:void(0)">Detail </a> </td>
                     </tr>`);
             });
             $('.TeacherAttendanceListTable').fadeIn();
@@ -220,18 +220,17 @@ $('.search-btn').on('click', function () {
                 ],
 
             })
-             
-            $('.TeacherAttendanceListTable tbody').append(` 
+
+            $('.TeacherAttendanceListTable tbody').append(`
                 <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
-                    <td  class="font18" align="right"></td>
-                    <td   class="font18" align="center">Grand Total :</td>
+                    <td class="font18" align="right"></td>
+                    <td class="font18" align="center">Grand Total :</td>
                     <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${totalDR.toLocaleString('en-US')}</td>
                     <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${totalCR.toLocaleString('en-US')} </td>
-                    <td class="totalNo" colspan="2"> 
+                    <td class="totalNo" colspan="2">
                         <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${(totalCR - totalDR).toFixed(2).toLocaleString('en-US').replace('-', '') } ${(totalCR - totalDR) > 0 ? 'CR' : 'DR'}</span>
                     </td>
-                   
-                </tr>   
+                </tr>
             `);
         }
     });
@@ -248,12 +247,12 @@ $(document).on('click', '.btn-detail', function (event) {
         $('.comment').val($(this).data('label'))
         $('#itemModal').modal('show');
         event.preventDefault();
-    }else{ 
+    }else{
         window.location = `/detail/${invoice_id}/${label}`;
     }
-    
-   
-      
+
+
+
 
 });
 $('.reset-btn').on('click', function () {
