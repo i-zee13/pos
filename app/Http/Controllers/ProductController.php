@@ -18,7 +18,6 @@ class ProductController extends Controller
     }
     public function store(Request $request)
     {
-        // dd($request->all());
         $duplicateField = '';
         if (Product::where('company_id', $request->company_id)
             ->where('product_name', $request->hidden_product_name)
@@ -26,7 +25,7 @@ class ProductController extends Controller
             ->exists()
         ) {
             $duplicateField = 'Product Name with same  Company already Exist';
-        } elseif (Product::where('barcode', $request->barcode)
+        } elseif (Product::whereIn('barcode', $request->barcode)
             ->where('id', '!=', $request->hidden_product_id)
             ->exists()
         ) {
@@ -49,7 +48,7 @@ class ProductController extends Controller
             } else {
                 $product     =   new Product();
             }
-            $product->barcode            =  $request->barcode;
+            $product->barcode            =  isset($request->barcode) ? implode(',', $request->barcode) : $request->barcode_span;
             $product->product_name       =  $request->hidden_product_name;
             $product->size               =  $request->size;
             $product->old_purchase_price =  $request->purchase_price;

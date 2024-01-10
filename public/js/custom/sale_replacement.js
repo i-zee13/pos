@@ -17652,7 +17652,8 @@ $(document).on('focusout', '.bar-code', function () {
   $('#qty').val('');
   $('.amount').val('');
   var filter_product = product_list.filter(function (x) {
-    return x.barcode == data_variable;
+    var barcodeArray = x.barcode.split(',');
+    return barcodeArray.includes(data_variable) || x.id == data_variable;
   });
   if (data_variable != '') {
     if (filter_product.length > 0) {

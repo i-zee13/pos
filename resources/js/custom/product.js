@@ -65,9 +65,20 @@ $(document).ready(function() {
                 $('.pc-cartlist').show();
                 $('.barcode_span').text(response.product.id);
 
-                $('input[name="barcode"]').focus();
-                $('input[name="barcode"]').val(response.product.barcode);
-                $('input[name="barcode"]').blur();
+                $('.bar_code_div').empty();
+                response.product.barcode.split(',').forEach(code => {
+                    $('.bar_code_div').append(`
+                        <div class="item-wrapper col-md-6 PB-10">
+                            <div class="form-group">
+                                <input type="text" name="barcode[]" class="form-control barcode" value="${code.trim()}" />
+                                <i class="fa fa-trash remove-item" aria-hidden="true" onclick="removeItem(this)"></i>
+                            </div>
+                        </div>
+                    `);
+                });
+                // $('input[name="barcode[]"]').focus();
+                // $('input[name="barcode[]"]').val(response.product.barcode);
+                // $('input[name="barcode[]"]').blur();
                 
                 setTimeout(() => { 
                     selectize.setValue(id);
@@ -254,7 +265,7 @@ $(document).ready(function() {
         });
 
     });
-    $(document).on('click', '#saveProduct', function() { 
+    $(document).on('click', '#saveProduct', function() {  
         let dirty = false;
         $('.field-required').each(function () {
             if (!$(this).val() || $(this).val() == 0) {
@@ -270,6 +281,9 @@ $(document).ready(function() {
             }, 3000);
             return;
         }
+
+       
+            var barcode_span = $('.barcode_span').text();
         // if (!$('input[name="product_name"]').val() || !$('select[name="company_id"]').val()) {
         //     $('#notifDiv').fadeIn();
         //     $('#notifDiv').css('background', 'red');
@@ -290,6 +304,7 @@ $(document).ready(function() {
             url    : '/product-store',
             data :{
                 prod_name:prod_name,
+                barcode_span:barcode_span
             },
             cache  : false,
             success: function(response) {

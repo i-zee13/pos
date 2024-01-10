@@ -285,9 +285,9 @@ $(document).on('focusout input', '.bar-code', function () {
   $('#amount').val('');
   if (data_variable) {
     var filter_product = product_list.filter(function (x) {
-      return x.barcode == data_variable;
+      var barcodeArray = x.barcode.split(',');
+      return barcodeArray.includes(data_variable) || x.id == data_variable;
     });
-    console.log(filter_product);
     $('#products').val(filter_product[0].id).trigger('change');
     $('.retail_price').text(filter_product[0].sale_price);
     $('#purchase_price').val(filter_product[0].old_purchase_price);

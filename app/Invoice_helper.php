@@ -1,29 +1,16 @@
 <?php
 
-use App\Models\AdminSaleClose;
-use App\Models\City;
-use App\Models\Country;
-use App\Models\Customer;
-use App\Models\CustomerLedger;
-use App\Models\PostalCode;
-use App\Models\Product;
+ 
 use App\Models\ProductPurchase;
 use App\Models\ProductReplacement;
 use App\Models\ProductReplacementInvoice;
 use App\Models\ProductReturns;
 use App\Models\ProductSale;
 use App\Models\PurchaseInvoice;
-use App\Models\PurchaseReturn;
 use App\Models\ReturnInvoice;
-use App\Models\State;
 use App\Models\Sale as SaleInvoice;
-use App\Models\SaleReplacement;
 use App\Models\SaleReturn;
 use App\Models\SaleReturnProduct;
-use App\Models\Stock;
-use App\Models\Student;
-use App\Models\VendorLedger;
-use App\Models\VendorStock;
 
 if (!function_exists('getSaleInv')) {
    function getSaleInv($id)
@@ -214,8 +201,7 @@ if (!function_exists('ProfitReportRecords')) {
 
       return $sales;
    }
-}
-
+} 
 if (!function_exists('PurchaseReportList')) {
    function PurchaseReportList($request, $current_date)
    {

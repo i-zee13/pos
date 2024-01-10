@@ -87,9 +87,9 @@ class ProductController extends Controller
     public function getSubCatToUpdate($id)
     {
         $query    =  Product::where('products.id', $id)
-            ->leftjoin('companies', 'companies.id', '=', 'products.company_id')
-            ->selectRaw('products.* , (SELECT company_name FROM companies WHERE id = products.company_id) as company_name')
-            ->first();
+                                ->join('companies', 'companies.id', '=', 'products.company_id')
+                                ->selectRaw('products.* , (SELECT company_name FROM companies WHERE id = products.company_id) as company_name, EXPLODE(",", products.barcode) as barcode')
+                                ->first();
         return response()->json([
             'msg'       =>  'Product Fetched for update',
             'status'    =>  'success',

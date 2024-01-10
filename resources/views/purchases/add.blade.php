@@ -86,9 +86,10 @@
       </div>
       @section('content')
       <style>
-      .container{
-        max-width: 1370px;
-    }
+          .container {
+              max-width: 1370px;
+          }
+
           select:focus>option:checked {
               background: #000 !important;
           }
@@ -347,7 +348,7 @@
           }
 
           .inputSale {
-              width: 65;
+              width: 155;
               border-radius: 0;
               border: solid 1px #dbdbdb;
               background-color: #f6f6f6;
@@ -597,79 +598,75 @@
 
                   <input type="hidden" id="" value="1" name="form_status">
                   <!-- <input type="hidden" id="stock_products"   value="{{json_encode($products)}}"> -->
-                  <div class="col-md-4 left-sidebox ">
-                      <div class="sidebox-content text-white" style="background-color: #152e4d">
-                          <div class="CT_sec">
-                              <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
-                              <div class="col-md-12 PB-10">
-                                  <label class="font13 mb-5">Invoice Type</label>
-                                  <div class="form-s2">
-                                      <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
-                                          <option value="1" {{@$invoice->invoice_type == 1 ? 'selected' : ''}}>Net Purchse</option>
-                                          <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
-                                      </select>
-                                      @if (@$invoice->customer_id)
-                                      <input type="hidden" name="invoice_type" value="{{ @$invoice->invoice_type }}">
-                                      @endif
-                                  </div>
-                              </div>
-                              <div class="col-md-12 PB-10">
-                                  <label class="font13 mb-5">Invoice #</label>
-                                  <div class="form-s2">
-                                      <input type="text" id="" class="form-control" value="{{@$invoice_first_part}}">
-                                      <input type="hidden" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
+                  <div class="CT_sec">
+                  </div>
+                  <div class="row  text-white d-flex" style="background-color: #152e4d">
+                  <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
 
-                                  </div>
-                              </div>
-                              <div class="col-md-12 PB-10">
-                                  <label class="font13 mb-5">Date</label>
-                                  <div class="form-s2">
-                                      <input type="Date" name="invoice_date" class="form-control new_dob new_form_field " value="{{ @$invoice ? $invoice->date : $current_date }}">
-                                  </div>
-                              </div>
-                              <div class="form-wrap p-0">
-                                  <div class="row">
-                                      <div class="col-md-12">
-                                          <label class="font13 mb-5">Select Vendor</label>
-                                          <div class="form-s2">
-                                              <select class="form-control formselect form_clear  required customer_id" placeholder="Select Customer" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
-                                                  <option value="">Select Customer</option>
-                                                  @foreach($customers as $customer)
-                                                  <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->id}} - {{$customer->customer_name}}</option>
-                                                  @endforeach
-                                              </select>
-                                          </div>
-                                      </div>
+                      <div class="col-md-2 PB-10">
+                          <label class="font13 mb-5">Invoice Type</label>
+                          <div class="form-s2">
+                              <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                                  <option value="1" {{@$invoice->invoice_type == 1 ? 'selected' : ''}}>Net Purchse</option>
+                                  <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
+                              </select>
+                              @if (@$invoice->customer_id)
+                              <input type="hidden" name="invoice_type" value="{{ @$invoice->invoice_type }}">
+                              @endif
+                          </div>
+                      </div>
+                      <div class="col-md-2 PB-10">
+                      <label class="font13 mb-5">Invoice Type</label>
+                          <div class="form-s2">
+                              <input type="text" id="" class="form-control" value="{{@$invoice_first_part}}">
+                              <input type="hidden" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
 
-                                  </div>
-                              </div>
-                              <div class="form-wrap p-0">
-                                  <div class="row">
-                                      <div class="col-md-12 mt-5">
-                                          <label class="font13 mb-5">Description</label>
-                                          <div class="form-s2">
-                                              <textarea rows="4" name="description" id="description">{{@$invoice->description}}</textarea>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                              <h2 class="title border-bottom">Vendor <span>Ledger</span></h2>
-                              <div class="row CompanyInfo">
-                                  <!-- <div class="col-md-7 pr-0"><strong>Old Recived:</strong> </div>
+                          </div>
+                      </div>
+                      <div class="col-md-2 PB-10">
+                          <label class="font13 mb-5">Date</label>
+                          <div class="form-s2">
+                              <input type="Date" name="invoice_date" class="form-control new_dob new_form_field " value="{{ @$invoice ? $invoice->date : $current_date }}">
+                          </div>
+                      </div>
+
+                      <div class="col-md-2">
+                          <label class="font13 mb-5">Select Vendor</label>
+                          <div class="form-s2">
+                              <select class="form-control formselect form_clear  required customer_id" placeholder="Select Customer" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                                  <option value="">Select Customer</option>
+                                  @foreach($customers as $customer)
+                                  <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->id}} - {{$customer->customer_name}}</option>
+                                  @endforeach
+                              </select>
+                          </div>
+                      </div>
+
+
+
+                      <div class="col-md-3 mt-5">
+                          <label class="font13 mb-5">Description</label>
+                          <div class="form-s2">
+                              <textarea  name="description" id="description">{{@$invoice->description}}</textarea>
+                          </div>
+                      </div> 
+                      <div class="row CompanyInfo">
+                          <!-- <div class="col-md-7 pr-0"><strong>Old Recived:</strong> </div>
                                   <div class="col-md-5"><span class=" text-red">{{@$invoice->amount_received}}</span></div>
                                   <div class="col-md-7 pr-0"><strong>Previous Paid :</strong></div>
                                   <div class="col-md-5"><span class="">{{@$invoice->paid_amount}}</span></div> -->
-                                  <div class="col-md-7 pr-0"><strong class="previous_payable_heading">Previous Receivable :</strong> </div>
+                          <div class="col-md-7 pr-0"><strong class="previous_payable_heading">Previous Receivable :</strong> </div>
 
-                                  <div class="col-md-5"><span class="dashboard_avg_rev_perCust {{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '' }}</span></div>
-                                  <!-- <div class="col-md-7 pr-0"><strong>Country:</strong></div>
+                          <div class="col-md-5"><span class="dashboard_avg_rev_perCust {{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '' }}</span></div>
+                          <!-- <div class="col-md-7 pr-0"><strong>Country:</strong></div>
                           <div class="col-md-5"><span id="country"></span></div> -->
-                              </div>
-                              <!-- <h2 class="title m-0 pb-0">Shipping <span>Details</span></h2> -->
-                          </div>
                       </div>
+                      <!-- <h2 class="title m-0 pb-0">Shipping <span>Details</span></h2> -->
+
                   </div>
-                  <div class="col-md-8 right-sid ebox" >
+
+
+                  <div class="col-md-12 right-sid ebox">
                       <div class="row">
                           <div class="col-6">
                               <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Update' : 'New'}} Purchase<span>Invoice</span></h2>
@@ -743,10 +740,10 @@
                                       </thead>
                                       <tbody id="productGrid">
                                           <tr>
-                                              <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;"></td>
+                                              <td style="width: 0px;"><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1"  ></td>
                                               <td>
                                                   <div class="form-s2" style="width:165px">
-                                                      <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 130;">
+                                                      <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" >
                                                           <option value="0">Select Product *</option>
                                                           @foreach($products as $product)
                                                           <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
@@ -754,11 +751,11 @@
                                                       </select>
                                                   </div>
                                               </td>
-                                              <td><input type="number" style="font-size: 13px; width: 60;" readonly id="purchase_price" class="inputSale purchase_price" placeholder="" name="purchase_price"  ></td>
-                                              <td> <input type="number" id="new_purchase_price" class="inputSale" placeholder="" name="new_purchase_price " tabindex="3" style=" width: 60;" min="0"></td>
-                                              <td> <input type="number"   class="inputSale new_sale_price" placeholder="" name="new_sale_price " tabindex="4" style=" width: 60;" min="0"></td>
-                                              <td> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="5" style=" width: 95;"></td>
-                                              <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="6" min="0" style=" width: 45;"></td>
+                                              <td><input type="number" style="font-size: 13px; width: 60;" readonly id="purchase_price" class="inputSale purchase_price" placeholder="" name="purchase_price"></td>
+                                              <td> <input type="number" id="new_purchase_price" class="inputSale" placeholder="" name="new_purchase_price " tabindex="3"  min="0" style="width: 70;"></td>
+                                              <td> <input type="number" class="inputSale new_sale_price" placeholder="" name="new_sale_price " tabindex="4"  min="0"  style="width: 70;"></td>
+                                              <td style="width: 0px;"> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="5" style=" width: 95;"></td>
+                                              <td style="width: 0px;"> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="6" min="0" style="width: 70;"></td>
 
                                               <td><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;width: 55;" tabindex="7" min="0"></td>
                                               <td class='add- S-input '><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;width: 75;"></td>
@@ -826,7 +823,7 @@
                                               <td></td>
                                               <td></td>
                                               <td align="right" class="cash-return">Cash To Pay </td>
-                                              <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00"  value="{{@$invoice->paid_amount}}"></td>
+                                              <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" value="{{@$invoice->paid_amount}}"></td>
                                           </tr>
 
 

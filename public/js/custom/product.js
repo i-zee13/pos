@@ -150,9 +150,14 @@ $(document).ready(function () {
         $('._cl-bottom').show();
         $('.pc-cartlist').show();
         $('.barcode_span').text(response.product.id);
-        $('input[name="barcode"]').focus();
-        $('input[name="barcode"]').val(response.product.barcode);
-        $('input[name="barcode"]').blur();
+        $('.bar_code_div').empty();
+        response.product.barcode.split(',').forEach(function (code) {
+          $('.bar_code_div').append("\n                        <div class=\"item-wrapper col-md-6 PB-10\">\n                            <div class=\"form-group\">\n                                <input type=\"text\" name=\"barcode[]\" class=\"form-control barcode\" value=\"".concat(code.trim(), "\" />\n                                <i class=\"fa fa-trash remove-item\" aria-hidden=\"true\" onclick=\"removeItem(this)\"></i>\n                            </div>\n                        </div>\n                    "));
+        });
+        // $('input[name="barcode[]"]').focus();
+        // $('input[name="barcode[]"]').val(response.product.barcode);
+        // $('input[name="barcode[]"]').blur();
+
         setTimeout(function () {
           selectize.setValue(id);
           var selectedOption = selectize.getItem(id);
@@ -341,6 +346,7 @@ $(document).ready(function () {
       }, 3000);
       return;
     }
+    var barcode_span = $('.barcode_span').text();
     // if (!$('input[name="product_name"]').val() || !$('select[name="company_id"]').val()) {
     //     $('#notifDiv').fadeIn();
     //     $('#notifDiv').css('background', 'red');
@@ -358,7 +364,8 @@ $(document).ready(function () {
       type: "POST",
       url: '/product-store',
       data: {
-        prod_name: prod_name
+        prod_name: prod_name,
+        barcode_span: barcode_span
       },
       cache: false,
       success: function success(response) {

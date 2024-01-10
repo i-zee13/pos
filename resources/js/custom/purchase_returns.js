@@ -217,9 +217,11 @@ $(document).on('focusout input', '.bar-code', function () {
     $('#qty').val('');
     $('#amount').val('');
     if(data_variable ){
-        var filter_product = product_list.filter(x => x.barcode == data_variable)
-
-        console.log(filter_product);
+        var filter_product = product_list.filter(x => {
+            const barcodeArray = x.barcode.split(',');
+            return barcodeArray.includes(data_variable) || x.id == data_variable;
+        });
+ 
         $('#products').val(filter_product[0].id).trigger('change');
         $('.retail_price').text(filter_product[0].sale_price);
         $('#purchase_price').val(filter_product[0].old_purchase_price);

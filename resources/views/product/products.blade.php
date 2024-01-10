@@ -16,11 +16,11 @@
                                 <form style="display: flex;" id="saveProductForm">
                                     @csrf
                                     <input type="text" id="operation" hidden>
-                                    <input type="text" id="product_id" hidden name="hidden_product_id"> 
+                                    <input type="text" id="product_id" hidden name="hidden_product_id">
                                     <div id="floating-label" class="card p-20 top_border mb-3" style="width: 100%">
                                         <h2 class="_head03">Product <span>Details</span></h2>
                                         <div class="form-wrap p-0">
-                                            <div class="row">
+                                            <div class="row" id="item-container">
                                                 <div class="col-md-6 PB-10 ">
                                                     <label class="font12 mb-0">Companies *</label>
                                                     <div class="form-s2 ">
@@ -32,27 +32,55 @@
                                                         </select>
                                                     </div>
                                                 </div>
+                                                <style>
+                                                    .fa-trash {
+                                                        margin-top: 28px;
+                                                        margin-left: 10px;
+                                                        color: red;
+                                                        cursor: pointer
+                                                    }
 
-                                                <div class="col-md-6 PB-10">
-                                                    <div class="form-group">
-                                                        <label class="control-label mb-10">Bar Code </label>
-                                                        <input type="text" name="barcode" class="form-control barcode" value="" id="barcode">
-                                                       
+                                                    .addBTN-act {
+                                                        font-size: 13px;
+                                                        background-color: #040725;
+                                                        border: none;
+                                                        -webkit-border-radius: 0;
+                                                        -moz-border-radius: 0;
+                                                        border-radius: 0;
+                                                        -khtml-border-radius: 0;
+                                                        box-shadow: 2px 2px 10px 0 rgba(79, 79, 79, .2);
+                                                        padding: 6px 10px;
+                                                        color: #fff !important;
+                                                        float: right;
+                                                        cursor: pointer;
+                                                    }
+                                                </style>
+                                                <div class="row">
+                                                    <div class="col-md-12 mt-25">
+                                                        <h2 class="_head03">Add <span>Barcode</span><a onclick="addMoreItems()" class="btn addBTN-act"><i class="fa fa-plus"></i> New Barcode</a></h2>
                                                     </div>
-                                                    <h6 class="_head03" style="padding-bottom:0px;border-bottom:0px">ID :  <span class="barcode_span"></span></h6>  
+                                                </div>
+                                                <h6 class="_head03" style="padding-bottom: 0px; border-bottom: 0px">ID : <span class="barcode_span"></span></h6>
+                                                <div class="row bar_code_div d-flex">
+                                                    <div class="item-wrapper col-md-6 PB-10">
+                                                        <div class="form-group">
+                                                            <input type="text" name="barcode[]" class="form-control barcode" value="" />
+                                                            <i class="fa fa-trash remove-item" aria-hidden="true" onclick="removeItem(this)"></i>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="row">
-                                            <div class="col-md-12 PB-10 ">
+                                                <div class="col-md-12 PB-10 ">
                                                     <label class="font12 mb-0">Products *</label>
                                                     <div class="form-s2">
-                                                    <input type="hidden" id="hidden_product_name"  name="hidden_product_name">
+                                                        <input type="hidden" id="hidden_product_name" name="hidden_product_name">
 
-                                                    <!-- <select class="form-control formselect attribute" placeholder="select Designation" style="width:100%!important" name="attribute_id"> -->
-                                                    <select id="MCategory" class="demo-default attribute" data-placeholder="Product name" name="product_name">
+                                                        <!-- <select class="form-control formselect attribute" placeholder="select Designation" style="width:100%!important" name="attribute_id"> -->
+                                                        <select id="MCategory" class="demo-default attribute" data-placeholder="Product name" name="product_name">
 
-                                                    </select>
-                                                </div>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-6 PB-10">
                                                     <div class="form-group">
@@ -97,7 +125,7 @@
 </div>
 @endsection
 @section('content')
- 
+
 
 <div class="header">
 
@@ -143,4 +171,23 @@
 @endsection
 @push('js')
 <script src="{{asset('js/custom/product.js')}}"> </script>
+<script>
+    function addMoreItems() {
+
+        var newItem = $(".item-wrapper:first").clone();
+        $(".bar_code_div").append(` 
+        <div class="item-wrapper col-md-6 PB-10">
+            <div class="form-group">
+                <input type="text" name="barcode[]" class="form-control barcode" value="" />
+                <i class="fa fa-trash remove-item" aria-hidden="true" onclick="removeItem(this)"></i>
+            </div>
+        </div>
+        `);
+    }
+
+    function removeItem(button) {
+        // Remove the parent item wrapper when the remove button is clicked
+        $(button).closest('.item-wrapper').remove();
+    }
+</script>
 @endpush
