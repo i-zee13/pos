@@ -5,15 +5,15 @@ let n = 0;
 let customer_transaction_array = [];
 let ledger_type = '';
 let operation = '';
-let  total_amount = 0;
-$(document).ready(function() {
+let total_amount = 0;
+$(document).ready(function () {
     var segments = location.href.split('/');
-     action      = segments[3].replace(/[#?]+$/, '');
-     operation   = action.split('-')[0];
-     ledger_type = action.split('-')[2];
-        fetchLedgers();
+    action = segments[3].replace(/[#?]+$/, '');
+    operation = action.split('-')[0];
+    ledger_type = action.split('-')[2];
+    fetchLedgers();
 
-    $(document).on('click', '.openDataSidebarForUpdateCustomerLedger', function() {
+    $(document).on('click', '.openDataSidebarForUpdateCustomerLedger', function () {
         $('input[id="action"]').val('');
         $('select option').removeAttr('disabled');
         $('.customer_id').select2();
@@ -23,50 +23,48 @@ $(document).ready(function() {
         $('.customers').hide();
         $('.ProductTable').show();
         var this_btn = $(this)
-        var id            =  this_btn.attr('customer-id');
-        var customer_name =  this_btn.attr('customer_name');
-        var cr            =  this_btn.attr('cr');
-        var dr            =  this_btn.attr('dr');
-        var balance       =  this_btn.attr('balance');
+        var id = this_btn.attr('customer-id');
+        var customer_name = this_btn.attr('customer_name');
+        var cr = this_btn.attr('cr');
+        var dr = this_btn.attr('dr');
+        var balance = this_btn.attr('balance');
         $.ajax({
-            url : '/get-customer-transactions',
-            type : 'post',
-            data    : {
+            url: '/get-customer-transactions',
+            type: 'post',
+            data: {
                 _token: $('meta[name="csrf_token"]').attr('content'),
-                current_url:action,
-                id:id,
-                operation:operation
+                current_url: action,
+                id: id,
+                operation: operation
             },
-            success:function(response){
+            success: function (response) {
                 var balance_sum = 0;
                 var dr_sum = 0;
                 var cr_sum = 0;
                 $('#transactionTable tbody').empty()
                 $('.customer_balnce').val(response.customer.balance);
                 response.transactions.forEach(data => {
-                  console.log(data)
+                    console.log(data)
                     balance_sum += data.balance;
                     cr_sum += data.cr;
                     dr_sum += data.dr;
-                    if(action == operation+'-ledger-jama' &&  data.cr > 0){
+                    if (action == operation + '-ledger-jama' && data.cr > 0) {
                         $('#transactionTable tbody').append(`
                                 <tr id='tr-${data.id}'>
                                     <td>${data.crv_no}</td>
                                     <td>${data.cr}</td>
                                     <td>${data.comment ? data.comment : 'NA'}</td>
-                                </tr>`
-                        );
+                                </tr>`);
                     }
-                    if(action == operation+'-ledger-banam' &&  data.dr > 0){
+                    if (action == operation + '-ledger-banam' && data.dr > 0) {
                         console.log(data)
                         $('#transactionTable tbody').append(`
                             <tr id='tr-${data.id}'>
                                 <td>${data.cpv_no}</td>
                                 <td>${data.dr}</td>
                                 <td>${data.comment ? data.comment : 'NA'}</td>
-                            </tr>`
-                        );
-                    } 
+                            </tr>`);
+                    }
                 });
                 $('#transactionTable tbody').append(`
                 <tr style="background: #152e4d;color: white;">
@@ -74,8 +72,8 @@ $(document).ready(function() {
                     <td colspan="2">${action == operation+'-ledger-jama' ? cr_sum : dr_sum}</td>
                 </tr>
             `);
-            this_btn.closest('tr').find('.total_balance').text((action == operation+'-ledger-jama' ? cr_sum + 'CR' : dr_sum + 'DR') );
-            $('.add-more').append(`
+                this_btn.closest('tr').find('.total_balance').text((action == operation + '-ledger-jama' ? cr_sum + 'CR' : dr_sum + 'DR'));
+                $('.add-more').append(`
                     <div class="row _head03">
                         <div class="col-6"> 
                         <h5 class="">${customer_name}</h5>
@@ -121,14 +119,14 @@ $(document).ready(function() {
 
         $('input[id="customer_id"]').val(id);
         $('input[id="hidden_balance"]').val(balance);
-        $('.customer_name').text(customer_name+' Details');
+        $('.customer_name').text(customer_name + ' Details');
         $('input[name="cr"]').focus().val(cr).blur();
         $('input[name="dr"]').focus().val(dr).blur();
         $('input[name="balance"]').focus().val(balance >= 0 ? balance + ' DR' : (-balance) + ' CR').blur();
 
         openSidebar();
     });
-    $(document).on('click', '.openDataSidebarForEditCustomerLedger', function() {
+    $(document).on('click', '.openDataSidebarForEditCustomerLedger', function () {
 
         $('select option').removeAttr('disabled');
         $('.customer_id').select2();
@@ -139,15 +137,19 @@ $(document).ready(function() {
         $('.ProductTable').show();
         $('#transactionTable tbody').empty();
         var this_btn = $(this)
-        var id            =  this_btn.attr('customer-id');
-        var customer_name =  this_btn.attr('customer_name');
-        var cr            =  this_btn.attr('cr');
-        var dr            =  this_btn.attr('dr');
-        var balance       =  this_btn.attr('balance');
-        if(action == operation+'-ledger-jama' &&  cr > 0) {
-            balance  =  parseFloat(balance) + parseFloat(cr)
-        }else{
-            balance -=  parseFloat(balance) - parseFloat(dr)
+        var id = this_btn.attr('customer-id');
+        var customer_name = this_btn.attr('customer_name');
+        var cr = this_btn.attr('cr');
+        var dr = this_btn.attr('dr');
+        var comment = this_btn.attr('comment');
+        var balance = this_btn.attr('balance');
+        var cr_dr = 0;
+        if (action == operation + '-ledger-jama' && cr > 0) {
+            balance = parseFloat(balance) + parseFloat(cr)
+            cr_dr = cr;
+        } else {
+            balance = parseFloat(balance) - parseFloat(dr)
+            cr_dr = dr;
         }
         $('.add-more').append(`
                 <div class="row  remove_div" >
@@ -156,13 +158,13 @@ $(document).ready(function() {
                             <label class="control-label mb-10">Add Amount *</label>
                             <input type="hidden" name="hidden_cust_balance[]" value="${balance}">
                             <input type="hidden" name="hidden_cust_id[]" value="${id}">
-                            <input type="number" name="amount[]" class="form-control field-required amount" id="amount_${id}" required tabindex="2" data-customer_id="${id}" value="${cr}">
+                            <input type="number" name="amount[]" class="form-control field-required amount" id="amount_${id}" required tabindex="2" data-customer_id="${id}" value="${cr_dr}">
                         </div>
                     </div>
                     <div class="col-md-6 PB-10">
                         <div class="form-group focused">
                             <label class="control-label mb-10">Remarks </label>
-                            <textarea name="comment[]" class="form-control remarks_${id}" rows="6" tabindex="3"></textarea>
+                            <textarea name="comment[]" class="form-control remarks_${id}" rows="6" tabindex="3">${comment}</textarea>
                         </div>
                     </div>
                     <div class="col-md-1 PB-10" style="margin-top: 21px;">
@@ -170,7 +172,7 @@ $(document).ready(function() {
                     </div>
                 </div>
             `);
-           n++;
+        n++;
         $('input[id="action"]').val('edit');
         lastOp = 'update';
         $('#dataSidebarLoader').show();
@@ -184,7 +186,7 @@ $(document).ready(function() {
 
         $('input[id="customer_id"]').val(id);
         $('input[id="hidden_balance"]').val(balance);
-        $('.customer_name').text(customer_name+' Details');
+        $('.customer_name').text(customer_name + ' Details');
         $('input[name="cr"]').focus().val(cr).blur();
         $('input[name="dr"]').focus().val(dr).blur();
 
@@ -192,14 +194,15 @@ $(document).ready(function() {
         $('input[name="balance"]').focus().val(balance >= 0 ? balance + ' DR' : (-balance) + ' CR').blur();
 
         openSidebar();
-    }); 
+    });
     $("#saveTransaction").on('click', function () {
         var current_action = $(this);
-        saveTransaction(current_action,'save');
-        current_action.text('Save') 
-    }); 
-    function saveTransaction(current_action,type){
-         var dirty = true;
+        saveTransaction(current_action, 'save');
+        current_action.text('Save')
+    });
+
+    function saveTransaction(current_action, type) {
+        var dirty = true;
         if (n == 0) {
             $('#notifDiv').fadeIn();
             $('#notifDiv').css('background', 'red');
@@ -209,7 +212,7 @@ $(document).ready(function() {
             }, 3000);
             return;
         }
-        $('.amount').each(function(){
+        $('.amount').each(function () {
             if (!$(this).val()) {
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'red');
@@ -221,76 +224,76 @@ $(document).ready(function() {
                 return;
             }
         })
-        if(dirty){
-        current_action.text('Processing...')
-        current_action.attr('disabled', 'disabled');
-        $('#saveTransaction').attr('disabled', 'disabled');
-        $('#cancelSubCat').attr('disabled', 'disabled');
-        $('#saveTransaction').text('Processing..');
-             $('#saveTransactionForm').ajaxSubmit({
-            type   : "POST",
-            url    : '/transaction-store',
-            cache  : false,
-            data:{
-                current_url:action,
-            },
-            success: function(response) {
-                if (response.status == "success") { 
-                    if($("#print-invoice").prop("checked")){
-                        var zz = 0;
-                        if(action == operation+'-ledger-jama') {
-                           zz = 1;
-                        }else{
-                           zz = 2;
+        if (dirty) {
+            current_action.text('Processing...')
+            current_action.attr('disabled', 'disabled');
+            $('#saveTransaction').attr('disabled', 'disabled');
+            $('#cancelSubCat').attr('disabled', 'disabled');
+            $('#saveTransaction').text('Processing..');
+            $('#saveTransactionForm').ajaxSubmit({
+                type: "POST",
+                url: '/transaction-store',
+                cache: false,
+                data: {
+                    current_url: action,
+                },
+                success: function (response) {
+                    if (response.status == "success") {
+                        if ($("#print-invoice").prop("checked")) {
+                            var zz = 0;
+                            if (action == operation + '-ledger-jama') {
+                                zz = 1;
+                            } else {
+                                zz = 2;
+                            }
+                            var printWindow = window.open("/print-transaction-invoice/" + response.transaction_id + '/' + response.customer_id + '/' + operation + '/' + zz);
+                            printWindow.onload = function () {
+                                printWindow.print();
+                            };
+                            location.reload();
                         }
-                        var printWindow    = window.open("/print-transaction-invoice/" + response.transaction_id + '/' + response.customer_id + '/' + operation + '/' + zz);
-                        printWindow.onload = function() {
-                        printWindow.print();
-                        };
-                        location.reload();
-                    }
-                  
-                    $('#saveTransactionForm')[0].reset();
-                    console.log($('.voucher_no').val())
-                    $('.voucher_no').empty().val(response.voucher)
-                    closeSidebar();
-                    location.reload();
-                    fetchLedgers();
-                    $('#saveTransaction').removeAttr('disabled').text('Save');
-                    $('#cancelSubCat').removeAttr('disabled');
-                    $('#amount').val('');
-                    var msg = 'Transaction Successfully Updated';
-                    $('#notifDiv').fadeIn().text(msg).css('background', 'green');
 
-                    setTimeout(() => {
-                        $('#notifDiv').fadeOut();
-                    }, 3000);
+                        $('#saveTransactionForm')[0].reset();
+                        console.log($('.voucher_no').val())
+                        $('.voucher_no').empty().val(response.voucher)
+                        closeSidebar();
+                        location.reload();
+                        fetchLedgers();
+                        $('#saveTransaction').removeAttr('disabled').text('Save');
+                        $('#cancelSubCat').removeAttr('disabled');
+                        $('#amount').val('');
+                        var msg = 'Transaction Successfully Updated';
+                        $('#notifDiv').fadeIn().text(msg).css('background', 'green');
+
+                        setTimeout(() => {
+                            $('#notifDiv').fadeOut();
+                        }, 3000);
+                    }
+                    if (response.status == "failed") {
+                        $('#saveTransaction').removeAttr('disabled');
+                        $('#cancelSubCat').removeAttr('disabled');
+                        $('#saveTransaction').text('Save');
+                        $('#notifDiv').fadeIn();
+                        $('#notifDiv').css('background', 'red');
+                        $('#notifDiv').text('Not Updated at this moment');
+                        setTimeout(() => {
+                            $('#notifDiv').fadeOut();
+                        }, 3000);
+                    }
+                },
+                error: function (err) {
+                    if (err.status == 422) {
+                        $.each(err.responseJSON.errors, function (i, error) {
+                            var el = $(document).find('[name="' + i + '"]');
+                            el.after($('<small style="color: red; position: absolute; width:100%; text-align: right; margin-left: -30px">' + error[0] + '</small>'));
+                        });
+                    }
                 }
-                if (response.status == "failed") {
-                    $('#saveTransaction').removeAttr('disabled');
-                    $('#cancelSubCat').removeAttr('disabled');
-                    $('#saveTransaction').text('Save');
-                    $('#notifDiv').fadeIn();
-                    $('#notifDiv').css('background', 'red');
-                    $('#notifDiv').text('Not Updated at this moment');
-                    setTimeout(() => {
-                        $('#notifDiv').fadeOut();
-                    }, 3000);
-                }
-            },
-            error: function(err) {
-                if (err.status == 422) {
-                    $.each(err.responseJSON.errors, function(i, error) {
-                        var el = $(document).find('[name="' + i + '"]');
-                        el.after($('<small style="color: red; position: absolute; width:100%; text-align: right; margin-left: -30px">' + error[0] + '</small>'));
-                    });
-                }
-            }
-        });
+            });
         }
 
     }
-    $(document).on('click', '.openDataSidebarForAddCustomerLedger', function() {
+    $(document).on('click', '.openDataSidebarForAddCustomerLedger', function () {
         // $('.customer_id').children(`option`).attr('disabled', false);
         $('select option').removeAttr('disabled');
         $('.customer_id').select2();
@@ -302,11 +305,11 @@ $(document).ready(function() {
         $('.customer_balnce').val('');
         $('textarea[name="comment"]').val('');
         $('.customer_id').val(0).trigger('change');
-        var id            =  $(this).attr('customer-id');
-        var customer_name =  $(this).attr('customer_name');
-        var cr            =  $(this).attr('cr');
-        var dr            =  $(this).attr('dr');
-        var balance       =  $(this).attr('balance');
+        var id = $(this).attr('customer-id');
+        var customer_name = $(this).attr('customer_name');
+        var cr = $(this).attr('cr');
+        var dr = $(this).attr('dr');
+        var balance = $(this).attr('balance');
 
 
         $('input[id="operation"]').val('update');
@@ -321,7 +324,7 @@ $(document).ready(function() {
 
         $('input[id="customer_id"]').val(id);
         $('input[id="hidden_balance"]').val(balance);
-        $('.customer_name').text(customer_name ?? 'Customer'+' Details');
+        $('.customer_name').text(customer_name ?? 'Customer' + ' Details');
         $('input[name="cr"]').focus().val(cr).blur();
         $('input[name="dr"]').focus().val(dr).blur();
         $('input[name="balance"]').focus().val(balance >= 0 ? balance + ' DR' : (-balance) + ' CR').blur();
@@ -329,18 +332,19 @@ $(document).ready(function() {
         openSidebar();
     });
 });
+
 function fetchLedgers() {
     $.ajax({
-        type    : 'post',
-        url     : '/get-ledgers-list',
-        data    : {
+        type: 'post',
+        url: '/get-ledgers-list',
+        data: {
             _token: $('meta[name="csrf_token"]').attr('content'),
-            current_url:action,
-            operation:operation
+            current_url: action,
+            operation: operation
         },
-        success : function(response) {
-                    $('.body').empty();
-                    $('.body').append(`
+        success: function (response) {
+            $('.body').empty();
+            $('.body').append(`
                     <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;">
                         <thead>
                             <tr>
@@ -355,16 +359,16 @@ function fetchLedgers() {
                         </thead>
                     <tbody></tbody>
                     </table>`);
-                    $('.subCatsListTable tbody').empty();
-                    var sNo = 1;
-                    response.customers.forEach((element,key) => {
-                        var total_cr_dr = 0;
-                        var voucher = ''; 
-                         total_cr_dr    =    action == 'customer-ledger-jama'? element.rec[0].total_cr ?? '0' :  element.rec[0].total_dr ?? '0';
-                         voucher        =    action == 'customer-ledger-jama'? element.crv_no ?? '0' :  element.cpv_no ?? '0'
-                         ledger_balance =    element['balance'] >= 0 ? element['balance'] + ' DR' : (-element['balance']) + ' CR'
-                      
-                        $('.subCatsListTable tbody').append(`
+            $('.subCatsListTable tbody').empty();
+            var sNo = 1;
+            response.customers.forEach((element, key) => {
+                var total_cr_dr = 0;
+                var voucher = '';
+                total_cr_dr = action == 'customer-ledger-jama' ? element.rec[0].total_cr ?? '0' : element.rec[0].total_dr ?? '0';
+                voucher = action == 'customer-ledger-jama' ? element.crv_no ?? '0' : element.cpv_no ?? '0'
+                ledger_balance = element['balance'] >= 0 ? element['balance'] + ' DR' : (-element['balance']) + ' CR'
+
+                $('.subCatsListTable tbody').append(`
                         <tr>
                          <td> ${voucher}</td> 
                             <td> ${element['customer_name']}</td>
@@ -379,6 +383,7 @@ function fetchLedgers() {
                                             cr="${element['cr']}"
                                             dr="${element['dr']}"
                                             balance="${element['customer_balance']}"
+                                            comment="${element['comment']}"
                                     >Edit</button>
                                     <button  class="btn btn-default btn-line openDataSidebarForUpdateCustomerLedger"
                                             customer-id="${element['customer_id']}"
@@ -389,22 +394,21 @@ function fetchLedgers() {
                                     >Add Payment</button>
                             </td>
                         </tr>`);
-                    });
-                    $('#tblLoader').hide();
-                    $('.body').fadeIn();
-                    $('.subCatsListTable').DataTable();
-                }
+            });
+            $('#tblLoader').hide();
+            $('.body').fadeIn();
+            $('.subCatsListTable').DataTable();
+        }
     });
 }
- $('.customer_id').on('change',function(){
-    var cust_bal     =  $('option:selected', this).attr('balance');
-    var cus_name     =  $('option:selected', this).attr('cus_name');
-    var customer_val =  $(this).val()
+$('.customer_id').on('change', function () {
+    var cust_bal = $('option:selected', this).attr('balance');
+    var cus_name = $('option:selected', this).attr('cus_name');
+    var customer_val = $(this).val()
     $('.hidden_balance').val(cust_bal);
     $('.customer_balnce').val(cust_bal)
     $('#customer_id').val($(this).val());
-    if(customer_val > 0)
-    {
+    if (customer_val > 0) {
         n++
         $('.customer_balnce').val(cust_bal)
         $('.add-more').append(`
@@ -439,14 +443,15 @@ function fetchLedgers() {
         `);
         $('.customer_id').children(`option[value="${customer_val}"]`).attr('disabled', true);
         setTimeout(() => {
-            $('.customer_id').val('0');$('.customer_id').select2();
+            $('.customer_id').val('0');
+            $('.customer_id').select2();
             $(`#amount_${customer_val}`).focus();
         }, 500);
 
     }
 
- });
- $(document).on('click', `.remove`, function () {
+});
+$(document).on('click', `.remove`, function () {
     var cus_id = $(this).attr('data-customer_id');
     // $(`.remove_btn_${cus_id}`).parent().parent().remove();
     $(this).closest('.remove_div').remove();
@@ -454,39 +459,40 @@ function fetchLedgers() {
     n--;
     $('.customer_id').children('option[value="' + cus_id + '"]').attr('disabled', false);
     $(".customer_id").val('0');
-    $(".customer_id").select2(); 
-    var  total_amount = 0;
-    $('.amount').each(function(){
-        var inputValue = parseFloat($(this).val()); 
-        total_amount += inputValue; 
-    });   
-        $('.total_ledger_sum').text(total_amount);
+    $(".customer_id").select2();
+    var total_amount = 0;
+    $('.amount').each(function () {
+        var inputValue = parseFloat($(this).val());
+        total_amount += inputValue;
+    });
+    $('.total_ledger_sum').text(total_amount);
 })
- $('.close').on('click',function(){
+$('.close').on('click', function () {
     $(this).remove();
- })
- $('#saveTransaction').on('focus', function() {
+})
+$('#saveTransaction').on('focus', function () {
     $(this).css('background', 'green');
 });
-$('#saveTransaction').on('blur', function() {
+$('#saveTransaction').on('blur', function () {
     $(this).css('background', 'linear-gradient(90deg, #152e4d 0%, #152e4d 100%)');
 });
 $(document).on('click', '.btn-cancel', function () {
-    if(n > 0){
+    if (n > 0) {
         $('#hidden_btn_to_open_modal').click();
-    }else{closeSidebar();}
+    } else {
+        closeSidebar();
+    }
 })
 $(document).on('click', '.confirm_btn', function () {
     closeSidebar();
 });
- 
-$(document).on('focusout','.amount',function(){ 
+
+$(document).on('focusout', '.amount', function () {
     var total_amount = 0;
-    $('.amount').each(function(){
-        var inputValue = parseFloat($(this).val()); 
-        total_amount += inputValue; 
-    });   
-        $('.total_ledger_sum').text(total_amount);
-     
- })   
- 
+    $('.amount').each(function () {
+        var inputValue = parseFloat($(this).val());
+        total_amount += inputValue;
+    });
+    $('.total_ledger_sum').text(total_amount);
+
+})

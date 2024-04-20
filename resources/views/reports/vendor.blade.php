@@ -36,8 +36,6 @@
         }
     }
 </style>
-<?php
-$ledger_for  = request()->segment(1) == 'customer-reports' ? 'Customer' : 'Vendor';  ?>
 
 <div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -90,7 +88,7 @@ $ledger_for  = request()->segment(1) == 'customer-reports' ? 'Customer' : 'Vendo
         <div class="col">
             <!-- Pretitle -->
             <h6 class="header-pretitle">
-            {{$ledger_for}}
+                {{$ledger_for}}
             </h6>
             <!-- Title -->
             <h1 class="header-title">

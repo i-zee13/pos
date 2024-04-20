@@ -48,7 +48,7 @@ $('.search-btn').on('click', function () {
       CurrentRef.attr('disabled', false);
       $('.loader').show();
       $('.teacher_attendance_list').empty();
-      $('.teacher_attendance_list').append("\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th hidden>id</th>\n                            <th>#</th>\n                            <th>Company Name</th>\n                            <th>Product Name</th>\n                            <th>Purchase Price</th>  \n                            <th>Expire Date</th> \n                            <th>Qty</th> \n                            <th>Balance</th> \n                        </tr>\n                    </thead><tbody>\n                </tbody>\n                </table>");
+      $('.teacher_attendance_list').append("\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th hidden>id</th>\n                            <th>#</th>\n                            <th>Company Name</th>\n                            <th>Product Name</th> \n                            <th>Balance</th> \n                        </tr>\n                    </thead><tbody>\n                </tbody>\n                </table>");
       $('.TeacherAttendanceListTable tbody').empty();
       if (response.records.length == 0) {
         $('#notifDiv').fadeIn();
@@ -58,12 +58,16 @@ $('.search-btn').on('click', function () {
           $('#notifDiv').fadeOut();
         }, 3000);
       }
+      var total_balance = 0;
       response.records.forEach(function (element, key) {
-        console.log(element);
+        total_balance += element['balance'];
+        var percentageValue = (element.sale_price - element.p_price) / element.p_price * 100;
         var date = new Date(element.expire_date);
         var formattedDate = date.toDateString();
-        $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td hidden>".concat(element['id'], "</td>\n                        <td>").concat(key + 1, "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat(element['product_name'], "</td>\n                        <td>").concat(element['p_price'], "</td> \n                        <td>").concat(element.expire_date ? date.toDateString() : 'NA', "</td>\n                        <td>").concat(element['qty'] ? element['qty'] : 'N/A', " percentageValue > 0 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger';</td> \n                        <td>").concat(element['balance'], "</td> \n                    </tr>"));
+        $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td hidden>".concat(element['id'], "</td>\n                        <td>").concat(key + 1, "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat(element['product_name'], "</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(element['balance'], "</td> \n                    </tr>"));
       });
+      $('.TeacherAttendanceListTable tbody').append("\n            <tr style=\"background: #152e4d;border: solid 1px #dbdbdb;color: white\">\n                <td class=\"font18\" align=\"right\" colspan=\"2\"></td>\n                <td class=\"font18\" align=\"center\">Grand Total :</td>\n                <td class=\"totalNo\">\n                    <span class=\"grand-total\" style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">".concat(total_balance, "</span>\n                </td>\n            </tr>\n        "));
+      $('.ttl_stock_in_hand').html(total_balance);
       $('.TeacherAttendanceListTable').fadeIn();
       $('.loader').hide();
       var title = '';
@@ -125,9 +129,11 @@ $('.company_id').on('change', function () {
 });
 $('.reset-btn').on('click', function () {
   $('.company_id').val('').trigger('change');
+  $('.product_id').val('').trigger('change');
   $('#search-form')[0].reset();
   $('.teacher_attendance_list').empty();
   $('.teacher_attendance_list').append("\n            <div class=\"col-12 pb-10\">\n            <div class=\"no-info\">\n                <div class=\"m-auto\"><strong>Please Filter Your Stock Record !</strong></div>\n            </div>\n        </div>\n        ");
+  $('.ttl_stock_in_hand').html(0);
 });
 /******/ })()
 ;

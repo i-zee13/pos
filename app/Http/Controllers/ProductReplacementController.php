@@ -6,7 +6,7 @@ use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Product;
 use App\Models\ProductReplacement;
-use App\Models\ProductReplacementInvoice; 
+use App\Models\ProductReplacementInvoice;
 use App\Models\SaleReturn;
 use App\Models\Stock;
 use App\Models\VendorStock;
@@ -23,21 +23,22 @@ class ProductReplacementController extends Controller
         $sales          =   ProductReplacementInvoice::selectRaw('product_replacment_invoices.* ,
                                         (SELECT cr FROM customer_ledger WHERE sale_invoice_id = product_replacment_invoices.id) as paid_amount,
                                         (SELECT customer_name FROM customers WHERE id=product_replacment_invoices.customer_id) as customer_name')
-                                        ->whereRaw("Date(created_at) = '$current_date'")
-                                        ->orderBy('id', 'DESC')
-                                        ->get(); 
+            ->whereRaw("Date(created_at) = '$current_date'")
+            ->orderBy('id', 'DESC')
+            ->get();
         return view('sales.replacement.index', compact('sales'));
     }
 
-    public function create(){
+    public function create()
+    {
         $invoice_no          =   getProductReplacementNo();
         $parts               =   explode('-', $invoice_no);
         $invoice_first_part  =   $parts[0];
         $current_date        =   Carbon::today()->toDateString();
         $customers           =   Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
-        $products            =   Product::where('stock_balance','!=',0)->get();
+        $products            =   Product::where('stock_balance', '!=', 0)->get();
 
-        return view('sales.replacement.create',compact('customers','current_date','invoice_first_part','products','invoice_no'));
+        return view('sales.replacement.create', compact('customers', 'current_date', 'invoice_first_part', 'products', 'invoice_no'));
     }
     public function store(Request $request)
     {
@@ -83,6 +84,7 @@ class ProductReplacementController extends Controller
                         $sale          =  new ProductReplacement();
                     }
                     $sale->sale_price          = $sale_product['retail_price'];
+                    dd($sale->sale_price);
                     $sale->product_replacement_invoice_id     = $invoice->id;
                     $sale->invoice_no          = $invoice->invoice_no;
                     $sale->company_id          = Product::where('id', $sale_product['product_id'])->value('company_id');
@@ -92,11 +94,11 @@ class ProductReplacementController extends Controller
                     $sale->product_discount    = $sale_product['prod_discount'];
                     $sale->product_type        = $sale_product['prod_type'];
                     $sale->expiry_date         = $sale_product['expiry_date'];
-                    $sale->created_by          = Auth::id(); 
+                    $sale->created_by          = Auth::id();
                     $previous_qty              = ProductReplacement::where('product_replacement_invoice_id', $request->hidden_invoice_id)
-                                                            ->where('product_id', $sale->product_id)
-                                                            ->orderBy('id', 'Desc')
-                                                            ->value('qty');
+                        ->where('product_id', $sale->product_id)
+                        ->orderBy('id', 'Desc')
+                        ->value('qty');
 
                     if ($sale->save()) {
                         $sale_products_array[] = $sale->id;
@@ -104,17 +106,17 @@ class ProductReplacementController extends Controller
                         $vendor_id             =  $check_stock->vendor_id;
                         if ($check_stock) {
                             $balance           =  $check_stock->balance;
-                        } 
+                        }
                         $sale->purchased_price = $sale_product['purchased_price'];
                         if ($request->hidden_invoice_id) {
                             if ($previous_qty > 0) {
                                 $v          =  $this->updateStock($previous_qty, $sale, $balance, $vendor_id, 'vendor');
                                 $balance    =  $v->balance;
                             }
-                        } 
+                        }
                         $v_stock = $this->updateStock($previous_qty = 0, $sale, $balance, $vendor_id, 'vendor');
                         if ($v_stock->save()) {
-                            $sale->vendor_stock_id = $v_stock->id; 
+                            $sale->vendor_stock_id = $v_stock->id;
                             // if ($request->hidden_invoice_id) {
                             //     $old =  VendorStock::where('product_replacement_invoice_id', $request->hidden_invoice_id)
                             //                                 ->where('product_id', $sale->product_id)
@@ -132,12 +134,12 @@ class ProductReplacementController extends Controller
                         }
                     }
                 }
-               
+
                 if ($request->hidden_invoice_id) {
-                 
+
                     ProductReplacement::where('product_replacement_invoice_id', $request->hidden_invoice_id)
-                                    ->whereNotIn('id', $sale_products_array)
-                                    ->delete(); 
+                        ->whereNotIn('id', $sale_products_array)
+                        ->delete();
                 }
 
                 $customer_ledger       =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->first();
@@ -153,11 +155,11 @@ class ProductReplacementController extends Controller
                     $customer_ledger   =   new  CustomerLedger();
                     // $previous_recived  =   0;
                 }
-                $customer_ledger->cr          = $invoice->paid_amount; 
+                $customer_ledger->cr          = $invoice->paid_amount;
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
                 $customer_ledger->trx_type    = 1;  //Sale
-                $customer_ledger->dr          = $invoice->total_invoice_amount -  $balance;
+                $customer_ledger->dr          = $invoice->total_invoice_amount -   ($request->hidden_invoice_id ? 0 :  $balance);
                 $customer_ledger->balance     = ($invoice->total_invoice_amount - $customer_ledger->cr); //balance
                 $customer_ledger->created_by  = Auth::id();
                 $customer_ledger->product_replacement_invoice_id = $invoice->id;
@@ -180,28 +182,28 @@ class ProductReplacementController extends Controller
     {
         $invoice            =     ProductReplacementInvoice::where('id', $id)->first();
         $customers          =     Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
-        $products           =     Product::where('stock_balance','!=',0)->get();
+        $products           =     Product::where('stock_balance', '!=', 0)->get();
         $parts              =     explode('-', $invoice->invoice_no);
         $invoice_first_part =     $parts[0];
         $purchasd_products  =     ProductReplacement::where('product_replacement_invoice_id', $id)
-                                                    ->selectRaw('product_replacements.*')
-                                                    ->get();
+            ->selectRaw('product_replacements.*')
+            ->get();
         $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)
-                                                ->where('trx_type', '=', 1)
-                                                ->where('product_replacement_invoice_id', $invoice->id)
-                                                ->orderBy('id', 'DESC')->first();
+            ->where('trx_type', '=', 1)
+            ->where('product_replacement_invoice_id', $invoice->id)
+            ->orderBy('id', 'DESC')->first();
 
-        return view('sales.replacement.create', compact('invoice','products', 'customers', 'get_customer_ledger', 'invoice_first_part'));
+        return view('sales.replacement.create', compact('invoice', 'products', 'customers', 'get_customer_ledger', 'invoice_first_part'));
     }
 
     public function getReplacmentProduct($id)
     {
         $products   =   ProductReplacement::where('product_replacement_invoice_id', $id)
-                                            ->selectRaw('product_replacements.*,
+            ->selectRaw('product_replacements.*,
                                                         (SELECT product_name FROM products WHERE id=product_replacements.product_id) as product_name,
                                                         (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=product_replacements.product_id) as purchase_price,
                                                         (SELECT stock_balance FROM products WHERE id=product_replacements.product_id) as stock_in_hand')
-                                            ->get();
+            ->get();
         return response()->json([
             'msg'       => 'Sale Product Fetched',
             'status'    => 'success',
@@ -213,13 +215,13 @@ class ProductReplacementController extends Controller
         $old_record = '';
         $old_record          =  $sale;
         $v                   =  new VendorStock();
-        $v->vendor_id        =  $vendor_id; 
-        $v->transaction_type = $sale->product_type == 1 ? 3 : 2; 
-        if($previous_qty > 0){
+        $v->vendor_id        =  $vendor_id;
+        $v->transaction_type = $sale->product_type == 1 ? 3 : 2;
+        if ($previous_qty > 0) {
             $v->qty         =  $previous_qty;
             $v->status      =  $sale->product_type == 1 ? 2 : 1;   //Product_type 1 = Replace , 2 = New Sale  and Status 2 - Out  , 1- IN
             $v->balance     =   $sale->product_type == 1 ? $balance -  $v->qty : $balance +  $v->qty;
-        }else{
+        } else {
             $v->status      =   $sale->product_type == 1 ? 1 : 2;   //Product_type 1 = Replace , 2 = New Sale  and Status 2 - Out  , 1- IN
             $v->qty         =   $sale->qty;
             $v->balance     =   $sale->product_type == 1 ? $balance +  $v->qty : $balance - $v->qty;
@@ -234,31 +236,33 @@ class ProductReplacementController extends Controller
         return $v;
     }
 
-    public function deleteProduct(Request $request){
+    public function deleteProduct(Request $request)
+    {
         return  deleteProduct($request);
     }
-    public function getCustomerBalance(Request $request, $id){
+    public function getCustomerBalance(Request $request, $id)
+    {
         return  getCustomerBalance($request, $id);
     }
     public function printInvoice($invoice_id, $customer_id, $received_amount)
     {
-          
+
         $invoiceId                  =   $invoice_id;
         $customerId                 =   $customer_id;
         $customer_balance           =   0;
         $invoice                    =   ProductReplacementInvoice::where('id', $invoiceId)->where('customer_id', $customerId)
-                                                    ->selectRaw("product_replacment_invoices.*,
+            ->selectRaw("product_replacment_invoices.*,
                                                         (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
                                                         (SELECT cr FROM customer_ledger WHERE product_replacement_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
                                                         ")
-                                                    ->first(); 
+            ->first();
         $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
         $products                   =   ProductReplacement::where('product_replacement_invoice_id', $invoice_id)
-                                                    ->selectRaw("product_replacements.*,
+            ->selectRaw("product_replacements.*,
                                                     (SELECT product_name FROM products WHERE id=product_replacements.product_id) as product_name")
-                                                    ->get();
+            ->get();
         $ledgerCount      = CustomerLedger::where('customer_id', $customerId)->count();
-      
+
         $customer_balance = 0;
         if ($ledgerCount > 1) {
             $customer_balance = CustomerLedger::where('customer_id', $customerId)

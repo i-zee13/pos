@@ -3,15 +3,17 @@
     <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
 </div>
 <div class="parent-div" style="display:none">
-     
+
     @section('content')
     <style>
-    .container{
-        max-width: 1370px;
-    }
-       select:focus > option:checked { 
+        .container {
+            max-width: 1370px;
+        }
+
+        select:focus>option:checked {
             background: #000 !important;
-            }
+        }
+
         .OrderWrapper {
             padding: 0 !important;
         }
@@ -511,13 +513,13 @@
                 <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
                 <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
                 <input type="hidden" id="service_charges" class="form-control " value="{{@$invoice->service_charges}}" name="service_charges">
-                <input type="hidden"   id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
+                <input type="hidden" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
                 <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
 
                 <input type="hidden" id="" value="1" name="form_status">
-                <input type="hidden" id="stock_products"   value="{{json_encode($products)}}">
+                <input type="hidden" id="stock_products" value="{{json_encode($products)}}">
                 <div class="col-md-4 left-sidebox ">
-                    <div class="sidebox-content text-white"  style="background-color: #152e4d">
+                    <div class="sidebox-content text-white" style="background-color: #152e4d">
                         <div class="CT_sec">
                             <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
                             <div class="col-md-12 PB-10">
@@ -563,15 +565,15 @@
                                 </div>
                             </div>
                             <div class="form-wrap p-0">
-                              <div class="row">
-                                  <div class="col-md-12">
-                                      <label class="font13 mb-5">Description</label>
-                                      <div class="form-s2">
-                                          <textarea rows="4"></textarea>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label class="font13 mb-5">Description</label>
+                                        <div class="form-s2">
+                                            <textarea rows="4"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
 
                             <h2 class="title border-bottom">Invoice <span>Details</span></h2>
@@ -580,7 +582,7 @@
                                 <div class="col-md-5"><span class=" text-red">{{@$invoice->amount_received}}</span></div>
                                 <div class="col-md-7 pr-0"><strong>Previous Paid :</strong></div>
                                 <div class="col-md-5"><span class="">{{@$invoice->paid_amount}}</span></div> -->
-                                <div class="col-md-7 pr-0"><strong class="previous_payable_heading">Previous Receivable :</strong> </div>
+                                <div class="col-md-7 pr-0"><strong class="previous_payable_heading">Previous Payable :</strong> </div>
 
                                 <div class="col-md-5"><span class="dashboard_avg_rev_perCust {{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '' }}</span></div>
                                 <!-- <div class="col-md-7 pr-0"><strong>Country:</strong></div>
@@ -588,7 +590,7 @@
                             </div>
                             <!-- <h2 class="title m-0 pb-0">Shipping <span>Details</span></h2> -->
                         </div>
- 
+
 
                     </div>
                 </div>
@@ -599,7 +601,7 @@
                             <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'sale-edit' ? 'Sale' : 'New'}} <span>Invoice</span></h2>
                         </div>
 
-                         
+
                     </div>
 
                     <div class="right_Info">
@@ -611,18 +613,18 @@
                                 <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
 
                             </div>
-                           
+
 
                             <div class="infoDiv">
                                 <form id="purchse-form">
                                     <div class="row">
-                                        
+
                                         <input type="text" id="purchase_price" class="inputfileds  purchase_price " placeholder="" name="purchase_price" hidden>
                                         <input type="text" id="retail _price" class="inputfileds" placeholder="" name="ret ail_price" hidden>
- 
+
                                         <input id="datepicker" type="hidden" class="inputfileds new_dob new_form_field expiry_date " name="expiry_date">
 
-                                       
+
                                     </div>
                                 </form>
                             </div>
@@ -701,7 +703,7 @@
                                         <tr class="previous_payable_tr" style="display:none">
                                             <td></td>
                                             <td></td>
-                                            <td align="right" class="previous_payable_heading">Previous Receivable</td>
+                                            <td align="right" class="previous_payable_heading">Previous Payable</td>
                                             <td class="{{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '0' }}</td>
                                         </tr>
 
@@ -806,7 +808,7 @@
 
 </div>
 </div>
-@endsection 
+@endsection
 @push('js')
 <script>
     var clients = JSON.parse('{!! json_encode($customers)  !!}');

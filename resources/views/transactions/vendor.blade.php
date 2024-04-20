@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="modal-footer border-0">
-                <button type="button" class="btn btn-primary yes-btn confirm_btn" data-dismiss="modal" >Yes</button>
+                <button type="button" class="btn btn-primary yes-btn confirm_btn" data-dismiss="modal">Yes</button>
                 <button type="submit" class="btn w-btn btn-cancel cancel_delete_modal no-btn" data-dismiss="modal" aria-label="Close">No</button>
             </div>
         </div>
@@ -28,7 +28,7 @@
 </div>
 <div id="product-cl-sec">
     <a href="#" id="pl-close" class="close-btn-pl"></a>
-    <div class="pro-header-text">Cash <span>{{request()->segment(1) == 'customer-ledger-jama' ? 'Received' : 'Payment' }}</span></div>
+    <div class="pro-header-text">Cash <span>{{request()->segment(1) == 'vendor-ledger-jama' ? 'Received' : 'Payment' }}</span></div>
     <div style="min-height: 400px" id="dataSidebarLoader" style="display: none">
         <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
     </div>
@@ -69,7 +69,7 @@
                                                 </div>
                                                 <div class="col-md-6 PB-10">
                                                     <div class="form-group">
-                                                        <label class="control-label mb-10">Receivable Balance</label>
+                                                        <label class="control-label mb-10">Balance</label>
                                                         <input type="text" name="balance" class="form-control customer_balnce" readonly>
                                                     </div>
                                                 </div>
@@ -91,7 +91,7 @@
                                                     <table class="ProductTable table " id="transactionTable" width="100%" border="0" cellspacing="0" cellpadding="0">
                                                         <thead>
                                                             <tr>
-                                                            <th class="">Voucher #</th>
+                                                                <th class="">Voucher #</th>
                                                                 <th class="">{{request()->segment(1) == $operation.'-ledger-jama' ? 'CR' : 'DR' }}</th>
                                                                 <th class="">Remarks</th>
                                                             </tr>
@@ -123,20 +123,20 @@
                                                     
                                                 </div> -->
                                                 <table class="table">
-                                                <tr style="background: #152e4d;color: white;">  
-                                                    <td style="font-family:bold" >Total:</td>
-                                                    <td colspan="2" class="total_ledger_sum"></td>
-                                                </tr>
+                                                    <tr style="background: #152e4d;color: white;">
+                                                        <td style="font-family:bold">Total:</td>
+                                                        <td colspan="2" class="total_ledger_sum"></td>
+                                                    </tr>
                                                 </table>
                                                 <h2 class="_head03 ">To <span>Print</span></h2>
-                                                    <div class="row status-sh">
-                                                        <div class="col-12">
-                                                            <div class="custom-control custom-radio">
-                                                                <input class="custom-control-input" type="checkbox"id="print-invoice" value="1" data-id="print-invoice" name="print_invoice">
-                                                                <label class="custom-control-label font13 he ad-sta" for="print-invoice">Print</label>
-                                                            </div>
+                                                <div class="row status-sh">
+                                                    <div class="col-12">
+                                                        <div class="custom-control custom-radio">
+                                                            <input class="custom-control-input" type="checkbox" id="print-invoice" value="1" data-id="print-invoice" name="print_invoice">
+                                                            <label class="custom-control-label font13 he ad-sta" for="print-invoice">Print</label>
                                                         </div>
                                                     </div>
+                                                </div>
                                                 <div class="col-md-12 ml-3" hidden>
                                                     <div class="row">
                                                         <div class="col-auto pl-0">
@@ -167,13 +167,13 @@
     <div class="_cl-bottom">
         <!-- <button type="button" id="print-invoice" class="btn btn-primary mr-2" tabindex="4">Print</button> -->
         <button type="submit" class="btn btn-primary mr-2" id="saveTransaction" tabindex="5">Save</button>
-        <button  type="button" class="btn btn-cancel mr-2" id="cancelSubCat">Cancel</button>
+        <button type="button" class="btn btn-cancel mr-2" id="cancelSubCat">Cancel</button>
     </div>
 </div>
 @endsection
 @section('content')
 
-<div class="header">  
+<div class="header">
     <!-- Body -->
     <div class="header-body">
         <div class="row  ">
@@ -197,14 +197,14 @@
     </div>
 
 
-</div> 
+</div>
 <div class="row">
     <div class="col-md-12">
         <div class="card">
             <div class="header mb-0">
                 <a class="btn add_button openDataSidebarForAddCustomerLedger vendor-ledger-jama-banam"><i class="fa fa-plus"></i> Add New</a>
                 <h2>Vendor Cash {{request()->segment(1) == 'vendor-ledger-jama' ? '( جمع )'  :' ( بنام )'}}</h2>
-             </div>
+            </div>
             <div style="min-height: 400px" id="tblLoader">
                 <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
             </div>

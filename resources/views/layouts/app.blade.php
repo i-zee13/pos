@@ -98,11 +98,27 @@
             width: 100% !important;
         }
 
-        .loader{
+        .loader {
             display: block;
             -webkit-user-select: none;
             margin: auto;
             background-color: hsl(0, 0%, 90%);
+        }
+
+        .smBTN:hover {
+            background: linear-gradient(90deg, green 0%, green 100%) !important;
+        }
+
+        .smBTN:focus {
+            background: white !important;
+            color: #040725 !important;
+            border: 1px solid #040725 !important;
+        }
+
+        .btn-product-add:focus {
+            background: green !important;
+            color: white !important;
+            border: 1px solid #040725 !important;
         }
     </style>
     <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
@@ -121,14 +137,17 @@
 
 <body style="display: block;">
     @php $close_routes = closeRoute() @endphp
-    @php $is_close = isClose() @endphp
+    @php $is_close = isClose();
+    $is_container = 0;
+    @endphp
     <div id="notifDiv">
     </div>
 
     @if(request()->segment(1) != 'stock-add' && request()->segment(1) != 'purchase-edit' && request()->segment(1) != 'sale-add'
     && request()->segment(1) != 'sale-edit' && request()->segment(1) != 'sale-return' && request()->segment(1) != 'add-return'
     && request()->segment(1) != 'edit-sale-return' && request()->segment(1) != 'product-replacement-create' && request()->segment(1) != 'product-replacement-edit'
-    && request()->segment(1) != 'detail' && request()->segment(1) != 'purchase-return-edit')
+    && request()->segment(1) != 'detail' && request()->segment(1) != 'purchase-return-edit' && request()->segment(1) != 'sale-detail')
+    <?php $is_container = 1; ?>
     @include('layouts.sidebar-menu')
     @endif
 
@@ -139,7 +158,7 @@
             <div class="overlay-blure"></div>
             <div class="overlay-for-sidebar" style="display: none"></div>
 
-            <div class="container  ">
+            <div class="{{$is_container == 1 ? 'container' : ''}}">
                 <!-- <div class="md-header-fixed">
                     <div class="MD__Logo"><img src="{{asset('images/Shama-logo.png')}}" alt="" /></div>
                     <button class="mobile__toggler" id="modalShow"><span></span></button>
@@ -167,6 +186,7 @@
     <script src="{{asset('/js/selectize.min.js')}}"></script>
     <script src="{{asset('/js/bootstrap-datepicker.js?v=1.1')}}"></script>
     <script src="{{asset('/js/dataTables.buttons.min.js')}}"></script>
+    <script src="{{asset('/js/jquery.mCustomScrollbar.min.js')}}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.33/pdfmake.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
@@ -181,6 +201,17 @@
         var segments = location.href.split('/');
         var action = segments[3];
         $(document).ready(function() {
+            function addCommas(nStr) {
+                nStr += "";
+                x = nStr.split(".");
+                x1 = x[0];
+                x2 = x.length > 1 ? "." + x[1] : "";
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                    x1 = x1.replace(rgx, "$1" + "," + "$2");
+                }
+                return x1 + x2;
+            }
             $("#contentContainerDiv").removeClass("blur-div");
             $('.dropify').dropify();
             $(".formselect").select2();
@@ -293,7 +324,7 @@
     <!-- Theme JS -->
     <script src="{{asset('/assets/js/theme.bundle.js')}}"></script><input type="file" multiple="multiple" class="dz-hidden-input" tabindex="-1" style="visibility: hidden; position: absolute; top: 0px; left: 0px; height: 0px; width: 0px;">
     @stack('js')
-    
+
     <script>
         var is_close = '{!! $is_close !!}';
         if (is_close == 1) {
@@ -310,8 +341,8 @@
                 }
             }
         }
-    </script> 
-    <script src="{{asset('/js/custom/master.js')}}"> </script> 
+    </script>
+    <script src="{{asset('/js/custom/master.js')}}"> </script>
 </body>
 
 </html>

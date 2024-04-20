@@ -119,7 +119,7 @@
         </div>
     </div>
     <div class="_cl-bottom">
-        <button type="submit" class="btn btn-primary mr-2" id="saveProduct">Save</button>
+        <button type="submit" class="btn btn-primary mr-2 btn-product-add" id="saveProduct">Save</button>
         <button id="pl-close" type="submit" class="btn btn-cancel mr-2" id="cancelSubCat">Cancel</button>
     </div>
 </div>

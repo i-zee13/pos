@@ -4,8 +4,8 @@ let sessions = [];
 let CurrentRef = '';
 let segments = location.href.split('/');
 $('.search-btn').on('click', function () {
-    var start_date  = $('.start_date').val();
-    var end_date    = $('.end_date').val();
+    var start_date = $('.start_date').val();
+    var end_date = $('.end_date').val();
     if (start_date != '' && end_date == '') {
         $('#notifDiv').fadeIn().css('background', 'red').text('End Date should not be Empty').focus();
         $('.end_date').focus();
@@ -71,34 +71,49 @@ $('.search-btn').on('click', function () {
                     $('#notifDiv').fadeOut();
                 }, 3000);
             }
-            var total_profit            = 0;
-            var ttl_quantity            = 0;
-            var ttl_product_discount    = 0;
-            var ttl_invoice_discount    = 0;
-            var ttl_cost_product        = 0;
-            var ttl_sale_product        = 0;
-            var purchase_price          = 0 ;
+            var total_profit = 0;
+            var total_avg_profit = 0;
+            var ttl_quantity = 0;
+            var ttl_product_discount = 0;
+            var ttl_invoice_discount = 0;
+            var ttl_cost_product = 0;
+            var ttl_sale_product = 0;
+            var purchase_price = 0;
             response.sales.forEach((element, key) => {
-                element['old_purchase_price']  = element['new_purchase_price'] ?? element['old_purchase_price'];
-                element['sale_price']  = element['sale_price'] - element['old_purchase_price'];
-                total_profit            += (element['sale_price'] - element['old_purchase_price'] ) * element['qty'] ;
-                ttl_quantity            += element['qty'] ? element['qty'] : 0;
-                ttl_cost_product        += element['old_purchase_price'] ? element['old_purchase_price'] : 0;
-                ttl_sale_product        += element['sale_price'] ? element['sale_price'] : 0;
-                ttl_invoice_discount    += element['invoice_discount'] ? element['invoice_discount'] : 0;
-                var date                = new Date(element.expire_date);
-                var formattedDate       = date.toDateString();
-                var invoice_no          = "";
-                invoice_no              = element.invoice_no.split('-');
-                reportTable(invoice_no[0],element)
+                var purchase_price = 0;
+                if (element['product_purchased_price']) {
+                    purchase_price = element['product_purchased_price'];
+                } else if (element['new_purchase_price']) {
+                    purchase_price = element['new_purchase_price'];
+                } else {
+                    purchase_price = element['old_purchase_price'];
+                }
+                element['sale_price'] = element['sale_price'];
+                var avg_profit = ((element['sale_price'] - purchase_price) / purchase_price) * 100;
+                total_avg_profit += avg_profit;
+                ttl_quantity += element['qty'] ? element['qty'] : 0;
+                var cost_price = (purchase_price ? purchase_price : 0) * element['qty'];
+                var sale_price = (element['sale_price'] ? element['sale_price'] : 0) * element['qty'];
+                total_profit += (element['sale_price'] - purchase_price) * element['qty'];
+                ttl_cost_product += cost_price;
+                ttl_sale_product += sale_price;
+                // ttl_cost_product += (element['old_purchase_price'] ? element['old_purchase_price'] : 0);
+                // ttl_sale_product += element['sale_price'] ? element['sale_price'] : 0;
+                ttl_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
+                ttl_product_discount += element['product_discount'] ? element['product_discount'] : 0;
+                var date = new Date(element.expire_date);
+                var formattedDate = date.toDateString();
+                var invoice_no = "";
+                invoice_no = element.invoice_no.split('-');
+                reportTable(invoice_no[0], element, purchase_price, avg_profit)
             });
             $('.TeacherAttendanceListTable').fadeIn();
             // sale_return_total(ttl_quantity,ttl_product_discount,total_profit,'Sale')
             $('.filter_name').empty();
-            if($('.product_id').val() != ''){
-                $('.filter_name').html('Product: <span>'+$('.product_id option:selected').text()+'</span>');
-            } else if($('.company_id').val() != '' && $('.product_id').val() == ''){
-                $('.filter_name').html('Company: <span>'+$('.company_id option:selected').text()+'</span>');
+            if ($('.product_id').val() != '') {
+                $('.filter_name').html('Product: <span>' + $('.product_id option:selected').text() + '</span>');
+            } else if ($('.company_id').val() != '' && $('.product_id').val() == '') {
+                $('.filter_name').html('Company: <span>' + $('.company_id option:selected').text() + '</span>');
 
             }
             //Grand Total
@@ -112,19 +127,19 @@ $('.search-btn').on('click', function () {
                 <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${addCommas(ttl_cost_product)}</td>
                 <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${addCommas(ttl_sale_product)}</td>
                 <td class="totalNo" colspan="2">
-                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(total_profit)}</span>
+                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(total_profit)} <span style="color: ${total_avg_profit > 0 ? '#29f129' : 'red' };font-size: 18px">${total_avg_profit.toFixed(2)}% </span></span>
                 </td>
             </tr>
         `);
 
 
-            $('.ttl_sales').html('<span>Rs.</span>'+ addCommas(total_profit));
+            $('.ttl_sales').html('<span>Rs.</span>' + addCommas(total_profit) + ` <span style="font-size: 28px"> ( <span style="color: ${total_avg_profit > 0 ? '#29f129' : 'red' };font-size: 25px">  ${total_avg_profit.toFixed(2)}% </span> )</span>`);
             // $('.ttl_payment').html(total_profit ? addCommas(addCommas(parseInt(total_profit + ttl_invoice_discount + ttl_product_discount))) : 0);
             $('.ttl_payment').html(ttl_cost_product ? addCommas(ttl_cost_product) : 0);
             $('.ttl_quantity').html(ttl_quantity ? addCommas(ttl_quantity) : 0);
             $('.ttl_product_discount').html(ttl_sale_product ? addCommas(ttl_sale_product) : 0);
             $('.ttl_invoice_discount').html(ttl_invoice_discount ? addCommas(ttl_invoice_discount) : 0);
-            // $('.ttl_discount').html(ttl_sale_product ? addCommas(ttl_sale_product) : 0);
+            $('.ttl_discount').html(ttl_product_discount ? addCommas(ttl_product_discount) : 0);
 
             $('.loader').hide();
             var title = 'Profit Report';
@@ -138,16 +153,15 @@ $('.search-btn').on('click', function () {
                 $('.TeacherAttendanceListTable').DataTable().clear().destroy();
             }
             var table = $('.TeacherAttendanceListTable').DataTable({
-                "bSort"     : false,
-                "bPaginate" : false,
-                scrollX     : false,
-                scrollY     : '400px',
+                "bSort": false,
+                "bPaginate": false,
+                scrollX: false,
+                scrollY: '400px',
                 scrollCollapse: true,
                 dom: 'Bfrtip',
-                buttons: [
-                    {
+                buttons: [{
                         extend: 'pdfHtml5',
-                        title:title,
+                        title: title,
                         orientation: 'landscape',
                         header: true,
                         exportOptions: {
@@ -157,24 +171,24 @@ $('.search-btn').on('click', function () {
                         customize: function (doc) {
                             doc.content.splice(0, 1, {
                                 text: [{
-                                  text:title,
-                                  bold: true,
-                                  fontSize: 14,
-                                  alignment: 'left'
-                                },
-                                // {
-                                //     text: 'Sale Report ',
-                                //     bold: false,
-                                //     fontSize: 14,
-                                //     alignment: 'left'
-                                // },
-                                // {
-                                //     text: `()`,
-                                //     bold: true,
-                                //     fontSize: 11,
-                                //     alignment: 'right',
-                                // }
-                            ],
+                                        text: title,
+                                        bold: true,
+                                        fontSize: 14,
+                                        alignment: 'left'
+                                    },
+                                    // {
+                                    //     text: 'Sale Report ',
+                                    //     bold: false,
+                                    //     fontSize: 14,
+                                    //     alignment: 'left'
+                                    // },
+                                    // {
+                                    //     text: `()`,
+                                    //     bold: true,
+                                    //     fontSize: 11,
+                                    //     alignment: 'right',
+                                    // }
+                                ],
                                 margin: [0, 0, 0, 12],
                             });
                             console.log(doc);
@@ -188,14 +202,30 @@ $('.search-btn').on('click', function () {
                             doc.content[1].table.widths = 'auto';
                             //cell border
                             var objLayout = {};
-                            objLayout['hLineWidth'] = function (i) { return 0.5; };
-                            objLayout['vLineWidth'] = function (i) { return 0.5; };
-                            objLayout['hLineColor'] = function (i) { return '#E6E6E6'; };
-                            objLayout['vLineColor'] = function (i) { return '#E6E6E6'; };
-                            objLayout['paddingLeft'] = function (i) { return 3; };
-                            objLayout['paddingRight'] = function (i) { return 3; };
-                            objLayout['paddingTop'] = function (i) { return 4; };
-                            objLayout['paddingBottom'] = function (i) { return 4; };
+                            objLayout['hLineWidth'] = function (i) {
+                                return 0.5;
+                            };
+                            objLayout['vLineWidth'] = function (i) {
+                                return 0.5;
+                            };
+                            objLayout['hLineColor'] = function (i) {
+                                return '#E6E6E6';
+                            };
+                            objLayout['vLineColor'] = function (i) {
+                                return '#E6E6E6';
+                            };
+                            objLayout['paddingLeft'] = function (i) {
+                                return 3;
+                            };
+                            objLayout['paddingRight'] = function (i) {
+                                return 3;
+                            };
+                            objLayout['paddingTop'] = function (i) {
+                                return 4;
+                            };
+                            objLayout['paddingBottom'] = function (i) {
+                                return 4;
+                            };
                             doc.content[1].layout = objLayout;
 
                             //cell border
@@ -260,7 +290,8 @@ $('.search-btn').on('click', function () {
         }
     });
 });
-function reportTable(invoice_no,element){
+
+function reportTable(invoice_no, element, purchase_price, avg_profit) {
     $('.TeacherAttendanceListTable tbody').append(`
                     <tr>
                         <td>${invoice_no}</td>
@@ -268,12 +299,13 @@ function reportTable(invoice_no,element){
                         <td>${element['company_name']}</td>
                         <td>${element['product_name']}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['old_purchase_price']}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${purchase_price}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['sale_price']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;"><i  class="${ (element['sale_price'] - element['old_purchase_price'] ) > 0 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger'}"></i>  <strong>${addCommas((element['sale_price'] -  element['old_purchase_price']) * element['qty'] ) } </strong></td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;"><i  class="${ (element['sale_price'] - purchase_price ) > 0 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger'}"></i>  <strong style="font-family: 'Rationale', sans-serif !important; font-size: 19px;" >${addCommas((element['sale_price'] - purchase_price) * element['qty'] )}</strong> <span style="color: ${avg_profit > 0 ? 'green' : 'red' };">${avg_profit.toFixed(2)}% </span></td>
                     </tr>`);
 }
-function sale_return_total(ttl_quantity,ttl_product_discount,total,flag){
+
+function sale_return_total(ttl_quantity, ttl_product_discount, total, flag) {
     $('.TeacherAttendanceListTable tbody').append(`
     <tr style="background:#eaf1fa ; color:#152e4d" >
         <th></th>
@@ -323,6 +355,7 @@ $('.reset-btn').on('click', function () {
         </div>
         `);
 })
+
 function addCommas(nStr) {
     nStr += "";
     x = nStr.split(".");

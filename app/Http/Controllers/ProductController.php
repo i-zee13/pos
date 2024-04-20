@@ -14,11 +14,14 @@ class ProductController extends Controller
         $companies       = Company::all();
         $products        = Product::all();
         $next_product_id = Product::count() + 1;
-        return view('product.products', compact('companies', 'next_product_id','products'));
+        return view('product.products', compact('companies', 'next_product_id', 'products'));
     }
     public function store(Request $request)
     {
         $duplicateField = '';
+        // $barcodeArray = explode(',', $request->barcode);
+
+
         if (Product::where('company_id', $request->company_id)
             ->where('product_name', $request->hidden_product_name)
             ->where('id', '!=', $request->hidden_product_id)
@@ -34,7 +37,7 @@ class ProductController extends Controller
         if ($duplicateField != '') {
             return response()->json([
                 'msg'    =>  'duplicate',
-                'duplicate_msg' => $duplicateField ,
+                'duplicate_msg' => $duplicateField,
                 'status' =>  'error',
             ]);
         } else {
@@ -74,7 +77,7 @@ class ProductController extends Controller
     public function getProducts()
     {
         $data =  Product::selectRaw('products.* , (SELECT company_name FROM companies WHERE id = products.company_id) as company_name')
-                        ->orderBy('created_at', 'DESC')->get();
+            ->orderBy('created_at', 'DESC')->get();
         $maxId = Product::withTrashed()->max('id');
         return response()->json([
             'msg'       =>  'Products Fetched',
@@ -95,55 +98,54 @@ class ProductController extends Controller
             'product'   =>   $query
         ]);
     }
-    public function deleteProduct(Request $request,$id)
+    public function deleteProduct(Request $request, $id)
     {
         if ($request->status == 'delete' && Product::where('id', $id)->delete()) {
             return response()->json([
                 'msg' => 'Product has Deleted Successfully',
                 'status' => 'success'
             ]);
-        }else if( Product::withTrashed()->find($id)->restore()){
+        } else if (Product::withTrashed()->find($id)->restore()) {
             return response()->json([
                 'msg' => 'Product has Restored Successfully',
                 'status' => 'success'
             ]);
-        }else{
+        } else {
             return response()->json([
-            'msg' => 'failed',
-            'status' => 'failed'
-        ]);
+                'msg' => 'failed',
+                'status' => 'failed'
+            ]);
+        }
+    }
+
+    //Change price Controlls
+    public function changePrice()
+    {
+        $companies = Company::get();
+        return view('product.change-price', compact('companies'));
+    }
+
+    public function getCompanyProducts(Request $request)
+    {
+        $companyId = $request->input('company_id');
+        $products = Product::where('company_id', $companyId)
+            ->select('id', 'product_name', 'sale_price', 'new_purchase_price', 'old_purchase_price')
+            ->get();
+        return response()->json(['products' => $products]);
+    }
+
+    public function updateProduct(Request $request, $id)
+    {
+        $salePrice = $request->input('salePrice');
+
+        $product = Product::find($id);
+        if ($product) {
+            $product->sale_price = $salePrice;
+            $product->save();
+
+            return response()->json(['products' => $product]);
         }
 
+        return response()->json(['success' => false, 'message' => 'Product not found.']);
     }
-
-//Change price Controlls
-public function changePrice(){
-    $companies = Company::get();
-    return view('product.change-price', compact('companies'));
-
-}
-
-public function getCompanyProducts(Request $request)
-{
-    $companyId = $request->input('company_id');
-    $products = Product::where('company_id', $companyId)
-                        ->select('id', 'product_name', 'sale_price', 'new_purchase_price', 'old_purchase_price')
-                        ->get();
-    return response()->json(['products' => $products]);
-}
-
-public function updateProduct(Request $request, $id)
-{
-    $salePrice = $request->input('salePrice');
-
-    $product = Product::find($id);
-    if ($product) {
-        $product->sale_price = $salePrice;
-        $product->save();
-
-        return response()->json(['products' => $product]);
-    }
-
-    return response()->json(['success' => false, 'message' => 'Product not found.']);
-}
 }

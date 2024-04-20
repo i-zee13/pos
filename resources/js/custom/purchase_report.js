@@ -4,8 +4,8 @@ let sessions = [];
 let CurrentRef = '';
 let segments = location.href.split('/');
 $('.search-btn').on('click', function () {
-    var start_date  = $('.start_date').val();
-    var end_date    = $('.end_date').val();
+    var start_date = $('.start_date').val();
+    var end_date = $('.end_date').val();
     if (start_date != '' && end_date == '') {
         $('#notifDiv').fadeIn().css('background', 'red').text('End Date should not be Empty').focus();
         $('.end_date').focus();
@@ -46,6 +46,7 @@ $('.search-btn').on('click', function () {
             $('.loader').show();
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
+
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
                     <thead>
                         <tr>
@@ -64,7 +65,7 @@ $('.search-btn').on('click', function () {
 
 
             $('.TeacherAttendanceListTable tbody').empty();
-            if (response.stocks.length == 0) {
+            if (response.reports.length == 0) {
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'green');
                 $('#notifDiv').text('No data available');
@@ -72,40 +73,44 @@ $('.search-btn').on('click', function () {
                     $('#notifDiv').fadeOut();
                 }, 3000);
             }
-            var total_sales             = 0;
-            var ttl_quantity            = 0;
-            var ttl_product_discount    = 0;
-            var ttl_invoice_discount    = 0;
+            var total_sales = 0;
+            var ttl_quantity = 0;
+            var ttl_product_discount = 0;
+            var ttl_invoice_discount = 0;
             //Sale Return Variables
-            var total_returns                  = 0;
-            var ttl_return_quantity            = 0;
-            var ttl_return_product_discount    = 0;
-            var ttl_return_invoice_discount    = 0;
-            response.stocks.sales.forEach((element, key) => {
-                total_sales             += element['total_invoice_amount'] ? element['total_invoice_amount'] : 0;
-                ttl_quantity            += element['qty'] ? element['qty'] : 0;
-                ttl_product_discount    += element['product_discount'] ? element['product_discount'] : 0;
-                ttl_invoice_discount    += element['invoice_discount'] ? element['invoice_discount'] : 0;
-                var date                = new Date(element.expire_date);
-                var formattedDate       = date.toDateString();
-                var invoice_no          = "";
-                invoice_no              = element.invoice_no.split('-');
-                reportTable(invoice_no[0],element)
-            });
-            $('.TeacherAttendanceListTable').fadeIn();
-            sale_return_total(ttl_quantity,ttl_product_discount,total_sales,'Purchase')
-           if( response.stocks.sale_returns.length > 0 ){
-               //Sale Returns
-               response.stocks.sale_returns.forEach((element, key) => {
-                   total_returns                  += element['total_invoice_amount'] ? element['total_invoice_amount'] : 0;
-                   ttl_return_quantity            += element['qty'] ? element['qty'] : 0;
-                   ttl_return_product_discount    += element['product_discount'] ? element['product_discount'] : 0;
-                   ttl_return_invoice_discount    += element['invoice_discount'] ? element['invoice_discount'] : 0;
-                   var invoice_no                 = "";
-                   invoice_no                     = element.invoice_no.split('-');
-                   reportTable(invoice_no[0],element);
+            var total_returns = 0;
+            var ttl_return_quantity = 0;
+            var ttl_return_product_discount = 0;
+            var ttl_return_invoice_discount = 0;
+
+            if (response.reports.purchases && response.reports.purchases.length > 0) {
+                response.reports.purchases.forEach((element, key) => {
+                    total_sales += element['product_net_total'] ? element['product_net_total'] : 0;
+                    ttl_quantity += element['qty'] ? element['qty'] : 0;
+                    ttl_product_discount += element['product_discount'] ? element['product_discount'] : 0;
+                    ttl_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
+                    var date = new Date(element.expire_date);
+                    var formattedDate = date.toDateString();
+                    var invoice_no = "";
+                    invoice_no = element.invoice_no.split('-');
+                    reportTable(invoice_no[0], element)
                 });
-             sale_return_total(ttl_return_quantity,ttl_return_product_discount,total_returns,'Return');
+                $('.TeacherAttendanceListTable').fadeIn();
+                sale_return_total(ttl_quantity, ttl_product_discount, total_sales, 'Purchase')
+            }
+
+            if (response.reports.purchase_returns && response.reports.purchase_returns.length > 0) {
+                //Sale Returns
+                response.reports.purchase_returns.forEach((element, key) => {
+                    total_returns += element['product_net_total'] ? element['product_net_total'] : 0;
+                    ttl_return_quantity += element['qty'] ? element['qty'] : 0;
+                    ttl_return_product_discount += element['product_discount'] ? element['product_discount'] : 0;
+                    ttl_return_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
+                    var invoice_no = "";
+                    invoice_no = element.invoice_no.split('-');
+                    reportTable(invoice_no[0], element);
+                });
+                sale_return_total(ttl_return_quantity, ttl_return_product_discount, total_returns, 'Return');
             }
             //Grand Total
             $('.TeacherAttendanceListTable tbody').append(`
@@ -121,7 +126,7 @@ $('.search-btn').on('click', function () {
         `);
 
 
-            $('.ttl_sales').html('<span>Rs.</span>'+ addCommas(total_sales - total_returns));
+            $('.ttl_sales').html('<span>Rs.</span>' + addCommas(total_sales - total_returns));
             // $('.ttl_payment').html(total_sales ? addCommas(addCommas(parseInt(total_sales + ttl_invoice_discount + ttl_product_discount))) : 0);
             $('.ttl_payment').html(total_sales ? addCommas(total_sales) : 0);
             $('.ttl_quantity').html(ttl_quantity ? addCommas(ttl_quantity) : 0);
@@ -141,14 +146,13 @@ $('.search-btn').on('click', function () {
                 $('.TeacherAttendanceListTable').DataTable().clear().destroy();
             }
             var table = $('.TeacherAttendanceListTable').DataTable({
-                "bSort"     : false,
-                "bPaginate" : false,
-                scrollX     : false,
-                scrollY     : '400px',
+                "bSort": false,
+                "bPaginate": false,
+                scrollX: false,
+                scrollY: '400px',
                 scrollCollapse: true,
                 dom: 'Bfrtip',
-                buttons: [
-                    {
+                buttons: [{
                         extend: 'pdfHtml5',
                         title: `Sale Report`,
                         orientation: 'landscape',
@@ -160,24 +164,24 @@ $('.search-btn').on('click', function () {
                         customize: function (doc) {
                             doc.content.splice(0, 1, {
                                 text: [{
-                                  text: `Sale Report`,
-                                  bold: true,
-                                  fontSize: 14,
-                                  alignment: 'left'
-                                },
-                                // {
-                                //     text: 'Sale Report ',
-                                //     bold: false,
-                                //     fontSize: 14,
-                                //     alignment: 'left'
-                                // },
-                                // {
-                                //     text: `()`,
-                                //     bold: true,
-                                //     fontSize: 11,
-                                //     alignment: 'right',
-                                // }
-                            ],
+                                        text: `Sale Report`,
+                                        bold: true,
+                                        fontSize: 14,
+                                        alignment: 'left'
+                                    },
+                                    // {
+                                    //     text: 'Sale Report ',
+                                    //     bold: false,
+                                    //     fontSize: 14,
+                                    //     alignment: 'left'
+                                    // },
+                                    // {
+                                    //     text: `()`,
+                                    //     bold: true,
+                                    //     fontSize: 11,
+                                    //     alignment: 'right',
+                                    // }
+                                ],
                                 margin: [0, 0, 0, 12],
                             });
                             console.log(doc);
@@ -191,14 +195,30 @@ $('.search-btn').on('click', function () {
                             doc.content[1].table.widths = 'auto';
                             //cell border
                             var objLayout = {};
-                            objLayout['hLineWidth'] = function (i) { return 0.5; };
-                            objLayout['vLineWidth'] = function (i) { return 0.5; };
-                            objLayout['hLineColor'] = function (i) { return '#E6E6E6'; };
-                            objLayout['vLineColor'] = function (i) { return '#E6E6E6'; };
-                            objLayout['paddingLeft'] = function (i) { return 3; };
-                            objLayout['paddingRight'] = function (i) { return 3; };
-                            objLayout['paddingTop'] = function (i) { return 4; };
-                            objLayout['paddingBottom'] = function (i) { return 4; };
+                            objLayout['hLineWidth'] = function (i) {
+                                return 0.5;
+                            };
+                            objLayout['vLineWidth'] = function (i) {
+                                return 0.5;
+                            };
+                            objLayout['hLineColor'] = function (i) {
+                                return '#E6E6E6';
+                            };
+                            objLayout['vLineColor'] = function (i) {
+                                return '#E6E6E6';
+                            };
+                            objLayout['paddingLeft'] = function (i) {
+                                return 3;
+                            };
+                            objLayout['paddingRight'] = function (i) {
+                                return 3;
+                            };
+                            objLayout['paddingTop'] = function (i) {
+                                return 4;
+                            };
+                            objLayout['paddingBottom'] = function (i) {
+                                return 4;
+                            };
                             doc.content[1].layout = objLayout;
 
                             //cell border
@@ -263,7 +283,8 @@ $('.search-btn').on('click', function () {
         }
     });
 });
-function reportTable(invoice_no,element){
+
+function reportTable(invoice_no, element) {
     $('.TeacherAttendanceListTable tbody').append(`
                     <tr>
                         <td></td>
@@ -272,10 +293,11 @@ function reportTable(invoice_no,element){
                         <td>${element['product_name']}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['purchase_price'] ? element['purchase_price'] : 0}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['total_invoice_amount'])}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['product_net_total'])}</td>
                     </tr>`);
 }
-function sale_return_total(ttl_quantity,ttl_product_discount,total,flag){
+
+function sale_return_total(ttl_quantity, ttl_product_discount, total, flag) {
     $('.TeacherAttendanceListTable tbody').append(`
     <tr style="background:#eaf1fa ; color:#152e4d" >
         <th colspan="3"></th>
@@ -320,6 +342,7 @@ $('.reset-btn').on('click', function () {
         </div>
         `);
 })
+
 function addCommas(nStr) {
     nStr += "";
     x = nStr.split(".");

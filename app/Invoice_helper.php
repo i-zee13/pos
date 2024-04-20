@@ -1,6 +1,6 @@
 <?php
 
- 
+
 use App\Models\ProductPurchase;
 use App\Models\ProductReplacement;
 use App\Models\ProductReplacementInvoice;
@@ -141,7 +141,7 @@ if (!function_exists('PurchaseReportRecords')) {
                                 LEFT JOIN products pr ON pr.id = pp.product_id 
                                 LEFT JOIN companies co ON co.id = pp.company_id 
                                 WHERE 
-                                $query
+                                $query 
                                 ORDER BY pi.invoice_no DESC
                           ");
       return $records;
@@ -187,8 +187,10 @@ if (!function_exists('ProfitReportRecords')) {
                                  IFNULL(ps.sale_price - IFNULL(ps.product_discount,0),0) AS sale_price,
                                  ps.product_id,
                                  ps.company_id,
+                                 ps.purchase_price as product_purchased_price,
                                  pr.old_purchase_price,
-                                 pr.new_purchase_price
+                                 pr.new_purchase_price,
+                                 ps.product_discount as product_discount
                               FROM
                               products_sales as ps
                               LEFT JOIN sale_invoices si ON si.id = ps.sale_invoice_id
@@ -201,7 +203,7 @@ if (!function_exists('ProfitReportRecords')) {
 
       return $sales;
    }
-} 
+}
 if (!function_exists('PurchaseReportList')) {
    function PurchaseReportList($request, $current_date)
    {
@@ -215,7 +217,7 @@ if (!function_exists('PurchaseReportList')) {
       if (isset($request->customer_id)) {
          $query .= " AND si.customer_id = $request->customer_id";
       }
-      if (isset($request->start_date) != '' && isset($request->end_date) != '') {
+      if (isset($request->start_date) != '' && isset($request->end_date) != '' && !$request->is_current_date) {
          $query .= " AND DATE(ps.created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
       } else {
          $query .=  " AND  DATE(ps.created_at) = '$current_date'";
@@ -223,7 +225,8 @@ if (!function_exists('PurchaseReportList')) {
       if (isset($request->bill_no)) {
          $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
       }
-      $sales          =  DB::select("
+
+      $purchases          =  DB::select("
                               SELECT
                                  DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
                                  pr.product_name,
@@ -241,14 +244,15 @@ if (!function_exists('PurchaseReportList')) {
                                  ps.product_id,
                                  ps.company_id,
                                  ps.purchase_price,
-                                 pr.sale_price
+                                 pr.sale_price,
+                                 si.product_net_total
                               FROM
                               products_purchases as ps
                               LEFT JOIN purchase_invoices si ON si.id = ps.purchase_invoice_id
                               LEFT JOIN products pr ON pr.id = ps.product_id
                               LEFT JOIN companies co ON co.id = ps.company_id
                               WHERE
-                              $query
+                              $query GROUP BY purchase_invoice_id
                               ORDER BY si.invoice_no ASC
                         ");
       $returns        =  DB::select("
@@ -269,16 +273,76 @@ if (!function_exists('PurchaseReportList')) {
                                  ps.company_id,
                                  pr.old_purchase_price,
                                  ps.purchase_price,
-                                 pr.sale_price
+                                 pr.sale_price,
+                                 si.product_net_total
                               FROM
                               products_returns as ps
                               LEFT JOIN purchase_return_invoices si ON si.id = ps.purchase_return_invoice_id
                               LEFT JOIN products pr ON pr.id = ps.product_id
                               LEFT JOIN companies co ON co.id = ps.company_id
                               WHERE
-                              $query
+                              $query GROUP BY purchase_return_invoice_id
                               ORDER BY si.invoice_no ASC
                   ");
-                  return ['sales' => $sales, 'sale_returns' => $returns];
+      $report = [];
+      if ($request->report_type == 1) {
+         $report['purchases'] = $purchases;
+      } else if ($request->report_type == 2) {
+         $report['purchase_returns'] = $returns;
+      } else {
+         $report['purchases'] = $purchases;
+         $report['purchase_returns'] = $returns;
+      }
+      return $report;
+   }
+}
+if (!function_exists('ProductReportList')) {
+   function ProductReportList($request, $current_date)
+   {
+      $query = " 1=1";
+      if (isset($request->company_id)) {
+         $query .= " AND ps.company_id = $request->company_id";
+      }
+      if (isset($request->product_id)) {
+         $query .= " AND ps.product_id = $request->product_id";
+      }
+      if (isset($request->customer_id)) {
+         $query .= " AND si.customer_id = $request->customer_id";
+      }
+      if (isset($request->start_date) != '' && isset($request->end_date) != '' && !$request->is_current_date) {
+         $query .= " AND DATE(ps.created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
+      } else {
+         $query .=  " AND  DATE(ps.created_at) = '$current_date'";
+      }
+      if (isset($request->bill_no)) {
+         $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
+      }
+
+      $reports          =  DB::select("
+                                 SELECT
+                                    ps.*,
+                                    pr.product_name,
+                                    co.company_name,
+                                    IFNULL((SELECT customer_name FROM customers WHERE id = ps.vendor_id),'NA') as customer_name,
+                                    GROUP_CONCAT(ps.id ORDER BY ps.id DESC LIMIT 1) AS p_id,
+                                    GROUP_CONCAT(ps.qty ORDER BY ps.id DESC LIMIT 1) AS p_qty,
+                                    GROUP_CONCAT(ps.balance ORDER BY ps.id DESC LIMIT 1) AS p_balance,
+                                    GROUP_CONCAT(ps.status ORDER BY ps.id DESC LIMIT 1) AS p_status
+                                 FROM
+                                    vendor_stocks as ps
+                                 JOIN products pr ON pr.id = ps.product_id
+                                 JOIN companies co ON co.id = ps.company_id
+                                 WHERE 
+                                  
+                                    $query
+                                 GROUP BY 
+                                    purchase_invoice_id , 
+                                    purchase_return_invoice_id ,
+                                    sale_invoice_id,
+                                    sale_return_id,
+                                    product_replacement_invoice_id
+                                 ORDER BY p_id DESC
+                           ");
+      return $reports;
    }
 }

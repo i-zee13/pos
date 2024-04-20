@@ -86,9 +86,10 @@
     </div>
     @section('content')
     <style>
-       select:focus > option:checked { 
+        select:focus>option:checked {
             background: #000 !important;
-            }
+        }
+
         .OrderWrapper {
             padding: 0 !important;
         }
@@ -592,9 +593,9 @@
                 <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
 
                 <input type="hidden" id="" value="1" name="form_status">
-                <input type="hidden" id="stock_products"   value="{{json_encode($products)}}">
+                <input type="hidden" id="stock_products" value="{{json_encode($products)}}">
                 <div class="col-md-4 left-sidebox ">
-                    <div class="sidebox-content text-white"  style="background-color: #152e4d">
+                    <div class="sidebox-content text-white" style="background-color: #152e4d">
                         <div class="CT_sec">
                             <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
                             <div class="col-md-12 PB-10">
@@ -640,15 +641,15 @@
                                 </div>
                             </div>
                             <div class="form-wrap p-0">
-                                  <div class="row">
-                                      <div class="col-md-12 mt-5">
-                                          <label class="font13 mb-5">Description</label>
-                                          <div class="form-s2">
-                                              <textarea rows="4" name="description" id="description">{{@$invoice->description}}</textarea>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
+                                <div class="row">
+                                    <div class="col-md-12 mt-5">
+                                        <label class="font13 mb-5">Description</label>
+                                        <div class="form-s2">
+                                            <textarea rows="4" name="description" id="description">{{@$invoice->description}}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <h2 class="title border-bottom">Invoice <span>Details</span></h2>
                             <div class="row CompanyInfo">
                                 <!-- <div class="col-md-7 pr-0"><strong>Old Recived:</strong> </div>
@@ -743,18 +744,22 @@
                             <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'sale-edit' ? 'Update' : 'New'}} <span>Sale Invoice</span></h2>
                         </div>
 
+                        <div class="col p-0   d-flex">
+                            <input type="number" value="" data-price="" class="custom-select custom-select-sm  calculate_by_amount" style="height: 28px;border-color: white; width: 100px;margin-top: 11px;">
+                            <span class="calculate_by_amount_text ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red;margin-top:5px">0</span>
+                        </div>
                         <!-- <div class="col p-0 text-right">
-                    <select class="custom-select custom-select-sm custom-select-cs" id="currencySelector">
-                        <option sign="$" value="USD" selected>USD - United States Dollar
-                        </option>
-                        <option sign="EUR" value="EUR">EUR - Euro
-                        </option>
-                        <option sign="Rs" value="PKR">PKR - Pakistan Rupees
-                        </option>
-                        <option sign="HK$" value="HKD">HKD — Hong Kong dollar</option>
-                        <option sign="AFN" value="AFN">AFN — Afghani</option>
-                    </select>
-                </div> -->
+                            <select class="custom-select custom-select-sm custom-select-cs" id="currencySelector">
+                                <option sign="$" value="USD" selected>USD - United States Dollar
+                                </option>
+                                <option sign="EUR" value="EUR">EUR - Euro
+                                </option>
+                                <option sign="Rs" value="PKR">PKR - Pakistan Rupees
+                                </option>
+                                <option sign="HK$" value="HKD">HKD — Hong Kong dollar</option>
+                                <option sign="AFN" value="AFN">AFN — Afghani</option>
+                            </select>
+                        </div> -->
                         <!-- <div class="col-6 PL-10">
                             <div class="total-amt-top">
                                 <div class="TAM-div"><small>Amount Dues</small><span id="amount_due">0</span></div>
@@ -851,10 +856,10 @@
                                     </thead>
                                     <tbody id="productGrid">
                                         <tr>
-                                            <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;"></td>
-                                            <td>
-                                                <div class="form-s2" style="width:165px">
-                                                    <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 150;">
+                                            <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1"></td>
+                                            <td style="width : 200px;max-width: 200px;">
+                                                <div class="form-s2">
+                                                    <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2">
                                                         <option value="0">Select Product *</option>
                                                         @foreach($products as $product)
                                                         <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
@@ -862,12 +867,12 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
+                                            <td> <input type="text" id="qty" class="inputSale only_numerics qty" placeholder="" name="qty" tabindex="3" min="0"></td>
                                             <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" readonly></td>
                                             <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" tabindex="4" min="0"></td>
-                                            <td class='add- S-input '><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;"></td>
-                                            <td>
-                                                <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5" style="padding: 5px 15px 5px 15px; background:green">Add</button>
+                                            <td class='add- S-input ' style="width: 130px;"><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px; width:100%"></td>
+                                            <td style="width: 100px;">
+                                                <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5" style="padding: 5px 15px 5px 15px; background:green;width:100%">Add</button>
                                             </td>
                                         </tr>
 
@@ -896,7 +901,7 @@
                                             <td></td>
                                             <td></td>
                                             <td align="right">Service charges </td>
-                                            <td style="width:112px"><input type="number" name="discount" id="discount" class="inputvalue service_charges_input" style="font-size: 13px" value="{{@$invoice->service_charges}}" placeholder="0.00"  data-id="" data-value="" min="0"></td>
+                                            <td style="width:112px"><input type="number" name="discount" id="discount" class="inputvalue service_charges_input" style="font-size: 13px" value="{{@$invoice->service_charges}}" placeholder="0.00" data-id="" data-value="" min="0"></td>
                                         </tr>
                                         <tr class="previous_payable_tr" style="display:none">
                                             <td></td>
@@ -930,7 +935,7 @@
                                             <td></td>
                                             <td></td>
                                             <td align="right" class="cash-return">Cash Recived </td>
-                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00"  value="{{@$invoice->amount_received}}"></td>
+                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" value="{{@$invoice->amount_received}}"></td>
                                         </tr>
 
 
@@ -1006,7 +1011,7 @@
 
 </div>
 </div>
-@endsection 
+@endsection
 @push('js')
 <script>
     var clients = JSON.parse('{!! json_encode($customers)  !!}');

@@ -3511,12 +3511,12 @@
             </h6>
             <!-- Title -->
             <h1 class="header-title">
-                <h2 class="_head01">Sales<span> Report</span></h2>
+                <h2 class="_head01">Purchase<span> Report</span></h2>
             </h1>
         </div>
         <div class="col-auto">
             <ol class="breadcrumb">
-                <li><a href="#"><span>Sale</span></a></li>
+                <li><a href="#"><span>Purchase</span></a></li>
                 <li><span>Active</span></li>
             </ol>
         </div>
@@ -3531,16 +3531,8 @@
                 <div class="row">
 
                     <div class="col pr-0">
-                        <div class="_cust_filter col-4">
-                            <div class="form-s2">
-                                <select class="form-control formselect company_id" name="company_id">
-                                    <option value="">Select Company</option>
-                                    @foreach($companies as $company)
-                                    <option value="{{$company->id}}">{{$company->id}}-{{$company->company_name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
+
+
                         <div class="_cust_filter col-4">
                             <div class="form-s2">
                                 <select class="form-control formselect product_id" name="product_id">
@@ -3551,29 +3543,23 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter col-4">
-                            <div class="form-s2">
-                                <select class="form-control formselect customer_id" name="customer_id">
-                                    <option value="">Select Customer</option>
-                                    @foreach($customers as $customer)
-                                    <option value="{{$customer->id}}">{{$customer->id}}-{{$customer->customer_name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
+
                         <style>
                             .CL-Product input {
                                 height: 31px !important;
                             }
                         </style>
-                        <div class="CL-Product inputmonth" style="width:250px;padding-top: 0px;margin-left:2px">
-                            <i class="fa fa-search" style="top: 8px"></i>
-                            <input type="text" class="form-control" placeholder="Bill #" name="bill_no">
+                        <div>
+                            <div class="custom-control custom-checkbox mr-sm-2">
+                                <input type="checkbox" id="current-date" name="is_current_date" heading="Filter by" class="custom-control-input access_rights_headings" value="1">
+                                <label class="custom-control-label" for="current-date" style="font-weight:bolder">Current Date</label>
+                            </div>
                         </div>
-
                     </div>
+
                 </div>
                 <div class="row" style="margin-bottom: 10px;">
+
                     <div class="col-auto" style="padding: 0px">
                         <div class="CL-Product inputmonth" style="width:250px;margin-left:11px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
                             <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
@@ -3616,7 +3602,7 @@
                                 <canvas id="timechart" width="310" height="110"></canvas>
                             </div>
 
-                            <h2 class="card-heading">Total <span> Sales</span></h2>
+                            <h2 class="card-heading">Total Purchase<span> After Return</span></h2>
                             <div class="total-amount ttl_sales p-0"><span>Rs.</span> 0</div>
                         </div>
                         <div class="col-12">
@@ -3631,10 +3617,10 @@
                 <div class="col-lg-5 col-md-12">
                     <div class="row m-0">
                         <div class="col-6 total-val border-bottom"><span class="ttl_payment">0</span>
-                            Total Sale Before Discount</div>
-                        <div class="col-6 total-val border-left border-bottom"><span class="ttl_discount">0</span>Total Return Before Discount</div>
-                        <div class="col-6 total-val"><span class="ttl_invoice_discount">0</span> Total Invoice Discount</div>
-                        <div class="col-6 total-val border-left"><span class="ttl_product_discount ">0</span> Total Product Discount </div>
+                            Total Purchase</div>
+                        <div class="col-6 total-val border-left border-bottom"><span class="ttl_product_discount">0</span> Total Product Discount</div>
+                        <div class="col-6 total-val"><span class="ttl_invoice_discount">0</span> Total Returns</div>
+                        <div class="col-6 total-val border-left"><span class="ttl_discount">0</span> Total Discount</div>
                     </div>
                 </div>
             </div>
@@ -3645,7 +3631,7 @@
     <div class="col-md-12">
         <div class="card" style="padding: 0px">
             <div class="header m-0">
-                <h2>Sale <span>List</span></h2>
+                <h2>Purchase <span>List</span></h2>
             </div>
             <div style="min-height: 400px; display: none;" class="loader">
                 <img src="images/loading.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
@@ -3653,7 +3639,7 @@
             <div class="body teacher_attendance_list">
                 <div class="col-12 pb-10">
                     <div class="no-info">
-                        <div class="m-auto"><strong> Please Filter Your Sale Record !</strong></div>
+                        <div class="m-auto"><strong> Please Filter Your Purchase Record !</strong></div>
                     </div>
                 </div>
             </div>
@@ -3662,5 +3648,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/sale_report.js') }}"></script>
+<script src="{{asset('js/custom/product_report.js') }}"></script>
 @endpush

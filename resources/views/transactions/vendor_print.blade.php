@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{{$invoice->customer_name}} {{date('d-m-Y',strtotime($invoice->date))}} {{$invoice->cpv_no ? 'Cash Received' : 'Cash Payment'}} Voucher</title>
+    <title>{{$invoice->customer_name}} {{date('d-m-Y',strtotime($invoice->date))}} {{$invoice->cpv_no ? 'Cash Payment' : 'Cash Received'}} Voucher</title>
     <style>
         @media print {
             .page-break {
@@ -171,14 +171,14 @@
 <body translate="no" onload="javascript:window.print()">
     <div id="invoice-POS">
         <center id="top">
-            <div class="info"> 
+            <div class="info">
                 <p>SHAMA STORE TOUNSA MOR CHOWK KOT ADDU.</p>
                 <p>Phone # 03456873232 03326873232</p>
             </div><!--End Info-->
         </center><!--End InvoiceTop-->
         <div id="mid">
             <div class="info">
-                {{$invoice->cpv_no ? 'Cash Received' : 'Cash Payment'}} Voucher
+                {{$invoice->cpv_no ? 'Cash Payment' : 'Cash Received'}} Voucher
             </div>
         </div><!--End Invoice Mid-->
         <div id="bot">
@@ -198,33 +198,33 @@
                     <td>Vendor : <span style="text-transform:capitalize">{{$invoice->customer_name}}</span></td>
                 </tr>
             </table>
-           
+
             <table class="bot-5-table">
-            @php
-           
+                @php
+
                 if($type == 1){
-                $bal = $invoice->balance+$invoice->cr;
+                $bal = $invoice->balance-($invoice->cr);
                 } else{
-                $bal = $invoice->balance-$invoice->dr;
+                $bal = $invoice->balance+($invoice->dr);
                 }
                 @endphp
-                <tr>    
+                <tr>
                     <td class="payable-heading">Previous {{$bal >= 0 ? 'Payable' : 'Receivable' }} :</td>
-                    <td>{{number_format($type == 1 ? $invoice->balance-$invoice->dr : $invoice->balance+$invoice->cr)}}</td>
+                    <td>{{number_format($type == 1 ? $invoice->balance-($invoice->cr) : $invoice->balance+($invoice->dr))}}</td>
                 </tr>
                 <!-- <tr>
                         <td class="payable-heading">Total Amount:</td>
                         <td>{{number_format($invoice->total_invoice_amount)}}</td>
                     </tr> -->
                 <tr>
-                    <td class="payable-heading">{{$type == 1 ? ' Received'  : ' Paid'}} :</td>
+                    <td class="payable-heading">Cash{{$type == 1 ? ' Received'  : ' Paid'}} :</td>
                     <td>{{number_format($type == 2 ? $invoice->dr : $invoice->cr)}}</td>
                 </tr>
                 <tr>
                     <td class="payable-heading">{{$invoice->balance > 0 ? 'Remaining Payable'  : 'Remaining Receivable'}} :</td>
-                    <td>{{number_format($invoice->balance,2)}}</td>
+                    <td>{{number_format(-$invoice->balance,2)}}</td>
                 </tr>
-                 
+
 
             </table>
             @if($invoice->comment)
@@ -235,7 +235,7 @@
                 <tr class="body-description-tr">
                     <td class=" tableitem">{{$invoice->comment}}</td>
                 </tr>
-               
+
             </table>
             @endif
             <table class="footer">

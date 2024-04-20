@@ -2,40 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
+use App\Models\Product;
 use App\Models\VendorLedger;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
+
 require app_path('Invoice_helper.php');
 
 class LedgerDetailControlller extends Controller
 {
    public function customerReport()
-   { 
+   {
+      $ledger_for = 'Customer';
       $vendors   =   Customer::where('customer_type', 2)->get();
-      return view('reports.vendor', compact('vendors'));
+      return view('reports.vendor', compact('vendors', 'ledger_for'));
    }
    public function vendorReport()
    {
+      $ledger_for = 'Vendor';
       $vendors   =   Customer::where('customer_type', 1)->get();
-      return view('reports.vendor', compact('vendors'));
+      return view('reports.vendor', compact('vendors', 'ledger_for'));
+   }
+   public function productReports()
+   {
+      $ledger_for = 'Product';
+      $companies  =   Company::select('id', 'company_name')->get();
+      $products   =   Product::select('id', 'product_name')->get();
+      return view('reports.product', compact('products', 'companies', 'ledger_for'));
+   }
+   public function productList(Request $request)
+   {
+      $current_date     =  date('Y-m-d');
+      $records          =  ProductReportList($request, $current_date);
+
+      return response()->json([
+         'msg'     => 'Product report list fetched',
+         'status'  => 'success',
+         'reports'  => $records
+      ]);
    }
    public function reportList(Request $request)
    {
       $dateFilter    =  " 1=1";
       if ($request->start_date != '' && $request->end_date != '') {
          $dateFilter = " Date(created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
-      } 
+      }
       if (str_contains($request->current_url, 'vendor-reports')) {
          $query      =  VendorLedger::selectRaw('vendor_ledger.*,  DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at,
                                       IFNULL( CONCAT("PI ", (SELECT invoice_no FROM purchase_invoices WHERE purchase_invoices.id = vendor_ledger.purchase_invoice_id)) ,
                                              CONCAT("PR ", (SELECT invoice_no FROM purchase_return_invoices WHERE purchase_return_invoices.id = vendor_ledger.purchase_return_invoice_id))) AS invoice_no
                                        ')
-                                       ->whereRaw("$dateFilter AND customer_id = $request->vendor_id")
-                                      
-                                       ->get();
-     
-      } else { 
+            ->whereRaw("$dateFilter AND customer_id = $request->vendor_id")
+
+            ->get();
+      } else {
          $query      = CustomerLedger::selectRaw('*, DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at,
                                                    COALESCE( CONCAT("SI ", (SELECT invoice_no FROM sale_invoices WHERE sale_invoices.id = customer_ledger.sale_invoice_id)) ,
                                                    CONCAT("SR ", (SELECT invoice_no FROM sale_return_invoices WHERE sale_return_invoices.id = customer_ledger.sale_return_invoice_id)),
@@ -57,19 +79,19 @@ class LedgerDetailControlller extends Controller
       $parts   = explode('/', $url);
       $lastParameter = end($parts);
 
-      $label = str_replace([' ', '%20'], '_', strtolower($lastParameter)); 
-      if ($label === 'sale_inv') { 
-         $invoice     = getSaleInv($id);  
-      }elseif ($label == 'sale_return_inv') {
+      $label = str_replace([' ', '%20'], '_', strtolower($lastParameter));
+      if ($label === 'sale_inv') {
+         $invoice     = getSaleInv($id);
+      } elseif ($label == 'sale_return_inv') {
          $invoice     = getSaleReturnInv($id);
       } else if ($label == 'purchase_inv') {
          $invoice     = getPurchaseInv($id);
       } elseif ($label == 'return_inv') {
          $invoice     = getPurchaseReturnInv($id);
       } elseif ($label == 'product_replacement_inv') {
-         $invoice     = getProductReplacementInv($id); 
-         return view('reports.replacement-detail',compact('invoice'));
-       } 
-      return view('reports.detail',compact('invoice'));
-   } 
+         $invoice     = getProductReplacementInv($id);
+         return view('reports.replacement-detail', compact('invoice'));
+      }
+      return view('reports.detail', compact('invoice'));
+   }
 }

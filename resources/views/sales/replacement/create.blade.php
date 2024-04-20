@@ -548,8 +548,8 @@
             width: 190px;
         }
     }
- 
-        
+
+
     @media (min-width: 1440px) {
         .left-sidebox {
             -ms-flex: 380px;
@@ -579,13 +579,13 @@
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         top: 0px !important;
     }
-    @media (min-width: 768px){
+
+    @media (min-width: 768px) {
         .col-md-8 {
             flex: 0 0 auto;
             width: 70.66667%;
         }
     }
-   
 </style>
 <div class="container-fluid">
     <form id="form" enctype="multipart/form-data" class="">
@@ -647,15 +647,15 @@
                             </div>
                         </div>
                         <div class="form-wrap p-0">
-                                  <div class="row">
-                                      <div class="col-md-12 mt-5">
-                                          <label class="font13 mb-5">Description</label>
-                                          <div class="form-s2">
-                                              <textarea rows="4" name="description" id="description">{{@$invoice->description}}</textarea>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
+                            <div class="row">
+                                <div class="col-md-12 mt-5">
+                                    <label class="font13 mb-5">Description</label>
+                                    <div class="form-s2">
+                                        <textarea rows="4" name="description" id="description">{{@$invoice->description}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <h2 class="title border-bottom">Invoice <span>Details</span></h2>
                         <div class="row CompanyInfo">
                             <!-- <div class="col-md-7 pr-0"><strong>Old Recived:</strong> </div>
@@ -717,7 +717,7 @@
                     </div>
                     <style>
                         .ProductTable tbody tr:hover td {
-                            background: #152e4d !important; 
+                            background: #152e4d !important;
                             color: white !important;
                         }
                     </style>
@@ -742,11 +742,20 @@
                                     </tr>
                                 </thead>
                                 <tbody id="productGrid" class="parent_body in_table">
+                                    <style>
+                                        #productGrid tr td {
+                                            width: 80;
+                                        }
+
+                                        #productGrid tr td input {
+                                            width: 100%;
+                                        }
+                                    </style>
                                     <tr>
-                                        <td><input type="text" id="bar-code1" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;"></td>
-                                        <td>
-                                            <div class="form-s2" style="width:165px">
-                                                <select class="inputfileds formselect products" name="product_name" id="products1" tabindex="2" style="width: 150;">
+                                        <td><input type="text" id="bar-code1" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1"></td>
+                                        <td style="width : 200px;max-width: 200px;">
+                                            <div class="form-s2" style="width: 100%;">
+                                                <select class="inputfileds formselect products" name="product_name" id="products1" tabindex="2" style="width: 100%;">
                                                     <option value="0">Select Product *</option>
                                                     @foreach($products as $product)
                                                     <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
@@ -754,14 +763,14 @@
                                                 </select>
                                             </div>
                                         </td>
-                                        <td> <input type="date" id="expiry_date" class="inputSale p_expiry_date  expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="5" style=" width: 95;"></td>
+                                        <td> <input type="date" id="expiry_date" class="inputSale p_expiry_date  expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="3"></td>
                                         <!-- Assigning tabindex for the input fields -->
-                                        <td><input type="number" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="3" min="0" style=" width: 50;" data-product-type="1"></td>
-                                        <td><input type="number" id="retail_price" class="inputSale retail_price" placeholder="" name="retail_price" style="font-size: 13px;" readonly tabindex="4"></td>
-                                        <td><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;width: 50;" tabindex="5" min="0"></td>
-                                        <td class='add-S-input'><input type="text" id="amount" class="inputSale amount" placeholder="" name="amount" style="font-size: 13px;" tabindex="6"></td>
-                                        <td>
-                                            <button type="button" id="add-product" class="btn btn-primary smBTN mr-2 add-product" tabindex="7" style="padding: 5px 15px 5px 15px; background:green">Add</button>
+                                        <td><input type="number" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="4" min="0" data-product-type="1"></td>
+                                        <td><input type="number" id="retail_price" class="inputSale retail_price" placeholder="" name="retail_price" style="font-size: 13px;" readonly></td>
+                                        <td><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;" tabindex="5" min="0"></td>
+                                        <td class='add-S-input'><input type="text" id="amount" class="inputSale amount" placeholder="" name="amount" style="font-size: 13px;"></td>
+                                        <td style="width:80px">
+                                            <button type="button" id="add-product" class="btn btn-primary smBTN mr-2 add-product" tabindex="6" style="padding: 5px 15px 5px 15px; background:green;width:100%">Add</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -770,23 +779,22 @@
                     </div>
 
                     <div class="row">
-                    <div class="row">
-                        <style>
-                                .in-out{
+                        <div class="row">
+                            <style>
+                                .in-out {
                                     width: 60px;
                                     font-size: 15px;
                                     font-family: 'Courier New', Courier, monospace;
-                                    
+
                                     margin-bottom: 0px;
                                     margin-top: 9px;
                                     color: white;
                                     padding: 0px 0px 8px 17px;
-                                } 
-
-                        </style>
+                                }
+                            </style>
                             <div class="col-2">
-                                <h5 class="title PT-10 in-out" style=" background-color: red; " >OUT</h2>
-                            </div> 
+                                <h5 class="title PT-10 in-out" style=" background-color: red; ">OUT</h2>
+                            </div>
                         </div>
                         <div class="col-12" id="table-container">
                             <table class="ProductTable table designationsTable" id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -804,10 +812,10 @@
                                 </thead>
                                 <tbody id="productGrid" class="parent_body out_table">
                                     <tr>
-                                        <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="8" style="width: 50;"></td>
-                                        <td>
-                                            <div class="form-s2" style="width:165px">
-                                                <select class="inputfileds formselect products" data-btn="replacement" name="product_name" id="products" tabindex="9" style="width: 150;">
+                                        <td style="width : 80px;"><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="7" style="width: 100%;"></td>
+                                        <td style="width : 200px;max-width: 200px;">
+                                            <div class="form-s2" style="width:100%">
+                                                <select class="inputfileds formselect products" data-btn="replacement" name="product_name" id="products" tabindex="8" style="width: 100%;">
                                                     <option value="0">Select Product *</option>
                                                     @foreach($products as $product)
                                                     <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
@@ -815,15 +823,15 @@
                                                 </select>
                                             </div>
                                         </td>
-                                        <td> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="5" style=" width: 95;"></td>
+                                        <td style="width : 80px;"> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="9" style=" width:100%;"></td>
 
                                         <!-- Assigning tabindex for the input fields -->
-                                        <td><input type="number" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="10" min="0" style=" width:50;" data-product-type="2"></td>
-                                        <td><input type="number" id="retail_price" class="inputSale retail_price" placeholder="" name="retail_price" style="font-size: 13px;" readonly tabindex="11"></td>
-                                        <td><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;width: 50;" tabindex="12" min="0"></td>
-                                        <td class='add-S-input'><input type="text" id="amount" class="inputSale  amount" placeholder="" name="amount" style="font-size: 13px;" tabindex="13"></td>
-                                        <td>
-                                            <button type="button" id="add-product" data-btn="replacement" class="btn btn-primary smBTN mr-2 add-product" tabindex="14" style="padding: 5px 15px 5px 15px; background:green">Add</button>
+                                        <td style="width : 80px;"><input type="number" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="10" min="0" style=" width:100%;" data-product-type="2"></td>
+                                        <td style="width : 80px;"><input type="number" id="retail_price" class="inputSale retail_price" placeholder="" name="retail_price" style="font-size: 13px;width:100%" readonly></td>
+                                        <td style="width : 80px;"><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;width:100%" tabindex="10" min="0"></td>
+                                        <td style="width : 80px;" class='add-S-input'><input type="text" id="amount" class="inputSale  amount" placeholder="" name="amount" style="font-size: 13px; width:100%"></td>
+                                        <td style="width:80">
+                                            <button type="button" id="add-product" data-btn="replacement" class="btn btn-primary smBTN mr-2 add-product" tabindex="11" style="padding: 5px 15px 5px 15px; background:green;width:100%">Add</button>
 
                                         </td>
                                     </tr>
@@ -938,7 +946,7 @@
 
 
 
-                    <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
+                    <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 25px" id="btns_div">
                         @if(request()->query('invoice') == 'detail')
                         <a href="{{route('ProductReplacement.index')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
                         @else
