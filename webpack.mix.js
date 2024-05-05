@@ -24,10 +24,11 @@ mix.js('resources/js/app.js', 'public/js')
     .js('resources/js/custom/purchase_report.js', 'public/js/custom')
     .js('resources/js/custom/profit_report.js', 'public/js/custom')
     .js('resources/js/custom/sale_return.js', 'public/js/custom')
-    .js('resources/js/custom/vendor_transaction.js', 'public/js/custom') 
+    .js('resources/js/custom/vendor_transaction.js', 'public/js/custom')
     .js('resources/js/custom/purchase_return.js', 'public/js/custom')
     .js('resources/js/custom/sale_replacement.js', 'public/js/custom')
     .js('resources/js/custom/product_change_price.js', 'public/js/custom')
+    .js('resources/js/custom/organization.js', 'public/js/custom')
 
 
 

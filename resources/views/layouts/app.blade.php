@@ -120,6 +120,14 @@
             color: white !important;
             border: 1px solid #040725 !important;
         }
+
+        /* @media (max-width: 320px) {
+
+            tbody {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        } */
     </style>
     <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('/css/jquery.steps.css')}}" rel="stylesheet">
@@ -201,6 +209,7 @@
         var segments = location.href.split('/');
         var action = segments[3];
         $(document).ready(function() {
+
             function addCommas(nStr) {
                 nStr += "";
                 x = nStr.split(".");

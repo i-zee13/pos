@@ -33,7 +33,11 @@ class HomeController extends Controller
             $message = 'Good Afternoon';
         } else {
             $message = 'Good Evening';
-        }  
-        return view('home',compact('message'));
+        }
+        return view('home', compact('message'));
+    }
+    public function deleteInvoice(Request $request)
+    {
+        dd($request->all());
     }
 }

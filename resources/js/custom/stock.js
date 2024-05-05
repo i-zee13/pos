@@ -96,7 +96,7 @@ $(document).ready(function () {
                             <td>${product.product_id}</td>
                             <td style="width : 200px;max-width: 200px;" colspan="2">${product.p_name}</td>
                             <td  style="width : 95px"><input type="number" value="${product.purchased_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${amount}" data-quantity="${product.qty}"  style="font-size: 13px;width:100%" min="0"></td>
-                            <td style="width : 95px"><input type="number" value="${product.sale_price}" data-purchase="${product.sale_price}" data-stock="${stock_in_hand}" class="inputSale sale_price_input td-${product.product_id}"  data-id="${product.product_id}"   style="font-size: 13px;width:100%" min="0"></td>
+                            <td style="width : 95px"><input type="number" value="${product.sale_price}" data-purchase="${product.sale_price}" data-stock="${product.stock_in_hand}" class="inputSale sale_price_input td-${product.product_id}"  data-id="${product.product_id}"   style="font-size: 13px;width:100%" min="0"></td>
                              <td><input type="date" value="${product.expiry_date}" class="inputSale expiry_date expiry_input"  data-id="${product.product_id}" style="font-size: 13px;width: 95;" min="0" ></td>
                             <td style="width : 80px">
                                 <input type="number" value="${product.qty}" data-purchase="${product.old_price}" data-stock="${product.stock_in_hand}"
@@ -105,7 +105,7 @@ $(document).ready(function () {
                             </td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.prod_discount}</td>
                              <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount - product.prod_discount}</td>
-                            <td><a type="button" id="${product.product_id}" data-id="${product.purchase_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="" style="${!is_removable ? 'display:none' : ''}">Remove</a></td>
+                            <td><a type="button" id="${product.product_id}" data-id="${product.purchase_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="" style="${!is_removable ? 'display:none' : ''}" data-stock="${product.stock_in_hand}" data-quantity="${product.qty}">Remove</a></td>
                         </tr>
                     `);
                 })
@@ -143,7 +143,16 @@ $('.close').on('click', function () {
 $(document).on('click', '.remove_btn', function () {
     deleteRef = $(this);
     var product_id = $(this).attr('id');
+    var current_stock = $(this).attr('data-stock');
+    var purchased_qty = $(this).attr('data-quantity');
     var purchase_invoice_id = $(this).attr('data-id');
+    if (parseInt(current_stock) < parseInt(purchased_qty)) {
+        $('#notifDiv').fadeIn().css('background', 'red').text(`Current stock is less then ${current_stock} -- ${purchased_qty}`);
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    }
     if (segments[3] == 'purchase-edit') {
         swal({
                 title: "Are you sure?",
@@ -164,6 +173,7 @@ $(document).on('click', '.remove_btn', function () {
                             _token: $('meta[name="csrf_token"]').attr('content'),
                             product_id: product_id,
                             purchase_invoice_id: purchase_invoice_id,
+                            qty: purchased_qty,
                         },
                         success: function (response) {
                             if (response.status == 'success') {

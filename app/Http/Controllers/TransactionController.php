@@ -26,6 +26,12 @@ class TransactionController extends Controller
       $customers    =   Customer::where('customer_type', 1)->get();
       return view('transactions.vendor', compact('current_date', 'customers', 'operation'));
    }
+   public function getLedgerPurchi()
+   {
+      $current_date =   Carbon::today()->toDateString();
+      $customers    =   Customer::where('customer_type', 2)->get();
+      return view('transactions.purchi', compact('current_date', 'customers'));
+   }
 
    public function getCustomerLedgers(Request $request)
    {
@@ -153,6 +159,40 @@ class TransactionController extends Controller
          'status'         =>  'success',
          'transaction_id' =>  $ledger->id,
          'customer_id'    =>  $ledger->customer_id,
+      ]);
+   }
+   public function saveTransaction(Request $request)
+   {
+      dd($request->all());
+      foreach ($request->customers as $key => $customer) {
+         isEditable($customer);
+         // if ($request->action == 'edit') {
+         $balance              = CustomerLedger::where('customer_id', $customer->id)->where('trx_type', 3)->orderBy('created_at', 'desc')->value('balance');
+         // } else {
+         $ledger              =   new CustomerLedger();
+         // }
+         // if ($request->amount_to == 1) {     //1 = CR Ledger-jama
+         $ledger->crv_no   =  getCrvNo();
+         $ledger->balance  =  $customer->balance - $customer->receiving_amount;
+         $ledger->cr       =  $customer->receiving_amount;
+         // } else {                            // DR Ledger-Banam
+         //    $ledger->cpv_no   =  getCpvNo();
+         //    $ledger->balance  =  $balance + $request->amount[$key];
+         //    $ledger->dr       =  $request->amount[$key];
+         // }
+         $ledger->customer_id =   $customer->id;
+         $ledger->trx_type    =   3;
+         $ledger->is_editable =   1;
+         $ledger->comment     =   "Bulk";
+         $ledger->date        =   Carbon::now();
+         $ledger->created_by  =   Auth::user()->id;
+         if ($ledger->save()) {
+            Customer::where('id', $customer->id)->update(['balance' => $ledger->balance]);
+         }
+      }
+      return response()->json([
+         'msg'            =>  'Ledger Updated',
+         'status'         =>  'success'
       ]);
    }
    public function getCustomerTransactions(Request $request)

@@ -150,7 +150,7 @@ $(document).ready(function () {
             'stock_in_hand': "".concat(product.stock_in_hand),
             'purchased_price': "".concat(product.purchase_price),
             'p_name': "".concat(product.product_name),
-            'return_invoice_id': "".concat(product.return_invoice_id)
+            'return_invoice_id': "".concat(product.id)
           });
         });
         $('.display').show();

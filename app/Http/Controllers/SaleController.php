@@ -7,6 +7,7 @@ use App\Models\CustomerLedger;
 use App\Models\Product;
 use App\Models\ProductSale;
 use App\Models\Sale as SaleInvoice;
+use App\Models\StockManagment;
 use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -34,30 +35,45 @@ class SaleController extends Controller
             'customers' => $customers
         ]);
     }
-    public function updateStock($previous_qty, $sale, $balance, $vendor_id, $type)
+    public function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type, $transaction_type)
     {
-        $v                   =  new VendorStock();
-        $v->vendor_id        =  $vendor_id;
-        $v->transaction_type =  2;  //Sale
-        if ($previous_qty > 0) {
-            $v->qty         =  $previous_qty;
-            $v->status      =   1;   // IN
-            $v->balance     =   $balance + $v->qty;
-        } else {
-            $v->status      =    2;   // Out
-            $v->qty         =   $sale->qty;
-            $v->balance     =   $balance -  $v->qty;
-        }
+
+        $v                      =  new VendorStock();
+        $v->vendor_id           =   $sale->vendor_id;
+        $v->transaction_type    =  $transaction_type;
+        $v->qty                 =  $qty_value;
+        $v->status              =  $In_out_status;   //IN
+        $v->balance             =  $In_out_status == 2 ? $balance - $qty_value : $balance +  $qty_value;
+        $v->actual_qty          =  $sale->qty;
         $v->invoice_no           =  $sale->invoice_no;
         $v->sale_invoice_id      =  $sale->sale_invoice_id;
-        $v->product_unit_price   =  $sale->purchase_price;
         $v->company_id           =  $sale->company_id;
         $v->product_id           =  $sale->product_id;
         $v->date                 =  $sale->created_at;
-        $v->amount               =   $sale->sale_total_amount;
+        $v->sale_unit_price      =  $sale->sale_price;
         $v->created_by           =  Auth::id();
+        if ($transaction_type == 1) { //Purchase
+            $v->total_purchase_amount =  $sale->purchased_total_amount;
+        } else if ($transaction_type == 2) {  //Sale
+            $v->total_sale_amount    =  $sale->sale_total_amount;
+        }
         $v->save();
         return $v;
+    }
+    public function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
+    {
+        $stock = StockManagment::where('product_id', $purchase->product_id)
+            ->where('company_id', $purchase->company_id)
+            ->orderBy('id', 'DESC')->first();
+        if (!$stock) {
+            $stock = new StockManagment();
+        }
+        $stock->company_id  = $purchase->company_id;
+        $stock->product_id  = $purchase->product_id;
+        $balance            = $In_out_status == 2 ? $stock->balance - $stock_qty : $stock->balance +  $stock_qty;
+        $stock->balance     = $balance;
+        $stock->vs_id       = $vendor_stock_id;
+        $stock->save();
     }
     public function saleInvoice(Request $request)
     {
@@ -92,9 +108,13 @@ class SaleController extends Controller
             if (count($request->sales_product_array) > 0) {
                 $old_ids        = $request->existing_product_ids;
                 foreach ($request->sales_product_array as $key => $sale_product) {
+                    $flag = true;
                     $new_ids[]  = $sale_product['product_id'];
                     if ($sale_product['sale_prod_id'] > 0) {
                         $sale          =  ProductSale::where('id', $sale_product['sale_prod_id'])->first();
+                        if ($sale->qty == $sale_product['qty']) {
+                            $flag = false;
+                        }
                     } else {
                         $sale          =  new ProductSale();
                     }
@@ -114,25 +134,40 @@ class SaleController extends Controller
                         ->value('qty');
                     if ($sale->save()) {
                         $sale_products_array[] = $sale->id;
+                        $balance = 0;
                         $check_stock           =  VendorStock::where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
-                        $vendor_id             =  $check_stock->vendor_id;
                         if ($check_stock) {
+                            $vendor_id             =  $check_stock->vendor_id;
                             $balance           =  $check_stock->balance;
                         }
-
-                        if ($request->hidden_invoice_id) {
-                            if ($previous_qty != 0) {
-                                $v          = $this->updateStock($previous_qty, $sale, $balance, $vendor_id, 'vendor');
-                                $balance    =  $v->balance;
+                        if ($flag) {
+                            $change_qty_value   =   $sale->qty;
+                            $In_out_status      =   2;
+                            if ($request->hidden_invoice_id) {
+                                if ($previous_qty != 0) {
+                                    if ($sale->qty >=  $previous_qty) {
+                                        $change_qty_value = $sale->qty - $previous_qty;
+                                        $In_out_status = 2; // OUT
+                                    } else {
+                                        $change_qty_value = $previous_qty - $sale->qty;
+                                        $In_out_status = 1; // IN
+                                    }
+                                }
                             }
-                        }
-                        $v_stock = $this->updateStock($previous_qty = 0, $sale, $balance, $vendor_id, 'vendor');
-
-                        if ($v_stock->save()) {
-                            $sale->vendor_stock_id = $v_stock->id;
-                            Product::where('id', $v_stock->product_id)->update([
-                                'stock_balance' =>  $v_stock->balance,
+                            VendorStock::where('sale_invoice_id', $sale->sale_invoice_id)->where('product_id', $sale->product_id)->update([
+                                'actual_qty' => 0,
+                                'actual_status' => 0
                             ]);
+                            $sale->customer_id  =  $invoice->customer_id;
+                            $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'sale', 2);
+                            StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status, 'sale');
+
+                            if ($v_stock->save()) {
+                                $sale->vendor_stock_id = $v_stock->id;
+                                Product::where('id', $v_stock->product_id)->update([
+                                    'stock_balance' =>  $v_stock->balance,
+                                ]);
+                            }
                         }
                     }
                 }
@@ -318,37 +353,19 @@ class SaleController extends Controller
 
         $vs      = VendorStock::where('sale_invoice_id', $request->sale_invoice_id)
             ->where('product_id', $request->product_id)
-            ->where('qty', $request->qty)
-            ->where('status', 2)->orderBy('id', 'DESC')
+            ->where('transaction_type', 2)->orderBy('id', 'DESC')
             ->first();
         if ($vs) {
+            $v_stock = updateStock($vs, $vs->balance, $request->qty, 1, 'sale', 5);
+            StockManagment($v_stock->id, $vs, $request->qty, 1, 'sale');
 
-            $stock_inHand                  = VendorStock::where('product_id', $request->product_id)
-                ->orderBy('id', 'DESC')->value('balance');
-            $v_stock                       =  new VendorStock();
-            $v_stock->balance              =  $stock_inHand + $request->qty;
-            $v_stock->qty                  =  $request->qty;
-            $v_stock->status               =  1; //IN
-            $v_stock->transaction_type     =  3; //Return
-            $v_stock->sale_invoice_id      =  $request->sale_invoice_id;
-            $v_stock->product_unit_price   =  $vs->product_unit_price;
-            $v_stock->product_id           =  $request->product_id;
-            $v_stock->vendor_id            =  $vs->vendor_id;
-            $v_stock->date                 =  Carbon::now();
-            $v_stock->amount               =  $vs->amount;
-            $v_stock->created_by           =  Auth::id();
-            if ($v_stock->save()) {
+            if ($v_stock) {
                 Product::where('id', $v_stock->product_id)->update([
                     'stock_balance' =>  $v_stock->balance,
                 ]);
                 ProductSale::where('sale_invoice_id', $request->sale_invoice_id)
                     ->where('product_id', $request->product_id)->where('qty', $request->qty)
                     ->delete();
-                // $v_stock->vendor_stock_id = $v_stock->id;
-                // unset($v_stock->vendor_id);
-                // $stockData = $v_stock->toArray();
-                // Stock::insert($stockData);
-
                 return response()->json([
                     'msg'       => 'product removed',
                     'status'    => 'success',

@@ -118,7 +118,7 @@ $(document).ready(function () {
                         $('#notifDiv').fadeOut();
                     }, 1500);
                     setTimeout(() => {
-                        window.location = "/organization";
+                        window.location = "/organization-detail";
                         $('#notifDiv').fadeOut();
                     }, 1000);
                 }

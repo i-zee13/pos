@@ -84,7 +84,7 @@ class ProductReplacementController extends Controller
                         $sale          =  new ProductReplacement();
                     }
                     $sale->sale_price          = $sale_product['retail_price'];
-                    dd($sale->sale_price);
+
                     $sale->product_replacement_invoice_id     = $invoice->id;
                     $sale->invoice_no          = $invoice->invoice_no;
                     $sale->company_id          = Product::where('id', $sale_product['product_id'])->value('company_id');

@@ -64,7 +64,7 @@ $(document).ready(function () {
                         'stock_in_hand': `${product.stock_in_hand}`,
                         'purchased_price': `${product.purchase_price}`,
                         'p_name': `${product.product_name}`,
-                        'return_invoice_id': `${product.return_invoice_id}`,
+                        'return_invoice_id': `${product.id}`,
                     });
                 })
                 $('.display').show();

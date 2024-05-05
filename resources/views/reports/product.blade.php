@@ -1,6 +1,15 @@
 @extends('layouts.app')
 @section('content')
 <style>
+    .TS-delete {
+        background: #d71919;
+        border-color: #e71717;
+        color: #ffffff;
+        border-radius: 2px;
+        padding: 4px 4px;
+        font-size: 9px;
+    }
+
     .lds-ring {
         display: inline-block;
         position: relative;
@@ -3511,12 +3520,12 @@
             </h6>
             <!-- Title -->
             <h1 class="header-title">
-                <h2 class="_head01">Purchase<span> Report</span></h2>
+                <h2 class="_head01">Product<span> Ledger</span></h2>
             </h1>
         </div>
         <div class="col-auto">
             <ol class="breadcrumb">
-                <li><a href="#"><span>Purchase</span></a></li>
+                <li><a href="#"><span>Product</span></a></li>
                 <li><span>Active</span></li>
             </ol>
         </div>
@@ -3590,7 +3599,7 @@
         </div>
     </div>
 </div>
-
+<!-- 
 <div class="row">
     <div class="col-12">
         <div class="card total-sale">
@@ -3602,7 +3611,7 @@
                                 <canvas id="timechart" width="310" height="110"></canvas>
                             </div>
 
-                            <h2 class="card-heading">Total Purchase<span> After Return</span></h2>
+                            <h2 class="card-heading">Total Stock<span> In Hand</span></h2>
                             <div class="total-amount ttl_sales p-0"><span>Rs.</span> 0</div>
                         </div>
                         <div class="col-12">
@@ -3626,12 +3635,12 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 <div class="row">
     <div class="col-md-12">
         <div class="card" style="padding: 0px">
             <div class="header m-0">
-                <h2>Purchase <span>List</span></h2>
+                <h2>Product <span>List</span></h2>
             </div>
             <div style="min-height: 400px; display: none;" class="loader">
                 <img src="images/loading.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">

@@ -56,12 +56,11 @@ $('.search-btn').on('click', function () {
                             <th hidden>Invoice #</th>
                             <th >Invoice #</th>
                             <th>Date</th>
-                            <th>Invoice #</th>
-                            <th>Vendor</th>
-                            <th>Qty</th> 
+                            <th>Invoice #</th> 
+                            <th>Name</>
+                            <th>IN</th> 
+                            <th>OUT</th> 
                             <th>Balance</th>
-                            <th>Status</th>
-                            <th>Action</th>
                         </tr>
                     </thead><tbody>
                 </tbody>
@@ -75,10 +74,14 @@ $('.search-btn').on('click', function () {
                     $('#notifDiv').fadeOut();
                 }, 3000);
             }
+            let stock_in_hand = 0;
             let totalCR = 0;
             let totalDR = 0;
             let final_balance = 0;
-            response.reports.forEach((element, key) => {
+            response.reports.forEach((element, key, array) => {
+                if (key === array.length - 1) {
+                    stock_in_hand = element.balance;
+                }
                 var label = 'N/A';
                 var inv_id = '';
                 var flag = false;
@@ -86,18 +89,15 @@ $('.search-btn').on('click', function () {
                 totalCR += element['cr'] || 0;
                 totalDR += element['dr'] || 0;
                 if (element['sale_invoice_id'] != null && element['sale_invoice_id'] != 0) {
-
                     label = 'Sale Inv';
                     inv_id = element['sale_invoice_id'];
                 } else if (element['purchase_invoice_id'] != null && element['purchase_invoice_id'] != 0) {
                     flag = true;
-
                     label = 'Purchase Inv';
                     inv_id = element['purchase_invoice_id'];
-                } else if (element['sale_return_invoice_id'] != null && element['sale_return_invoice_id'] != 0) {
-
+                } else if (element['sale_return_id'] != null && element['sale_return_id'] != 0) {
                     label = 'Sale Return Inv';
-                    inv_id = element['sale_return_invoice_id'];
+                    inv_id = element['sale_return_id'];
                 } else if (element['product_replacement_invoice_id'] != null && element['product_replacement_invoice_id'] != 0) {
 
                     label = 'Product Replacement Inv';
@@ -191,7 +191,7 @@ $('.search-btn').on('click', function () {
                     <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${totalDR.toLocaleString('en-US')}</td>
                     <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${totalCR.toLocaleString('en-US')} </td>
                     <td class="totalNo" >
-                        <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${final_balance}</span>
+                        <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${stock_in_hand}</span>
                     </td>
                 </tr>
             `);
@@ -223,30 +223,23 @@ $('.reset-btn').on('click', function () {
 })
 
 function productDate(element, inv_id, label, formattedDate) {
-    var crValue = '0';
-    var drValue = 0;
+
     tableHtml(element, inv_id, formattedDate, label)
 }
 
 function tableHtml(element, inv_id, formattedDate, label) {
-    var dr_val = 0;
-    var cr_val = 0;
-
     var RowHTML = ` <tr>
    <td hidden>${element.id}</td>
    <td >${element.p_id}</td>
    <td>${formattedDate}</td> 
-   <td>${label}</td> 
+   <td style="font-weight:bold">${label} ${element.transaction_type == 5 ? '<span class="TS-delete">Deleted</span>': ''} </td> 
    <td>${element.customer_name}</td> 
-   <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.p_qty} </td>
-   <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.p_balance}</td>
-   <td > <span style='color:${element.p_status ==  1 ? 'green'  : 'red' };font-family: 'Rationale', sans-serif !important;font-size: 18px;'>${element.p_status ==  1 ? 'IN' : 'OUT'}</span></td>
-   <td><a class="btn btn-default btn-detail  btn-line"
-           data-inv-id="${inv_id}"
-           data-inv_no=""
-           data-label="${label}"
-           data-id="${element.id}" 
-           href="javascript:void(0)">Detail</a></td>
+    
+   ${element.p_status} 
+   <td style="color:${element.p_status ==  1 ? 'green'  : 'red' };font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.p_status == 1 ? element.p_qty : '-'} </td>
+   <td style="color:${element.p_status ==  1 ? 'green'  : 'red' };font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.p_status == 2 ? element.p_qty : '-'} </td>
+   <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.p_balance} <i  class=" ${element.p_status == 1 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger'}"></i></td>
+    
 </tr>`;
     $('.TeacherAttendanceListTable tbody').append(RowHTML);
 

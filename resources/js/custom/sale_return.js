@@ -228,7 +228,7 @@ $(document).on('click', '.remove_btn', function () {
                     deleteRef.text('Processing...');
                     $.ajax({
                         type: 'DELETE',
-                        url: '/delete-product-from-sale',
+                        url: '/delete-product-from-sale-return',
                         data: {
                             _token: $('meta[name="csrf_token"]').attr('content'),
                             product_id: product_id,

@@ -41,7 +41,8 @@ class ReportsController extends Controller
       $query               =  " 1=1";
       $inner_join_where    =  " 1=1";
       $query_expiry        =  "";
-      $where               =  " vs.transaction_type != 4";
+      // $where               =  " vs.transaction_type != 4";
+      $where               =  "1=1 ";
       // $group_order_by      =   "ORDER BY vs.id ASC";
       $group_order_by      =  "GROUP BY vs.product_id,vs.purchase_invoice_id ORDER BY vs.id DESC";
 

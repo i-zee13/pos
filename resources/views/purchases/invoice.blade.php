@@ -187,8 +187,9 @@
     <div id="invoice-POS">
         <center id="top">
             <div class="info">
-                <p>SHAMA STORE TOUNSA MOR CHOWK KOT ADDU.</p>
-                <p>Phone # 03456873232 03326873232</p>
+                <!-- <img src="/storage/{{$organization->logo_img}}" class="navbar-brand-img mx-auto" alt="..." style="height: 35px;"> -->
+                <p>{{$organization->name}} {{$organization->address}}</p>
+                <p>Phone # {{$organization->phone_number}}</p>
             </div><!--End Info-->
         </center><!--End InvoiceTop-->
         <div id="mid">
@@ -362,7 +363,7 @@
             </table>
             <table class="footer-copyright">
                 <tr class="copyright">
-                    <td>Software doveloped by Zeeshan Hamza +92-333-6701313</td>
+                    <td>Software doveloped by {{$developer}}</td>
                 </tr>
             </table>
 

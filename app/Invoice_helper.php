@@ -299,7 +299,7 @@ if (!function_exists('PurchaseReportList')) {
 if (!function_exists('ProductReportList')) {
    function ProductReportList($request, $current_date)
    {
-      $query = " 1=1";
+      $query = " 1=1 AND actual_qty > 0";
       if (isset($request->company_id)) {
          $query .= " AND ps.company_id = $request->company_id";
       }
@@ -317,32 +317,29 @@ if (!function_exists('ProductReportList')) {
       if (isset($request->bill_no)) {
          $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
       }
+      $reports = DB::select("
+                           SELECT
+                              ps.*,
+                              pr.product_name,
+                              co.company_name,
+                              CASE
+                                 WHEN ps.vendor_id IS NOT NULL THEN (SELECT customer_name FROM customers WHERE id = ps.vendor_id)
+                                 WHEN ps.customer_id IS NOT NULL THEN (SELECT customer_name FROM customers WHERE id = ps.customer_id)
+                                 ELSE 'NA'
+                              END as customer_name,
+                              ps.id AS p_id,
+                              ps.actual_qty AS p_qty,
+                              ps.balance AS p_balance,
+                              ps.actual_status AS p_status
+                           FROM
+                              vendor_stocks as ps
+                           JOIN products pr ON pr.id = ps.product_id
+                           JOIN companies co ON co.id = ps.company_id
+                           WHERE 
+                              $query
+                           ORDER BY p_id ASC
+                     ");
 
-      $reports          =  DB::select("
-                                 SELECT
-                                    ps.*,
-                                    pr.product_name,
-                                    co.company_name,
-                                    IFNULL((SELECT customer_name FROM customers WHERE id = ps.vendor_id),'NA') as customer_name,
-                                    GROUP_CONCAT(ps.id ORDER BY ps.id DESC LIMIT 1) AS p_id,
-                                    GROUP_CONCAT(ps.qty ORDER BY ps.id DESC LIMIT 1) AS p_qty,
-                                    GROUP_CONCAT(ps.balance ORDER BY ps.id DESC LIMIT 1) AS p_balance,
-                                    GROUP_CONCAT(ps.status ORDER BY ps.id DESC LIMIT 1) AS p_status
-                                 FROM
-                                    vendor_stocks as ps
-                                 JOIN products pr ON pr.id = ps.product_id
-                                 JOIN companies co ON co.id = ps.company_id
-                                 WHERE 
-                                  
-                                    $query
-                                 GROUP BY 
-                                    purchase_invoice_id , 
-                                    purchase_return_invoice_id ,
-                                    sale_invoice_id,
-                                    sale_return_id,
-                                    product_replacement_invoice_id
-                                 ORDER BY p_id DESC
-                           ");
       return $reports;
    }
 }

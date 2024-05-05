@@ -673,7 +673,7 @@
                 <div class="col-md-8 right-sid ebox">
                     <div class="row">
                         <div class="col-6">
-                            <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Update' : 'New'}} Purchase<span>Invoice</span></h2>
+                            <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Update' : 'New'}} Purchase <span>Invoice</span></h2>
                         </div>
 
                     </div>

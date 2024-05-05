@@ -116,9 +116,13 @@ class SalesReturnController extends Controller
         if ($invoice->save()) {
             if (count($request->sales_product_array) > 0) {
                 foreach ($request->sales_product_array as $key => $sale_product) {
+                    $flag = true;
                     $new_ids[] = $sale_product['product_id'];
                     if ($sale_product['sale_return_nvoice_id'] > 0) {
                         $sale                  = SaleReturnProduct::where('id', $sale_product['sale_return_nvoice_id'])->first();
+                        if ($sale->qty == $sale_product['qty']) {
+                            $flag = false;
+                        }
                     } else {
                         $sale                  = new SaleReturnProduct();
                     }
@@ -149,17 +153,34 @@ class SalesReturnController extends Controller
                             $balance           =  $check_stock->balance;
                         }
                         $sale->purchased_price = $sale_product['purchased_price'];
-                        if ($request->hidden_invoice_id) {
-                            if ($previous_qty != 0) {
-                                $v       = updateStock($previous_qty, $sale, $balance, $vendor_id, 'vendor');
-                                $balance =  $v->balance;
+                        if ($flag) {
+                            $change_qty_value   =   $sale->qty;
+                            $In_out_status      =   1;
+                            if ($request->hidden_invoice_id) {
+                                if ($previous_qty != 0) {
+                                    if ($sale->qty >=  $previous_qty) {
+                                        $change_qty_value = $sale->qty - $previous_qty;
+                                        $In_out_status   = 1; // IN
+                                    } else {
+                                        $change_qty_value = $previous_qty - $sale->qty;
+                                        $In_out_status = 2; // OUT
+                                    }
+                                }
                             }
-                        }
-                        $v_stock = updateStock($previous_qty = 0, $sale, $balance, $vendor_id, 'vendor');
-                        if ($v_stock->save()) {
-                            Product::where('id', $v_stock->product_id)->update([
-                                'stock_balance' =>  $v_stock->balance,
+                            VendorStock::where('sale_return_id',  $sale->sale_return_invoice_id)->where('product_id', $sale->product_id)->update([
+                                'actual_qty' => 0,
+                                'actual_status' => 0
                             ]);
+                            $sale->customer_id  =  $invoice->customer_id;
+                            $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'sale_return', 4);
+                            StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status, 'sale_return');
+
+
+                            if ($v_stock->save()) {
+                                Product::where('id', $v_stock->product_id)->update([
+                                    'stock_balance' =>  $v_stock->balance,
+                                ]);
+                            }
                         }
                     }
                 }
@@ -269,5 +290,40 @@ class SalesReturnController extends Controller
         //                                     ->orderBy('id', 'DESC')->value('balance'); 
 
         return view('sales.sale-invoice', compact('invoice', 'products', 'customer_balance'));
+    }
+    public function deleteProduct(Request $request)
+    {
+
+        $vs      = VendorStock::where('sale_return_id', $request->sale_return_invoice_id)
+            ->where('product_id', $request->product_id)
+            ->where('transaction_type', 4)->orderBy('id', 'DESC')
+            ->first();
+        if ($vs) {
+            // VendorStock::where('sale_return_id', $request->sale_return_invoice_id)
+            //     ->where('product_id', $request->product_id)->update([
+            //         'actual_qty'    => 0,
+            //         'actual_status' => 0
+            //     ]);
+            $v_stock = updateStock($vs, $vs->balance, $request->qty, 2, 'sale-return', 5);
+            StockManagment($v_stock->id, $vs, $request->qty, 2, 'sale-return');
+            if ($v_stock) {
+                Product::where('id', $v_stock->product_id)->update([
+                    'stock_balance' =>  $v_stock->balance,
+                ]);
+                SaleReturnProduct::where('sale_return_invoice_id', $request->sale_return_invoice_id)
+                    ->where('product_id', $request->product_id)->where('qty', $request->qty)
+                    ->delete();
+                return response()->json([
+                    'msg'       => 'product removed',
+                    'status'    => 'success',
+                    'updated_stock' => $v_stock->balance
+                ]);
+            } else {
+                return response()->json([
+                    'msg'       => 'Not Updated at this moment',
+                    'status'    => 'failed',
+                ]);
+            }
+        }
     }
 }

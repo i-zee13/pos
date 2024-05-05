@@ -85,7 +85,9 @@ function SaleCloseRecord(close_date) {
             $('.ttl_received').text(addCommas(parseFloat(ttl_cash_recovery).toFixed(2)));
             $('.ttl_in_hand').text(addCommas(parseFloat(ttl_in_hand).toFixed(2)));
             //Sales
+
             $('.net_sale').text(addCommas(parseFloat(total_net_sales).toFixed(2)));
+
             $('.credit_sale').text(addCommas(parseFloat(total_credit_sales).toFixed(2)));
             $('.discount').text(addCommas(parseFloat(total_discount).toFixed(2)));
             $('.service_charges').text(addCommas(parseFloat(total_service_charges).toFixed(2)));
@@ -113,6 +115,37 @@ function SaleCloseRecord(close_date) {
             $('.total_pr_invc_amount').text(addCommas(parseFloat(total_pr_invc_amount).toFixed(2))); //Paid Via Purchase Invoice
 
             $('.cash_in_hand').text(addCommas(parseFloat(cash_in_hand).toFixed(2)));
+
+            //Showing Divs
+            // Sales
+            total_net_sales > 0 ? $('.net_sale_div').show() : '';
+            total_net_sales > 0 ? $('.net_sales_div').show() : '';
+            total_credit_sales > 0 ? $('.credit_sale_div').show() : '';
+            total_discount > 0 ? $('.discount_div').show() : '';
+            total_service_charges > 0 ? $('.service_charges_div').show() : '';
+            total_sales > 0 ? $('.total_sales_div').show() : '';
+            // Returns
+            total_net_sale_returns > 0 ? $('.total_sale_returns_div').show() : '';
+            total_credit_sale_returns > 0 ? $('.total_credit_sale_returns_div').show() : '';
+            total_return_discount > 0 ? $('.return_discount_div').show() : '';
+            total_return_service_charges > 0 ? $('.return_service_charges_div').show() : '';
+            total_returns > 0 ? $('.total_returns_div').show() : '';
+            // Recoveries
+            ttl_cash_recovery > 0 ? $('.cash_recovery_div').show() : '';
+            customer_cash_recovery > 0 ? $('.customer_recovery_div').show() : '';
+            vendor_cash_recovery > 0 ? $('.vendor_recovery_div').show() : '';
+            credit_sale_receivings > 0 ? $('.credit_sale_receivings_div').show() : '';
+            openning_balance > 0 ? $('.openning_balance_div').show() : '';
+            expense > 0 ? $('.expense_div').show() : '';
+            credit_return_payments > 0 ? $('.credit_return_payment_div').show() : '';
+            vendor_payment > 0 ? $('.vendor_payments_div').show() : '';
+            customer_payment > 0 ? $('.customer_payments_div').show() : '';
+            total_payments > 0 ? $('.total_payments_div').show() : '';
+            total_pr_paid_amount > 0 ? $('.total_pr_paid_amount_div').show() : '';
+            total_pr_invc_amount > 0 ? $('.total_pr_invc_amount_div').show() : '';
+            cash_in_hand > 0 ? $('.cash_in_hand_div').show() : '';
+
+
 
             $('.total_sale_table').empty();
             $('.total_sale_table').append(`

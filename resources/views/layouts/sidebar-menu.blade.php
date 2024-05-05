@@ -27,6 +27,8 @@
         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sidebarIcon">
           <a href="#" class="dropdown-item">Profile</a>
           <a href="#" class="dropdown-item">Settings</a>
+          <a href="{{route('admin.organization')}}" class="dropdown-item">Organization</a>
+          <a href="/admin-sale-close" class="dropdown-item">Admin Close</a>
           <hr class="dropdown-divider">
           <a href="{{ route('logout') }}" class="dropdown-item">Logout</a>
         </div>
@@ -263,11 +265,11 @@
                   </ul>
                 </div>
               </li>
-              <!-- <li class="nav-item">
-                <a href="{{route('vendor-ledgers')}}" class="nav-link ">
-                  Vendors
+              <li class="nav-item">
+                <a href="{{route('ledger-purchi')}}" class="nav-link ">
+                  Bulk Transactions
                 </a>
-              </li> -->
+              </li>
 
             </ul>
           </div>
@@ -374,6 +376,8 @@
           <div class="dropdown-menu" aria-labelledby="sidebarIconCopy">
             <a href="#" class="dropdown-item">Profile</a>
             <a href="#" class="dropdown-item">Settings</a>
+            <a href="{{route('admin.organization')}}" class="dropdown-item">Organization</a>
+
             <a href="/admin-sale-close" class="dropdown-item">Admin Close</a>
             <hr class="dropdown-divider">
             <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();

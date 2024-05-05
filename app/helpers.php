@@ -12,6 +12,7 @@ use App\Models\Sale as SaleInvoice;
 use App\Models\SaleReplacement;
 use App\Models\SaleReturn;
 use App\Models\Stock;
+use App\Models\StockManagment;
 use App\Models\VendorLedger;
 use App\Models\VendorStock;
 use Carbon\Carbon;
@@ -137,32 +138,7 @@ if (!function_exists('getVendorCpvNo')) {
         return $invoice_no;
     }
 }
-if (!function_exists('updateStock')) {
-    function updateStock($previous_qty, $sale, $balance, $vendor_id, $type)
-    {
-        $v                   =  new VendorStock();
-        $v->vendor_id        =  $vendor_id ?  $vendor_id  : 0;
-        $v->transaction_type =  3;  //Purchase
-        if ($previous_qty > 0) {
-            $v->qty         =  $previous_qty;
-            $v->status      =   2;   //Out
-            $v->balance     =   $balance - $v->qty;
-        } else {
-            $v->status      =    1;   // IN
-            $v->qty         =   $sale->qty;
-            $v->balance     =   $balance +  $v->qty;
-        }
-        $v->sale_return_id       =  $sale->sale_return_invoice_id;
-        $v->product_unit_price   =  $sale->purchase_price;
-        $v->company_id           =  $sale->company_id;
-        $v->product_id           =  $sale->product_id;
-        $v->date                 =  $sale->created_at;
-        $v->amount               =  $sale->return_total_amount;
-        $v->created_by           =  Auth::id();
-        $v->save();
-        return $v;
-    }
-}
+
 if (!function_exists('isEditable')) {
     function isEditable($customer_id)
     {
@@ -283,4 +259,90 @@ if (!function_exists('getCustomerBalance')) {
             'customer_balance'  => $customer_balance
         ]);
     }
+}
+
+function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type, $transaction_type)
+{
+
+    $v                       =  new VendorStock();
+    $v->vendor_id            =  $sale->vendor_id;
+    // if ($transaction_type !== 1 || $transaction_type !== 3) {
+    $v->customer_id          =  $sale->customer_id;
+    // }
+    $v->transaction_type     =  $transaction_type;
+    $v->qty                  =  $qty_value;
+    $v->status               =  $In_out_status;
+    $v->balance              =  $In_out_status  == 2 ? $balance - $qty_value : $balance +  $qty_value;
+    $v->actual_qty           =  $sale->qty;
+    $v->invoice_no           =  $sale->invoice_no;
+    $v->company_id           =  $sale->company_id;
+    $v->product_id           =  $sale->product_id;
+    $v->date                 =  $sale->created_at;
+    $v->created_by           =  Auth::id();
+    if ($transaction_type == 1) { //Purchase
+        $v->actual_status         =  1; //IN
+        $v->purchase_invoice_id   =  $sale->purchase_invoice_id;
+        $v->product_unit_price    =  $sale->purchase_price;
+        $v->total_purchase_amount =  $sale->purchased_total_amount;
+    } else if ($transaction_type == 2) {  //Sale
+        $v->actual_status         =  2; //OUT
+        $v->sale_invoice_id       =  $sale->sale_invoice_id;
+        $v->sale_unit_price       =  $sale->sale_price;
+        $v->total_sale_amount     =  $sale->sale_total_amount;
+    } else if ($transaction_type == 3) {  //Purchase Return
+        $v->actual_status         =  2; //OUT
+        $v->purchase_return_invoice_id  =  $sale->purchase_return_invoice_id;
+        $v->product_unit_price    =  $sale->purchase_price;
+        $v->total_purchase_amount =  $sale->product_return_total_amount;
+    } else if ($transaction_type == 4) {  //Sale Return
+        $v->actual_status         =  1; //IN
+        $v->sale_return_id        =  $sale->sale_return_invoice_id;
+        $v->sale_unit_price       =  $sale->sale_price;
+        $v->total_sale_amount     =  $sale->return_total_amount;
+    } else if ($transaction_type == 5) {  //Purchase Delete
+        deleteProductFields($v, $sale, $invoice_type);
+    }
+    $v->save();
+    return $v;
+}
+function deleteProductFields($v, $sale, $type)
+{
+    $v->actual_qty           =  $sale->actual_qty;
+
+    if ($type == 'purchase') {
+        $v->actual_status         =  2; //OUT
+        $v->purchase_invoice_id   =  $sale->purchase_invoice_id;
+        $v->product_unit_price    =  $sale->product_unit_price;
+        $v->total_purchase_amount =  $sale->total_purchase_amount;
+    } else if ($type == 'sale') {
+        $v->actual_status         =  1; //IN
+        $v->sale_invoice_id       =  $sale->sale_invoice_id;
+        $v->sale_unit_price       =  $sale->sale_unit_price;
+        $v->total_sale_amount     =  $sale->total_sale_amount;
+    } else if ($type == 'purchase-return') {
+        $v->actual_status         =  1; //IN
+        $v->purchase_return_invoice_id  =  $sale->purchase_return_invoice_id;
+        $v->product_unit_price    =  $sale->product_unit_price;
+        $v->total_purchase_amount =  $sale->product_return_total_amount;
+    } else if ($type == 'sale-return') {  //Sale Return
+        $v->actual_status         =  2; //OUT
+        $v->sale_return_id        =  $sale->sale_return_id;
+        $v->sale_unit_price       =  $sale->sale_unit_price;
+        $v->total_sale_amount     =  $sale->total_sale_amount;
+    }
+}
+function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
+{
+    $stock = StockManagment::where('product_id', $purchase->product_id)
+        ->where('company_id', $purchase->company_id)
+        ->orderBy('id', 'DESC')->first();
+    if (!$stock) {
+        $stock = new StockManagment();
+    }
+    $stock->company_id  = $purchase->company_id;
+    $stock->product_id  = $purchase->product_id;
+    $balance            = $In_out_status == 2 ? $stock->balance - $stock_qty : $stock->balance +  $stock_qty;
+    $stock->balance     = $balance;
+    $stock->vs_id       = $vendor_stock_id;
+    $stock->save();
 }

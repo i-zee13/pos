@@ -48,6 +48,22 @@ Route::group(['middleware' => ['auth']], function () {
     Route::Resource('/AccessRights',   App\Http\Controllers\AccessRights::class);
 
 
+
+    /**organization-CRUD Routes */
+    Route::get('/organization', [App\Http\Controllers\OrganizationController::class, 'index'])->name('admin.organization');
+    Route::post('/organization/store', [App\Http\Controllers\OrganizationController::class, 'store'])->name('admin.organization.store');
+    //Add Mulitiple Locations of Organization
+    Route::post('/organization-location/store', [App\Http\Controllers\OrganizationController::class, 'storeLocaion'])->name('admin.organization-location');
+    Route::get('/location-list', [App\Http\Controllers\OrganizationController::class, 'locationList'])->name('admin.location-list');
+    Route::get('/get-location-form/{id}', [App\Http\Controllers\OrganizationController::class, 'getLocation'])->name('admin.get-location-form');
+    Route::POST('/location-delete/{id}', [App\Http\Controllers\OrganizationController::class, 'deleteLocation'])->name('admin.location-delete');
+
+    /**End Organization  Routes */
+    Route::get('/get-city-against-states/{id}', [App\Http\Controllers\OrganizationController::class, 'getCityAgainst_States'])->name('admin.getCityAgainst_States');
+    Route::get('/get-state-against-country/{id}', [App\Http\Controllers\OrganizationController::class, 'getStateAgainst_Country'])->name('admin.getStateAgainst_Country');
+    Route::get('/get-countries', [App\Http\Controllers\OrganizationController::class, 'getCountries'])->name('admin.getCountries');
+
+
     Route::get('/', [App\Http\Controllers\HomeController::class,   'index'])->name('home');
     Route::get('/home', [App\Http\Controllers\HomeController::class,   'index'])->name('home');
     Route::get('/get-companies', [App\Http\Controllers\CompanyController::class, 'getCompanies'])->name('get-companies');
@@ -106,12 +122,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/edit-sale-return/{id}', [App\Http\Controllers\SalesReturnController::class, 'edit'])->name('salereturn-edit');
     Route::get('/get-sale-return-products/{id}', [App\Http\Controllers\SalesReturnController::class, 'getReturnProduct'])->name('get-salereturn-products');
     Route::get('/print-salereturn-invoice/{invoice_id}/{customer_id}/{received_amount}', [App\Http\Controllers\SalesReturnController::class, 'printInvoice'])->name('print-salereturn-invoice');
+    Route::delete('/delete-product-from-sale-return', [App\Http\Controllers\SalesReturnController::class, 'deleteProduct'])->name('sale-return-delete-product');
 
     // Route::post('/add-purchase-return'   ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
 
     //Genrate invoice
     Route::get('/print-sale-invoice/{invoice_id}/{customer_id}/{received_amount}', [App\Http\Controllers\SaleController::class, 'printInvoice'])->name('print-sale-invoice');
     //Transactions
+
     Route::get('/customer-ledger-jama', [App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledger-jama');
     Route::get('/customer-ledger-banam', [App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledger-banam');
     Route::post('/get-ledgers-list', [App\Http\Controllers\TransactionController::class, 'getCustomerLedgers'])->name('get-customer-ledger-list');
@@ -124,6 +142,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/vendor-ledgers', [App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('vendor-ledgers');
     Route::get('/customer-ledgers', [App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledgers');
     Route::get('/print-transaction-invoice/{invoice_id}/{customer_id}/{operation}/{type}', [App\Http\Controllers\TransactionController::class, 'printInvoice'])->name('print-salereturn-invoice');
+    //Multiple Transtaction of Customer
+    Route::get('/ledger-purchi', [App\Http\Controllers\TransactionController::class, 'getLedgerPurchi'])->name('ledger-purchi');
+    Route::post('/save-tranasctions', [App\Http\Controllers\TransactionController::class, 'saveTransaction'])->name('save-tranasctions');
     //Reports
     Route::get('/customer-reports', [App\Http\Controllers\LedgerDetailControlller::class, 'customerReport'])->name('customer-reports');
     Route::get('/vendor-reports', [App\Http\Controllers\LedgerDetailControlller::class, 'vendorReport'])->name('vendor-reports');
@@ -164,6 +185,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/delete-product-replacement', [App\Http\Controllers\ProductReplacementController::class, 'deleteProduct'])->name('ProductReplacement.delete');
     Route::get('/get-customer-balance-for-product-replacement/{id}', [App\Http\Controllers\ProductReplacementController::class, 'getCustomerBalance'])->name('ProductReplacement.get-customer-balance');
     Route::get('/print-replacement-invoice/{invoice_id}/{customer_id}/{received_amount}', [App\Http\Controllers\ProductReplacementController::class, 'printInvoice'])->name('print-replacement-invoice');
+    //INVOICE DELETE 
+    Route::post('/delete-invoice', [App\Http\Controllers\HomeController::class, 'deleteInvoice'])->name('delete-invoice');
 
     // Admin Close Report Fakhar
     Route::get('/admin-sale-close', [App\Http\Controllers\ReportsController::class, 'adminSaleClose'])->name('admin-sale-close');
