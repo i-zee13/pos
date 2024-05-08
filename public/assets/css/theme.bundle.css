@@ -16091,7 +16091,7 @@ button:focus {
 
 .navbar-brand-img,
 .navbar-brand>img {
-    max-height: 1.5rem;
+    /* max-height: 1.5rem; */
     max-width: 100%
 }
 
@@ -16667,7 +16667,7 @@ button:focus {
 }
 
 .navbar-vertical.navbar-expand-xs .navbar-brand-img {
-    max-height: 3rem
+    /* max-height: 3rem */
 }
 
 .navbar-vertical.navbar-expand-xs .navbar-user {
@@ -16780,7 +16780,7 @@ button:focus {
     }
 
     .navbar-vertical.navbar-expand-sm .navbar-brand-img {
-        max-height: 3rem
+        /* max-height: 3rem */
     }
 
     .navbar-vertical.navbar-expand-sm .navbar-user {
@@ -16894,7 +16894,7 @@ button:focus {
     }
 
     .navbar-vertical.navbar-expand-md .navbar-brand-img {
-        max-height: 3rem
+        /* max-height: 3rem */
     }
 
     .navbar-vertical.navbar-expand-md .navbar-user {
@@ -17008,7 +17008,7 @@ button:focus {
     }
 
     .navbar-vertical.navbar-expand-lg .navbar-brand-img {
-        max-height: 3rem
+        /* max-height: 3rem */
     }
 
     .navbar-vertical.navbar-expand-lg .navbar-user {

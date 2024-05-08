@@ -8,7 +8,7 @@
 
     <!-- Brand -->
     <a class="navbar-brand" href="{{route('home')}}">
-      <img src="{{asset('images/Shama-logo.png')}}" class="navbar-brand-img mx-auto" alt="..." style="height: 35px;">
+      <img src="/storage/{{$organization->logo_img}}" class="navbar-brand-img mx-auto" alt="..." style="height: 35px;">
     </a>
 
     <!-- User (xs) -->

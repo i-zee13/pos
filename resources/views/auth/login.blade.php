@@ -41,7 +41,7 @@
       <div class="col-12 col-md-5 col-lg-6 col-xl-4 px-lg-6 my-5 align-self-center">
 
         <!-- Heading -->
-        <img src="{{asset('images/Shama-logo.png')}}" class="mb-3" alt="..." style="height: 45px;margin-left:85px;">
+        <img src="/storage/{{$organization->logo_img}}" class="mb-3" alt="..." style="height: 45px;margin-left:85px;">
 
         <!-- Subheading -->
         <p class="text-muted text-center mb-5">
