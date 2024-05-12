@@ -55,6 +55,7 @@ class ReportsController extends Controller
       }
       $inner_join_where = $query;
       $query      .= " AND $where";
+      $max_id = '';
 
       // if (isset($request->start_date) != '' && isset($request->end_date) != '') {
       //    $query .= " AND DATE(vs.created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
@@ -77,7 +78,17 @@ class ReportsController extends Controller
                                  vs.product_id = pp.product_id
                                  AND
                                  pp.expiry_date BETWEEN '$current_date' AND '$expiry_limit_date'";
+      } else {
+         $max_id = "JOIN (
+            SELECT product_id, MAX(id) AS max_id
+            FROM `vendor_stocks` as vs
+            WHERE $inner_join_where
+            GROUP BY product_id
+        ) AS max_ids
+        ON vs.product_id = max_ids.product_id
+        AND vs.id = max_ids.max_id";
       }
+
 
       $records       =  DB::select("
                            SELECT
@@ -107,14 +118,7 @@ class ReportsController extends Controller
                               IFNULL((SELECT customer_name FROM customers WHERE id = (SELECT customer_id FROM sale_invoices WHERE sale_invoices.id=vs.sale_invoice_id)),'') AS customer_name
                            FROM
                            vendor_stocks vs
-                           JOIN (
-                              SELECT product_id, MAX(id) AS max_id
-                              FROM `vendor_stocks` as vs
-                              WHERE $inner_join_where
-                              GROUP BY product_id
-                          ) AS max_ids
-                          ON vs.product_id = max_ids.product_id
-                          AND vs.id = max_ids.max_id
+                           $max_id    
                            $query_expiry
                            WHERE
                            $query

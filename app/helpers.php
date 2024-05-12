@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\AdminSaleClose;
+use App\Models\BatchStockMgt;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Product;
@@ -201,39 +202,33 @@ if (!function_exists('closeRoute')) {
 if (!function_exists('deleteProduct')) {
     function deleteProduct($request)
     {
-
-        $prod  = VendorStock::where('product_replacement_invoice_id', $request->product_replacement_invoice_id)
+        $vs  = VendorStock::where('product_replacement_invoice_id', $request->product_replacement_invoice_id)
             ->where('product_id', $request->product_id);
-        $request->prod_type == 1 ?  $prod->where('status', 1) : $prod->where('status', 2);
-        $prod = $prod->orderBy('id', 'DESC')->first();
-        if ($prod) {
-            $out_stock              = new VendorStock();
-            $out_stock->vendor_id   = $prod->vendor_id;
-            $out_stock->product_id  = $prod->product_id;
-            $out_stock->date        = $prod->created_at;
-            $out_stock->amount      = $prod->amount;
-            $out_stock->qty         = $prod->qty;
-            $out_stock->status      = $request->prod_type == 1 ?  2 : 1; // 1- In , 2 - Out
-            $out_stock->balance     = $request->prod_type == 1 ? $prod->balance - $prod->qty : $prod->balance + $prod->qty;
-            $out_stock->created_by  = Auth::id();
-            $out_stock->product_replacement_invoice_id  = $prod->product_replacement_invoice_id;
-            $out_stock->product_unit_price   = $prod->product_unit_price;
-            if ($out_stock->save()) {
-                Product::where('id', $out_stock->product_id)->update([
-                    'stock_balance' =>  $out_stock->balance,
+        $request->prod_type == 1 ?  $vs->where('status', 1) : $vs->where('status', 2);
+        $vs = $vs->orderBy('id', 'DESC')->first();
+        $in_out_status =  $request->prod_type == 1 ? 2 : 1;
+
+        if ($vs) {
+            $v_stock = updateStock($vs, $vs->balance, $request->qty, $in_out_status, 'replacement', 5, $request->prod_type);
+            StockManagment($v_stock->id, $vs, $request->qty, $in_out_status, 'replacement');
+
+            if ($v_stock) {
+                Product::where('id', $v_stock->product_id)->update([
+                    'stock_balance' =>  $v_stock->balance,
                 ]);
                 ProductReplacement::where('product_replacement_invoice_id', $request->product_replacement_invoice_id)
                     ->where('product_id', $request->product_id)->delete();
                 return response()->json([
                     'msg'       => 'product removed',
                     'status'    => 'success',
+                    'updated_stock' => $v_stock->balance
+                ]);
+            } else {
+                return response()->json([
+                    'msg'       => 'Not Updated at this moment',
+                    'status'    => 'failed',
                 ]);
             }
-        } else {
-            return response()->json([
-                'msg'       => 'not remove',
-                'status'    => 'failed',
-            ]);
         }
     }
 }
@@ -261,7 +256,7 @@ if (!function_exists('getCustomerBalance')) {
     }
 }
 
-function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type, $transaction_type)
+function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type, $transaction_type, $prod_type = null)
 {
 
     $v                       =  new VendorStock();
@@ -299,13 +294,41 @@ function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type,
         $v->sale_return_id        =  $sale->sale_return_invoice_id;
         $v->sale_unit_price       =  $sale->sale_price;
         $v->total_sale_amount     =  $sale->return_total_amount;
-    } else if ($transaction_type == 5) {  //Purchase Delete
-        deleteProductFields($v, $sale, $invoice_type);
+    } else if ($transaction_type == 6) {  //Replacement
+        $v->actual_status   = ($prod_type == 1) ? 1 : 2;
+        $unit_prefix        = ($prod_type == 1) ? 'product' : 'sale';
+        $total_prefix       = ($prod_type == 1) ? 'total_purchase' : 'total_sale';
+        $v->{$unit_prefix . '_unit_price'}  = $sale->sale_price;
+        $v->{$total_prefix . '_amount'}     = $sale->sale_total_amount;
+        $v->product_replacement_invoice_id  =  $sale->product_replacement_invoice_id;
+    } else if ($transaction_type == 5) {  //Product Delete
+        deleteProductFields($v, $sale, $invoice_type, $prod_type);
     }
     $v->save();
     return $v;
 }
-function deleteProductFields($v, $sale, $type)
+function BatchWiseStockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
+{
+    $s      =  BatchStockMgt::where('product_id', $purchase->product_id)->where('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC')->first();
+    if (!$s) {
+        $s  =  new BatchStockMgt();
+    }
+    $s->company_id          =   $purchase->company_id;
+    $s->product_id          =   $purchase->product_id;
+    $s->expiry_date         =   $purchase->expiry_date;
+    $s->qty                 =   $purchase->qty;
+    $s->actual_qty          =   $purchase->qty;
+    $s->actual_status       =   $In_out_status;
+    $s->unit_cost_price     =   $purchase->unit_cost_price;
+    $s->ttl_cost_price      =   $purchase->ttl_cost_price;
+    $balance                =   $In_out_status == 2 ? $s->balance - $stock_qty : $s->balance +  $stock_qty;
+    $s->total_balance       =   $balance;
+    $s->batch_wise_balance  =   $balance;
+    $s->vs_id               =   $vendor_stock_id;
+    $s->save();
+}
+
+function deleteProductFields($v, $sale, $type, $prod_type = null)
 {
     $v->actual_qty           =  $sale->actual_qty;
 
@@ -329,6 +352,13 @@ function deleteProductFields($v, $sale, $type)
         $v->sale_return_id        =  $sale->sale_return_id;
         $v->sale_unit_price       =  $sale->sale_unit_price;
         $v->total_sale_amount     =  $sale->total_sale_amount;
+    } else if ($type == 'replacement') {  //Sale Replacement
+        $v->actual_status   = ($prod_type == 1) ? 2 : 1;   // 2 = OUT , 1 - IN
+        $unit_prefix        = ($prod_type == 1) ? 'product' : 'sale';
+        $total_prefix       = ($prod_type == 1) ? 'total_purchase' : 'total_sale';
+        $v->{$unit_prefix . '_unit_price'}  = $sale->sale_unit_price;
+        $v->{$total_prefix . '_amount'}     = $sale->total_sale_amount;
+        $v->product_replacement_invoice_id  =  $sale->product_replacement_invoice_id;
     }
 }
 function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)

@@ -76,15 +76,21 @@ class ProductReplacementController extends Controller
 
             if (count($request->sales_product_array) > 0) {
                 $old_ids        = $request->existing_product_ids;
+                $sale_products_array = [];
                 foreach ($request->sales_product_array as $key => $sale_product) {
+                    $flag = true;
+
                     $new_ids[]  = $sale_product['product_id'];
                     if ($sale_product['product_replacement_invoice_id'] > 0) {
-                        $sale          =  ProductReplacement::where('id', $sale_product['product_replacement_invoice_id'])->first();
+                        $sale          =  ProductReplacement::where('product_replacement_invoice_id', $sale_product['product_replacement_invoice_id'])->where('product_type', $sale_product['prod_type'])->first();
+                        // dd($sale_product, $sale, $sale_product['prod_type'], $sale_product['product_replacement_invoice_id']);
+                        if ($sale->qty == $sale_product['qty']) {
+                            $flag      = false;
+                        }
                     } else {
                         $sale          =  new ProductReplacement();
                     }
                     $sale->sale_price          = $sale_product['retail_price'];
-
                     $sale->product_replacement_invoice_id     = $invoice->id;
                     $sale->invoice_no          = $invoice->invoice_no;
                     $sale->company_id          = Product::where('id', $sale_product['product_id'])->value('company_id');
@@ -101,6 +107,7 @@ class ProductReplacementController extends Controller
                         ->value('qty');
 
                     if ($sale->save()) {
+                        $sale->invoice_no      = $invoice->invoice_no;
                         $sale_products_array[] = $sale->id;
                         $check_stock           =  VendorStock::where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
                         $vendor_id             =  $check_stock->vendor_id;
@@ -108,35 +115,45 @@ class ProductReplacementController extends Controller
                             $balance           =  $check_stock->balance;
                         }
                         $sale->purchased_price = $sale_product['purchased_price'];
-                        if ($request->hidden_invoice_id) {
-                            if ($previous_qty > 0) {
-                                $v          =  $this->updateStock($previous_qty, $sale, $balance, $vendor_id, 'vendor');
-                                $balance    =  $v->balance;
+                        $status = 0;
+                        if ($flag) {
+                            $In_out_status = ($sale_product['prod_type'] == 1) ? 1 : 2;
+
+                            $change_qty_value   =   $sale->qty;
+                            if ($request->hidden_invoice_id) {
+                                if ($previous_qty != 0) {
+                                    $In_out_status = ($sale_product['prod_type'] == 1) ? 1 : 2;
+
+                                    if ($sale->qty >= $previous_qty) {
+                                        $change_qty_value = $sale->qty - $previous_qty;
+                                    } else {
+                                        $change_qty_value = $previous_qty - $sale->qty;
+                                        $In_out_status = 3 - $In_out_status; // Switch between IN (1) and OUT (2)
+                                    }
+                                }
                             }
-                        }
-                        $v_stock = $this->updateStock($previous_qty = 0, $sale, $balance, $vendor_id, 'vendor');
-                        if ($v_stock->save()) {
-                            $sale->vendor_stock_id = $v_stock->id;
-                            // if ($request->hidden_invoice_id) {
-                            //     $old =  VendorStock::where('product_replacement_invoice_id', $request->hidden_invoice_id)
-                            //                                 ->where('product_id', $sale->product_id)
-                            //                                 ->where('status', 2)
-                            //                                 ->orderBy('id', 'Desc')
-                            //                                 ->first();
-                            //     if ($old) {
-                            //         $v_stock = $this->updateStock($old, $sale, $balance, $vendor_id, 'company');
-                            //     }
-                            // }
-                            // $v_stock = $this->updateStock($old = 0, $sale, $balance, $vendor_id, 'company');
-                            Product::where('id', $v_stock->product_id)->update([
-                                'stock_balance' =>  $v_stock->balance,
-                            ]);
+
+                            VendorStock::where('product_replacement_invoice_id',  $sale->product_replacement_invoice_id)
+                                ->where('product_id', $sale->product_id)->update([
+                                    'actual_qty'    => 0,
+                                    'actual_status' => 0
+                                ]);
+                            $sale->vendor_id  =  $invoice->customer_id;
+                            $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'replacement', 6, $sale_product['prod_type']);
+                            StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status);
+                            if ($v_stock->save()) {
+                                $sale->vendor_stock_id = $v_stock->id;
+                                Product::where('id', $v_stock->product_id)->update([
+                                    'stock_balance' =>  $v_stock->balance,
+                                    'expiry_date' =>  $sale->sale_price,
+                                ]);
+                            }
                         }
                     }
                 }
 
                 if ($request->hidden_invoice_id) {
-
+                    dump($sale_products_array);
                     ProductReplacement::where('product_replacement_invoice_id', $request->hidden_invoice_id)
                         ->whereNotIn('id', $sale_products_array)
                         ->delete();
