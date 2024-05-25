@@ -51,7 +51,7 @@ $(document).ready(function () {
             type: 'get',
             success: function (response) {
                 response.products.forEach(function (product) {
-
+                    console.log(product)
                     existing_product_ids.push(product.product_id);
                     p_name = product.product_name;
                     returns_product_array.push({
@@ -64,7 +64,8 @@ $(document).ready(function () {
                         'stock_in_hand': `${product.stock_in_hand}`,
                         'purchased_price': `${product.purchase_price}`,
                         'p_name': `${product.product_name}`,
-                        'return_invoice_id': `${product.id}`,
+                        'return_invoice_id': `${product.purchase_return_invoice_id}`,
+                        'return_invoice_prod_id': `${product.id}`,
                     });
                 })
                 $('.display').show();
@@ -72,7 +73,7 @@ $(document).ready(function () {
                 var x = 0
                 returns_product_array.forEach(function (product, key) {
                     x++;
-                    tableHtml(product.product_id, product.p_name, product.expiry_date, product.retail_price, product.purchased_price, product.stock_in_hand, product.amount, product.qty, product.prod_discount)
+                    tableHtml(product.product_id, product.p_name, product.expiry_date, product.retail_price, product.purchased_price, product.stock_in_hand, product.amount, product.qty, product.prod_discount, product.return_invoice_id, product.return_invoice_prod_id)
                 })
             }
         })
@@ -117,7 +118,7 @@ $('#add-product').on('click', function () {
             $('#qty').css('border-color', ''); // Reset the border color
         }
         var prod_discount = $('#discount').val();
-        expiry_date = $('.expiry_date').val();
+        expiry_date = $('#expiry_date').val();
         returns_product_array.push({
             'return_invoice_id': '',
             'prod_discount': prod_discount ? prod_discount : 0,
@@ -167,11 +168,14 @@ $('.close').on('click', function () {
     $('#new_residence_status').val(0).trigger('change');
 })
 $(document).on('click', '.remove_btn', function () {
+    alert(34);
     deleteRef = $(this);
     var product_id = $(this).attr('id');
-    var return_invoice_id = $(this).attr('data-id');
     var q = $(this).attr('data-quantity');
-    if (segments[3] == 'edit-purchase-return' && return_invoice_id != undefined) {
+    var return_invoice_id = $(this).attr('data-invoice-id');
+    var product_invoice_id = $(this).attr('data-product-invoice');
+    console.log(return_invoice_id)
+    if (segments[3] == 'purchase-return-edit' && return_invoice_id != undefined) {
         swal({
                 title: "Are you sure?",
                 icon: "warning",
@@ -190,6 +194,8 @@ $(document).on('click', '.remove_btn', function () {
                             _token: $('meta[name="csrf_token"]').attr('content'),
                             product_id: product_id,
                             return_invoice_id: return_invoice_id,
+                            product_invoice_id: product_invoice_id,
+
                             qty: q
                         },
                         success: function (response) {
@@ -715,7 +721,7 @@ $('#invoice_discount').on('input', function () {
     grandSum(previous_payable, service_charges, $(this).val());
 })
 
-function tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0) {
+function tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0, return_prod_id = 0) {
     $('#designationsTable tbody').append(`
     <tr class='tr-${product_id}' data-prod_id ="${product_id}">
         <td>${product_id}</td>
@@ -725,6 +731,6 @@ function tableHtml(product_id, p_name, expiry_date, retail_price, purchased_pric
         <td style="width:80px;"> <input type="number" value="${retail_price}" data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px;width:100%" min="0"></td>
         <td style="width:70px;"><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${prod_discount}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"    style="font-size: 13px;width:100%" min="0"></td>
         <td class='purchase-product-amount${product_id} add- S-input' style="width:80px;" >${amount - prod_discount}</td>
-        <td style="width:80px;"><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn W-100"   data-quantity="${qty}" data-invoice-id="${invoice_id}">Remove</button></td>
+        <td style="width:80px;"><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn W-100"   data-quantity="${qty}" data-invoice-id="${invoice_id}" data-product-invoice="${return_prod_id}">Remove</button></td>
         </tr>`);
 }

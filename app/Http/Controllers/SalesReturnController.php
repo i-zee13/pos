@@ -11,7 +11,8 @@ use App\Models\Stock;
 use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Auth;
+// use Auth;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Route;
 
 class SalesReturnController extends Controller
@@ -40,45 +41,7 @@ class SalesReturnController extends Controller
 
         return view('sales.return.create', compact('customers', 'current_date', 'invoice_first_part', 'products', 'invoice_no'));
     }
-    public function updateStock($previous_qty, $sale, $balance, $vendor_id, $type)
-    {
-        $old_record = '';
-        if ($type == 'company') {
-            $old_record         =  $previous_qty;
-            $previous_qty = 0;
 
-            $v                   =  new Stock();
-            $v->vendor_stock_id  =  $old_record->vendor_stock_id ?? $sale->vendor_stock_id;
-            $v->status           =  $old_record != '' && !empty($old_record)  ? 1 : 2;
-            $v->transaction_type =  $old_record != '' && !empty($old_record) ? 4 : 2; //4 = Edit , 2= Sale
-        } else {
-            $v                   =  new VendorStock();
-            $v->vendor_id        =  $vendor_id;
-            $v->status           =  $previous_qty > 0 ? 1 : 2;
-            $v->transaction_type =  $previous_qty > 0 ? 4 : 2; //4 = Edit , 2= Sale
-        }
-
-        if ($previous_qty > 0) {
-            $v->qty     =  $previous_qty;
-            $v->balance = $balance + $v->qty;
-        } else if ($old_record != '' && !empty($old_record)) {
-            $v->qty =  $old_record->qty;
-        } else {
-            $v->qty     = $sale->qty;
-            $v->balance = $balance - $sale->qty;
-        }
-        // $v->qty                  =  $previous_qty > 0 ? $previous_qty : ($old_record != '' && !empty($old_record) ? $old_record->qty  : $sale->qty);
-        // $v->balance              =  $previous_qty > 0 ? $balance + $v->qty : $balance - $sale->qty;
-        $v->invoice_no           =  $sale->invoice_no;
-        $v->sale_return_invoice_id      =  $old_record != '' && !empty($old_record) ? $old_record->sale_return_invoice_id  : $sale->sale_return_invoice_id;
-        $v->product_unit_price   =  $sale->purchased_price;
-        $v->product_id           =  $old_record != '' && !empty($old_record) ? $old_record->product_id  : $sale->product_id;
-        $v->date                 =  $old_record != '' && !empty($old_record) ? $old_record->date  : $sale->created_at;
-        $v->amount               =  $old_record != '' && !empty($old_record) ? $old_record->amount  : $sale->return_total_amount;
-        $v->created_by           =  Auth::id();
-        $v->save();
-        return $v;
-    }
     public function store(Request $request)
     {
         // dd($request->all());
@@ -112,7 +75,7 @@ class SalesReturnController extends Controller
         $invoice->previous_receivable  = $request->previous_receivable;
         $invoice->is_editable          = 1;
         $invoice->status               = $request->invoice_type;
-        $invoice->created_by           = Auth::id();
+        $invoice->created_by           = FacadesAuth::id();
         if ($invoice->save()) {
             if (count($request->sales_product_array) > 0) {
                 foreach ($request->sales_product_array as $key => $sale_product) {
@@ -133,9 +96,10 @@ class SalesReturnController extends Controller
                     $sale->product_id          = $sale_product['product_id'];
                     $sale->purchase_price      = $sale_product['purchased_price'];
                     $sale->qty                 = $sale_product['qty'];
-                    $sale->return_total_amount   = $sale_product['amount'];
+                    $sale->expiry_date         = $sale_product['expiry_date'];
+                    $sale->return_total_amount = $sale_product['amount'];
                     $sale->product_discount    = $sale_product['prod_discount'];
-                    $sale->created_by          = Auth::id();
+                    $sale->created_by          = FacadesAuth::id();
 
 
                     $previous_qty = SaleReturnProduct::where('sale_return_invoice_id', $request->hidden_invoice_id)
@@ -173,6 +137,7 @@ class SalesReturnController extends Controller
                             ]);
                             $sale->customer_id  =  $invoice->customer_id;
                             $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'sale_return', 4);
+                            BatchWiseStockManagment($v_stock->id,  $invoice->id, $sale, $change_qty_value, $In_out_status, 4, $v_stock->balance);
                             StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status, 'sale_return');
 
 
@@ -212,7 +177,7 @@ class SalesReturnController extends Controller
                     $customer_ledger->balance     =  $request->previous_receivable - $total_cr +  $customer_ledger->dr; //balance
                 }
 
-                $customer_ledger->created_by  = Auth::id();
+                $customer_ledger->created_by  = FacadesAuth::id();
                 $customer_ledger->sale_return_invoice_id = $invoice->id;
                 $customer_ledger->save();
                 Customer::where('id', $request->customer_id)->update([
@@ -305,6 +270,8 @@ class SalesReturnController extends Controller
             //         'actual_status' => 0
             //     ]);
             $v_stock = updateStock($vs, $vs->balance, $request->qty, 2, 'sale-return', 5);
+            BatchWiseDeleteProduct($request->sale_return_invoice_id, $request->product_invoice_id, $request->qty, 2, 5);
+
             StockManagment($v_stock->id, $vs, $request->qty, 2, 'sale-return');
             if ($v_stock) {
                 Product::where('id', $v_stock->product_id)->update([

@@ -149,6 +149,8 @@ class PurchaseReturnController extends Controller
                             ]);
                             $purchased->vendor_id  =  $invoice->customer_id;
                             $v_stock = updateStock($purchased, $balance, $change_qty_value, $In_out_status, 'purchase_return', 3);
+                            BatchWiseStockManagment($v_stock->id,  $invoice->id, $purchased, $change_qty_value, $In_out_status, 3, $v_stock->balance);
+
                             StockManagment($v_stock->id, $purchased, $change_qty_value, $In_out_status, 'purchase_return');
                             if ($v_stock->save()) {
                                 $purchased->vendor_stock_id = $v_stock->id;
@@ -265,12 +267,8 @@ class PurchaseReturnController extends Controller
             ->where('transaction_type', 3)->orderBy('id', 'DESC')
             ->first();
         if ($vs) {
-            // VendorStock::where('purchase_return_invoice_id', $request->return_invoice_id)
-            //     ->where('product_id', $request->product_id)->update([
-            //         'actual_qty'    => 0,
-            //         'actual_status' => 0
-            //     ]);
             $v_stock = updateStock($vs, $vs->balance,  $request->qty, 1, 'purchase-return', 5);
+            BatchWiseDeleteProduct($request->return_invoice_id, $request->product_invoice_id, $request->qty, 1, 5);
             StockManagment($v_stock->id, $vs,  $request->qty, 1, 'purchase-return');
 
             if ($v_stock) {

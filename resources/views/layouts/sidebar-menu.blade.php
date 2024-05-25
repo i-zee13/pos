@@ -1,4 +1,37 @@
-<nav class="navbar navbar-vertical fixed-start navbar-expand-md navbar-light" id="sidebar">
+<style>
+  .sidebar-height {
+    max-height: 100vh;
+    /* Ensure the sidebar uses the full height of the viewport */
+    padding-top: 5px;
+    padding-bottom: 5px;
+    overflow-y: auto;
+    /* Enable vertical scrolling */
+  }
+
+  /* Custom scrollbar styles */
+  .sidebar-height::-webkit-scrollbar {
+    width: 5px;
+    /* Width of the scrollbar */
+  }
+
+  .sidebar-height::-webkit-scrollbar-thumb {
+    background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
+    opacity: 0.75;
+    border-radius: 4px;
+  }
+
+  .sidebar-height::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
+    /* Color when hovered */
+  }
+
+  .sidebar-height::-webkit-scrollbar-track {
+    background: white;
+    /* Background color of the scrollbar track */
+  }
+</style>
+
+<nav class="navbar navbar-vertical fixed-start navbar-expand-md navbar-light sidebar-height" id="sidebar">
   <div class="container-fluid">
 
     <!-- Toggler -->
@@ -8,7 +41,7 @@
 
     <!-- Brand -->
     <a class="navbar-brand" href="{{route('home')}}">
-      <img src="/storage/{{$organization->logo_img}}" class="navbar-brand-img mx-auto" alt="..." style="height: 35px;">
+      <img src="/storage/{{$organization->logo_img}}" class="navbar-brand-img mx-auto" alt="storeeo" style="height: 75px;">
     </a>
 
     <!-- User (xs) -->

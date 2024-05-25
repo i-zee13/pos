@@ -77,3 +77,4 @@ $('body').on('mouseleave', '.ProductTable tr', function () {
     $('.retail_price').text(0);
     $('.stock_balance').text(0);
 });
+

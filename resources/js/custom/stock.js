@@ -105,7 +105,7 @@ $(document).ready(function () {
                             </td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.prod_discount}</td>
                              <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount - product.prod_discount}</td>
-                            <td><a type="button" id="${product.product_id}" data-id="${product.purchase_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="" style="${!is_removable ? 'display:none' : ''}" data-stock="${product.stock_in_hand}" data-quantity="${product.qty}">Remove</a></td>
+                            <td  style="width: 80px;"><a style="width: 100%;" type="button" id="${product.product_id}" data-product-invoice="${product.purchase_prod_id}" data-id="${product.purchase_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="" style="${!is_removable ? 'display:none' : ''}" data-stock="${product.stock_in_hand}" data-quantity="${product.qty}">Remove</a></td>
                         </tr>
                     `);
                 })
@@ -146,6 +146,7 @@ $(document).on('click', '.remove_btn', function () {
     var current_stock = $(this).attr('data-stock');
     var purchased_qty = $(this).attr('data-quantity');
     var purchase_invoice_id = $(this).attr('data-id');
+    var product_invoice_id = $(this).attr('data-product-invoice');
     if (parseInt(current_stock) < parseInt(purchased_qty)) {
         $('#notifDiv').fadeIn().css('background', 'red').text(`Current stock is less then ${current_stock} -- ${purchased_qty}`);
         setTimeout(() => {
@@ -173,6 +174,7 @@ $(document).on('click', '.remove_btn', function () {
                             _token: $('meta[name="csrf_token"]').attr('content'),
                             product_id: product_id,
                             purchase_invoice_id: purchase_invoice_id,
+                            product_invoice_id: product_invoice_id,
                             qty: purchased_qty,
                         },
                         success: function (response) {

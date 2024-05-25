@@ -32,7 +32,7 @@ let invoice_discount = 0;
 let data_variable = '';
 let return_total = 0;
 $(document).ready(function () {
-
+    $('.expiry_date').removeAttr('min');
     $('.parent-div').show();
     $('#tblLoader').hide();
     $('#bar-code').focus();
@@ -84,6 +84,9 @@ $(document).ready(function () {
                 sales_product_array.forEach(function (product, key) {
                     // console.log(product)
                     x++;
+                    // tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0);
+                    // tableHtml(product.product_id, product.p_name, product.expiry_date, product.retail_price, product.purchased_price, product.stock_in_hand, product.amount, product.qty, product.prod_discount, product.return_invoice_id, product.return_invoice_prod_id)
+
                     $('#designationsTable tbody').append(`
                         <tr id='tr-${product.product_id}'>
                             <td>${product.product_id}</td>
@@ -92,7 +95,7 @@ $(document).ready(function () {
                             <td><input type="number" value="${product.retail_price}"  data-retail="${product.retail_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
                             <td><input type="number" value="${product.prod_discount}"  class="inputSale discount-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  style="font-size: 13px" min="0"></td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount}</td>
-                            <td><a type="button" id="${product.product_id}" data-id="${product.sale_return_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="" data-quantity="${product.qty}">Remove</a></td>
+                            <td><a type="button" id="${product.product_id}" data-id="${product.sale_return_invoice_id}" data-product-invoice="${product.id}" class="btn smBTN red-bg remove_btn" data-index="" data-quantity="${product.qty}">Remove</a></td>
                         `);
                 })
             }
@@ -127,7 +130,7 @@ $('#add-product').on('click', function () {
             $('#qty').css('border-color', ''); // Reset the border color
         }
         var prod_discount = $('#discount').val();
-        expiry_date = $('.expiry_date').val();
+        expiry_date = $('#expiry_date').val();
         sales_product_array.push({
             'sale_return_nvoice_id': '',
             'prod_discount': prod_discount ? prod_discount : 0,
@@ -211,8 +214,10 @@ $('.close').on('click', function () {
 })
 $(document).on('click', '.remove_btn', function () {
     deleteRef = $(this);
-    var product_id = $(this).attr('id');
-    var sale_return_invoice_id = $(this).attr('data-id');
+    var product_id               = $(this).attr('id');
+    var sale_return_invoice_id   = $(this).attr('data-id');
+    var product_invoice_id       = $(this).attr('data-product-invoice');
+
     var q = $(this).attr('data-quantity');
     if (segments[3] == 'edit-sale-return' && sale_return_invoice_id != undefined) {
         swal({
@@ -233,6 +238,8 @@ $(document).on('click', '.remove_btn', function () {
                             _token: $('meta[name="csrf_token"]').attr('content'),
                             product_id: product_id,
                             sale_return_invoice_id: sale_return_invoice_id,
+                            product_invoice_id: product_invoice_id,
+
                             qty: q
                         },
                         success: function (response) {

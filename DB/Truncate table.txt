@@ -24,6 +24,7 @@ TRUNCATE product_replacements;
 TRUNCATE stocks;
 TRUNCATE vendor_stocks; 
 TRUNCATE vendor_stock_managment;
+TRUNCATE stock_batches_items;
 
 
 TRUNCATE customer_ledger;

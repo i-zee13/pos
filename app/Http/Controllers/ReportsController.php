@@ -37,6 +37,75 @@ class ReportsController extends Controller
    }
    public function stockReportList(Request $request)
    {
+      $query               =  " 1=1";
+      $current_date        =   date('Y-m-d');
+      if (isset($request->company_id)) {
+         $query      .= " AND vs.company_id =  $request->company_id";
+      }
+      if (isset($request->product_id)) {
+         $query      .= " AND vs.product_id = $request->product_id";
+      }
+      if (isset($request->expiry)) {
+         $dateTime             =   new DateTime($current_date);
+         if ($request->expiry == '1') {
+            $expiry_limit_date =   $dateTime->modify('+1 month')->format('Y-m-d');
+         } else {
+            $expiry_limit_date =   $dateTime->modify('+2 month')->format('Y-m-d');
+         }
+
+         $query               .=  " AND vs.expiry_date BETWEEN '$current_date' AND '$expiry_limit_date'";
+         $records = DB::select("
+                                 SELECT
+                                     vs.batch_wise_balance AS balance,
+                                     vs.vs_id,
+                                     IFNULL(
+                                         (SELECT company_name FROM companies WHERE id = vs.company_id),
+                                         ''
+                                     ) AS company_name,
+                                     IFNULL(
+                                         (SELECT product_name FROM products WHERE id = vs.product_id),
+                                         ''
+                                     ) AS product_name, 
+                                     vs.product_id,
+                                     DATE_FORMAT(vs.expiry_date, '%d %b %Y') AS expiry_date
+                                 FROM
+                                   stock_batches_items vs
+                                 WHERE
+                                     $query
+                             ");
+      } else {
+
+         $records = DB::select("
+                              SELECT
+                              vs.balance AS balance,
+                              vs.vs_id,
+                              IFNULL(
+                                 (SELECT company_name FROM companies WHERE id = vs.company_id),
+                                 ''
+                              ) AS company_name,
+                              IFNULL(
+                                 (SELECT product_name FROM products WHERE id = vs.product_id),
+                                 ''
+                              ) AS product_name,
+                              IFNULL(
+                                 (SELECT sale_price FROM products WHERE id = vs.product_id),
+                                 ''
+                                 ) AS sale_price,
+                              vs.product_id 
+                           FROM
+                           vendor_stock_managment vs
+                           WHERE
+                           $query
+                           ");
+      }
+      return response()->json([
+         'msg'     =>   'Stock reports list fetched',
+         'status'  =>   'success',
+         'records' =>   $records
+      ]);
+   }
+   public function old_stockReportList(Request $request)
+   {
       $select_expiry       =  "";
       $query               =  " 1=1";
       $inner_join_where    =  " 1=1";

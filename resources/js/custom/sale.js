@@ -80,7 +80,7 @@
                  var x = 0
                  sales_product_array.forEach(function (product, key) {
                      x++;
-                     tableHtml(product.product_id, product.p_name, product.retail_price, product.purchased_price, product.stock_in_hand, product.amount, product.qty, product.prod_discount, product.sale_invoice_id, is_removable)
+                     tableHtml(product.product_id, product.p_name, product.retail_price, product.purchased_price, product.stock_in_hand, product.amount, product.qty, product.prod_discount, product.sale_invoice_id, is_removable, product.sale_prod_id)
 
                      // $('#designationsTable tbody').append(`
                      //     <tr id='tr-${product.product_id}' data-prod_id ="${product.product_id}">
@@ -215,6 +215,8 @@
      deleteRef = $(this);
      var product_id = $(this).attr('id');
      var sale_invoice_id = $(this).attr('data-id');
+     var product_invoice_id = $(this).attr('data-product-invoice');
+
      var q = $(this).attr('data-quantity');
      if (segments[3] == 'sale-edit' && sale_invoice_id != undefined) {
          swal({
@@ -235,6 +237,7 @@
                              _token: $('meta[name="csrf_token"]').attr('content'),
                              product_id: product_id,
                              sale_invoice_id: sale_invoice_id,
+                             product_invoice_id: product_invoice_id,
                              qty: q
                          },
                          success: function (response) {
@@ -920,7 +923,7 @@
      $('.calculate_by_amount_text').text(quantity.toFixed(2));
  });
 
- function tableHtml(product_id, p_name, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0, is_removable = true) {
+ function tableHtml(product_id, p_name, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0, is_removable = true, sale_prod_id = null) {
      $('#designationsTable tbody').append(`
     <tr id='tr-${product_id}' data-prod_id ="${product_id}">
         <td>${product_id}</td>
@@ -929,6 +932,6 @@
         <td><input type="number" value="${retail_price}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
         <td><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
         <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
-        <td  style="width:80px;"><a type="button" id="${product_id}" data-id="${invoice_id}" class="btn smBTN red-bg remove_btn" data-index="" data-quantity="${qty}" style="width:100%; ${!is_removable ? 'display:none' : ''}" >Remove</a></td>
+        <td  style="width:80px;"><a type="button" id="${product_id}" data-id="${invoice_id}" class="btn smBTN red-bg remove_btn" data-product-invoice="${sale_prod_id}" data-index="" data-quantity="${qty}" style="width:100%; ${!is_removable ? 'display:none' : ''}" >Remove</a></td>
     `);
  }

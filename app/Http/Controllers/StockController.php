@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BatchStockMgt;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\ProductPurchase;
@@ -154,6 +155,7 @@ class StockController extends Controller
                         ->value('qty');
                     if ($purchased->save()) {
                         $purchased->invoice_no = $invoice->invoice_no;
+
                         $purchased_products_array[] = $purchased->id;
                         $check_stock           =  VendorStock::where('product_id', $purchased->product_id)->orderBy('id', 'DESC')->first();
                         $balance   = 0;
@@ -185,6 +187,7 @@ class StockController extends Controller
                             ]);
                             $purchased->vendor_id  =  $invoice->customer_id;
                             $v_stock = updateStock($purchased, $balance, $change_qty_value, $In_out_status, 'purchase', 1);
+                            BatchWiseStockManagment($v_stock->id,  $invoice->id, $purchased, $change_qty_value, $In_out_status, 1, $v_stock->balance);
                             StockManagment($v_stock->id, $purchased, $change_qty_value, $In_out_status, 'purchase');
 
                             if ($v_stock->save()) {
@@ -344,33 +347,12 @@ class StockController extends Controller
             ->where('product_id', $request->product_id)
             ->where('transaction_type', 1)->orderBy('id', 'DESC')->first();
         if ($prod) {
-            // VendorStock::where('purchase_invoice_id',  $prod->purchase_invoice_id)
-            //     ->where('product_id', $prod->product_id)->update([
-            //         'actual_qty'    => 0,
-            //         'actual_status' => 0
-            //     ]);
+
             $prod->actual_qty = $request->qty;
-            $v_stock = updateStock($prod, $prod->balance,  $request->qty, 2, 'purchase', 5,);
+            $v_stock = updateStock($prod, $prod->balance,  $request->qty, 2, 'purchase', 5);
+            BatchWiseDeleteProduct($request->purchase_invoice_id, $request->product_invoice_id, $request->qty, 2, 5);
             StockManagment($v_stock->id, $prod,  $request->qty, 2);
 
-            // $out_stock                          =  new VendorStock();
-            // $out_stock->vendor_id               =  $prod->vendor_id;
-            // $out_stock->company_id              =  $prod->company_id;
-            // $out_stock->product_id              =  $prod->product_id;
-            // $out_stock->date                    =  $prod->created_at;
-
-            // $out_stock->actual_qty              =  $prod->qty; //OUT
-            // $out_stock->actual_status           =  2; //OUT 
-            // $out_stock->product_unit_price      =  $prod->purchase_price;
-            // $out_stock->total_purchase_amount   =  $prod->product_return_total_amount;
-            // $out_stock->product_unit_price      =  $prod->product_unit_price;
-
-            // $out_stock->qty                     =  $prod->qty;
-            // $out_stock->transaction_type        =  4; //Deleted
-            // $out_stock->status                  =  2; //out
-            // $out_stock->balance                 =  $prod->balance - $prod->qty;
-            // $out_stock->created_by              =  Auth::id();
-            // $out_stock->purchase_invoice_id     =  $prod->purchase_invoice_id;
             if ($v_stock) {
                 Product::where('id', $v_stock->product_id)->update([
                     'stock_balance' =>  $v_stock->balance,

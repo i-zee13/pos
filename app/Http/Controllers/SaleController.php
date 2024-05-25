@@ -126,6 +126,7 @@ class SaleController extends Controller
                     $sale->qty                 = $sale_product['qty'];
                     $sale->sale_total_amount   = $sale_product['amount'];
                     $sale->product_discount    = $sale_product['prod_discount'];
+                    $sale->expiry_date         = $sale_product['expiry_date'];
                     $sale->created_by          = Auth::id();
                     $sale->purchase_price      = $sale_product['purchased_price'];
                     $previous_qty              = ProductSale::where('sale_invoice_id', $request->hidden_invoice_id)
@@ -160,6 +161,8 @@ class SaleController extends Controller
                             ]);
                             $sale->customer_id  =  $invoice->customer_id;
                             $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'sale', 2);
+                            BatchWiseStockManagment($v_stock->id,  $invoice->id, $sale, $change_qty_value, $In_out_status, 2, $v_stock->balance);
+
                             StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status, 'sale');
 
                             if ($v_stock->save()) {
@@ -350,13 +353,13 @@ class SaleController extends Controller
     }
     public function deleteProduct(Request $request)
     {
-
         $vs      = VendorStock::where('sale_invoice_id', $request->sale_invoice_id)
             ->where('product_id', $request->product_id)
             ->where('transaction_type', 2)->orderBy('id', 'DESC')
             ->first();
         if ($vs) {
             $v_stock = updateStock($vs, $vs->balance, $request->qty, 1, 'sale', 5);
+            BatchWiseDeleteProduct($request->sale_invoice_id, $request->product_invoice_id, $request->qty, 1, 5);
             StockManagment($v_stock->id, $vs, $request->qty, 1, 'sale');
 
             if ($v_stock) {

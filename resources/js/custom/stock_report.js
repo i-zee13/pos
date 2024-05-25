@@ -52,6 +52,7 @@ $('.search-btn').on('click', function () {
                             <th>#</th>
                             <th>Company Name</th>
                             <th>Product Name</th> 
+                            <th>Expiry</th>
                             <th>Balance</th> 
                         </tr>
                     </thead><tbody>
@@ -78,12 +79,13 @@ $('.search-btn').on('click', function () {
                         <td>${key+1}</td>
                         <td>${element['company_name'] }</td>
                         <td>${element['product_name'] }</td>
+                        <td>${element['expiry_date'] ? element['expiry_date'] : 'NA' }</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${element['balance']}</td> 
                     </tr>`);
             });
             $('.TeacherAttendanceListTable tbody').append(`
             <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
-                <td class="font18" align="right" colspan="2"></td>
+                <td class="font18" align="right" colspan="3"></td>
                 <td class="font18" align="center">Grand Total :</td>
                 <td class="totalNo">
                     <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${total_balance}</span>
