@@ -205,7 +205,7 @@
                 <a class="btn add_button openDataSidebarForAddCustomerLedger vendor-ledger-jama-banam"><i class="fa fa-plus"></i> Add New</a>
                 <h2>Vendor Cash {{request()->segment(1) == 'vendor-ledger-jama' ? '( جمع )'  :' ( بنام )'}}</h2>
             </div>
-            <div style="min-height: 400px" id="tblLoader">
+           <div style="min-height: 400px" id="tblLoader">
                 <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
             </div>
             <div class="body" style="display: none">

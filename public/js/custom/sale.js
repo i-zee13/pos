@@ -481,7 +481,7 @@ $(document).on('keyup', '.bar-code', function () {
         }
       }
     }
-  }, 250);
+  }, 1500);
   return 0;
 });
 $(document).on('input change', '.qty', function () {

@@ -127,7 +127,49 @@
                 overflow-x: auto;
                 white-space: nowrap;
             }
-        } */
+        } */ 
+
+        .lds-ring div {
+            box-sizing: border-box;
+            display: block;
+            position: absolute;
+            width: 34px;
+            height: 34px;
+            margin: 6px;
+            border: 6px solid #001e35;
+            border-radius: 50%;
+            animation: lds-ring 1.5s cubic-bezier(.7, .1, .3, .9) infinite;
+            border-color: transparent;
+            border-top-color: #001e35;
+        }
+        .lds-ring :nth-child(1) {
+            animation-delay: -0.1s;
+            opacity: 0.8;
+        }
+        .lds-ring :nth-child(2) {
+            animation-delay: -0.2s;
+            opacity: 0.6;
+        }
+        .lds-ring :nth-child(3) {
+            animation-delay: -0.3s;
+            opacity: 0.4;
+        }
+        .lds-ring :nth-child(4) {
+            animation-delay: -0.4s;
+            opacity: 0.2;
+        }
+        @keyframes lds-ring {
+        0% {
+        transform: rotate(0deg);
+        }
+        100% {
+        transform: rotate(360deg);
+        }
+        }
+        .loader-div {position: absolute;	display: inline-block;	width: 50px;height: 50px;margin: auto;
+            left: 0;right: 0;top: 0;bottom: 0;}
+
+
     </style>
     <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('/css/jquery.steps.css')}}" rel="stylesheet">

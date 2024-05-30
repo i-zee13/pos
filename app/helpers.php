@@ -311,17 +311,16 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
 {
     $query = BatchStockMgt::where('product_id', $purchase->product_id);
 
-    if ($transaction_type == 1 || $transaction_type == 4) {
+    if ($transaction_type == 1 || $transaction_type == 4 || $transaction_type == 3) {
         $query->whereDate('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC');
-    } else if ($transaction_type == 2 || $transaction_type == 3) {
+    } else if ($transaction_type == 2 ) {
         $query->where('batch_wise_balance', '>', 0)->orderBy('id', 'ASC');
-    }
-
+    } 
     $s = $query->first();
 
     if (!$s) {
         $s = new BatchStockMgt();
-        $s->expiry_date         = $purchase->expiry_date;
+        $s->expiry_date         =   $purchase->expiry_date;
     }
     $s->company_id              =   $purchase->company_id;
     $s->product_id              =   $purchase->product_id;

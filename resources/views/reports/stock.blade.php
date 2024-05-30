@@ -3537,8 +3537,8 @@
                             <input type="date" autocomplete="off" class="form-control" placeholder="End Date" name="end_date" value="{{date('Y-m-d')}}" readonly>
                         </div>
                     </div>
-                    <div class="col pr-0" style="padding-left:0px">
-                        <div class="_cust_filter col-3" style="width: 210px!important">
+                    <div class="col" style="">
+                        <div class="_cust_filter col-md-3" style="width: 210px!important">
                             <div class="form-s2">
                                 <select class="form-control formselect company_id" name="company_id">
                                     <option value="">Select Company</option>
@@ -3548,7 +3548,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter col-3" style="width: 210px!important">
+                        <div class="_cust_filter col-md-3" style="width: 210px!important">
                             <div class="form-s2">
                                 <select class="form-control formselect product_id" name="product_id">
                                     <option value="">Select Product</option>
@@ -3558,7 +3558,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter col-3" style="width: 210px!important">
+                        <div class="_cust_filter col-md-3" style="width: 210px!important">
                             <div class="form-s2">
                                 <select class="form-control formselect expiry-select" name="expiry">
                                     <option value="">Select Expiry</option>

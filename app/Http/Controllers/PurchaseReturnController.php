@@ -149,8 +149,7 @@ class PurchaseReturnController extends Controller
                             ]);
                             $purchased->vendor_id  =  $invoice->customer_id;
                             $v_stock = updateStock($purchased, $balance, $change_qty_value, $In_out_status, 'purchase_return', 3);
-                            BatchWiseStockManagment($v_stock->id,  $invoice->id, $purchased, $change_qty_value, $In_out_status, 3, $v_stock->balance);
-
+                            BatchWiseStockManagment($v_stock->id,  $invoice->id, $purchased, $change_qty_value, $In_out_status, 3, $v_stock->balance); 
                             StockManagment($v_stock->id, $purchased, $change_qty_value, $In_out_status, 'purchase_return');
                             if ($v_stock->save()) {
                                 $purchased->vendor_stock_id = $v_stock->id;

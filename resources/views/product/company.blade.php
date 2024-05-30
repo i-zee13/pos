@@ -98,7 +98,7 @@
                 <a class="btn add_button openDataSidebarForAddingCompany"><i class="fa fa-plus"></i> New Company</a>
                 <h2>Companies</h2>
             </div>
-            <div style="min-height: 400px" id="tblLoader">
+           <div style="min-height: 400px" id="tblLoader">
                 <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
             </div>
             <div class="body" style="display: none">

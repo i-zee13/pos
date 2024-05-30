@@ -36,9 +36,15 @@
               <a href="{{route('ProductReplacement.create')}}" type="submit" class="btn btn-primary mr-2 add-replacement" style="font-size: 13px;padding: 6px 11px 4px 9px;margin-top: -10px; float: right;">Add New</a>
 
             </div>
-            <!-- <div style="min-height: 400px" id="tblLoader">
-                <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
-            </div> -->
+            <!--<div class="loader-div" id="tblLoader">
+                            <div class="lds-ring" aria-role="none">
+                              <div></div>
+                              <div></div>
+                              <div></div>
+                              <div></div>
+                              <div></div>
+                            </div>
+                          </div> -->
             <div class="body" >
             <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;" id="example">
                 <thead>

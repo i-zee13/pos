@@ -1,7 +1,13 @@
 @extends('layouts.app')
-<div style="min-height: 400px" id="tblLoader">
-    <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
-</div>
+ <div class="loader-div" id="tblLoader">
+                            <div class="lds-ring" aria-role="none">
+                              <div></div>
+                              <div></div>
+                              <div></div>
+                              <div></div>
+                              <div></div>
+                            </div>
+                          </div>
 <div class="parent-div" style="display:none">
 
     @section('content')
