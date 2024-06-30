@@ -169,7 +169,115 @@
         .loader-div {position: absolute;	display: inline-block;	width: 50px;height: 50px;margin: auto;
             left: 0;right: 0;top: 0;bottom: 0;}
 
+            @-webkit-keyframes wcLoading {
+    0% {
+        -webkit-transform: scaleY(0.1);
+        transform: scaleY(0.1);
+        background: var(--white);
+    }
 
+    50% {
+        -webkit-transform: scaleY(1);
+        transform: scaleY(1);
+        background: #001e35;
+    }
+
+    100% {
+        -webkit-transform: scaleY(0.1);
+        transform: scaleY(0.1);
+        background: transparent;
+    }
+}
+
+@keyframes wcLoading {
+    0% {
+        -webkit-transform: scaleY(0.1);
+        transform: scaleY(0.1);
+        background: var(--white);
+    }
+
+    50% {
+        -webkit-transform: scaleY(1);
+        transform: scaleY(1);
+        background: #001e35;
+    }
+
+    100% {
+        -webkit-transform: scaleY(0.1);
+        transform: scaleY(0.1);
+        background: transparent;
+    }
+}
+
+.preloader {
+    width: 100%;
+    height: 100vh;
+    background-color: var(--black-2);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 99999;
+}
+
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.loading .bar {
+    width: 6px;
+    height: 60px;
+    background: var(--white);
+    display: inline-block;
+    -webkit-transform-origin: bottom center;
+    transform-origin: bottom center;
+    -webkit-animation: wcLoading 1.5s ease-in-out infinite;
+    animation:wcLoading 1.5s ease-in-out infinite;
+}
+
+.loading .bar1 {
+    -webkit-animation-delay: 0.1s;
+    animation-delay: 0.1s;
+}
+
+.loading .bar2 {
+    -webkit-animation-delay: 0.2s;
+    animation-delay: 0.2s;
+}
+
+.loading .bar3 {
+    -webkit-animation-delay: 0.3s;
+    animation-delay: 0.3s;
+}
+
+.loading .bar4 {
+    -webkit-animation-delay: 0.4s;
+    animation-delay: 0.4s;
+}
+
+.loading .bar5 {
+    -webkit-animation-delay: 0.5s;
+    animation-delay: 0.5s;
+}
+
+.loading .bar6 {
+    -webkit-animation-delay: 0.6s;
+    animation-delay: 0.6s;
+}
+
+.loading .bar7 {
+    -webkit-animation-delay: 0.7s;
+    animation-delay: 0.7s;
+}
+
+.loading .bar8 {
+    -webkit-animation-delay: 0.8s;
+    animation-delay: 0.8s;
+}
     </style>
     <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('/css/jquery.steps.css')}}" rel="stylesheet">
@@ -201,6 +309,18 @@
     @include('layouts.sidebar-menu')
     @endif
 
+    <!-- <div class="preloader">
+    <div class="loading">
+      <div class="bar bar1"></div>
+      <div class="bar bar2"></div>
+      <div class="bar bar3"></div>
+      <div class="bar bar4"></div>
+      <div class="bar bar5"></div>
+      <div class="bar bar6"></div>
+      <div class="bar bar7"></div>
+      <div class="bar bar8"></div>
+    </div>
+  </div> -->
 
     <!-- MAIN CONTENT -->
     <div class="main-content">

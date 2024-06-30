@@ -174,3 +174,6 @@ $('.reset-btn').on('click', function () {
 
     $('.ttl_stock_in_hand').html(0);
 })
+$('.expiry-select').on('change',function(){
+    $(this).val() == 3 ? $('.inputmonth').show()  :  $('.inputmonth').hide();
+})

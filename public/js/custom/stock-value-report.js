@@ -41,79 +41,7 @@ $('.search-btn').on('click', function () {
         },
         success: function success(response) {
             CurrentRef.attr('disabled', false);
-            //       $('.loader').show();
-            //       $('.teacher_attendance_list').empty();
-            //       $('.teacher_attendance_list').append(`
-            //   <table class="table table-hover dt-responsive nowrap StockListTable" style="width:100%;">
-            //     <thead>
-            //       <tr>
-            //         <th>#</th>
-            //         <!-- <th>Invoice #</th> -->
-            //         ${$('.company_id').val() != '' ? `<th>Product Name</th>` : ''}
-            //         <th>Rate</th>
-            //         <th>QTY</th>
-            //         <th>Amount</th>
-            //       </tr>
-            //     </thead>
-            //     <tbody> </tbody>
-            //   </table>
-            // `);
-            //       $('.StockListTable tbody').empty();
-            //       if (response.records.length == 0) {
-            //           $('#notifDiv').fadeIn();
-            //           $('#notifDiv').css('background', 'green');
-            //           $('#notifDiv').text('No data available');
-            //           setTimeout(function () {
-            //               $('#notifDiv').fadeOut();
-            //           }, 3000);
-            //       }
-            //       var last_balance = 0;
-            //       var balance_qty = 0;
-            //       var total_payment = 0;
-            //       var table_rows = "";
-            //       var Pinvoice = '';
-            //       var ttl_qty_purchase = 0;
-            //       var filter_selected = $('input[name="filter_by_value"]:checked').val();
-            //       response.records.forEach(function (element, key) {
-            //           if (filter_selected == 1) {
-            //               last_balance += parseInt(element.qty) * parseInt(element.p_price);
-            //           } else {
-            //               last_balance += parseInt(element.balance) * parseInt(element.p_price);
-            //           }
-            //           var date = new Date(element.expire_date);
-            //           var formattedDate = date.toDateString();
-            //           table_rows = '';
-            //           // Pinvoice            = element.purchase_invoice_id.split('-');
-            //           balance_qty += element.balance;
-            //           total_payment += element.p_price;
-            //           ttl_qty_purchase += element.qty;
-            //           table_rows = `<tr>
-            //                               <td>${key+1}</td>
-            //                               <!-- <td>${Pinvoice[0]} (${element.vendor_name ? element.vendor_name : "NA"})</td> -->
-            //                               ${$('.company_id').val() != '' ? `<td>${element.product_name ? element.product_name : 'NA'}</td>` : ''}
-            //                               <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element.p_price ? addCommas(element.p_price) : 0}</td>
-            //                               <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${filter_selected == 1 ? addCommas(element.qty) : addCommas(element.balance)}</td>
-            //                               <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${filter_selected == 1 ? addCommas(parseInt(element.qty) * parseInt(element.p_price)) : addCommas(parseInt(element.balance) * parseInt(element.p_price))}</td>
-            //                           </tr>`;
-            //           $('.StockListTable tbody').append(`
-            //     ${table_rows}
-            //   `)
-            //       });
-            //       $('.StockListTable tbody').append(`
-            //   <tr style="background-color: #f6f6f6">
-            //       ${$('.company_id').val() != '' ? `<th></th>` : ''}
-            //       <th>Total</th>
-            //       <th style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${total_payment ? addCommas(total_payment) : '0'}</th>
-            //       <th style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${filter_selected == 1 ? addCommas(ttl_qty_purchase) :  addCommas(balance_qty)}</th>
-            //       <th style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${last_balance ? addCommas(last_balance) : 0}</th>
-            //   </tr>
-            // `);
-            //       $('.filter_name').empty();
-            //       if ($('.product_id').val() != '') {
-            //           $('.filter_name').html('Product: <span>' + $('.product_id option:selected').text() + '</span>');
-            //       }
-            //       $('.StockListTable').fadeIn();
-            //       $('.loader').hide();
+            
             CurrentRef.attr('disabled', false);
             var filter_selected = $('input[name="filter_by_value"]:checked').val();
             $('.loader').show();
@@ -126,7 +54,7 @@ $('.search-btn').on('click', function () {
                       <th>#</th>
                       <th>Company Name</th>
                       <th>Product Name</th> 
-                      <th>Cost</th>
+                      <th>Unit Cost</th>
                        <th>QTY</th>
                       <th>Balance</th> 
                   </tr>
@@ -149,13 +77,13 @@ $('.search-btn').on('click', function () {
                 var cost = 0;
                 var amount = 0;
                 if (filter_selected == 1) {
-                    amount = element.avg_product_value * parseInt(element.balance);
+                    amount = element.ttl_avg_cost * parseInt(element.balance);
                     // last_balance += parseInt(element.balance) * parseInt(element.avg_product_value);
-                    cost = element.avg_product_value;
+                    cost = element.ttl_avg_cost;
                 } else {
-                    amount = element.p_price * parseInt(element.balance);
+                    amount = element.purchase_price * parseInt(element.balance);
                     // last_balance += parseInt(element.balance) * parseInt(element.p_price);
-                    cost = element.p_price;
+                    cost = element.purchase_price;
                 }
                 last_balance += amount;
                 total_balance += element['balance'];

@@ -45,14 +45,9 @@ class ReportsController extends Controller
       if (isset($request->product_id)) {
          $query      .= " AND vs.product_id = $request->product_id";
       }
-      if (isset($request->expiry)) {
+      if (isset($request->expiry) && $request->expiry > 0 ) {
          $dateTime             =   new DateTime($current_date);
-         if ($request->expiry == '1') {
-            $expiry_limit_date =   $dateTime->modify('+1 month')->format('Y-m-d');
-         } else {
-            $expiry_limit_date =   $dateTime->modify('+2 month')->format('Y-m-d');
-         }
-
+         $expiry_limit_date =   $dateTime->modify('+ '. $request->expiry.'month')->format('Y-m-d');
          $query               .=  " AND vs.expiry_date BETWEEN '$current_date' AND '$expiry_limit_date'";
          $records = DB::select("
                                  SELECT
@@ -208,62 +203,72 @@ class ReportsController extends Controller
    public function fetchStockValueReport(Request $request)
    {
       $query               =  " 1=1";
-      $inner_join_where    =  " 1=1";
-      $select_query = ' 1=1';
       if (isset($request->company_id)) {
          $query      .= " AND vs.company_id =  $request->company_id";
       }
       if (isset($request->product_id)) {
          $query      .= " AND vs.product_id = $request->product_id";
       }
-      if ($request->filter_by_value == '2') {
+// ;      if ($request->filter_by_value == '2') {
          // $where            =  " DATE(vs.created_at) BETWEEN '$request->start_date' AND '$request->end_date' AND vs.transaction_type != 4 ";
-         $where            =  "DATE(vs.created_at) <= '$request->end_date' AND vs.transaction_type != 4";
-         $group_order_by   =   "GROUP BY vs.product_id ORDER BY vs.id DESC";
-      } else {
-         $where            =  " DATE(vs.created_at) <= '$request->end_date' ";
-         $group_order_by   =   "ORDER BY vs.id DESC";
-         $select_query     =  "( SELECT SUM(purchased_total_amount)/ SUM(qty) as avg_product_value FROM products_purchases vs  WHERE $query ) as avg_product_value ";
-      }
+         // $where            =  " DATE(vs.created_at) <= $request->end_date";
+      // }
+      //  else {
+      //    $where            =  " DATE(vs.created_at) <= '$request->end_date' ";
+      //    $group_order_by   =   "ORDER BY vs.id DESC";
+      //    $select_query     =  "( SELECT SUM(purchased_total_amount)/ SUM(qty) as avg_product_value FROM products_purchases vs  WHERE $query ) as avg_product_value ";
+      // }
 
-      $inner_join_where = $query;
-      $query      .= " AND $where";
-      $records             =  DB::select("
-                                 SELECT
-                                    vs.balance AS balance,
-                                    vs.id AS vs_id,
-                                    IFNULL(
-                                       (SELECT company_name FROM companies WHERE id = vs.company_id),
-                                       ''
-                                    ) as company_name,
-                                    IFNULL(
-                                       (SELECT product_name FROM products WHERE id = vs.product_id),
-                                       ''
-                                    ) AS product_name,
-                                    product_unit_price AS p_price,
-                                    (SELECT invoice_no FROM purchase_invoices where purchase_invoices.id =  vs.purchase_invoice_id) AS purchase_invoice_id,
-                                    vs.qty AS qty,
-                                    vs.transaction_type,
-                                    vs.status,
-                                    vs.product_id,
-                                    (SELECT invoice_no FROM sale_invoices where sale_invoices.id =  vs.sale_invoice_id) AS sale_invoice_id,
-                                    (SELECT customer_name FROM customers WHERE id = vs.vendor_id) AS vendor_name,
-                                    IFNULL((SELECT customer_name FROM customers WHERE id = (SELECT customer_id FROM sale_invoices WHERE sale_invoices.id=vs.sale_invoice_id)),'') AS customer_name,
-                                    $select_query
-                                 FROM
-                                 vendor_stocks vs
-                                 JOIN (
-                                    SELECT product_id, MAX(id) AS max_id
-                                    FROM `vendor_stocks` as vs
-                                    WHERE $inner_join_where
-                                    GROUP BY product_id
-                                ) AS max_ids
-                                ON vs.product_id = max_ids.product_id
-                                AND vs.id = max_ids.max_id
-                                 WHERE
-                                 $query
-                                 $group_order_by
+      $records = DB::select("SELECT vs.balance AS balance, vs.vs_id,vs.product_id,vs.ttl_avg_cost,vs.ttl_cost,purchase_price,
+                                 IFNULL(
+                                    (SELECT company_name FROM companies WHERE id = vs.company_id),'') AS company_name,
+                                 IFNULL(
+                                    (SELECT product_name FROM products WHERE id = vs.product_id),'') AS product_name,
+                                 IFNULL(
+                                    (SELECT sale_price FROM products WHERE id = vs.product_id),'') AS sale_price
+                              FROM
+                              vendor_stock_managment vs
+                              WHERE
+                              $query
                               ");
+
+      // $records             =  DB::select("
+      //                            SELECT
+      //                               vs.balance AS balance,
+      //                               vs.id AS vs_id,
+      //                               IFNULL(
+      //                                  (SELECT company_name FROM companies WHERE id = vs.company_id),
+      //                                  ''
+      //                               ) as company_name,
+      //                               IFNULL(
+      //                                  (SELECT product_name FROM products WHERE id = vs.product_id),
+      //                                  ''
+      //                               ) AS product_name,
+      //                               product_unit_price AS p_price,
+      //                               (SELECT invoice_no FROM purchase_invoices where purchase_invoices.id =  vs.purchase_invoice_id) AS purchase_invoice_id,
+      //                               vs.qty AS qty,
+      //                               vs.transaction_type,
+      //                               vs.status,
+      //                               vs.product_id,
+      //                               (SELECT invoice_no FROM sale_invoices where sale_invoices.id =  vs.sale_invoice_id) AS sale_invoice_id,
+      //                               (SELECT customer_name FROM customers WHERE id = vs.vendor_id) AS vendor_name,
+      //                               IFNULL((SELECT customer_name FROM customers WHERE id = (SELECT customer_id FROM sale_invoices WHERE sale_invoices.id=vs.sale_invoice_id)),'') AS customer_name,
+      //                               $select_query
+      //                            FROM
+      //                            vendor_stocks vs
+      //                            JOIN (
+      //                               SELECT product_id, MAX(id) AS max_id
+      //                               FROM `vendor_stocks` as vs
+      //                               WHERE $inner_join_where
+      //                               GROUP BY product_id
+      //                           ) AS max_ids
+      //                           ON vs.product_id = max_ids.product_id
+      //                           AND vs.id = max_ids.max_id
+      //                            WHERE
+      //                            $query
+      //                            $group_order_by
+      //                         ");
+    
       return response()->json([
          'msg'     =>   'Stock reports list fetched',
          'status'  =>   'success',

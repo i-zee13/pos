@@ -3530,15 +3530,15 @@
             <form id="search-form">
                 <div class="row">
                     <div class="col-auto">
-                        <div class="CL-Product inputmonth" style="width:210px;margin-left:11px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
+                        <div class="CL-Product inputmonth" style="width:180px;margin-left:11px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
                             <input type="date" autocomplete="off" class="form-control " placeholder="Start Date" name="start_date" value="{{date('Y-m-d')}}">
                         </div>
-                        <div class="CL-Product inputmonth" style="width:210px;margin-left: 0px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
+                        <div class="CL-Product inputmonth" style="width:180px;margin-left: 0px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
                             <input type="date" autocomplete="off" class="form-control" placeholder="End Date" name="end_date" value="{{date('Y-m-d')}}">
                         </div>
                     </div>
-                    <div class="col pr-0">
-                        <div class="_cust_filter col-md-3" style="width: 210px!important">
+                    <div class="col p-0">
+                        <div class="_cust_filter col-md-3" style="width: 180px!important">
                             <div class="form-s2">
                                 <select class="form-control formselect company_id" name="company_id">
                                     <option value="">Select Company</option>
@@ -3558,29 +3558,20 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter col-md-3" style="width: 210px!important">
-                            <input type="radio" value="1" name="filter_by_value"> AVG Value
-                            <input type="radio" value="2" name="filter_by_value"> Last Value
+                        <div class="_cust_filter col-md-3" style="width: 170px!important">
+                            <div class="form-s2">
+                                <select class="form-control formselect product_id" name="filter_by_value">
+                                    <option value="">Select Value</option>
+                                    <option value="1">By Avrage</option>
+                                    <option value="2">By Last Price</option>
+                                </select>
+                            </div>
                         </div>
                         <style>
                             .CL-Product input {
                                 height: 31px !important;
                             }
-                        </style>
-                    </div>
-                </div>
-                <div class="row" style="margin-bottom: 10px;margin-left:0px">
-                    {{-- <div class="col-auto" style="padding: 0px">
-                        <div class="CL-Product inputmonth" style="width:250px;margin-left:11px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
-                            <input type="date" autocomplete="off" class="form-control " placeholder="Start Date" name="start_date">
-                        </div>
-                        <div class="CL-Product inputmonth" style="width:250px;margin-left: 0px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
-                            <input type="date" autocomplete="off" class="form-control" placeholder="End Date" name="end_date">
-                        </div>
-                    </div> --}}
-
-                    <div class="col-auto p-0">
-                        <style>
+                      
                             .reset-btn {
                                 box-shadow: none;
                             }
@@ -3589,12 +3580,14 @@
                                 color: white !important;
                             }
                         </style>
+                        <div style="float: right;">
+                        <button type="button" class="btn btn-primary m-0 search-btn" style=" margin-right:10px !important"> Search</button>
                         <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#152e4d !important"> Reset</button>
-                    </div>
-                    <div class="col-auto pl-0">
-                        <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
+
+                        </div>
                     </div>
                 </div>
+                
             </form>
             <div class="clearfix"></div>
         </div>

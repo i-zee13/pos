@@ -307,20 +307,36 @@ function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type,
     $v->save();
     return $v;
 }
-function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stock_qty, $In_out_status, $transaction_type, $balance_in_hand = null)
+function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stock_qty, $In_out_status, $transaction_type, $existing_inv_id =  null)
 {
+
     $query = BatchStockMgt::where('product_id', $purchase->product_id);
-
-    if ($transaction_type == 1 || $transaction_type == 4 || $transaction_type == 3) {
+    if ($existing_inv_id) {
+        $query->where('invoice_id', $existing_inv_id)->orderBy('id', 'ASC');
+    } else if ($transaction_type == 1 || $transaction_type == 4 || $transaction_type == 3) {
         $query->whereDate('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC');
-    } else if ($transaction_type == 2 ) {
+    } else if ($transaction_type == 2) {
         $query->where('batch_wise_balance', '>', 0)->orderBy('id', 'ASC');
-    } 
+    }
     $s = $query->first();
-
     if (!$s) {
-        $s = new BatchStockMgt();
-        $s->expiry_date         =   $purchase->expiry_date;
+        $s = new BatchStockMgt(); 
+    }
+    $previous_qty       =  0;
+    if ($existing_inv_id) {
+        $previous_qty = $s->qty ?? 0;
+    }
+    if ($transaction_type != 2) {
+       
+        $s->expiry_date         =   $purchase->expiry_date ?? null;
+    }
+    if ($In_out_status == 1) {
+        $new_cost_price = 0;
+        if($s->unit_cost_price !=   $purchase->purchase_price) {
+            $new_cost_price     =   $purchase->purchase_price * $stock_qty;
+        } 
+        $s->unit_cost_price     =   $purchase->purchase_price;
+        $s->ttl_cost_price      =   $s->ttl_cost_price + $new_cost_price;
     }
     $s->company_id              =   $purchase->company_id;
     $s->product_id              =   $purchase->product_id;
@@ -328,26 +344,42 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     $s->invoice_product_id      =   $purchase->id;
     $s->actual_qty              =   $purchase->qty;
     $s->actual_status           =   $In_out_status;
-    $s->unit_cost_price         =   $purchase->purchase_price;
     $s->qty                     =   $stock_qty;
-    $s->ttl_cost_price          =   $purchase->purchase_price * $stock_qty;
-    $balance                    =   $In_out_status == 2 ? $s->batch_wise_balance - $stock_qty : $s->batch_wise_balance + $stock_qty;
+    $balance                    =   $In_out_status == 2
+                                        ? ($s->batch_wise_balance - $previous_qty - $stock_qty)
+                                        : ($s->batch_wise_balance - $previous_qty + $stock_qty);
+
     if (($transaction_type == 2 || $transaction_type == 3) && $balance < 0) {
-        $balance                =    $balance < 0 ? -$balance : $balance;
+        $balance                =   abs($balance);
         $s->qty                 =   $s->batch_wise_balance;
-        $s->ttl_cost_price      =   $purchase->purchase_price * $s->batch_wise_balance;
+        $s->ttl_cost_price      =   ($s->unit_cost_price * $s->batch_wise_balance) ;
         $remaining_qty          =   abs($balance);
         $s->batch_wise_balance  =   0;
         $s->save();
-        return BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $remaining_qty, $In_out_status, $transaction_type, $balance_in_hand);
+        return BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $remaining_qty, $In_out_status, $transaction_type, $existing_inv_id);
     } else {
-
         $s->batch_wise_balance  = $balance;
-    }
-    $s->total_balance   = $balance_in_hand;
-    $s->vs_id           = $vendor_stock_id;
-    $s->trx_type        = $transaction_type;
-    $s->save();
+    }  
+    // $s->ttl_cost_price          = ($s->unit_cost_price * ($s->batch_wise_balance ??  $stock_qty)) ;
+    $s->total_balance           = NULL;
+    $s->vs_id                   = $vendor_stock_id;
+    $s->trx_type                = $transaction_type;
+    $s->avg_cost_price_per_unit = $s->ttl_cost_price / $s->batch_wise_balance;  
+    $s->save(); 
+    //Make avrage cost total
+    $prod   = DB::select("SELECT 
+                            IFNULL(SUM(batch_wise_balance), 0) AS ttl_balance,
+                            IFNULL(SUM(ttl_cost_price), 0) AS ttl_cost
+                        FROM stock_batches_items 
+                        WHERE product_id = $purchase->product_id")[0];   
+    $stock = StockManagment::where('product_id', $purchase->product_id)
+                            ->where('company_id', $purchase->company_id)
+                            ->orderBy('id', 'DESC')->first();
+    $stock->ttl_avg_cost    = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
+    $stock->ttl_cost        = $prod->ttl_cost > 0 ? $prod->ttl_cost  : 0;
+    $stock->purchase_price  = $purchase->purchase_price;
+    $stock->sale_price      = $purchase->sale_price;
+    $stock->save(); 
 }
 
 
@@ -386,18 +418,26 @@ function deleteProductFields($v, $sale, $type, $prod_type = null)
 }
 function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
 {
+ 
+    // $prod   = DB::select("SELECT 
+    //                         IFNULL(SUM(batch_wise_balance), 0) AS ttl_balance,
+    //                         IFNULL(SUM(ttl_cost_price), 0) AS ttl_cost
+    //                     FROM stock_batches_items 
+    //                     WHERE product_id = $purchase->product_id")[0];   
     $stock = StockManagment::where('product_id', $purchase->product_id)
         ->where('company_id', $purchase->company_id)
         ->orderBy('id', 'DESC')->first();
     if (!$stock) {
         $stock = new StockManagment();
     }
-    $stock->company_id  = $purchase->company_id;
-    $stock->product_id  = $purchase->product_id;
-    $balance            = $In_out_status == 2 ? $stock->balance - $stock_qty : $stock->balance +  $stock_qty;
-    $stock->balance     = $balance;
-    $stock->vs_id       = $vendor_stock_id;
-    $stock->save();
+    $stock->company_id      = $purchase->company_id;
+    $stock->product_id      = $purchase->product_id;
+    $stock->purchase_price  = $purchase->purchase_price;
+    $balance                = $In_out_status == 2 ? $stock->balance - $stock_qty : $stock->balance +  $stock_qty;
+    $stock->balance         = $balance;
+    $stock->vs_id           = $vendor_stock_id;
+    // $stock->ttl_avg_cost = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
+    $stock->save(); 
 }
 function BatchWiseDeleteProduct($invoice_id, $prod_invoice_id, $qty, $in_out, $type)
 {
@@ -406,11 +446,11 @@ function BatchWiseDeleteProduct($invoice_id, $prod_invoice_id, $qty, $in_out, $t
     if ($in_out == 1) {
         $balance =  $batch->batch_wise_balance + $qty;
     } else if ($in_out == 2) {
-        $balance =  $batch->batch_wise_balance + $qty;
+        $balance =  $batch->batch_wise_balance - $qty;
     }
-    $batch->batch_wise_balance =  $balance;
-    $batch->qty  =  $qty;
-    $batch->actual_status  = $in_out;
-    $batch->trx_type =  $type;
+    $batch->batch_wise_balance  =  $balance;
+    $batch->qty                 =  $qty;
+    $batch->actual_status       = $in_out;
+    $batch->trx_type            =  $type;
     $batch->save();
 }

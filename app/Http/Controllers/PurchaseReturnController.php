@@ -95,8 +95,8 @@ class PurchaseReturnController extends Controller
             if (count($request->returns_product_array) > 0) {
                 foreach ($request->returns_product_array as $purchase_product) {
                     $flag = true;
-                    if ($purchase_product['return_invoice_id'] > 0 && $purchase_product['return_invoice_id'] !=  "undefined") {
-                        $purchased          =  ProductReturns::where('id', $purchase_product['return_invoice_id'])->first();
+                    if ($purchase_product['return_invoice_prod_id']  && $purchase_product['return_invoice_prod_id'] > 0 && $purchase_product['return_invoice_prod_id'] !=  "undefined") {
+                        $purchased          =  ProductReturns::where('id', $purchase_product['return_invoice_prod_id'])->first();
                         if ($purchased->qty == $purchase_product['qty']) {
                             $flag = false;
                         }
@@ -129,9 +129,10 @@ class PurchaseReturnController extends Controller
                             $vendor_id         =  $check_stock->vendor_id;
                             $balance           =  $check_stock->balance;
                         }
+                        $change_qty_value   =   $purchased->qty;
+                        $In_out_status      =   2;
+                        $vs_id = 0;
                         if ($flag) {
-                            $change_qty_value   =   $purchased->qty;
-                            $In_out_status      =   2;
                             if ($request->hidden_invoice_id) {
                                 if ($previous_qty != 0) {
                                     if ($purchased->qty >=  $previous_qty) {
@@ -148,8 +149,8 @@ class PurchaseReturnController extends Controller
                                 'actual_status' => 0
                             ]);
                             $purchased->vendor_id  =  $invoice->customer_id;
-                            $v_stock = updateStock($purchased, $balance, $change_qty_value, $In_out_status, 'purchase_return', 3);
-                            BatchWiseStockManagment($v_stock->id,  $invoice->id, $purchased, $change_qty_value, $In_out_status, 3, $v_stock->balance); 
+                            $v_stock    = updateStock($purchased, $balance, $change_qty_value, $In_out_status, 'purchase_return', 3);
+                            $vs_id      = $v_stock->id;
                             StockManagment($v_stock->id, $purchased, $change_qty_value, $In_out_status, 'purchase_return');
                             if ($v_stock->save()) {
                                 $purchased->vendor_stock_id = $v_stock->id;
@@ -158,6 +159,7 @@ class PurchaseReturnController extends Controller
                                 ]);
                             }
                         }
+                        BatchWiseStockManagment($vs_id,  $invoice->id, $purchased, $purchased->qty, $In_out_status, 3, $request->hidden_invoice_id);
                         $check_stock    = VendorStock::where('product_id', $purchased->product_id)->orderBy('id', 'DESC')->first();
                         if ($check_stock) {
                             $balance    =   $check_stock->balance;

@@ -165,9 +165,10 @@ class StockController extends Controller
                             $balance           =  $check_stock->balance; //10
                         }
                         $status = 0;
+                        $vs_id = 0;
+                        $change_qty_value   =   $purchased->qty;
+                        $In_out_status      =   1;
                         if ($flag) {
-                            $change_qty_value   =   $purchased->qty;
-                            $In_out_status      =   1;
                             if ($request->hidden_invoice_id) {
                                 if ($previous_qty != 0) {
                                     if ($purchased->qty >=  $previous_qty) {
@@ -177,8 +178,6 @@ class StockController extends Controller
                                         $change_qty_value = $previous_qty - $purchased->qty; // 10 -8 = 2 if >0  OUT : IN 
                                         $In_out_status = 2; // OUT
                                     }
-                                    // $v          = $this->updateStock($previous_qty, $purchased, $balance, $vendor_id, 'vendor');
-                                    // $balance    =  $v->balance;
                                 }
                             }
                             VendorStock::where('purchase_invoice_id',  $purchased->purchase_invoice_id)->where('product_id', $purchased->product_id)->update([
@@ -187,9 +186,8 @@ class StockController extends Controller
                             ]);
                             $purchased->vendor_id  =  $invoice->customer_id;
                             $v_stock = updateStock($purchased, $balance, $change_qty_value, $In_out_status, 'purchase', 1);
-                            BatchWiseStockManagment($v_stock->id,  $invoice->id, $purchased, $change_qty_value, $In_out_status, 1, $v_stock->balance);
+                            $vs_id   = $v_stock->id;
                             StockManagment($v_stock->id, $purchased, $change_qty_value, $In_out_status, 'purchase');
-
                             if ($v_stock->save()) {
                                 $purchased->vendor_stock_id = $v_stock->id;
                                 Product::where('id', $v_stock->product_id)->update([
@@ -197,6 +195,7 @@ class StockController extends Controller
                                 ]);
                             }
                         }
+                        BatchWiseStockManagment($vs_id,  $invoice->id, $purchased, $purchased->qty, $In_out_status, 1, $request->hidden_invoice_id);
                         //Update Product Price
                         $product              = Product::where('id', $purchased->product_id)->first();
                         $company_id           = $product->company_id;

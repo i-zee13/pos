@@ -117,9 +117,10 @@ class SalesReturnController extends Controller
                             $balance           =  $check_stock->balance;
                         }
                         $sale->purchased_price = $sale_product['purchased_price'];
+                        $change_qty_value   =   $sale->qty;
+                        $In_out_status      =   1;
+                        $vs_id = 0;
                         if ($flag) {
-                            $change_qty_value   =   $sale->qty;
-                            $In_out_status      =   1;
                             if ($request->hidden_invoice_id) {
                                 if ($previous_qty != 0) {
                                     if ($sale->qty >=  $previous_qty) {
@@ -137,7 +138,8 @@ class SalesReturnController extends Controller
                             ]);
                             $sale->customer_id  =  $invoice->customer_id;
                             $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'sale_return', 4);
-                            BatchWiseStockManagment($v_stock->id,  $invoice->id, $sale, $change_qty_value, $In_out_status, 4, $v_stock->balance);
+                            $vs_id  = $v_stock->id;
+
                             StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status, 'sale_return');
 
 
@@ -147,6 +149,7 @@ class SalesReturnController extends Controller
                                 ]);
                             }
                         }
+                        BatchWiseStockManagment($vs_id,  $invoice->id, $sale, $sale->qty, 1, 4, $request->hidden_invoice_id);
                     }
                 }
                 if ($request->hidden_invoice_id) {

@@ -34,3 +34,9 @@ TRUNCATE vendor_ledger;
 UPDATE `customers` SET `balance` = '0';
 UPDATE `customers` SET `balance` = '0' where customer_type = 2; 
 UPDATE `products` SET `stock_balance` = '0';  
+
+
+ALTER TABLE `stock_batches_items` CHANGE `avg_cost_price` `avg_cost_price_per_unit` DOUBLE NULL DEFAULT NULL;
+ALTER TABLE `stock_batches_items` CHANGE `total_balance` `total_balance` DOUBLE NULL;
+ALTER TABLE `vendor_stock_managment` ADD `ttl_avg_cost` DOUBLE NOT NULL DEFAULT '0' AFTER `product_id`;
+ALTER TABLE `vendor_stock_managment` ADD `ttl_cost` DOUBLE NOT NULL DEFAULT '0' AFTER `ttl_avg_cost`;

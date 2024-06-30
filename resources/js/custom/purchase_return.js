@@ -121,6 +121,7 @@ $('#add-product').on('click', function () {
         expiry_date = $('#expiry_date').val();
         returns_product_array.push({
             'return_invoice_id': '',
+            'return_invoice_prod_id': '',
             'prod_discount': prod_discount ? prod_discount : 0,
             'product_id': `${product_id}`,
             'expiry_date': `${expiry_date}`,

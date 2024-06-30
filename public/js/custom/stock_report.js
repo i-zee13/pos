@@ -135,5 +135,8 @@ $('.reset-btn').on('click', function () {
   $('.teacher_attendance_list').append("\n            <div class=\"col-12 pb-10\">\n            <div class=\"no-info\">\n                <div class=\"m-auto\"><strong>Please Filter Your Stock Record !</strong></div>\n            </div>\n        </div>\n        ");
   $('.ttl_stock_in_hand').html(0);
 });
+$('.expiry-select').on('change', function () {
+  $(this).val() == 3 ? $('.inputmonth').show() : $('.inputmonth').hide();
+});
 /******/ })()
 ;

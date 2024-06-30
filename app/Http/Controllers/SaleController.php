@@ -138,12 +138,13 @@ class SaleController extends Controller
                         $balance = 0;
                         $check_stock           =  VendorStock::where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
                         if ($check_stock) {
-                            $vendor_id             =  $check_stock->vendor_id;
+                            $vendor_id         =  $check_stock->vendor_id;
                             $balance           =  $check_stock->balance;
                         }
+                        $change_qty_value   =   $sale->qty;
+                        $In_out_status      =   2;
+                        $vs_id              =   0;
                         if ($flag) {
-                            $change_qty_value   =   $sale->qty;
-                            $In_out_status      =   2;
                             if ($request->hidden_invoice_id) {
                                 if ($previous_qty != 0) {
                                     if ($sale->qty >=  $previous_qty) {
@@ -161,8 +162,7 @@ class SaleController extends Controller
                             ]);
                             $sale->customer_id  =  $invoice->customer_id;
                             $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'sale', 2);
-                            BatchWiseStockManagment($v_stock->id,  $invoice->id, $sale, $change_qty_value, $In_out_status, 2, $v_stock->balance);
-
+                            $vs_id = $v_stock->id;
                             StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status, 'sale');
 
                             if ($v_stock->save()) {
@@ -172,6 +172,7 @@ class SaleController extends Controller
                                 ]);
                             }
                         }
+                        BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, 2, $request->hidden_invoice_id);
                     }
                 }
                 if ($request->hidden_invoice_id) {

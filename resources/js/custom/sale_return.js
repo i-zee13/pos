@@ -91,11 +91,12 @@ $(document).ready(function () {
                         <tr id='tr-${product.product_id}'>
                             <td>${product.product_id}</td>
                             <td>${product.p_name}</td>
+                            <td><input type="date" value="${product.expiry_date}" class="inputSale   expiry_input"  data-id="${product.product_id}" style="font-size: 13px;width:110;" min="0" ></td>
                             <td><input type="number" value="${product.qty}"  data-retail="${product.retail_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product.product_id}" data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
                             <td><input type="number" value="${product.retail_price}"  data-retail="${product.retail_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
                             <td><input type="number" value="${product.prod_discount}"  class="inputSale discount-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  style="font-size: 13px" min="0"></td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount}</td>
-                            <td><a type="button" id="${product.product_id}" data-id="${product.sale_return_invoice_id}" data-product-invoice="${product.id}" class="btn smBTN red-bg remove_btn" data-index="" data-quantity="${product.qty}">Remove</a></td>
+                            <td style="width: 10%;"><a type="button" id="${product.product_id}" data-id="${product.sale_return_invoice_id}" data-product-invoice="${product.id}" class="btn smBTN red-bg remove_btn" data-index="" data-quantity="${product.qty}"  style="width: 100%;">Remove</a></td>
                         `);
                 })
             }

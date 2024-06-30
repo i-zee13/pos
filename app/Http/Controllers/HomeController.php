@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PurchaseInvoice;
+use App\Models\Sale;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -34,7 +36,11 @@ class HomeController extends Controller
         } else {
             $message = 'Good Evening';
         }
-        return view('home', compact('message'));
+        //get total sale from sale_invoice table 
+        $total_sale     = Sale::sum('total_invoice_amount');
+        $total_purchase = PurchaseInvoice::sum('paid_amount');
+
+        return view('home', compact('message', 'total_sale', 'total_purchase'));
     }
     public function deleteInvoice(Request $request)
     {

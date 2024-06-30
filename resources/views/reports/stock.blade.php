@@ -3560,11 +3560,9 @@
                         </div>
                         <div class="_cust_filter col-md-3" style="width: 210px!important">
                             <div class="form-s2">
-                                <select class="form-control formselect expiry-select" name="expiry">
-                                    <option value="">Select Expiry</option>
-                                    <option value="1">With In One Month</option>
-                                    <option value="2">With In Two Month</option>
-                                </select>
+                            <div class="CL-Product inputmonth" style="width:210px;margin-left: 0px;padding-top:0px">
+                            <input type="number" autocomplete="off" class="form-control" placeholder="Expiry In Month" name="expiry" value="" >
+                        </div>
                             </div>
                         </div>
                         <style>
