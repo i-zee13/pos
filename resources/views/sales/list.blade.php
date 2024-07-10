@@ -36,15 +36,18 @@
               <a href="{{route('sale-add')}}" type="submit" class="btn btn-primary mr-2 add-new-sale" style="font-size: 13px;padding: 6px 11px 4px 9px;margin-top: -10px; float: right;">Add New</a>
 
             </div>
-            <!--<div class="loader-div" id="tblLoader">
-                            <div class="lds-ring" aria-role="none">
-                              <div></div>
-                              <div></div>
-                              <div></div>
-                              <div></div>
-                              <div></div>
-                            </div>
-                          </div> -->
+            <!--<div class="preloader"  id="tblLoader">
+    <div class="loading">
+      <div class="bar bar1"></div>
+      <div class="bar bar2"></div>
+      <div class="bar bar3"></div>
+      <div class="bar bar4"></div>
+      <div class="bar bar5"></div>
+      <div class="bar bar6"></div>
+      <div class="bar bar7"></div>
+      <div class="bar bar8"></div>
+    </div>
+  </div> -->
             <div class="body" >
             <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;" id="example">
                 <thead>
@@ -74,7 +77,9 @@
                         <!-- <a id="{{$sale->id}}" class="btn btn-default " href="{{route('sale-detail' ,['id'=>$sale->id])}}">Detail</a> -->
                         <button id="{{$sale->id}}" data-invoice="{{$sale->id}}" data-customer-id="{{$sale->customer_id}}"
                          paid-amount="{{$sale->paid_amount}}" class="btn btn-default print-invoice">Print</button>
-                        <!-- <button type="button" id="{{$sale->id}}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button> -->
+                        @if($sale->is_editable== 1)
+                            <button type="button" id="{{$sale->id}}" route="/delete-sale-invoice" invoice-for="sale" class="btn btn-default red-bg  btn-invoice-delete" name="Sub_cat" title="Delete">Delete</button>
+                        @endif
                     </td>
                 </tr>
                 @endforeach
@@ -86,6 +91,8 @@
 </div>
 @endsection
 @push('js')
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
     <script>
         $('.print-invoice').on('click', function() {
             var invoice_id = $(this).attr('data-invoice');

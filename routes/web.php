@@ -90,6 +90,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/purchase-edit/{id}', [App\Http\Controllers\StockController::class, 'editPurchase'])->name('purchase-edit');
     Route::get('/get-purchase-products/{id}', [App\Http\Controllers\StockController::class, 'getPurchaseProduct'])->name('get-purchase-products');
     Route::delete('/delete-product-from-invoice', [App\Http\Controllers\StockController::class, 'deleteProduct'])->name('delete-product');
+    Route::delete('/delete-purchase-invoice', [App\Http\Controllers\StockController::class, 'deleteInvoice'])->name('delete-purchase-invoice');
     Route::get('/print-purchase-invoice/{invoice_id}/{customer_id}/{received_amount}', [App\Http\Controllers\StockController::class, 'printInvoice'])->name('print-purchase-invoice');
 
     // Purchase Returns /
@@ -113,6 +114,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/get-sale-products/{id}', [App\Http\Controllers\SaleController::class, 'getSaleProduct'])->name('get-sale-products');
     Route::get('/get-customer-balance/{id}', [App\Http\Controllers\SaleController::class, 'getCustomerBalance'])->name('get-customer-balance');
     Route::delete('/delete-product-from-sale', [App\Http\Controllers\SaleController::class, 'deleteProduct'])->name('delete-product');
+    Route::delete('/delete-sale-invoice', [App\Http\Controllers\SaleController::class, 'deleteInvoice'])->name('delete-sale-invoice');
+
 
     // Sales Returns /
     // Route::get('/get-customer-balance-products/{id}'  ,[App\Http\Controllers\PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');

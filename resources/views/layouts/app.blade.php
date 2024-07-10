@@ -229,12 +229,12 @@
 }
 
 .loading .bar {
-    width: 6px;
+    width: 3px;
     height: 60px;
-    background: var(--white);
+    /* background: var(--white); */
     display: inline-block;
-    -webkit-transform-origin: bottom center;
-    transform-origin: bottom center;
+    /* -webkit-transform-origin: bottom center; */
+    /* transform-origin: bottom center; */
     -webkit-animation: wcLoading 1.5s ease-in-out infinite;
     animation:wcLoading 1.5s ease-in-out infinite;
 }
@@ -309,18 +309,7 @@
     @include('layouts.sidebar-menu')
     @endif
 
-    <!-- <div class="preloader">
-    <div class="loading">
-      <div class="bar bar1"></div>
-      <div class="bar bar2"></div>
-      <div class="bar bar3"></div>
-      <div class="bar bar4"></div>
-      <div class="bar bar5"></div>
-      <div class="bar bar6"></div>
-      <div class="bar bar7"></div>
-      <div class="bar bar8"></div>
-    </div>
-  </div> -->
+
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
@@ -371,7 +360,10 @@
         var segments = location.href.split('/');
         var action = segments[3];
         $(document).ready(function() {
-
+            setTimeout(() => { 
+                $('#tblLoader').hide();
+                $('.parent-div').show();
+            }, 1500);
             function addCommas(nStr) {
                 nStr += "";
                 x = nStr.split(".");

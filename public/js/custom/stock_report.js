@@ -8,6 +8,9 @@ var batches = [];
 var sessions = [];
 var CurrentRef = '';
 var segments = location.href.split('/');
+$(document).ready(function () {
+  getStock();
+});
 $('.search-btn').on('click', function () {
   var start_date = $('.start_date').val();
   var end_date = $('.end_date').val();
@@ -35,17 +38,50 @@ $('.search-btn').on('click', function () {
     return;
   }
   CurrentRef = $(this);
+  getStock(CurrentRef, 1);
   // CurrentRef.attr('disabled', 'disabled');
+});
+
+$('.company_id').on('change', function () {
+  var company_id = $(this).val();
+  var batch = batches.filter(function (x) {
+    return x.company_id == company_id;
+  });
+  if (batch) {
+    $('.batch_id').empty();
+    $('.batch_id').append("<option value=\"\">Select Batch Code</option>");
+    $('.session_id').empty();
+    $('.session_id').append("<option value=\"\">Select Session Code</option>");
+    batch.forEach(function (data) {
+      $('.batch_id').append("<option value=\"".concat(data.id, "\" >").concat(data.batch_code, "</option>"));
+    });
+  }
+});
+$('.reset-btn').on('click', function () {
+  $('.company_id').val('').trigger('change');
+  $('.product_id').val('').trigger('change');
+  $('#search-form')[0].reset();
+  $('.teacher_attendance_list').empty();
+  $('.teacher_attendance_list').append("\n            <div class=\"col-12 pb-10\">\n            <div class=\"no-info\">\n                <div class=\"m-auto\"><strong>Please Filter Your Stock Record !</strong></div>\n            </div>\n        </div>\n        ");
+  $('.ttl_stock_in_hand').html(0);
+});
+$('.expiry-select').on('change', function () {
+  $(this).val() == 3 ? $('.inputmonth').show() : $('.inputmonth').hide();
+});
+function getStock() {
+  var CurrentRef = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var is_click = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   url = '/stocks';
   $("#search-form").ajaxSubmit({
     type: 'POST',
     url: url,
     data: {
       _token: $('meta[name="csrf_token"]').attr('content'),
-      current_url: segments[3]
+      current_url: segments[3],
+      is_click: is_click
     },
     success: function success(response) {
-      CurrentRef.attr('disabled', false);
+      CurrentRef ? CurrentRef.attr('disabled', false) : null;
       $('.loader').show();
       $('.teacher_attendance_list').empty();
       $('.teacher_attendance_list').append("\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th hidden>id</th>\n                            <th>#</th>\n                            <th>Company Name</th>\n                            <th>Product Name</th> \n                            <th>Expiry</th>\n                            <th>Balance</th> \n                        </tr>\n                    </thead><tbody>\n                </tbody>\n                </table>");
@@ -111,32 +147,6 @@ $('.search-btn').on('click', function () {
       });
     }
   });
-});
-$('.company_id').on('change', function () {
-  var company_id = $(this).val();
-  var batch = batches.filter(function (x) {
-    return x.company_id == company_id;
-  });
-  if (batch) {
-    $('.batch_id').empty();
-    $('.batch_id').append("<option value=\"\">Select Batch Code</option>");
-    $('.session_id').empty();
-    $('.session_id').append("<option value=\"\">Select Session Code</option>");
-    batch.forEach(function (data) {
-      $('.batch_id').append("<option value=\"".concat(data.id, "\" >").concat(data.batch_code, "</option>"));
-    });
-  }
-});
-$('.reset-btn').on('click', function () {
-  $('.company_id').val('').trigger('change');
-  $('.product_id').val('').trigger('change');
-  $('#search-form')[0].reset();
-  $('.teacher_attendance_list').empty();
-  $('.teacher_attendance_list').append("\n            <div class=\"col-12 pb-10\">\n            <div class=\"no-info\">\n                <div class=\"m-auto\"><strong>Please Filter Your Stock Record !</strong></div>\n            </div>\n        </div>\n        ");
-  $('.ttl_stock_in_hand').html(0);
-});
-$('.expiry-select').on('change', function () {
-  $(this).val() == 3 ? $('.inputmonth').show() : $('.inputmonth').hide();
-});
+}
 /******/ })()
 ;

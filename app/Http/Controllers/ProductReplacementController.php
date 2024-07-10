@@ -140,6 +140,8 @@ class ProductReplacementController extends Controller
                                 ]);
                             $sale->vendor_id  =  $invoice->customer_id;
                             $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'replacement', 6, $sale_product['prod_type']);
+                             BatchWiseDeleteProduct($request->sale_invoice_id, $request->product_invoice_id, $request->qty, $In_out_status, 6);
+
                             StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status);
                             if ($v_stock->save()) {
                                 $sale->vendor_stock_id = $v_stock->id;
@@ -152,8 +154,7 @@ class ProductReplacementController extends Controller
                     }
                 }
 
-                if ($request->hidden_invoice_id) {
-                    dump($sale_products_array);
+                if ($request->hidden_invoice_id) {  
                     ProductReplacement::where('product_replacement_invoice_id', $request->hidden_invoice_id)
                         ->whereNotIn('id', $sale_products_array)
                         ->delete();

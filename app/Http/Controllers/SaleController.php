@@ -383,4 +383,42 @@ class SaleController extends Controller
             }
         }
     }
+    public function deleteInvoice(Request $request)
+    {
+        $invoice_products   =  ProductSale::where('sale_invoice_id', $request->id)->get();
+        if($invoice_products){
+            foreach($invoice_products as $product){ 
+                $vs     = VendorStock::where('sale_invoice_id', $product->sale_invoice_id)
+                                        ->where('product_id', $product->product_id)
+                                        ->where('transaction_type', 2)->orderBy('id', 'DESC')
+                                        ->first();
+                if ($vs) {
+                    $v_stock = updateStock($vs, $vs->balance, $product->qty, 1, 'sale', 5);
+                    BatchWiseDeleteProduct($product->sale_invoice_id, $product->id, $product->qty, 1, 5);
+                    StockManagment($v_stock->id, $vs, $product->qty, 1, 'sale');
+                    if ($v_stock) {
+                        Product::where('id', $v_stock->product_id)->update([
+                            'stock_balance' =>  $v_stock->balance,
+                        ]); 
+                        return response()->json([
+                            'msg'       => 'product removed',
+                            'status'    => 'success',
+                            'updated_stock' => $v_stock->balance
+                        ]);
+                    } else {
+                        return response()->json([
+                            'msg'       => 'Not Updated at this moment',
+                            'status'    => 'failed',
+                        ]);
+                    }
+                }
+             }
+            ProductSale::where('sale_invoice_id', $product->sale_invoice_id)
+                                    ->where('product_id', $product->product_id)->where('qty', $product->qty)
+                                    ->delete();
+            saleInvoice::where('id',$request->id)->delete(); 
+        }
+    }
+
+
 }

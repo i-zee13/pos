@@ -82,3 +82,49 @@ function addCommas(nStr) {
     }
     return x1 + x2;
 }
+$(document).on('click', '.btn-invoice-delete', function() {
+    var id          = $(this).attr('id');
+    var route       = $(this).attr('route');
+    var invoice_for = $(this).attr('invoice-for');
+    var id          = $(this).attr('id');
+    deleteRef       = $(this);
+    swal({
+            title: "Are you sure?",
+            // text    : "",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            var thisRef = $(this);
+            deleteRef.attr('disabled', 'disabled');
+            deleteRef.text('Processing...');
+            if (willDelete) {
+                $.ajax({
+                    type: 'delete',
+                    url: route,
+                    data: {
+                        _token: $('meta[name="csrf_token"]').attr('content'),
+                        id: id,
+                        route: route,
+                        invoice_for: invoice_for,
+                    },
+                    success: function(r) {
+                        if (r.status == 'success') {
+                            deleteRef.closest('tr').remove();
+                            $('#notifDiv').fadeIn().css('background', 'green').text('Invoice deleted Successfully !');
+                            setTimeout(() => {
+                                $('#notifDiv').fadeOut();
+                            }, 3000);
+                        } else {
+                            $('#notifDiv').fadeIn().css('background', 'red').text('Not deleted at this moment !');
+                            setTimeout(() => {
+                                $('#notifDiv').fadeOut();
+                            }, 3000);
+                        }
+                    }
+                })
+            }
+        });
+
+})

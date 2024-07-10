@@ -1,13 +1,16 @@
 @extends('layouts.app')
-<div class="loader-div" id="tblLoader">
-    <div class="lds-ring" aria-role="none">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+<div class="preloader"  id="tblLoader">
+    <div class="loading">
+      <div class="bar bar1"></div>
+      <div class="bar bar2"></div>
+      <div class="bar bar3"></div>
+      <div class="bar bar4"></div>
+      <div class="bar bar5"></div>
+      <div class="bar bar6"></div>
+      <div class="bar bar7"></div>
+      <div class="bar bar8"></div>
     </div>
-</div>
+  </div>
 <!-- <div style="min-height: 400px" id="tblLoader">
     <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
 </div> -->

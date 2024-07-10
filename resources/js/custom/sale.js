@@ -351,7 +351,7 @@
 
 
      clearTimeout(debounceTimer);
-     debounceTimer = setTimeout(function () {
+    //  debounceTimer = setTimeout(function () {
          if (data_variable != '') {
              var filter_product = product_list.filter(x => {
                  const barcodeArray = x.barcode.split(',');
@@ -391,7 +391,7 @@
 
              }
          }
-     }, 1500);
+    //  }, 500);
 
 
 

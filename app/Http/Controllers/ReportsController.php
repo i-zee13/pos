@@ -37,6 +37,7 @@ class ReportsController extends Controller
    }
    public function stockReportList(Request $request)
    {
+      
       $query               =  " 1=1";
       $current_date        =   date('Y-m-d');
       if (isset($request->company_id)) {
@@ -45,11 +46,13 @@ class ReportsController extends Controller
       if (isset($request->product_id)) {
          $query      .= " AND vs.product_id = $request->product_id";
       }
-      if (isset($request->expiry) && $request->expiry > 0 ) {
+      if (isset($request->expiry) && $request->expiry > 0  || $request->is_click == 0) { //is_click = 0 mean on page load get 3 months expires
+         $expiry_month         =   $request->is_click == 0 ? 3 :  $request->expiry;
          $dateTime             =   new DateTime($current_date);
-         $expiry_limit_date =   $dateTime->modify('+ '. $request->expiry.'month')->format('Y-m-d');
+         $expiry_limit_date    =   $dateTime->modify('+ '. $expiry_month .'month')->format('Y-m-d');
+
          $query               .=  " AND vs.expiry_date BETWEEN '$current_date' AND '$expiry_limit_date'";
-         $records = DB::select("
+         $records    = DB::select("
                                  SELECT
                                      vs.batch_wise_balance AS balance,
                                      vs.vs_id,

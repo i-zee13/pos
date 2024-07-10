@@ -442,46 +442,47 @@ $(document).on('keyup', '.bar-code', function () {
   $('.calculate_by_amount').val('');
   $('.calculate_by_amount_text').html('0');
   clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(function () {
-    if (data_variable != '') {
-      var filter_product = product_list.filter(function (x) {
-        var barcodeArray = x.barcode.split(',');
-        return barcodeArray.includes(data_variable) || x.id == data_variable;
-      });
-      if (filter_product.length > 0) {
-        $('#products').val(filter_product[0].id).trigger('change');
-        // $('.retail_price').text(filter_product[0].sale_price);
-        $('.calculate_by_amount').attr('data-price', filter_product[0].sale_price);
-        $('.purchase_price').val(filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price);
-        $('.stock_balance').text(filter_product[0].stock_balance);
-        p_name = filter_product[0].product_name;
-        product_id = filter_product[0].id;
-        if (filter_product[0].barcode.length > 5) {
-          if (filter_product[0].stock_balance > 0) {
-            $('.qty').val(1).trigger('change');
-            $('#add-product').click();
-          } else {
-            $('#notifDiv').fadeIn().css('background', 'red').text("".concat(p_name, " is Out of Stock !"));
-            setTimeout(function () {
-              $('#notifDiv').fadeOut();
-            }, 3000);
-            return;
-          }
-        }
-      } else {
-        $('#products').val('0').trigger('change');
-        // $('#retail_price').val('');
-        $('.expiry_date ').val('');
-        if (data_variable) {
-          $('#notifDiv').fadeIn().css('background', 'red').text('Product Not Found');
-          // $('.bar-code').focus();
+  //  debounceTimer = setTimeout(function () {
+  if (data_variable != '') {
+    var filter_product = product_list.filter(function (x) {
+      var barcodeArray = x.barcode.split(',');
+      return barcodeArray.includes(data_variable) || x.id == data_variable;
+    });
+    if (filter_product.length > 0) {
+      $('#products').val(filter_product[0].id).trigger('change');
+      // $('.retail_price').text(filter_product[0].sale_price);
+      $('.calculate_by_amount').attr('data-price', filter_product[0].sale_price);
+      $('.purchase_price').val(filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price);
+      $('.stock_balance').text(filter_product[0].stock_balance);
+      p_name = filter_product[0].product_name;
+      product_id = filter_product[0].id;
+      if (filter_product[0].barcode.length > 5) {
+        if (filter_product[0].stock_balance > 0) {
+          $('.qty').val(1).trigger('change');
+          $('#add-product').click();
+        } else {
+          $('#notifDiv').fadeIn().css('background', 'red').text("".concat(p_name, " is Out of Stock !"));
           setTimeout(function () {
             $('#notifDiv').fadeOut();
           }, 3000);
+          return;
         }
       }
+    } else {
+      $('#products').val('0').trigger('change');
+      // $('#retail_price').val('');
+      $('.expiry_date ').val('');
+      if (data_variable) {
+        $('#notifDiv').fadeIn().css('background', 'red').text('Product Not Found');
+        // $('.bar-code').focus();
+        setTimeout(function () {
+          $('#notifDiv').fadeOut();
+        }, 3000);
+      }
     }
-  }, 1500);
+  }
+  //  }, 500);
+
   return 0;
 });
 $(document).on('input change', '.qty', function () {

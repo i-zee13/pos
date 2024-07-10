@@ -3560,9 +3560,9 @@
                         </div>
                         <div class="_cust_filter col-md-3" style="width: 170px!important">
                             <div class="form-s2">
-                                <select class="form-control formselect product_id" name="filter_by_value">
+                                <select class="form-control formselect product_id filter_by_value" name="filter_by_value">
                                     <option value="">Select Value</option>
-                                    <option value="1">By Avrage</option>
+                                    <option value="1">By Average</option>
                                     <option value="2">By Last Price</option>
                                 </select>
                             </div>

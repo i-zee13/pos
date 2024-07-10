@@ -125,8 +125,6 @@ var sale_price = 0;
 var data_variable = '';
 var grand_total = 0;
 $(document).ready(function () {
-  $('.parent-div').show();
-  $('#tblLoader').hide();
   $('#bar-code').focus();
   getProducts();
   if (segments[3] == "stock-add") {

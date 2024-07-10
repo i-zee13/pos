@@ -40,3 +40,5 @@ ALTER TABLE `stock_batches_items` CHANGE `avg_cost_price` `avg_cost_price_per_un
 ALTER TABLE `stock_batches_items` CHANGE `total_balance` `total_balance` DOUBLE NULL;
 ALTER TABLE `vendor_stock_managment` ADD `ttl_avg_cost` DOUBLE NOT NULL DEFAULT '0' AFTER `product_id`;
 ALTER TABLE `vendor_stock_managment` ADD `ttl_cost` DOUBLE NOT NULL DEFAULT '0' AFTER `ttl_avg_cost`;
+ALTER TABLE `vendor_stock_managment` ADD `purchase_price` DOUBLE NULL AFTER `product_id`, ADD `sale_price` DOUBLE NULL AFTER `purchase_price`;
+

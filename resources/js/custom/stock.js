@@ -38,8 +38,7 @@ let grand_total = 0;
 
 
 $(document).ready(function () {
-    $('.parent-div').show();
-    $('#tblLoader').hide();
+     
     $('#bar-code').focus();
     getProducts();
     if (segments[3] == "stock-add") {
@@ -70,18 +69,18 @@ $(document).ready(function () {
                     product_id = product.product_id
                     purchased_product_array.push({
                         'purchase_prod_id': `${product.id}`,
-                        'product_id': `${product.product_id}`,
-                        'expiry_date': `${product.expiry_date}`,
-                        'qty': `${product.qty_after_return > 0 ? product.qty_after_return : product.qty}`,
-                        'amount': `${product.purchased_total_amount}`,
-                        'old_price': `${product.purchase_price}`,
-                        'new_price': ``,
-                        'prod_discount': `${product.product_discount}`,
-                        'p_name': `${product.product_name}`,
+                        'product_id'    : `${product.product_id}`,
+                        'expiry_date'   : `${product.expiry_date}`,
+                        'qty'           : `${product.qty_after_return > 0 ? product.qty_after_return : product.qty}`,
+                        'amount'        : `${product.purchased_total_amount}`,
+                        'old_price'     : `${product.purchase_price}`,
+                        'new_price'     : ``,
+                        'prod_discount' : `${product.product_discount}`,
+                        'p_name'        : `${product.product_name}`,
                         'purchase_invoice_id': `${product.purchase_invoice_id}`,
-                        'stock_in_hand': `${product.stock_in_hand}`,
-                        'purchased_price': `${product.purchase_price}`,
-                        'sale_price': `${product.sale_price}`
+                        'stock_in_hand'     : `${product.stock_in_hand}`,
+                        'purchased_price'   : `${product.purchase_price}`,
+                        'sale_price'        : `${product.sale_price}`
                     });
                     $('.products').children(`option[value="${product.product_id}"]`).attr('disabled', true);
                 })

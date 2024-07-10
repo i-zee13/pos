@@ -43,7 +43,7 @@ $('.search-btn').on('click', function () {
             CurrentRef.attr('disabled', false);
             
             CurrentRef.attr('disabled', false);
-            var filter_selected = $('input[name="filter_by_value"]:checked').val();
+            var filter_selected = $('.filter_by_value').val();
             $('.loader').show();
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
@@ -73,6 +73,7 @@ $('.search-btn').on('click', function () {
             let total_balance = 0;
             var last_balance = 0;
             var ttl_qty_purchase = 0;
+            alert(filter_selected)
             response.records.forEach((element, key) => {
                 var cost = 0;
                 var amount = 0;

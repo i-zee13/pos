@@ -2,8 +2,7 @@
 
 @section('content')
 <div class="header">
-
-
+ 
     <!-- Body -->
     <div class="header-body">
         <div class="row  ">
@@ -37,15 +36,18 @@
                 <a href="{{route('stock-add')}}" type="submit" class="btn btn-primary mr-2 add-new-purchase" style="font-size: 13px;padding: 6px 11px 4px 9px;margin-top: -10px; float: right;">Add New</a>
 
             </div>
-            <!--<div class="loader-div" id="tblLoader">
-                            <div class="lds-ring" aria-role="none">
-                              <div></div>
-                              <div></div>
-                              <div></div>
-                              <div></div>
-                              <div></div>
-                            </div>
-                          </div> -->
+            <!--<div class="preloader"  id="tblLoader">
+    <div class="loading">
+      <div class="bar bar1"></div>
+      <div class="bar bar2"></div>
+      <div class="bar bar3"></div>
+      <div class="bar bar4"></div>
+      <div class="bar bar5"></div>
+      <div class="bar bar6"></div>
+      <div class="bar bar7"></div>
+      <div class="bar bar8"></div>
+    </div>
+  </div> -->
             <div class="body">
                 <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;" id="example">
                     <thead>
@@ -69,9 +71,9 @@
                             <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->product_net_total}} </td>
                             <td>
                                 <a id="{{$purchase->id}}" class="btn btn-default {{$purchase->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$purchase->is_editable== 1 ? route('purchase-edit' ,['id'=>$purchase->id]) : route('purchase-edit' ,['id'=>$purchase->id ,'invoice' => 'detail'])}}">{{$purchase->is_editable== 1  ? 'Edit'  : "Detail" }}</a>
-                                <!-- @if($purchase->is_editable== 1)
-                                <button type="button" id="{{$purchase->id}}" route="/delete-invoice" invoice-for="purchase" class="btn btn-default red-bg  btn-delete" name="Sub_cat" title="Delete">Delete</button>
-                                @endif -->
+                                @if($purchase->is_editable== 1)
+                                <button type="button" id="{{$purchase->id}}" route="/delete-purchase-invoice" invoice-for="purchase" class="btn btn-default red-bg  btn-invoice-delete" name="Sub_cat" title="Delete">Delete</button>
+                                @endif
                                 <button id="{{$purchase->id}}" data-invoice="{{$purchase->id}}" data-customer-id="{{$purchase->customer_id}}" paid-amount="{{$purchase->paid_amount}}" class="btn btn-default print-invoice">Print</button>
                             </td>
                         </tr>
@@ -84,8 +86,9 @@
 </div>
 @endsection
 @push('js')
-
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
+    var deleteRef = '';
     $('.print-invoice').on('click', function() {
         var invoice_id = $(this).attr('data-invoice');
         var customer_id = $(this).attr('data-customer-id');
@@ -97,34 +100,6 @@
             // printWindow.close();
         };
     })
-    $(document).on('click', '.btn-delete', function() {
-
-
-        var id = $(this).attr('id');
-        var route = $(this).attr('route');
-        var invoice_for = $(this).attr('invoice-for');
-        $.ajax({
-            type: 'post',
-            url: route,
-            data: {
-                id: id,
-                route: route,
-                invoice_for: invoice_for,
-            },
-            success: function(r) {
-                if (r.status == 'success') {
-                    $('#notifDiv').fadeIn().css('background', 'green').text('Invoice deleted Successfully !');
-                    setTimeout(() => {
-                        $('#notifDiv').fadeOut();
-                    }, 3000);
-                } else {
-                    $('#notifDiv').fadeIn().css('background', 'red').text('Not deleted at this moment !');
-                    setTimeout(() => {
-                        $('#notifDiv').fadeOut();
-                    }, 3000);
-                }
-            }
-        })
-    })
+  
 </script>
 @endpush

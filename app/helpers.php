@@ -322,6 +322,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     if (!$s) {
         $s = new BatchStockMgt(); 
     }
+    
     $previous_qty       =  0;
     if ($existing_inv_id) {
         $previous_qty = $s->qty ?? 0;
@@ -330,6 +331,11 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
        
         $s->expiry_date         =   $purchase->expiry_date ?? null;
     }
+    $balance                    =   $In_out_status == 2
+                                                    ? ($s->batch_wise_balance - $previous_qty - $stock_qty)
+                                                    : ($s->batch_wise_balance - $previous_qty + $stock_qty);
+  
+    $s->ttl_cost_price      =   ($s->unit_cost_price * $balance) ;
     if ($In_out_status == 1) {
         $new_cost_price = 0;
         if($s->unit_cost_price !=   $purchase->purchase_price) {
@@ -338,6 +344,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         $s->unit_cost_price     =   $purchase->purchase_price;
         $s->ttl_cost_price      =   $s->ttl_cost_price + $new_cost_price;
     }
+   
     $s->company_id              =   $purchase->company_id;
     $s->product_id              =   $purchase->product_id;
     $s->invoice_id              =   $invoice_id;
@@ -345,9 +352,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     $s->actual_qty              =   $purchase->qty;
     $s->actual_status           =   $In_out_status;
     $s->qty                     =   $stock_qty;
-    $balance                    =   $In_out_status == 2
-                                        ? ($s->batch_wise_balance - $previous_qty - $stock_qty)
-                                        : ($s->batch_wise_balance - $previous_qty + $stock_qty);
+   
 
     if (($transaction_type == 2 || $transaction_type == 3) && $balance < 0) {
         $balance                =   abs($balance);
@@ -369,7 +374,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     //Make avrage cost total
     $prod   = DB::select("SELECT 
                             IFNULL(SUM(batch_wise_balance), 0) AS ttl_balance,
-                            IFNULL(SUM(ttl_cost_price), 0) AS ttl_cost
+                            IFNULL(SUM(IF(batch_wise_balance > 0, ttl_cost_price, 0)), 0) AS ttl_cost
                         FROM stock_batches_items 
                         WHERE product_id = $purchase->product_id")[0];   
     $stock = StockManagment::where('product_id', $purchase->product_id)

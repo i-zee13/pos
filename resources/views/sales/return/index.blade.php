@@ -36,15 +36,18 @@
               <a href="{{route('salereturn.create')}}" type="submit" class="btn btn-primary mr-2 add-sale-return" style="font-size: 13px;padding: 6px 11px 4px 9px;margin-top: -10px; float: right;">Add New</a>
 
             </div>
-            <!--<div class="loader-div" id="tblLoader">
-                            <div class="lds-ring" aria-role="none">
-                              <div></div>
-                              <div></div>
-                              <div></div>
-                              <div></div>
-                              <div></div>
-                            </div>
-                          </div> -->
+            <!--<div class="preloader"  id="tblLoader">
+    <div class="loading">
+      <div class="bar bar1"></div>
+      <div class="bar bar2"></div>
+      <div class="bar bar3"></div>
+      <div class="bar bar4"></div>
+      <div class="bar bar5"></div>
+      <div class="bar bar6"></div>
+      <div class="bar bar7"></div>
+      <div class="bar bar8"></div>
+    </div>
+  </div> -->
             <div class="body" >
             <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;" id="example">
                 <thead>

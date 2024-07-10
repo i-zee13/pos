@@ -324,7 +324,7 @@
                   <ul class="nav nav-sm flex-column">
                     <li class="nav-item">
                       <a href="{{route('stock-reports')}}" class="nav-link ">
-                        Stock
+                        Expiry Report
                       </a>
                     </li>
                     <li class="nav-item">
