@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Product;
+use App\Models\ProductReturns;
 use App\Models\SaleReturn;
 use App\Models\SaleReturnProduct;
 use App\Models\Stock;
@@ -206,22 +207,22 @@ class SalesReturnController extends Controller
         $parts              =     explode('-', $invoice->invoice_no);
         $invoice_first_part =     $parts[0];
         $purchasd_products  =     SaleReturnProduct::where('sale_return_invoice_id', $id)
-            ->selectRaw('sale_return_products.*')
-            ->get();
+                                                    ->selectRaw('sale_return_products.*')
+                                                    ->get();
         $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)
-            ->where('trx_type', '=', 2)
-            ->where('sale_return_invoice_id', $invoice->id)
-            ->orderBy('id', 'DESC')->first();
+                                                    ->where('trx_type', '=', 2)
+                                                    ->where('sale_return_invoice_id', $invoice->id)
+                                                    ->orderBy('id', 'DESC')->first();
         return view('sales.return.create', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger', 'invoice_first_part'));
     }
     public function getReturnProduct($id)
     {
         $products   =   SaleReturnProduct::where('sale_return_invoice_id', $id)
-            ->selectRaw('sale_return_products.*,
-                                                (SELECT product_name FROM products WHERE id=sale_return_products.product_id) as product_name,
-                                                (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=sale_return_products.product_id) as purchase_price,
-                                                (SELECT stock_balance FROM products WHERE id=sale_return_products.product_id) as stock_in_hand')
-            ->get();
+                                            ->selectRaw('sale_return_products.*,
+                                                        (SELECT product_name FROM products WHERE id=sale_return_products.product_id) as product_name,
+                                                        (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=sale_return_products.product_id) as purchase_price,
+                                                        (SELECT stock_balance FROM products WHERE id=sale_return_products.product_id) as stock_in_hand')
+                                            ->get();
         return response()->json([
             'msg'       => 'Sale Product Fetched',
             'status'    => 'success',
@@ -235,11 +236,10 @@ class SalesReturnController extends Controller
         $customerId                 =   $customer_id;
         $customer_balance           =   0;
         $invoice                    =   SaleReturn::where('id', $invoiceId)->where('customer_id', $customerId)
-            ->selectRaw("sale_return_invoices.*,
-                                                        (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
-                                                        (SELECT cr FROM customer_ledger WHERE sale_return_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
-                                                        ")
-            ->first();
+                                                    ->selectRaw("sale_return_invoices.*,
+                                                                (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
+                                                                (SELECT cr FROM customer_ledger WHERE sale_return_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount")
+                                                    ->first();
         $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
         $products                   =   SaleReturnProduct::where('sale_return_invoice_id', $invoice_id)
             ->selectRaw("sale_return_products.*,
@@ -253,25 +253,18 @@ class SalesReturnController extends Controller
                 ->orderBy('id', 'DESC')->skip(1)->value('balance');
         }
 
-        // $customer_balance = CustomerLedger::where('customer_id', $customerId)
-        //                                     // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
-        //                                     ->orderBy('id', 'DESC')->value('balance'); 
-
+        
         return view('sales.sale-invoice', compact('invoice', 'products', 'customer_balance'));
     }
     public function deleteProduct(Request $request)
     {
 
         $vs      = VendorStock::where('sale_return_id', $request->sale_return_invoice_id)
-            ->where('product_id', $request->product_id)
-            ->where('transaction_type', 4)->orderBy('id', 'DESC')
-            ->first();
+                                ->where('product_id', $request->product_id)
+                                ->where('transaction_type', 4)->orderBy('id', 'DESC')
+                                ->first();
         if ($vs) {
-            // VendorStock::where('sale_return_id', $request->sale_return_invoice_id)
-            //     ->where('product_id', $request->product_id)->update([
-            //         'actual_qty'    => 0,
-            //         'actual_status' => 0
-            //     ]);
+            
             $v_stock = updateStock($vs, $vs->balance, $request->qty, 2, 'sale-return', 5);
             BatchWiseDeleteProduct($request->sale_return_invoice_id, $request->product_invoice_id, $request->qty, 2, 5);
 
@@ -295,5 +288,42 @@ class SalesReturnController extends Controller
                 ]);
             }
         }
+    }
+    public function deleteInvoice(Request $request)
+    {
+        $invoice_products   =  SaleReturnProduct::where('sale_return_invoice_id', $request->id)->get();
+        if($invoice_products){
+            foreach($invoice_products as $product){ 
+                $vs     = VendorStock::where('sale_return_id', $product->sale_return_invoice_id)
+                                        ->where('product_id', $product->product_id)
+                                        ->where('transaction_type', 4)->orderBy('id', 'DESC')
+                                        ->first();
+
+                if ($vs) {
+                    $vs->actual_qty   = $product->qty;
+                    $v_stock = updateStock($vs, $vs->balance, $product->qty, 2, 'sale-return', 4);
+                    BatchWiseDeleteProduct($product->sale_return_invoice_id, $product->id, $product->qty, 2, 4);
+                    StockManagment($v_stock->id, $vs, $product->qty, 2, 'sale-return');
+                    if ($v_stock) {
+                        Product::where('id', $v_stock->product_id)->update([
+                            'stock_balance' =>  $v_stock->balance,
+                        ]); 
+                        
+                    }  
+                }
+             }
+             SaleReturnProduct::where('sale_return_invoice_id', $product->sale_return_invoice_id)
+                                    ->where('product_id', $product->product_id)->where('qty', $product->qty)
+                                    ->delete();
+            SaleReturn::where('id',$request->id)->delete(); 
+            return response()->json([
+                'msg'       => 'Product Deleted !',
+                'status'    => 'success',
+            ]);
+        }
+        return response()->json([
+            'msg'       => 'Not Updated at this moment',
+            'status'    => 'failed',
+        ]);
     }
 }

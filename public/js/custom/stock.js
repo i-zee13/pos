@@ -443,7 +443,7 @@ function saleSave(current_action, type) {
   if ($('#customer_id').val() == 0) {
     $('#notifDiv').fadeIn();
     $('#notifDiv').css('background', 'red');
-    $('#notifDiv').text('Please select Customer first (*)');
+    $('#notifDiv').text('Please select Vendor first (*)');
     setTimeout(function () {
       $('#notifDiv').fadeOut();
     }, 3000);

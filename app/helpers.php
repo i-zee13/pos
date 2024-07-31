@@ -9,15 +9,14 @@ use App\Models\ProductReplacement;
 use App\Models\ProductReplacementInvoice;
 use App\Models\PurchaseInvoice;
 use App\Models\ReturnInvoice;
-use App\Models\Sale as SaleInvoice;
-use App\Models\SaleReplacement;
-use App\Models\SaleReturn;
-use App\Models\Stock;
+use App\Models\Sale as SaleInvoice; 
+use App\Models\SaleReturn; 
 use App\Models\StockManagment;
 use App\Models\VendorLedger;
 use App\Models\VendorStock;
 use Carbon\Carbon;
-use Firebase\JWT\JWT;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Stevebauman\Location\Facades\Location;
 
 
@@ -258,6 +257,9 @@ if (!function_exists('getCustomerBalance')) {
 
 function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type, $transaction_type, $prod_type = null)
 {
+    $sale_price             = $sale->sale_unit_price ?? $sale->sale_price;
+    $total_return_amount    =  $sale->total_sale_amount ?? $sale->return_total_amount;
+    $product_unit_price     =  $sale->product_unit_price ?? $sale->purchase_price;
 
     $v                       =  new VendorStock();
     $v->vendor_id            =  $sale->vendor_id;
@@ -275,32 +277,34 @@ function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type,
     $v->date                 =  $sale->created_at;
     $v->created_by           =  Auth::id();
     if ($transaction_type == 1) { //Purchase 
-        $v->actual_status         =  1; //IN
-        $v->purchase_invoice_id   =  $sale->purchase_invoice_id;
-        $v->product_unit_price    =  $sale->purchase_price;
-        $v->total_purchase_amount =  $sale->purchased_total_amount;
+        $v->actual_status                   =  1; //IN
+        $v->purchase_invoice_id             =  $sale->purchase_invoice_id;
+        $v->product_unit_price              =  $sale->purchase_price;
+        $v->total_purchase_amount           =  $sale->purchased_total_amount;
     } else if ($transaction_type == 2) {  //Sale
-        $v->actual_status         =  2; //OUT
-        $v->sale_invoice_id       =  $sale->sale_invoice_id;
-        $v->sale_unit_price       =  $sale->sale_price;
-        $v->total_sale_amount     =  $sale->sale_total_amount;
+        $v->actual_status                   =  2; //OUT
+        $v->sale_invoice_id                 =  $sale->sale_invoice_id;
+        $v->sale_unit_price                 =  $sale_price;
+        $v->total_sale_amount               =  $sale->sale_total_amount;
+        $v->product_unit_price              =  $sale->purchase_price;
     } else if ($transaction_type == 3) {  //Purchase Return
-        $v->actual_status         =  2; //OUT
-        $v->purchase_return_invoice_id  =  $sale->purchase_return_invoice_id;
-        $v->product_unit_price    =  $sale->purchase_price;
-        $v->total_purchase_amount =  $sale->product_return_total_amount;
+        $v->actual_status                   =  2; //OUT
+        $v->purchase_return_invoice_id      =  $sale->purchase_return_invoice_id;
+        $v->product_unit_price              =  $sale->purchase_price;
+        $v->total_purchase_amount           =  $sale->product_return_total_amount;
     } else if ($transaction_type == 4) {  //Sale Return
-        $v->actual_status         =  1; //IN
-        $v->sale_return_id        =  $sale->sale_return_invoice_id;
-        $v->sale_unit_price       =  $sale->sale_price;
-        $v->total_sale_amount     =  $sale->return_total_amount;
+        $v->actual_status                   =  1; //IN
+        $v->sale_return_id                  =  $sale->sale_return_invoice_id;
+        $v->sale_unit_price                 =  $sale_price;
+        $v->total_sale_amount               =  $total_return_amount;
+        $v->product_unit_price              =  $product_unit_price;
     } else if ($transaction_type == 6) {  //Replacement
-        $v->actual_status   = ($prod_type == 1) ? 1 : 2;
-        $unit_prefix        = ($prod_type == 1) ? 'product' : 'sale';
-        $total_prefix       = ($prod_type == 1) ? 'total_purchase' : 'total_sale';
-        $v->{$unit_prefix . '_unit_price'}  = $sale->sale_price;
-        $v->{$total_prefix . '_amount'}     = $sale->sale_total_amount;
-        $v->product_replacement_invoice_id  =  $sale->product_replacement_invoice_id;
+        $v->actual_status                   =   ($prod_type == 1) ? 1 : 2;
+        $unit_prefix                        =   ($prod_type == 1) ? 'product' : 'sale';
+        $total_prefix                       =   ($prod_type == 1) ? 'total_purchase' : 'total_sale';
+        $v->{$unit_prefix . '_unit_price'}  =   $sale_price;
+        $v->{$total_prefix . '_amount'}     =   $sale->sale_total_amount;
+        $v->product_replacement_invoice_id  =   $sale->product_replacement_invoice_id;
     } else if ($transaction_type == 5) {  //Product Delete
         deleteProductFields($v, $sale, $invoice_type, $prod_type);
     }
@@ -323,20 +327,29 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         $s = new BatchStockMgt(); 
     }
     
-    $previous_qty       =  0;
+    $previous_qty     =  0;
     if ($existing_inv_id) {
         $previous_qty = $s->qty ?? 0;
     }
     if ($transaction_type != 2) {
-       
-        $s->expiry_date         =   $purchase->expiry_date ?? null;
+        $s->expiry_date     =   $purchase->expiry_date ?? null;
     }
-    $balance                    =   $In_out_status == 2
-                                                    ? ($s->batch_wise_balance - $previous_qty - $stock_qty)
-                                                    : ($s->batch_wise_balance - $previous_qty + $stock_qty);
+    $balance = $stock_qty;
+    if($s->batch_wise_balance != 0){ 
+
   
-    $s->ttl_cost_price      =   ($s->unit_cost_price * $balance) ;
-    if ($In_out_status == 1) {
+        $balance                = $In_out_status == 2 ? $s->batch_wise_balance - $stock_qty : $s->batch_wise_balance +  $stock_qty;
+
+
+
+
+        // $balance                =   $In_out_status == 2  
+        //                                             ? ($s->batch_wise_balance - $previous_qty - $stock_qty) //OUT
+        //                                             : ($s->batch_wise_balance - $previous_qty + $stock_qty);//IN
+        $balance                =   $balance == 0  ? 1  : $balance;
+    }
+    $s->ttl_cost_price      =   ($s->unit_cost_price * $balance ) ;
+    if ($In_out_status == 1){
         $new_cost_price = 0;
         if($s->unit_cost_price !=   $purchase->purchase_price) {
             $new_cost_price     =   $purchase->purchase_price * $stock_qty;
@@ -450,7 +463,7 @@ function BatchWiseDeleteProduct($invoice_id, $prod_invoice_id, $qty, $in_out, $t
         ->first();
     if ($in_out == 1) {
         $balance =  $batch->batch_wise_balance + $qty;
-    } else if ($in_out == 2) {
+    } else if ($in_out == 2) { 
         $balance =  $batch->batch_wise_balance - $qty;
     }
     $batch->batch_wise_balance  =  $balance;

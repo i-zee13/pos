@@ -126,6 +126,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/get-sale-return-products/{id}', [App\Http\Controllers\SalesReturnController::class, 'getReturnProduct'])->name('get-salereturn-products');
     Route::get('/print-salereturn-invoice/{invoice_id}/{customer_id}/{received_amount}', [App\Http\Controllers\SalesReturnController::class, 'printInvoice'])->name('print-salereturn-invoice');
     Route::delete('/delete-product-from-sale-return', [App\Http\Controllers\SalesReturnController::class, 'deleteProduct'])->name('sale-return-delete-product');
+    Route::delete('/delete-sale-return-invoice', [App\Http\Controllers\SalesReturnController::class, 'deleteInvoice'])->name('delete-purchase-invoice');
 
     // Route::post('/add-purchase-return'   ,[App\Http\Controllers\PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
 

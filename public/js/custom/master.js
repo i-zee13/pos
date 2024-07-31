@@ -104,10 +104,10 @@ $(document).on('click', '.btn-invoice-delete', function() {
                     type: 'delete',
                     url: route,
                     data: {
-                        _token: $('meta[name="csrf_token"]').attr('content'),
-                        id: id,
-                        route: route,
-                        invoice_for: invoice_for,
+                        _token      : $('meta[name="csrf_token"]').attr('content'),
+                        id          : id,
+                        route       : route,
+                        invoice_for : invoice_for,
                     },
                     success: function(r) {
                         if (r.status == 'success') {

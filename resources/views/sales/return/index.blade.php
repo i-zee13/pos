@@ -77,7 +77,10 @@
                         <!-- <a id="{{$sale->id}}" class="btn btn-default " href="{{route('sale-detail' ,['id'=>$sale->id])}}">Detail</a> -->
                         <button id="{{$sale->id}}" data-invoice="{{$sale->id}}" data-customer-id="{{$sale->customer_id}}"
                          paid-amount="{{$sale->paid_amount > 0 ? $sale->paid_amount  : 0}}" class="btn btn-default print-invoice">Print</button>
-                        <!-- <button type="button" id="{{$sale->id}}" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete">Delete</button> -->
+                         @if($sale->is_editable== 1 || $sale->customer_id == 8)
+                            <button type="button" id="{{$sale->id}}" route="/delete-sale-return-invoice" invoice-for="sale-return" class="btn btn-default red-bg  btn-invoice-delete" name="Sub_cat" title="Delete">Delete</button>
+                        @endif
+
                     </td>
                 </tr>
                 @endforeach
@@ -89,6 +92,8 @@
 </div>
 @endsection
 @push('js')
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
     <script>
         $('.print-invoice').on('click', function() {
             var invoice_id = $(this).attr('data-invoice');

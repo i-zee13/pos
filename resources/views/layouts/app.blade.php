@@ -278,6 +278,12 @@
     -webkit-animation-delay: 0.8s;
     animation-delay: 0.8s;
 }
+.select2-dropdown--below{
+            width: 350px !important;
+}
+.right_Info{
+    padding-bottom: 15px !important;
+}
     </style>
     <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('/css/jquery.steps.css')}}" rel="stylesheet">

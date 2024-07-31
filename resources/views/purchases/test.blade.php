@@ -988,7 +988,7 @@
                         </div>
                     </div> -->
 
-                        <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
+                        <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px;text-align: right; margin-bottom: 1px" id="btns_div">
                             @if(request()->query('invoice') == 'detail')
                             <a href="{{route('sales')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
                             @else

@@ -72,9 +72,9 @@ $('.search-btn').on('click', function () {
             }
             let total_balance = 0;
             var last_balance = 0;
-            var ttl_qty_purchase = 0;
-            alert(filter_selected)
+            var ttl_qty_purchase = 0; 
             response.records.forEach((element, key) => {
+                console.log(element)
                 var cost = 0;
                 var amount = 0;
                 if (filter_selected == 1) {

@@ -150,9 +150,9 @@ class StockController extends Controller
                     $purchased->sale_price              = $purchase_product['sale_price'];
                     $purchased->created_by              = Auth::id();
                     $previous_qty = ProductPurchase::where('purchase_invoice_id', $request->hidden_invoice_id)
-                        ->where('product_id', $purchased->product_id)
-                        ->orderBy('id', 'Desc')
-                        ->value('qty');
+                                                    ->where('product_id', $purchased->product_id)
+                                                    ->orderBy('id', 'Desc')
+                                                    ->value('qty');
                     if ($purchased->save()) {
                         $purchased->invoice_no = $invoice->invoice_no;
 
@@ -195,7 +195,7 @@ class StockController extends Controller
                                 ]);
                             }
                         }
-                        BatchWiseStockManagment($vs_id,  $invoice->id, $purchased, $purchased->qty, $In_out_status, 1, $request->hidden_invoice_id);
+                        BatchWiseStockManagment($vs_id,  $invoice->id, $purchased, $change_qty_value, $In_out_status, 1, $request->hidden_invoice_id);
                         //Update Product Price
                         $product              = Product::where('id', $purchased->product_id)->first();
                         $company_id           = $product->company_id;
@@ -343,13 +343,13 @@ class StockController extends Controller
     public function deleteProduct(Request $request)
     {
         $prod = VendorStock::where('purchase_invoice_id', $request->purchase_invoice_id)
-            ->where('product_id', $request->product_id)
-            ->where('transaction_type', 1)->orderBy('id', 'DESC')->first();
+                            ->where('product_id', $request->product_id)
+                            ->where('transaction_type', 1)->orderBy('id', 'DESC')->first();
         if ($prod) {
 
-            $prod->actual_qty = $request->qty;
-            $v_stock = updateStock($prod, $prod->balance,  $request->qty, 2, 'purchase', 5);
-            BatchWiseDeleteProduct($request->purchase_invoice_id, $request->product_invoice_id, $request->qty, 2, 5);
+            $prod->actual_qty   = $request->qty;
+            $v_stock            = updateStock($prod, $prod->balance,  $request->qty, 2, 'purchase', 5);
+            BatchWiseDeleteProduct($request->purchase_invoice_id, $request->product_invoice_id, $request->qty,2, 5);
             StockManagment($v_stock->id, $prod,  $request->qty, 2);
 
             if ($v_stock) {
@@ -401,12 +401,14 @@ class StockController extends Controller
     {
         $invoice_products   =  ProductPurchase::where('purchase_invoice_id', $request->id)->get();
         if($invoice_products){
-            foreach($invoice_products as $product){ 
+            foreach($invoice_products as $k => $product){  
+
                 $prod       = VendorStock::where('purchase_invoice_id', $product->purchase_invoice_id)
                                         ->where('product_id', $product->product_id)
                                         ->where('transaction_type', 1)
                                         ->orderBy('id', 'DESC')
-                                        ->first(); 
+                                        ->first();  
+                         
                 if ($prod) { 
                     $prod->actual_qty   = $product->qty;
                     $v_stock            = updateStock($prod, $prod->balance,$product->qty, 2, 'purchase', 5);
@@ -415,22 +417,17 @@ class StockController extends Controller
                     if ($v_stock) {
                         Product::where('id', $v_stock->product_id)->update([
                             'stock_balance' =>  $v_stock->balance,
-                        ]); 
-                        return response()->json([
-                            'msg'       => 'product removed',
-                            'status'    => 'success',
-                        ]);
+                        ]);  
                     }
-                } else {
-                    return response()->json([
-                        'msg'       => 'not remove',
-                        'status'    => 'failed',
-                    ]);
-                }
+                }  
              } 
              ProductPurchase::where('purchase_invoice_id', $product->purchase_invoice_id)
                                ->where('product_id', $product->product_id)->delete();
             PurchaseInvoice::where('id',$request->id)->delete();
+             return response()->json([
+                'msg'       => 'product removed',
+                'status'    => 'success',
+            ]);
         }
     }
 }

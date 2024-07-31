@@ -222,7 +222,7 @@ class ReportsController extends Controller
       //    $select_query     =  "( SELECT SUM(purchased_total_amount)/ SUM(qty) as avg_product_value FROM products_purchases vs  WHERE $query ) as avg_product_value ";
       // }
 
-      $records = DB::select("SELECT vs.balance AS balance, vs.vs_id,vs.product_id,vs.ttl_avg_cost,vs.ttl_cost,purchase_price,
+      $records = DB::select("SELECT vs.balance AS balance, vs.vs_id,vs.product_id,vs.ttl_avg_cost,vs.ttl_cost,vs.purcwhase_price,
                                  IFNULL(
                                     (SELECT company_name FROM companies WHERE id = vs.company_id),'') AS company_name,
                                  IFNULL(
@@ -234,7 +234,7 @@ class ReportsController extends Controller
                               WHERE
                               $query
                               ");
-
+dd($records);
       // $records             =  DB::select("
       //                            SELECT
       //                               vs.balance AS balance,

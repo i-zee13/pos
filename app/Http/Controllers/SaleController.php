@@ -18,13 +18,13 @@ class SaleController extends Controller
 
     public function create()
     {
-        $invoice_no   =     getInvoice();
-        $parts        =     explode('-', $invoice_no);
-        $invoice_first_part   = $parts[0];
-        $current_date =   Carbon::today()->toDateString();
-        $customers    =   Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
-        $products     =   Product::get();
-        return view('sales.test', compact('customers', 'current_date', 'invoice_no', 'products', 'invoice_first_part'));
+        $invoice_no         =   getInvoice();
+        $parts              =   explode('-', $invoice_no);
+        $invoice_first_part =   $parts[0];
+        $current_date       =   Carbon::today()->toDateString();
+        $customers          =   Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
+        $products           =   Product::get();
+        return view('sales.add', compact('customers', 'current_date', 'invoice_no', 'products', 'invoice_first_part'));
     }
     public function getVendors()
     {
@@ -34,32 +34,7 @@ class SaleController extends Controller
             'status'    => 'success',
             'customers' => $customers
         ]);
-    }
-    public function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type, $transaction_type)
-    {
-
-        $v                      =  new VendorStock();
-        $v->vendor_id           =   $sale->vendor_id;
-        $v->transaction_type    =  $transaction_type;
-        $v->qty                 =  $qty_value;
-        $v->status              =  $In_out_status;   //IN
-        $v->balance             =  $In_out_status == 2 ? $balance - $qty_value : $balance +  $qty_value;
-        $v->actual_qty          =  $sale->qty;
-        $v->invoice_no           =  $sale->invoice_no;
-        $v->sale_invoice_id      =  $sale->sale_invoice_id;
-        $v->company_id           =  $sale->company_id;
-        $v->product_id           =  $sale->product_id;
-        $v->date                 =  $sale->created_at;
-        $v->sale_unit_price      =  $sale->sale_price;
-        $v->created_by           =  Auth::id();
-        if ($transaction_type == 1) { //Purchase
-            $v->total_purchase_amount =  $sale->purchased_total_amount;
-        } else if ($transaction_type == 2) {  //Sale
-            $v->total_sale_amount    =  $sale->sale_total_amount;
-        }
-        $v->save();
-        return $v;
-    }
+    } 
     public function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
     {
         $stock = StockManagment::where('product_id', $purchase->product_id)
@@ -76,7 +51,7 @@ class SaleController extends Controller
         $stock->save();
     }
     public function saleInvoice(Request $request)
-    {
+    {  
         if ($request->hidden_invoice_id) {
             $invoice = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
         } else {
@@ -130,9 +105,9 @@ class SaleController extends Controller
                     $sale->created_by          = Auth::id();
                     $sale->purchase_price      = $sale_product['purchased_price'];
                     $previous_qty              = ProductSale::where('sale_invoice_id', $request->hidden_invoice_id)
-                        ->where('product_id', $sale->product_id)
-                        ->orderBy('id', 'Desc')
-                        ->value('qty');
+                                                            ->where('product_id', $sale->product_id)
+                                                            ->orderBy('id', 'Desc')
+                                                            ->value('qty');
                     if ($sale->save()) {
                         $sale_products_array[] = $sale->id;
                         $balance = 0;
@@ -161,8 +136,8 @@ class SaleController extends Controller
                                 'actual_status' => 0
                             ]);
                             $sale->customer_id  =  $invoice->customer_id;
-                            $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'sale', 2);
-                            $vs_id = $v_stock->id;
+                            $v_stock            = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'sale', 2);
+                            $vs_id              = $v_stock->id;
                             StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status, 'sale');
 
                             if ($v_stock->save()) {
@@ -234,14 +209,14 @@ class SaleController extends Controller
         $parts              =     explode('-', $invoice->invoice_no);
         $invoice_first_part =     $parts[0];
         $purchasd_products  =     ProductSale::where('sale_invoice_id', $id)
-            ->selectRaw('products_sales.*')
-            ->get();
+                                                ->selectRaw('products_sales.*')
+                                                ->get();
         $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)
-            ->where('trx_type', '=', 1)
-            ->where('sale_invoice_id', $invoice->id)
-            ->orderBy('id', 'DESC')->first();
+                                                ->where('trx_type', '=', 1)
+                                                ->where('sale_invoice_id', $invoice->id)
+                                                ->orderBy('id', 'DESC')->first();
 
-        return view('sales.test', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger', 'invoice_first_part'));
+        return view('sales.add', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger', 'invoice_first_part'));
     }
     public function show($id)
     {
@@ -249,12 +224,12 @@ class SaleController extends Controller
         $products          =     Product::where('stock_balance', '>', 0)->get();
         $invoice           =     SaleInvoice::where('id', $id)->first();
         $purchasd_products =     ProductSale::where('sale_invoice_id', $id)
-            ->selectRaw('products_sales.*')
-            ->get();
+                                            ->selectRaw('products_sales.*')
+                                            ->get();
         $get_customer_ledger  = CustomerLedger::where('customer_id', $invoice->customer_id)
-            ->where('trx_type', '=', 1)
-            ->where('sale_invoice_id', $invoice->id)
-            ->orderBy('id', 'DESC')->first();
+                                            ->where('trx_type', '=', 1)
+                                            ->where('sale_invoice_id', $invoice->id)
+                                            ->orderBy('id', 'DESC')->first();
         return view('sales.detail', compact('invoice', 'customers', 'products', 'customers', 'get_customer_ledger'));
     }
     public function printInvoice($invoice_id, $customer_id, $received_amount)
@@ -263,11 +238,11 @@ class SaleController extends Controller
         $customerId                 =   $customer_id;
         $customer_balance           =   0;
         $invoice                    =   SaleInvoice::where('id', $invoiceId)->where('customer_id', $customerId)
-            ->selectRaw("sale_invoices.*,
-                                                        (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
-                                                        (SELECT cr FROM customer_ledger WHERE sale_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
-                                                        ")
-            ->first();
+                                                    ->selectRaw("sale_invoices.*,
+                                                                (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
+                                                                (SELECT cr FROM customer_ledger WHERE sale_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
+                                                                ")
+                                                    ->first();
         $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
         $products                   =   ProductSale::where('sale_invoice_id', $invoice_id)
             ->selectRaw("products_sales.*,
@@ -393,6 +368,7 @@ class SaleController extends Controller
                                         ->where('transaction_type', 2)->orderBy('id', 'DESC')
                                         ->first();
                 if ($vs) {
+                    $vs->actual_qty   = $product->qty; 
                     $v_stock = updateStock($vs, $vs->balance, $product->qty, 1, 'sale', 5);
                     BatchWiseDeleteProduct($product->sale_invoice_id, $product->id, $product->qty, 1, 5);
                     StockManagment($v_stock->id, $vs, $product->qty, 1, 'sale');
@@ -400,24 +376,23 @@ class SaleController extends Controller
                         Product::where('id', $v_stock->product_id)->update([
                             'stock_balance' =>  $v_stock->balance,
                         ]); 
-                        return response()->json([
-                            'msg'       => 'product removed',
-                            'status'    => 'success',
-                            'updated_stock' => $v_stock->balance
-                        ]);
-                    } else {
-                        return response()->json([
-                            'msg'       => 'Not Updated at this moment',
-                            'status'    => 'failed',
-                        ]);
-                    }
+                        
+                    }  
                 }
              }
             ProductSale::where('sale_invoice_id', $product->sale_invoice_id)
                                     ->where('product_id', $product->product_id)->where('qty', $product->qty)
                                     ->delete();
             saleInvoice::where('id',$request->id)->delete(); 
+            return response()->json([
+                'msg'       => 'product removed',
+                'status'    => 'success',
+            ]);
         }
+        return response()->json([
+            'msg'       => 'Invoice Not Found!',
+            'status'    => 'error',
+        ]);
     }
 
 
