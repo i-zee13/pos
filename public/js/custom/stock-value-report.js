@@ -77,6 +77,7 @@ $('.search-btn').on('click', function () {
                 console.log(element)
                 var cost = 0;
                 var amount = 0;
+                console.warn(filter_selected);
                 if (filter_selected == 1) {
                     amount = element.ttl_avg_cost * parseInt(element.balance);
                     // last_balance += parseInt(element.balance) * parseInt(element.avg_product_value);
