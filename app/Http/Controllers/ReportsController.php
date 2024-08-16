@@ -278,6 +278,22 @@ class ReportsController extends Controller
          'records' =>   $records
       ]);
    }
+   //Expense Reports 
+   public function expenseReport()
+   { 
+      $customer  =   Customer::where('id', 5)->first();
+      return view('reports.expense', compact('customer'));
+   }
+   public function expenseReportList(Request $request)
+   {
+      $current_date     =  date('Y-m-d');
+      $records          = ExpenseReportRecords($request, $current_date);
+      return response()->json([
+         'msg'     => 'Expense reports fetched',
+         'status'  => 'success',
+         'sales'  => $records
+      ]);
+   }
    //Profit Reports 
    public function profitReport()
    {

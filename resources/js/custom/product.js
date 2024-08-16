@@ -37,8 +37,7 @@ $(document).ready(function() {
             $('input[name="sale_price"]').val("").blur();
         }
         selectize.clear();
-        lastOp = 'add';
-
+        lastOp = 'add'; 
         if ($('#saveSubSecondaryServiceForm input[name="_method"]').length) {
             $('#saveSubSecondaryServiceForm input[name="_method"]').remove();
         } 

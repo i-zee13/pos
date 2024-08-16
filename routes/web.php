@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ProductReplacementController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,10 +14,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+ 
 Route::get('/clear', function () {
     Artisan::call('config:cache');
     Artisan::call('cache:clear');
@@ -23,20 +22,7 @@ Route::get('/clear', function () {
     Artisan::call('optimize:clear');
     return "All cache clear successfully";
 });
-// Route::get('/route-clear', function () {
-//     return "Route cache cleared successfully";
-// });
-// Route::get('/view-clear', function () {
-//     Artisan::call('route:clear');
-//     return "View cache cleared successfully";
-// });
-// Route::get('/config-cache', function () {
-//     return "Config cache successfully";
-// });
-// Route::get('/all-cache-clear', function () {
-//     return "All cache clear successfully";
-// });
-
+  
 Route::get('/', function () {
     return redirect('/home');
 });
@@ -45,10 +31,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::Resource('/company', App\Http\Controllers\CompanyController::class);
     Route::Resource('/customer', App\Http\Controllers\CustomerController::class);
     Route::Resource('/vendors', App\Http\Controllers\CustomerController::class);
-    Route::Resource('/AccessRights',   App\Http\Controllers\AccessRights::class);
-
-
-
+    Route::Resource('/AccessRights',   App\Http\Controllers\AccessRights::class); 
     /**organization-CRUD Routes */
     Route::get('/organization', [App\Http\Controllers\OrganizationController::class, 'index'])->name('admin.organization');
     Route::post('/organization/store', [App\Http\Controllers\OrganizationController::class, 'store'])->name('admin.organization.store');
@@ -132,6 +115,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     //Genrate invoice
     Route::get('/print-sale-invoice/{invoice_id}/{customer_id}/{received_amount}', [App\Http\Controllers\SaleController::class, 'printInvoice'])->name('print-sale-invoice');
+    Route::get('/print-ledger-purchi/{invoice_id}', [App\Http\Controllers\TransactionController::class, 'printPurchi'])->name('print-purchi');
     //Transactions
 
     Route::get('/customer-ledger-jama', [App\Http\Controllers\TransactionController::class, 'customerLedger'])->name('customer-ledger-jama');
@@ -170,6 +154,9 @@ Route::group(['middleware' => ['auth']], function () {
     //Profit Report
     Route::get('/profit-report', [App\Http\Controllers\ReportsController::class, 'profitReport'])->name('profit-reports');
     Route::post('/sales-profit-list', [App\Http\Controllers\ReportsController::class, 'saleProfitReportList'])->name('profit-report-list');
+    //Expense Report
+    Route::get('/expense-report', [App\Http\Controllers\ReportsController::class, 'expenseReport'])->name('expense-report');
+    Route::post('/expense-list', [App\Http\Controllers\ReportsController::class, 'expenseReportList'])->name('expense-report-list');
 
     // All Sales List Fakahr
     Route::get('/all-sales-list', [App\Http\Controllers\SaleController::class, 'allSalesList'])->name('all-sales-list');
@@ -189,6 +176,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/delete-product-replacement', [App\Http\Controllers\ProductReplacementController::class, 'deleteProduct'])->name('ProductReplacement.delete');
     Route::get('/get-customer-balance-for-product-replacement/{id}', [App\Http\Controllers\ProductReplacementController::class, 'getCustomerBalance'])->name('ProductReplacement.get-customer-balance');
     Route::get('/print-replacement-invoice/{invoice_id}/{customer_id}/{received_amount}', [App\Http\Controllers\ProductReplacementController::class, 'printInvoice'])->name('print-replacement-invoice');
+    Route::delete('/delete-replacement-invoice',    [ProductReplacementController::class, 'deleteInvoice'])->name('delete-replacement-invoice');
+    
     //INVOICE DELETE 
     Route::post('/delete-invoice', [App\Http\Controllers\HomeController::class, 'deleteInvoice'])->name('delete-invoice');
 
@@ -197,4 +186,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/sale-close-record/{closing_date}', [App\Http\Controllers\ReportsController::class, 'adminSaleCloseRecord'])->name('sale-close-record');
     Route::post('/save-closing-cash', [App\Http\Controllers\AdminSaleCloseController::class, 'saveAdminSaleCloseRecord'])->name('save-closing-cash');
     Route::post('/update-closing-cash', [App\Http\Controllers\AdminSaleCloseController::class, 'updateAdminSaleCloseRecord'])->name('update-closing-cash');
+
+     // User Profile
+  Route::get('/profile',                    [ProfileController::class, 'index'])->name('admin.profile');
+  Route::post('/update-user-password',      [ProfileController::class, 'update_user_password'])->name('admin.update-user-password');
+  Route::post('/update-user-profile-pic',   [ProfileController::class, 'update_user_profile_pic'])->name('admin.update-user-profile-pic');
+  
 });

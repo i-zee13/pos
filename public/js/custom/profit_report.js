@@ -27,13 +27,6 @@ $('.search-btn').on('click', function () {
     }, 3000);
     return;
   }
-  // if($('.company_id').val() == 0 && $('.product_id').val() == 0){
-  //     $('#notifDiv').fadeIn().css('background', 'red').text('Please Select Company/Product First.');
-  //     setTimeout(() => {
-  //         $('#notifDiv').fadeOut();
-  //     }, 3000);
-  //     return
-  // }
   CurrentRef = $(this);
   CurrentRef.text('Fetching...');
   CurrentRef.attr('disabled', 'disabled');

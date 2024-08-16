@@ -7,12 +7,10 @@ use App\Models\CustomerLedger;
 use App\Models\Product;
 use App\Models\ProductReplacement;
 use App\Models\ProductReplacementInvoice;
-use App\Models\SaleReturn;
-use App\Models\Stock;
 use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class ProductReplacementController extends Controller
 {
@@ -42,6 +40,7 @@ class ProductReplacementController extends Controller
     }
     public function store(Request $request)
     {
+        // dd($request->all());
         if ($request->hidden_invoice_id) {
             $invoice = ProductReplacementInvoice::where('id', $request->hidden_invoice_id)->first();
             // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received;
@@ -77,6 +76,7 @@ class ProductReplacementController extends Controller
             if (count($request->sales_product_array) > 0) {
                 $old_ids        = $request->existing_product_ids;
                 $sale_products_array = [];
+                // dd($request->sales_product_array);
                 foreach ($request->sales_product_array as $key => $sale_product) {
                     $flag = true;
 
@@ -100,6 +100,8 @@ class ProductReplacementController extends Controller
                     $sale->product_discount    = $sale_product['prod_discount'];
                     $sale->product_type        = $sale_product['prod_type'];
                     $sale->expiry_date         = $sale_product['expiry_date'];
+                    $sale->purchase_price      = $sale_product['purchased_price'];
+
                     $sale->created_by          = Auth::id();
                     $previous_qty              = ProductReplacement::where('product_replacement_invoice_id', $request->hidden_invoice_id)
                         ->where('product_id', $sale->product_id)
@@ -113,8 +115,7 @@ class ProductReplacementController extends Controller
                         $vendor_id             =  $check_stock->vendor_id;
                         if ($check_stock) {
                             $balance           =  $check_stock->balance;
-                        }
-                        $sale->purchased_price = $sale_product['purchased_price'];
+                        } 
                         $status = 0;
                         if ($flag) {
                             $In_out_status = ($sale_product['prod_type'] == 1) ? 1 : 2;
@@ -140,8 +141,9 @@ class ProductReplacementController extends Controller
                                 ]);
                             $sale->vendor_id  =  $invoice->customer_id;
                             $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'replacement', 6, $sale_product['prod_type']);
-                             BatchWiseDeleteProduct($request->sale_invoice_id, $request->product_invoice_id, $request->qty, $In_out_status, 6);
-
+                            $vs_id              = $v_stock->id; 
+                            // BatchWiseDeleteProduct($request->sale_invoice_id, $request->product_invoice_id, $request->qty, $In_out_status, 6);
+                            BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, $In_out_status, $request->hidden_invoice_id);
                             StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status);
                             if ($v_stock->save()) {
                                 $sale->vendor_stock_id = $v_stock->id;
@@ -245,7 +247,7 @@ class ProductReplacementController extends Controller
             $v->balance     =   $sale->product_type == 1 ? $balance +  $v->qty : $balance - $v->qty;
         }
         $v->product_replacement_invoice_id    =  $old_record != '' && !empty($old_record) ? $old_record->product_replacement_invoice_id  : $sale->product_replacement_invoice_id;
-        $v->product_unit_price   =  $sale->purchased_price;
+        $v->product_unit_price   =  $sale->purchase_price;
         $v->product_id           =  $old_record != '' && !empty($old_record) ? $old_record->product_id  : $sale->product_id;
         $v->date                 =  $old_record != '' && !empty($old_record) ? $old_record->created_at  : $sale->created_at;
         $v->amount               =  $old_record != '' && !empty($old_record) ? $old_record->sale_total_amount  : $sale->sale_total_amount;
@@ -286,12 +288,45 @@ class ProductReplacementController extends Controller
             $customer_balance = CustomerLedger::where('customer_id', $customerId)
                 // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
                 ->orderBy('id', 'DESC')->skip(1)->value('balance');
-        }
-
-        // $customer_balance = CustomerLedger::where('customer_id', $customerId)
-        //                                     // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
-        //                                     ->orderBy('id', 'DESC')->value('balance'); 
-
+        } 
         return view('sales.replacement.print', compact('invoice', 'products', 'customer_balance'));
+    }
+    public function deleteInvoice(Request $request)
+    {
+        $invoice_products   =  ProductReplacement::where('product_replacement_invoice_id', $request->id)->get();
+        if($invoice_products){
+            foreach($invoice_products as $product){ 
+                $vs     = VendorStock::where('product_replacement_invoice_id', $product->product_replacement_invoice_id)
+                                        ->where('product_id', $product->product_id)
+                                         ->orderBy('id', 'DESC')
+                                        ->first();
+                if ($vs) {
+                    $vs->actual_qty     =   $product->qty; 
+                    $product_type       =   $product->product_type; 
+                    $invoice_type       =   $product_type ==  1 ? 'purchase' : 'sale';
+                    $v_stock            = updateStock($vs, $vs->balance, $product->qty, $product_type, $invoice_type, 5);
+                    BatchWiseDeleteProduct($product->product_replacement_invoice_id, $product->id, $product->qty, $product_type, 5);
+                    StockManagment($v_stock->id, $vs, $product->qty, $product_type, $invoice_type);
+                    if ($v_stock) {
+                        Product::where('id', $v_stock->product_id)->update([
+                            'stock_balance' =>  $v_stock->balance,
+                        ]); 
+                        
+                    }  
+                }
+             }
+            ProductReplacement::where('product_replacement_invoice_id', $product->product_replacement_invoice_id)
+                                    ->where('product_id', $product->product_id)->where('qty', $product->qty)
+                                    ->delete();
+            ProductReplacementInvoice::where('id',$request->id)->delete(); 
+            return response()->json([
+                'msg'       => 'product removed',
+                'status'    => 'success',
+            ]);
+        }
+        return response()->json([
+            'msg'       => 'Invoice Not Found!',
+            'status'    => 'error',
+        ]);
     }
 }

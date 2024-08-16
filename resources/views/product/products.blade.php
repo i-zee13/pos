@@ -85,7 +85,7 @@
                                                 <div class="col-md-6 PB-10">
                                                     <div class="form-group">
                                                         <label class="control-label mb-10">Size *</label>
-                                                        <input type="text" name="size" class="form-control field-required" required>
+                                                        <input type="text" name="size" class="form-control " required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 PB-10">

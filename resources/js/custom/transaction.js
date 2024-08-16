@@ -23,11 +23,11 @@ $(document).ready(function () {
         $('.customers').hide();
         $('.ProductTable').show();
         var this_btn = $(this)
-        var id = this_btn.attr('customer-id');
-        var customer_name = this_btn.attr('customer_name');
-        var cr = this_btn.attr('cr');
-        var dr = this_btn.attr('dr');
-        var balance = this_btn.attr('balance');
+        var id              = this_btn.attr('customer-id');
+        var customer_name   = this_btn.attr('customer_name');
+        var cr              = this_btn.attr('cr');
+        var dr              = this_btn.attr('dr');
+        var balance         = this_btn.attr('balance');
         $.ajax({
             url: '/get-customer-transactions',
             type: 'post',
@@ -136,21 +136,23 @@ $(document).ready(function () {
         $('.customers').hide();
         $('.ProductTable').show();
         $('#transactionTable tbody').empty();
-        var this_btn = $(this)
-        var id = this_btn.attr('customer-id');
-        var customer_name = this_btn.attr('customer_name');
-        var cr = this_btn.attr('cr');
-        var dr = this_btn.attr('dr');
-        var comment = this_btn.attr('comment');
-        var balance = this_btn.attr('balance');
-        var cr_dr = 0;
+        var this_btn        = $(this)
+        var id              = this_btn.attr('customer-id');
+        var customer_name   = this_btn.attr('customer_name');
+        var cr              = this_btn.attr('cr');
+        var dr              = this_btn.attr('dr');
+        var comment         = this_btn.attr('comment');
+        var balance         = this_btn.attr('balance');
+        var cr_dr           = 0;
         if (action == operation + '-ledger-jama' && cr > 0) {
             balance = parseFloat(balance) + parseFloat(cr)
-            cr_dr = cr;
+            cr_dr   = cr;
         } else {
             balance = parseFloat(balance) - parseFloat(dr)
-            cr_dr = dr;
+            cr_dr   = dr;
         }
+        console.log(comment)
+
         $('.add-more').append(`
                 <div class="row  remove_div" >
                     <div class="col-md-5 PB-10">
@@ -164,7 +166,7 @@ $(document).ready(function () {
                     <div class="col-md-6 PB-10">
                         <div class="form-group focused">
                             <label class="control-label mb-10">Remarks </label>
-                            <textarea name="comment[]" class="form-control remarks_${id}" rows="6" tabindex="3">${comment}</textarea>
+                            <textarea name="comment[]" class="form-control remarks_${id}" rows="6" tabindex="3">${comment == null ? '' : comment}</textarea>
                         </div>
                     </div>
                     <div class="col-md-1 PB-10" style="margin-top: 21px;">

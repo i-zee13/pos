@@ -73,15 +73,11 @@ $(document).ready(function () {
                         'p_name'             : `${product.product_name}`,
                         'sale_invoice_id'    : `${product.sale_invoice_id}`,
                     });
-                // $('.products').children(`option[value="${product.product_id}"]`).attr('disabled', true);
                 })
-                // $(".products").val('0');
-                // $(".products").select2();
                 $('.display').show();
                 $('.show_existing_div').show();
                 var x=0
                 sales_product_array.forEach(function(product,key){
-                    // console.log(product)
                     x++;
                      $('#designationsTable tbody').append(`
                         <tr id='tr-${product.product_id}'>
@@ -109,7 +105,6 @@ $('#add-product').on('click', function () {
         for(var x =1 ; x <= qty ; x++){
             is_in_array[0].qty++;
         }
-        // $('.qty-input').val(sales_product_array[0].qty);
         $('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
     }else{
         if ($('#qty').val() == '') {
@@ -143,9 +138,6 @@ $('#add-product').on('click', function () {
         setTimeout(() => {
             $('.amount_received').trigger('input');
         }, 500);
-        // $('.products').children('option[value="' + product_id + '"]').attr('disabled', true);
-        // $(".products").val('0');
-        // $(".products").select2();
         let rowCount = $('#designationsTable tbody tr').length + 1;
         $('#designationsTable tbody').append(`
                 <tr id='tr-${product_id}'>
@@ -160,11 +152,6 @@ $('#add-product').on('click', function () {
                     );
         grandSum(previous_payable,service_charges);
         $('.show_existing_div').show()
-    
-        
-    
-        // var invoice_type = $('#invoice_type').val();
-        // $('#invoice_type').val(invoice_type).trigger('change'); 
         p_name = ''; 
     }
     $('.purchase_price').val('');
@@ -179,23 +166,7 @@ $('#add-product').on('click', function () {
     data_variable = '';
     
 });
-
-// $('#invoice_type').change(function(){
-//     if($(this).val()==1){ 
-//         $('#customer_id').removeClass('required')
-//         $('#customer_id').val('8').trigger('change');
-//     }else{
-//         $('#customer_id').addClass('required')
-//         $('#customer_id').val('0').trigger('change'); 
-//     }
-//     var total_paid_for_net_sale = 0;
-//     if($(this).val() == '1'){
-//         sales_product_array.forEach(function (data, key) {
-//             total_paid_for_net_sale += parseFloat(data.amount)
-//         });
-//     }
-//     $('.amount_pay_input').val(total_paid_for_net_sale);
-// });
+ 
 $('#datepicker , #datepicker2').datepicker({
     autoclose: true,
     todayHighlight: true,
@@ -410,27 +381,21 @@ function saleSave(current_action,type){
         }
     });
     if($('#customer_id').val() == 0){
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Please select Customer first (*)');
+        $('#notifDiv').fadeIn().css('background', 'red').text('Please select Customer first (*)');
         setTimeout(() => {
             $('#notifDiv').fadeOut();
         }, 3000);
         return;
     }
     if (dirty) {
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Please provide all the required information (*)');
+        $('#notifDiv').fadeIn().css('background', 'red').text('Please provide all the required information (*)');
         setTimeout(() => {
             $('#notifDiv').fadeOut();
         }, 3000);
         return;
     }
     if(sales_product_array.length == 0){
-        $('#notifDiv').fadeIn();
-        $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text('Please add at least one Product.');
+        $('#notifDiv').fadeIn().css('background', 'red').text('Please add at least one Product.');
         setTimeout(() => {
             $('#notifDiv').fadeOut();
         }, 3000)
@@ -490,7 +455,6 @@ function saleSave(current_action,type){
     current_action.text('Processing...')
     current_action.attr('disabled', 'disabled');
     $('.btn-cancel').attr('disabled', 'disabled');
-    // $('#print-invoice').attr('disabled', 'disabled');
     $('#save').attr('disabled', 'disabled');
 
     $('#form').ajaxSubmit({

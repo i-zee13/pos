@@ -119,7 +119,7 @@ $(document).ready(function () {
             $('#notifDiv').fadeOut();
           }, 1500);
           setTimeout(function () {
-            window.location = "/organization-detail";
+            window.location = "/organization";
             $('#notifDiv').fadeOut();
           }, 1000);
         }

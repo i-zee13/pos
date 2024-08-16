@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Models\CustomerLedger;
 use App\Models\ProductPurchase;
 use App\Models\ProductReplacement;
 use App\Models\ProductReplacementInvoice;
@@ -202,6 +202,19 @@ if (!function_exists('ProfitReportRecords')) {
                         ");
 
       return $sales;
+   }
+}
+if (!function_exists('ExpenseReportRecords')) {
+   function ExpenseReportRecords($request, $current_date)
+   {
+      $query = " 1=1"; 
+      if (isset($request->start_date) != '' && isset($request->end_date) != '') {
+         $query .= " AND DATE(created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
+      } else {
+         $query .=  " AND  DATE(created_at) = '$current_date'";
+      }  
+      $query      = CustomerLedger::selectRaw('*, DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at')->whereRaw("$query AND customer_id = 5")->get();
+      return $query;
    }
 }
 if (!function_exists('PurchaseReportList')) {

@@ -1,9 +1,5 @@
-import {
-    filter,
-    update
-} from 'lodash';
+ 
 import swal from 'sweetalert';
-
 var segments = location.href.split('/');
 var invalidSave = [];
 var result = 0;

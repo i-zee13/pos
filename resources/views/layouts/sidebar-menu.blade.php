@@ -351,6 +351,11 @@
                   Profit
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{route('expense-report')}}" class="nav-link ">
+                  Expense
+                </a>
+              </li>
 
             </ul>
           </div>
@@ -407,7 +412,7 @@
           </a>
           <!-- Menu -->
           <div class="dropdown-menu" aria-labelledby="sidebarIconCopy">
-            <a href="#" class="dropdown-item">Profile</a>
+            <a href="{{route('admin.profile')}}" class="dropdown-item">Profile</a>
             <a href="#" class="dropdown-item">Settings</a>
             <a href="{{route('admin.organization')}}" class="dropdown-item">Organization</a>
 

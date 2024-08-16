@@ -313,7 +313,8 @@ function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type,
 }
 function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stock_qty, $In_out_status, $transaction_type, $existing_inv_id =  null)
 {
-
+    // dd($purchase);
+    $purchase->expiry_date = $purchase->expiry_date ? $purchase->expiry_date : '0000-00-00';
     $query = BatchStockMgt::where('product_id', $purchase->product_id);
     if ($existing_inv_id) {
         $query->where('invoice_id', $existing_inv_id)->orderBy('id', 'ASC');

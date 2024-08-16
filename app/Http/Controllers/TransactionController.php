@@ -7,8 +7,8 @@ use App\Models\CustomerLedger;
 use App\Models\VendorLedger;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Auth, DB;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; 
 
 class TransactionController extends Controller
 {
@@ -40,12 +40,12 @@ class TransactionController extends Controller
          $customers  =  VendorLedger::selectRaw('vendor_ledger.*,
                                        (SELECT customer_name FROM customers WHERE id = vendor_ledger.customer_id) as customer_name,
                                        (SELECT balance FROM customers WHERE id = vendor_ledger.customer_id) as customer_balance')
-            ->leftjoin(DB::raw('(SELECT customer_id, MAX(id) as max_id FROM vendor_ledger GROUP BY customer_id) as t'), function ($join) {
-               $join->on('vendor_ledger.customer_id', '=', 't.customer_id')
-                  ->on('vendor_ledger.id', '=', 't.max_id');
-            })->whereDate('created_at', Carbon::today())
-            ->groupby('customer_id')
-            ->orderBy('vendor_ledger.id', 'DESC');
+                                       ->leftjoin(DB::raw('(SELECT customer_id, MAX(id) as max_id FROM vendor_ledger GROUP BY customer_id) as t'), function ($join) {
+                                          $join->on('vendor_ledger.customer_id', '=', 't.customer_id')
+                                             ->on('vendor_ledger.id', '=', 't.max_id');
+                                       })->whereDate('created_at', Carbon::today())
+                                       ->groupby('customer_id')
+                                       ->orderBy('vendor_ledger.id', 'DESC');
          if (str_contains($request->current_url, 'vendor-ledger-jama')) {
             $customers = $customers->where('cr', '>', 0)->where('crv_no', '!=', '')->get();
          } else {
@@ -163,31 +163,22 @@ class TransactionController extends Controller
    }
    public function saveTransaction(Request $request)
    {
-      dd($request->all());
+      // dd($request->all());
       foreach ($request->customers as $key => $customer) {
-         isEditable($customer);
-         // if ($request->action == 'edit') {
-         $balance              = CustomerLedger::where('customer_id', $customer->id)->where('trx_type', 3)->orderBy('created_at', 'desc')->value('balance');
-         // } else {
-         $ledger              =   new CustomerLedger();
-         // }
-         // if ($request->amount_to == 1) {     //1 = CR Ledger-jama
-         $ledger->crv_no   =  getCrvNo();
-         $ledger->balance  =  $customer->balance - $customer->receiving_amount;
-         $ledger->cr       =  $customer->receiving_amount;
-         // } else {                            // DR Ledger-Banam
-         //    $ledger->cpv_no   =  getCpvNo();
-         //    $ledger->balance  =  $balance + $request->amount[$key];
-         //    $ledger->dr       =  $request->amount[$key];
-         // }
-         $ledger->customer_id =   $customer->id;
-         $ledger->trx_type    =   3;
-         $ledger->is_editable =   1;
-         $ledger->comment     =   "Bulk";
-         $ledger->date        =   Carbon::now();
-         $ledger->created_by  =   Auth::user()->id;
+         isEditable($customer['id']);
+         $balance             =     CustomerLedger::where('customer_id', $customer['id'])->where('trx_type', 3)->orderBy('created_at', 'desc')->value('balance');
+         $ledger              =     new CustomerLedger();
+         $ledger->crv_no      =     getCrvNo();
+         $ledger->balance     =     $customer['balance'] - $customer['receiving_amount'];
+         $ledger->cr          =     $customer['receiving_amount'];
+         $ledger->customer_id =     $customer['id'];
+         $ledger->trx_type    =     3;
+         $ledger->is_editable =     1;
+         $ledger->comment     =     "Bulk";
+         $ledger->date        =     Carbon::now();
+         $ledger->created_by  =     Auth::user()->id;
          if ($ledger->save()) {
-            Customer::where('id', $customer->id)->update(['balance' => $ledger->balance]);
+            Customer::where('id', $customer['id'])->update(['balance' => $ledger->balance]);
          }
       }
       return response()->json([
@@ -242,5 +233,35 @@ class TransactionController extends Controller
             ->first();
          return view('transactions.print', compact('invoice', 'type'));
       }
+   }
+   public function printPurchi($invoice_id, $customer_id, $received_amount)
+   {
+       $invoiceId                  =   $invoice_id;
+       $customerId                 =   $customer_id;
+       $customer_balance           =   0;
+       $invoice                    =   SaleInvoice::where('id', $invoiceId)->where('customer_id', $customerId)
+                                                   ->selectRaw("sale_invoices.*,
+                                                               (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
+                                                               (SELECT cr FROM customer_ledger WHERE sale_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
+                                                               ")
+                                                   ->first();
+       $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
+       $products                   =   ProductSale::where('sale_invoice_id', $invoice_id)
+           ->selectRaw("products_sales.*,
+                                                   (SELECT product_name FROM products WHERE id=products_sales.product_id) as product_name")
+           ->get();
+       $ledgerCount      = CustomerLedger::where('customer_id', $customerId)->count();
+       $customer_balance = 0;
+       if ($ledgerCount > 1) {
+           $customer_balance = CustomerLedger::where('customer_id', $customerId)
+               // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+               ->orderBy('id', 'DESC')->skip(1)->value('balance');
+       }
+
+       // $customer_balance = CustomerLedger::where('customer_id', $customerId)
+       //                                     // ->whereDate('created_at', '!=', Carbon::today()->toDateString())
+       //                                     ->orderBy('id', 'DESC')->value('balance');
+
+       return view('sales.sale-invoice', compact('invoice', 'products', 'customer_balance'));
    }
 }
