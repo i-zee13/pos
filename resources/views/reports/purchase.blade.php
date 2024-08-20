@@ -3533,7 +3533,7 @@
                     <div class="col pr-0">
                         <div class="_cust_filter col-4">
                             <div class="form-s2">
-                                <select class="form-control formselect company_id" name="report_type">
+                                <select class="form-control formselect report_type" name="report_type">
                                     <option value="">Select Report Type</option>
                                     <option value="1">Purchase</option>
                                     <option value="2">Return</option>
@@ -3632,7 +3632,7 @@
                                 <canvas id="timechart" width="310" height="110"></canvas>
                             </div>
 
-                            <h2 class="card-heading">Total Purchase<span> After Return</span></h2>
+                            <h2 class="card-heading">Total <span class="sub_text"></span></h2>
                             <div class="total-amount ttl_sales p-0"><span>Rs.</span> 0</div>
                         </div>
                         <div class="col-12">

@@ -52,7 +52,7 @@ $('.search-btn').on('click', function () {
                         <tr>
                             <th></th>
                             <th>Date</th>
-                            <th>Company Name</th>
+                            <th>Vendor</th>
                             <th>Product Name</th>
                             <th>P.Price</th>
                             <th>Qty</th>
@@ -85,7 +85,7 @@ $('.search-btn').on('click', function () {
 
             if (response.reports.purchases && response.reports.purchases.length > 0) {
                 response.reports.purchases.forEach((element, key) => {
-                    total_sales += element['product_net_total'] ? element['product_net_total'] : 0;
+                    total_sales += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
                     ttl_quantity += element['qty'] ? element['qty'] : 0;
                     ttl_product_discount += element['product_discount'] ? element['product_discount'] : 0;
                     ttl_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
@@ -102,7 +102,7 @@ $('.search-btn').on('click', function () {
             if (response.reports.purchase_returns && response.reports.purchase_returns.length > 0) {
                 //Sale Returns
                 response.reports.purchase_returns.forEach((element, key) => {
-                    total_returns += element['product_net_total'] ? element['product_net_total'] : 0;
+                    total_returns += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
                     ttl_return_quantity += element['qty'] ? element['qty'] : 0;
                     ttl_return_product_discount += element['product_discount'] ? element['product_discount'] : 0;
                     ttl_return_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
@@ -284,16 +284,16 @@ $('.search-btn').on('click', function () {
     });
 });
 
-function reportTable(invoice_no, element) {
+function reportTable(invoice_no, element) { 
     $('.TeacherAttendanceListTable tbody').append(`
                     <tr>
                         <td></td>
                         <td>${element['created']}</td>
-                        <td>${element['company_name']}</td>
+                        <td>${element['customer_name']}</td>
                         <td>${element['product_name']}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['purchase_price'] ? element['purchase_price'] : 0}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['product_net_total'])}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['sale_total_amount'])}</td>
                     </tr>`);
 }
 
@@ -354,3 +354,12 @@ function addCommas(nStr) {
     }
     return x1 + x2;
 }
+$('.report_type').on('change', function () {
+    var report_type = $(this).val();
+    $('.sub_text').html(' ')
+    if(report_type == 1){
+      $('.sub_text').html(' Purchase');
+    }else if(report_type == 2){
+      $('.sub_text').html(' Return');
+    }
+  });

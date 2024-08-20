@@ -380,10 +380,11 @@ class SaleController extends Controller
                     }  
                 }
              }
+            customerLedger($request,'sale_invoice_id'); 
             ProductSale::where('sale_invoice_id', $product->sale_invoice_id)
                                     ->where('product_id', $product->product_id)->where('qty', $product->qty)
                                     ->delete();
-            saleInvoice::where('id',$request->id)->delete(); 
+            saleInvoice::where('id',$request->id)->delete();  
             return response()->json([
                 'msg'       => 'product removed',
                 'status'    => 'success',

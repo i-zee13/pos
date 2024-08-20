@@ -265,9 +265,10 @@ if (!function_exists('PurchaseReportList')) {
                               LEFT JOIN products pr ON pr.id = ps.product_id
                               LEFT JOIN companies co ON co.id = ps.company_id
                               WHERE
-                              $query GROUP BY purchase_invoice_id
+                              $query 
                               ORDER BY si.invoice_no ASC
                         ");
+                        // dd($purchases);
       $returns        =  DB::select("
                               SELECT
                                  DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
@@ -287,14 +288,14 @@ if (!function_exists('PurchaseReportList')) {
                                  pr.old_purchase_price,
                                  ps.purchase_price,
                                  pr.sale_price,
-                                 si.product_net_total
+                                 si.product_net_total as sale_total_amount
                               FROM
                               products_returns as ps
                               LEFT JOIN purchase_return_invoices si ON si.id = ps.purchase_return_invoice_id
                               LEFT JOIN products pr ON pr.id = ps.product_id
                               LEFT JOIN companies co ON co.id = ps.company_id
                               WHERE
-                              $query GROUP BY purchase_return_invoice_id
+                              $query 
                               ORDER BY si.invoice_no ASC
                   ");
       $report = [];

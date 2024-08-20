@@ -851,7 +851,7 @@
                                     </thead>
                                     <tbody id="productGrid">
                                         <tr>
-                                            <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;"></td>
+                                            <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1" style="width: 50;" autocomplete="off"></td>
                                             <td>
                                                 <div class="form-s2" style="width:165px">
                                                     <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 150;">

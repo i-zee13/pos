@@ -148,14 +148,14 @@
      $('#bar-code').val('');
      $('.products').val(0).trigger('change');
      $('#new_purchase_price').val('');
-     $('#retail_price').val('');
+    //  $('#retail_price').val('');
      $('#discount').val('');
      $('#bar-code').focus();
      data_variable = '';
      qty = '';
-     $('.retail_price').text(0.0);
-     $('.pp').text(0.0);
-     $('.stock_balance').text(0);
+    //  $('.retail_price').text(0.0);
+    //  $('.pp').text(0.0);
+    //  $('.stock_balance').text(0);
 
  }); 
 
@@ -286,7 +286,7 @@
              $('.purchase_price').val(filter_product[0].old_purchase_price);
          }
          $('#retail_price').val(filter_product[0].sale_price);
-         $('.stock_balance').text(filter_product[0].stock_balance);
+         $('.stock_balance').text(filter_product[0].stock_balance); 
          p_name = filter_product[0].product_name;
          product_id = filter_product[0].id;
          stock_in_hand = filter_product[0].stock_balance;
@@ -296,70 +296,86 @@
          // console.log(filter_product)
          // if (filter_product[0].barcode.length < 5) {
          //     $('.qty').focus();
-         // }
-
+         // } 
      }
  });
  let debounceTimer;
- $(document).on('keyup', '.bar-code', function () {
-     data_variable = $(this).val();
+ $(document).on('keyup focusout', '.bar-code', function (e) {
+    var flag      = false;
+    var focus_out = false;
+    data_variable = $(this).val();
+    console.log(data_variable)
+    if (e.type === 'keyup' &&  data_variable.length > 5) {
+        flag    = true; 
+    } else if (e.type === 'focusout') { 
+        focus_out = true; 
+    }
      $('.purchase_price').val('');
      $('#product-name').val('');
      $('.qty').val('');
      $('#amount').val('');
      $('.calculate_by_amount').val('');
-     $('.calculate_by_amount_text').html('0');
-
+     $('.calculate_by_amount_text').html('0'); 
 
      clearTimeout(debounceTimer);
-    //  debounceTimer = setTimeout(function () {
+    //  var timer = data_variable.length > 5 ? 100 : 500; 
+     debounceTimer = setTimeout(function () {
          if (data_variable != '') {
-             var filter_product = product_list.filter(x => {
-                 const barcodeArray = x.barcode.split(',');
-                 return barcodeArray.includes(data_variable) || x.id == data_variable;
-             });
-             if (filter_product.length > 0) {
-                 $('#products').val(filter_product[0].id).trigger('change');
-                 // $('.retail_price').text(filter_product[0].sale_price);
-                 $('.calculate_by_amount').attr('data-price', filter_product[0].sale_price);
-                 $('.purchase_price').val(filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price);
-                 $('.stock_balance').text(filter_product[0].stock_balance);
-                 p_name = filter_product[0].product_name;
-                 product_id = filter_product[0].id;
-                 if (filter_product[0].barcode.length > 5) {
-                     if (filter_product[0].stock_balance > 0) {
-                         $('.qty').val(1).trigger('change');
-                         $('#add-product').click();
-                     } else {
-                         $('#notifDiv').fadeIn().css('background', 'red').text(`${p_name} is Out of Stock !`);
-                         setTimeout(() => {
-                             $('#notifDiv').fadeOut();
-                         }, 3000);
-                         return;
-                     }
-                 }
-             } else {
-                 $('#products').val('0').trigger('change');
-                 // $('#retail_price').val('');
-                 $('.expiry_date ').val('');
-                 if (data_variable) {
-                     $('#notifDiv').fadeIn().css('background', 'red').text('Product Not Found');
-                     // $('.bar-code').focus();
-                     setTimeout(() => {
-                         $('#notifDiv').fadeOut();
-                     }, 3000)
-                 }
+            console.log(data_variable); 
+            if(focus_out){
+            console.log('Focus Out'); 
+                getProduct(data_variable);
+            }else  if(flag){
+            console.log('Key UP'); 
+                getProduct(data_variable) ;
+            } 
+         }  
+        },700)
+     return 0; 
+ });
+ function getProduct(data_variable){ 
+    var filter_product = product_list.filter(x => {
+        const barcodeArray = x.barcode.split(',');
+        return barcodeArray.includes(data_variable) || x.id == data_variable;
+    }); 
+   console.log(filter_product); 
+    if (filter_product.length > 0 ) { 
+        $('#products').val(filter_product[0].id).trigger('change');
+         $('.calculate_by_amount').attr('data-price', filter_product[0].sale_price);
+         $('.purchase_price').val(filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price);
+         $('.stock_balance').text(filter_product[0].stock_balance);
+         p_name = filter_product[0].product_name;
+         product_id = filter_product[0].id; 
 
+
+         if (data_variable.length > 5) {
+             if (filter_product[0].stock_balance > 0) {
+                 $('.qty').val(1).trigger('change');
+                 $('#add-product').click();
+             } else {
+                 $('#notifDiv').fadeIn().css('background', 'red').text(`${p_name} is Out of Stock !`);
+                 setTimeout(() => {
+                     $('#notifDiv').fadeOut();
+                 }, 3000);
+                 return;
              }
          }
-    //  }, 500);
 
 
+     } else {
+         $('#products').val('0').trigger('change');
+         // $('#retail_price').val('');
+         $('.expiry_date ').val('');
+         if (data_variable) {
+             $('#notifDiv').fadeIn().css('background', 'red').text('Product Not Found');
+             // $('.bar-code').focus();
+             setTimeout(() => {
+                 $('#notifDiv').fadeOut();
+             }, 3000)
+         }
 
-
-     return 0;
-
- });
+     }
+ }
  $(document).on('input change', '.qty', function () {
      qty = $(this).val();
      if (qty > stock_in_hand) {
@@ -395,8 +411,7 @@
      var current_action = $(this);
      saleSave(current_action, 'print');
      current_action.text('Print')
- })
-
+ }) 
  function saleSave(current_action, type) {
      let dirty = false;
      $('.required').each(function () {

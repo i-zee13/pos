@@ -473,3 +473,24 @@ function BatchWiseDeleteProduct($invoice_id, $prod_invoice_id, $qty, $in_out, $t
     $batch->trx_type            =  $type;
     $batch->save();
 }
+
+function customerLedger($request,$column){
+    $invoice = saleInvoice::where('id',$request->id)->first();
+    if ($request->hidden_invoice_id) {
+        $customer_ledger   =   CustomerLedger::where($column, $request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
+    } else {
+        $customer_ledger   =   new  CustomerLedger();
+    }
+    $customer_ledger->cr                = $invoice->paid_amount;
+    $customer_ledger->date              = $request->invoice_date;
+    $customer_ledger->customer_id       = $request->customer_id;
+    $customer_ledger->trx_type          = 1;  //Sale
+    $customer_ledger->dr                = $invoice->total_invoice_amount - ($request->hidden_invoice_id ? 0 :  $balance);
+    $customer_ledger->balance           = ($invoice->total_invoice_amount - $customer_ledger->cr); //balance
+    $customer_ledger->created_by        = Auth::id();
+    $customer_ledger->sale_invoice_id   = $invoice->id;
+    $customer_ledger->save();
+    Customer::where('id', $request->customer_id)->update([
+        'balance' => $customer_ledger->balance,
+    ]);
+}
