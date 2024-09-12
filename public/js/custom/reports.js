@@ -56,6 +56,7 @@ $('.search-btn').on('click', function () {
                             <th hidden>Invoice #</th>
                             <th>Invoice #</th>
                             <th>Date</th>
+                            <th>Comment</th>
                             <th>Debit</th>
                             <th>Credit</th>
                             <th>Balance</th>
@@ -213,6 +214,7 @@ $('.search-btn').on('click', function () {
             $('.TeacherAttendanceListTable tbody').append(`
                 <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
                     <td class="font18" align="right"></td>
+                    <td class="font18" align="right"></td>
                     <td class="font18" align="center">Grand Total :</td>
                     <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${totalDR.toLocaleString('en-US')}</td>
                     <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${totalCR.toLocaleString('en-US')} </td>
@@ -265,8 +267,9 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
         var firstRowHTML = `
             <tr>
                 <td hidden>${element.id}</td>
-                <td>${inv_no}</td>
+                <td>${inv_no ?? 'NA'}</td>
                 <td>${formattedDate}</td> 
+                <td>${element.comment ?? ''}</td> 
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.dr.toLocaleString('en-US')}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${firstBalance.toLocaleString('en-US')}</td>
@@ -288,8 +291,9 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
         var secondRowHTML = `
             <tr>
                 <td hidden>${element.id}</td>
-                <td>${inv_no}</td>
+                <td>${inv_no  ?? 'NA'}</td>
                 <td>${formattedDate}</td> 
+                <td>${element.comment ?? ''}</td>  
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.cr.toLocaleString('en-US')}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${secondBalance.toLocaleString('en-US')}</td>
@@ -321,8 +325,9 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
         var rowHTML = `
             <tr>
                 <td hidden>${element.id}</td>
-                <td>${inv_no}</td>
+                <td>${inv_no  ?? 'NA'}</td>
                 <td>${formattedDate}</td> 
+                 <td><span style='color:red;font-size: 16px;font-weight: bold;'> ${element.comment ?? ''}</span></td>  
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${drValue}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${crValue}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${balance_text}</td>

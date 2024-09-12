@@ -64,7 +64,7 @@
                         <button id="{{$sale->id}}" data-invoice="{{$sale->id}}" data-customer-id="{{$sale->customer_id}}"
                          paid-amount="{{$sale->paid_amount}}" class="btn btn-default print-invoice">Print</button>
                         @if($sale->is_editable== 1 || $sale->customer_id == 8)
-                            <button type="button" id="{{$sale->id}}" route="/delete-sale-invoice" invoice-for="sale" class="btn btn-default red-bg  btn-invoice-delete" name="Sub_cat" title="Delete">Delete</button>
+                            <button type="button" id="{{$sale->id}}" route="/delete-sale-invoice" invoice-for="sale" data-customer-id="{{$sale->customer_id}}" class="btn btn-default red-bg  btn-invoice-delete" name="Sub_cat" title="Delete">Delete</button>
                         @endif
                     </td>
                 </tr>

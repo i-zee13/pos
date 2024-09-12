@@ -14,21 +14,13 @@ return [
     | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
     |
     */
-
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
-
-    'allowed_methods' => ['*'],
-
-    'allowed_origins' => ['*'],
-
+'paths' => ['api/*', 'next-submit'], // Add the routes for CORS
+    'allowed_methods' => ['*'], // Allow all HTTP methods
+    'allowed_origins' => ['http://localhost:3000'], // Allow requests from Next.js frontend
     'allowed_origins_patterns' => [],
-
-    'allowed_headers' => ['*'],
-
+    'allowed_headers' => ['*'], // Allow all headers
     'exposed_headers' => [],
-
     'max_age' => 0,
-
     'supports_credentials' => false,
 
 ];

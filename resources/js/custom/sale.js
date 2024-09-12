@@ -115,8 +115,7 @@
          } else {
              $('.qty').css('border-color', ''); // Reset the border color
          }
-         var prod_discount = $('#discount').val();
-         expiry_date = $('.expiry_date').val();
+         var prod_discount = $('#discount').val(); 
          sales_product_array.push({
              'sale_prod_id': '',
              'prod_discount': prod_discount ? prod_discount : 0,
@@ -153,6 +152,7 @@
      $('#bar-code').focus();
      data_variable = '';
      qty = '';
+     expiry_date= '';
     //  $('.retail_price').text(0.0);
     //  $('.pp').text(0.0);
     //  $('.stock_balance').text(0);
@@ -292,6 +292,7 @@
          stock_in_hand = filter_product[0].stock_balance;
          purchased_price = filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price;
          $('.expiry_date').val(filter_product[0].expiry_date)
+         expiry_date = filter_product[0].expiry_date;
          $('.bar-code').val(filter_product[0].barcode);
          // console.log(filter_product)
          // if (filter_product[0].barcode.length < 5) {
@@ -345,6 +346,7 @@
          $('.purchase_price').val(filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price);
          $('.stock_balance').text(filter_product[0].stock_balance);
          p_name = filter_product[0].product_name;
+         expiry_date = filter_product[0].expiry_date;
          product_id = filter_product[0].id; 
 
 

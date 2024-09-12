@@ -72,7 +72,7 @@
                             <td>
                                 <a id="{{$purchase->id}}" class="btn btn-default {{$purchase->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$purchase->is_editable== 1 ? route('purchase-edit' ,['id'=>$purchase->id]) : route('purchase-edit' ,['id'=>$purchase->id ,'invoice' => 'detail'])}}">{{$purchase->is_editable== 1  ? 'Edit'  : "Detail" }}</a>
                                 @if($purchase->is_editable== 1)
-                                <button type="button" id="{{$purchase->id}}" route="/delete-purchase-invoice" invoice-for="purchase" class="btn btn-default red-bg  btn-invoice-delete" name="Sub_cat" title="Delete">Delete</button>
+                                <button type="button" id="{{$purchase->id}}" data-customer-id="{{$purchase->customer_id}}" route="/delete-purchase-invoice" invoice-for="purchase" class="btn btn-default red-bg  btn-invoice-delete" name="Sub_cat" title="Delete">Delete</button>
                                 @endif
                                 <button id="{{$purchase->id}}" data-invoice="{{$purchase->id}}" data-customer-id="{{$purchase->customer_id}}" paid-amount="{{$purchase->paid_amount}}" class="btn btn-default print-invoice">Print</button>
                             </td>

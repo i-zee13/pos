@@ -294,6 +294,14 @@ class ReportsController extends Controller
          'sales'  => $records
       ]);
    }
+     //Profit Reports 
+     public function stockProfitReport()
+     {
+        $companies  =   Company::select('id', 'company_name')->get();
+        $products   =   Product::select('id', 'product_name')->get();
+        $customers  =   Customer::select('id', 'customer_name')->where('customer_type', 2)->get();
+        return view('reports.profit', compact('companies', 'products', 'customers'));
+     }
    //Profit Reports 
    public function profitReport()
    {
@@ -303,9 +311,13 @@ class ReportsController extends Controller
       return view('reports.profit', compact('companies', 'products', 'customers'));
    }
    public function saleProfitReportList(Request $request)
-   {
+   { 
       $current_date     =  date('Y-m-d');
-      $records          = ProfitReportRecords($request, $current_date);
+      if($request->report_type == 1){
+         $records       = ProfitReportRecords($request, $current_date);
+      }else{
+         $records       = StockProfitReport($request, $current_date);
+      }
       return response()->json([
          'msg'     => 'Stock reports list fetched',
          'status'  => 'success',
@@ -336,6 +348,8 @@ class ReportsController extends Controller
       $query = " 1=1";
       $purchase_return_paid_amount = 0;
       $purchase_inv_paid_amount    = 0;
+      $query .= " AND ps.deleted_at IS NULL";
+
       if (isset($request->company_id)) {
          $query .= " AND ps.company_id = $request->company_id";
       }
@@ -553,11 +567,9 @@ class ReportsController extends Controller
                                              customer_id as vendor_id,
                                              IFNULL(cr,0) as cr,
                                              IFNULL(dr,0) as dr,
-                                             trx_type
+                                             trx_type 
                                           ")
-         ->whereRaw("
-                                             DATE(created_at) = '$closing_date' AND trx_type = 3
-                                          ")->get();
+                                          ->whereRaw("DATE(created_at) = '$closing_date' AND trx_type = 3 AND is_deleted = 0")->get(); 
       $records                         =  new stdClass();
       $records->total_pr_paid_amount   =  collect($saleRecords['pr_paid_amount'])->SUM('paid_amount'); //Purchase return invc payments
       $records->total_pr_invc_amount   =  collect($saleRecords['pr_invc_amount'])->SUM('paid_amount');  //Purchase invoice payment

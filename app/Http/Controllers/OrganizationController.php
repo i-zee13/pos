@@ -11,7 +11,7 @@ use Auth;
 
 class OrganizationController extends Controller
 {
-   public function index()
+   public function index(Request $r)
    {
 
       $data           =  Organization::leftjoin('postal_codes', 'organization.postal_code_id', '=', 'postal_codes.id')

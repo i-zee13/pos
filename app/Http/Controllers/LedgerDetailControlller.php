@@ -65,6 +65,7 @@ class LedgerDetailControlller extends Controller
                                                    ) AS invoice_no
                               
                                        ')->whereRaw("$dateFilter AND customer_id = $request->vendor_id")->get();
+                                       // dd($query);
          // $query      =  CustomerLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
       }
       return response()->json([

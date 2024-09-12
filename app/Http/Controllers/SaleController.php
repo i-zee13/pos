@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BatchStockMgt;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Product;
@@ -101,7 +102,7 @@ class SaleController extends Controller
                     $sale->qty                 = $sale_product['qty'];
                     $sale->sale_total_amount   = $sale_product['amount'];
                     $sale->product_discount    = $sale_product['prod_discount'];
-                    $sale->expiry_date         = $sale_product['expiry_date'];
+                    $sale->expiry_date         = BatchStockMgt::where('product_id', $sale_product['product_id'])->whereNotNull('batch_wise_balance')->orderBy('expiry_date', 'ASC')->value('expiry_date');
                     $sale->created_by          = Auth::id();
                     $sale->purchase_price      = $sale_product['purchased_price'];
                     $previous_qty              = ProductSale::where('sale_invoice_id', $request->hidden_invoice_id)
@@ -370,7 +371,7 @@ class SaleController extends Controller
                 if ($vs) {
                     $vs->actual_qty   = $product->qty; 
                     $v_stock = updateStock($vs, $vs->balance, $product->qty, 1, 'sale', 5);
-                    BatchWiseDeleteProduct($product->sale_invoice_id, $product->id, $product->qty, 1, 5);
+                    BatchWiseDeleteProduct($product->sale_invoice_id, $product, $product->qty, 1, 5);
                     StockManagment($v_stock->id, $vs, $product->qty, 1, 'sale');
                     if ($v_stock) {
                         Product::where('id', $v_stock->product_id)->update([
@@ -378,12 +379,10 @@ class SaleController extends Controller
                         ]); 
                         
                     }  
+                    ProductSale::where('sale_invoice_id', $product->sale_invoice_id)->where('product_id', $product->product_id)->where('qty', $product->qty)->delete();
                 }
              }
             customerLedger($request,'sale_invoice_id'); 
-            ProductSale::where('sale_invoice_id', $product->sale_invoice_id)
-                                    ->where('product_id', $product->product_id)->where('qty', $product->qty)
-                                    ->delete();
             saleInvoice::where('id',$request->id)->delete();  
             return response()->json([
                 'msg'       => 'product removed',

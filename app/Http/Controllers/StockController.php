@@ -377,23 +377,21 @@ class StockController extends Controller
         $customerId                 =   $customer_id;
         $customer_balance           =   0;
         $invoice                    =   PurchaseInvoice::where('id', $invoiceId)->where('customer_id', $customerId)
-            ->selectRaw("purchase_invoices.*,
-                                                        (SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
-                                                        (SELECT cr FROM vendor_ledger WHERE purchase_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
-                                                        ")
-            ->first();
+                                                    ->selectRaw("purchase_invoices.*,(SELECT customer_name FROM customers WHERE id ='$customerId') as customer_name,
+                                                                (SELECT dr FROM vendor_ledger WHERE purchase_invoice_id='$invoice_id' AND customer_id='$customerId') as paid_amount
+                                                                                                ")
+                                                    ->first();
         $invoice->received_amount   =   $received_amount ? $received_amount : $invoice->paid_amount;
 
         $products                   =   ProductPurchase::where('purchase_invoice_id', $invoice_id)
-            ->selectRaw("products_purchases.*,
-                                                    (SELECT product_name FROM products WHERE id=products_purchases.product_id) as product_name")
-            ->get();
+                                                        ->selectRaw("products_purchases.*,(SELECT product_name FROM products WHERE id=products_purchases.product_id) as product_name")
+                                                        ->get();
         $ledgerCount      = VendorLedger::where('customer_id', $customerId)->count();
         $customer_balance = 0;
         if ($ledgerCount > 1) {
             $customer_balance = VendorLedger::where('customer_id', $customerId)
                 ->orderBy('id', 'DESC')->skip(1)->value('balance');
-        }
+        } 
 
         return view('purchases.invoice', compact('invoice', 'products', 'customer_balance'));
     }
@@ -412,17 +410,19 @@ class StockController extends Controller
                 if ($prod) { 
                     $prod->actual_qty   = $product->qty;
                     $v_stock            = updateStock($prod, $prod->balance,$product->qty, 2, 'purchase', 5);
-                    BatchWiseDeleteProduct($product->purchase_invoice_id, $product->id, $product->qty, 2, 5);
+                    BatchWiseDeleteProduct($product->purchase_invoice_id, $product, $product->qty, 2, 5);
                     StockManagment($v_stock->id, $prod,  $product->qty, 2);
                     if ($v_stock) {
                         Product::where('id', $v_stock->product_id)->update([
                             'stock_balance' =>  $v_stock->balance,
                         ]);  
                     }
+                    ProductPurchase::where('purchase_invoice_id', $product->purchase_invoice_id)->where('product_id', $product->product_id)->delete();
                 }  
-             } 
-             ProductPurchase::where('purchase_invoice_id', $product->purchase_invoice_id)
-                               ->where('product_id', $product->product_id)->delete();
+                
+
+             }  
+            vendorLedger($request,'purchase_invoice_id');
             PurchaseInvoice::where('id',$request->id)->delete();
              return response()->json([
                 'msg'       => 'product removed',

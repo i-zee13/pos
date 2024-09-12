@@ -83,11 +83,13 @@ function addCommas(nStr) {
     return x1 + x2;
 }
 $(document).on('click', '.btn-invoice-delete', function() {
-    var id          = $(this).attr('id');
-    var route       = $(this).attr('route');
-    var invoice_for = $(this).attr('invoice-for');
-    var id          = $(this).attr('id');
     deleteRef       = $(this);
+    var id          = deleteRef.attr('id');
+    var route       = deleteRef.attr('route');
+    var invoice_for = deleteRef.attr('invoice-for');
+    var id          = deleteRef.attr('id');
+    var customer_id = deleteRef.attr('data-customer-id');
+console.log(customer_id)
     swal({
             title: "Are you sure?",
             // text    : "",
@@ -95,8 +97,7 @@ $(document).on('click', '.btn-invoice-delete', function() {
             buttons: true,
             dangerMode: true,
         })
-        .then((willDelete) => {
-            var thisRef = $(this);
+        .then((willDelete) => { 
             deleteRef.attr('disabled', 'disabled');
             deleteRef.text('Processing...');
             if (willDelete) {
@@ -108,6 +109,7 @@ $(document).on('click', '.btn-invoice-delete', function() {
                         id          : id,
                         route       : route,
                         invoice_for : invoice_for,
+                        customer_id : customer_id
                     },
                     success: function(r) {
                         if (r.status == 'success') {

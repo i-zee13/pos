@@ -3566,6 +3566,15 @@
                                 height: 31px !important;
                             }
                         </style>
+                         <div class="_cust_filter col-4">
+                            <div class="form-s2">
+                                <select class="form-control formselect report_type" name="report_type">
+                                    <option value="">Report Type</option>
+                                    <option value="1">Sale Profit</option>
+                                    <option value="2">Stock Profit</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="CL-Product inputmonth" style="width:250px;padding-top: 0px;margin-left:2px">
                             <i class="fa fa-search" style="top: 8px"></i>
                             <input type="text" class="form-control" placeholder="Bill #" name="bill_no">

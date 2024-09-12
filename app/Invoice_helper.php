@@ -147,6 +147,42 @@ if (!function_exists('PurchaseReportRecords')) {
       return $records;
    }
 }
+if (!function_exists('StockProfitReport')) {
+   function StockProfitReport($request, $current_date)
+   {
+      $query = " 1=1";
+      if (isset($request->company_id)) {
+         $query .= " AND ps.company_id = $request->company_id";
+      }
+      if (isset($request->product_id)) {
+         $query .= " AND ps.product_id = $request->product_id";
+      }
+      if (isset($request->customer_id)) {
+         $query .= " AND si.customer_id = $request->customer_id";
+      }
+      if (isset($request->start_date) != '' && isset($request->end_date) != '') {
+         $query .= " AND DATE(ps.created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
+      } else {
+         $query .=  " AND  DATE(ps.created_at) = '$current_date'";
+      }
+      if (isset($request->bill_no)) {
+         $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
+      }
+      $sales          =  DB::select("
+                              SELECT
+                                 DATE_FORMAT(vs.created_at,'%d-%m-%Y %h:%i %p') as created,
+                                 IFNUL(vs.company_name , then (SELECT company_name FROM companies WHERE com)) 
+                                 vs.*
+                              FROM
+                              vendor_stock_managment as vs  
+                              WHERE
+                              $query
+                              ORDER BY si.invoice_no DESC
+                        ");
+
+      return $sales;
+   }
+}
 if (!function_exists('ProfitReportRecords')) {
    function ProfitReportRecords($request, $current_date)
    {
@@ -168,6 +204,7 @@ if (!function_exists('ProfitReportRecords')) {
       if (isset($request->bill_no)) {
          $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
       }
+     
       // IFNULL(si.invoice_discount/sum(ps.qty),0) AS divide_invoice_discount,
       $sales          =  DB::select("
                               SELECT

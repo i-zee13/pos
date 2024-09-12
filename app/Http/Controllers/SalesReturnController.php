@@ -97,7 +97,7 @@ class SalesReturnController extends Controller
                     $sale->product_id          = $sale_product['product_id'];
                     $sale->purchase_price      = $sale_product['purchased_price'];
                     $sale->qty                 = $sale_product['qty'];
-                    $sale->expiry_date         = $sale_product['expiry_date'];
+                    $sale->expiry_date         = $sale_product['expiry_date'] ?? 0000-00-00;
                     $sale->return_total_amount = $sale_product['amount'];
                     $sale->product_discount    = $sale_product['prod_discount'];
                     $sale->created_by          = FacadesAuth::id();
@@ -302,19 +302,23 @@ class SalesReturnController extends Controller
                 if ($vs) {
                     $vs->actual_qty   = $product->qty;
                     $v_stock = updateStock($vs, $vs->balance, $product->qty, 2, 'sale-return', 4);
-                    BatchWiseDeleteProduct($product->sale_return_invoice_id, $product->id, $product->qty, 2, 4);
+                    BatchWiseDeleteProduct($product->sale_return_invoice_id, $product, $product->qty, 2, 4);
                     StockManagment($v_stock->id, $vs, $product->qty, 2, 'sale-return');
                     if ($v_stock) {
                         Product::where('id', $v_stock->product_id)->update([
                             'stock_balance' =>  $v_stock->balance,
-                        ]); 
-                        
-                    }  
+                        ]);  
+                    }
+                    SaleReturnProduct::where('sale_return_invoice_id', $product->sale_return_invoice_id)
+                    ->where('product_id', $product->product_id)->where('qty', $product->qty)
+                    ->delete();  
+
                 }
+              
              }
-             SaleReturnProduct::where('sale_return_invoice_id', $product->sale_return_invoice_id)
-                                    ->where('product_id', $product->product_id)->where('qty', $product->qty)
-                                    ->delete();
+            customerLedger($request,'sale_return_invoice_id'); 
+
+            
             SaleReturn::where('id',$request->id)->delete(); 
             return response()->json([
                 'msg'       => 'Product Deleted !',

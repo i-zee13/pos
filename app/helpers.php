@@ -321,11 +321,13 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     } else if ($transaction_type == 1 || $transaction_type == 4 || $transaction_type == 3) {
         $query->whereDate('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC');
     } else if ($transaction_type == 2) {
-        $query->where('batch_wise_balance', '>', 0)->orderBy('id', 'ASC');
+        $query->where('batch_wise_balance', '>', 0)->orderBy('expiry_date', 'ASC');
     }
     $s = $query->first();
     if (!$s) {
         $s = new BatchStockMgt(); 
+        $s->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
+        $s->product_name    = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
     }
     
     $previous_qty     =  0;
@@ -447,7 +449,9 @@ function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
         ->where('company_id', $purchase->company_id)
         ->orderBy('id', 'DESC')->first();
     if (!$stock) {
-        $stock = new StockManagment();
+        $stock                  = new StockManagment();  
+        $stock->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
+        $stock->product_name    = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
     }
     $stock->company_id      = $purchase->company_id;
     $stock->product_id      = $purchase->product_id;
@@ -455,13 +459,17 @@ function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
     $balance                = $In_out_status == 2 ? $stock->balance - $stock_qty : $stock->balance +  $stock_qty;
     $stock->balance         = $balance;
     $stock->vs_id           = $vendor_stock_id;
+    
     // $stock->ttl_avg_cost = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
-    $stock->save(); 
+    $stock->save();  
 }
-function BatchWiseDeleteProduct($invoice_id, $prod_invoice_id, $qty, $in_out, $type)
+function BatchWiseDeleteProduct($invoice_id, $product, $qty, $in_out, $type)
 {
-    $batch  = BatchStockMgt::whereRaw("invoice_product_id = $prod_invoice_id AND invoice_id = $invoice_id ") //AND trx_type = $type 
-        ->first();
+   
+    $expiryDate = $product->expiry_date ?? '0000-00-00';
+
+    $batch  = BatchStockMgt::whereDate("expiry_date" , $expiryDate)->where('product_id', $product->product_id )->first(); 
+         
     if ($in_out == 1) {
         $balance =  $batch->batch_wise_balance + $qty;
     } else if ($in_out == 2) { 
@@ -475,22 +483,57 @@ function BatchWiseDeleteProduct($invoice_id, $prod_invoice_id, $qty, $in_out, $t
 }
 
 function customerLedger($request,$column){
-    $invoice = saleInvoice::where('id',$request->id)->first();
-    if ($request->hidden_invoice_id) {
-        $customer_ledger   =   CustomerLedger::where($column, $request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
-    } else {
-        $customer_ledger   =   new  CustomerLedger();
-    }
-    $customer_ledger->cr                = $invoice->paid_amount;
-    $customer_ledger->date              = $request->invoice_date;
-    $customer_ledger->customer_id       = $request->customer_id;
-    $customer_ledger->trx_type          = 1;  //Sale
-    $customer_ledger->dr                = $invoice->total_invoice_amount - ($request->hidden_invoice_id ? 0 :  $balance);
-    $customer_ledger->balance           = ($invoice->total_invoice_amount - $customer_ledger->cr); //balance
-    $customer_ledger->created_by        = Auth::id();
-    $customer_ledger->sale_invoice_id   = $invoice->id;
-    $customer_ledger->save();
+    $balance                     =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->value('balance');
+    
+    $c                           =  CustomerLedger::where($column, $request->id)->orderBy('id', 'DESC')->first();
+    $bbalance                    =  $column == 'sale_return_invoice_id' ?  ((-$balance) + $c->dr) - $c->cr :  ($balance + $c->cr) - $c->dr;
+    $cust_ldr                    =  new  CustomerLedger();
+    $cust_ldr->cr                =  0;
+    $cust_ldr->date              =  $c->invoice_date;
+    $cust_ldr->customer_id       =  $c->customer_id;
+    $cust_ldr->trx_type          =  4; //Delete Invoice   
+    $cust_ldr->is_deleted        =  1; //Delete Invoice    
+    $cust_ldr->comment           =  'Sale Invoice Deleted '; 
+    $cust_ldr->cr                =  $c->dr;
+    $cust_ldr->balance           =  $bbalance; 
+    $cust_ldr->created_by        =  Auth::id(); 
+    $cust_ldr->save();
+    $c->is_deleted               =  1; //Delete Invoice    
+    $c->save();
+
     Customer::where('id', $request->customer_id)->update([
-        'balance' => $customer_ledger->balance,
+        'balance' => $cust_ldr->balance,
+    ]); 
+}
+
+function vendorLedger($request,$column){
+    $balance                    =      VendorLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->value('balance');
+    $c                          =      VendorLedger::where($column, $request->id)->orderBy('id', 'DESC')->first();
+    $cust_ldr                   =      new  VendorLedger();
+    if($column == 'purchase_return_invoice_id'){
+        $comment = 'Purchase Return Invoice Deleted';
+        $cust_ldr->cr            =      $c->dr;
+        $cust_ldr->dr            =      0;
+        $cust_ldr->purchase_return_invoice_id =  $c->purchase_return_invoice_id;
+    }else{
+        $comment = 'Purchase Invoice Deleted';
+        $cust_ldr->dr            =      $c->cr;
+        $cust_ldr->cr            =      0;
+        $cust_ldr->purchase_invoice_id   =  $c->purchase_invoice_id;
+        
+    }
+    
+    $cust_ldr->balance           = ($balance + $c->dr) - $c->cr;  
+    $cust_ldr->date              =  $c->invoice_date;
+    $cust_ldr->customer_id       =  $c->customer_id;
+    $cust_ldr->trx_type          =  4; //Delete Invoice    
+    $cust_ldr->is_deleted        =  1; //Delete Invoice    
+    $cust_ldr->comment           =  $comment; 
+    $cust_ldr->created_by        =  Auth::id(); 
+    $cust_ldr->save();
+    $c->is_deleted                =  1; //Delete Invoice    
+    $c->save();
+    Customer::where('id', $request->customer_id)->update([
+        'balance' => $cust_ldr->balance,
     ]);
 }
