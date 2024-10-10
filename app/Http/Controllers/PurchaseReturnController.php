@@ -173,8 +173,6 @@ class PurchaseReturnController extends Controller
                         ->whereNotIn('id', $purchased_products_array)
                         ->delete();
                 }
-
-
                 $customer_ledger = VendorLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->first();
                 if ($customer_ledger) {
                     $balance = $customer_ledger->balance;
@@ -186,17 +184,19 @@ class PurchaseReturnController extends Controller
                 } else {
                     $customer_ledger   =  new  VendorLedger();
                 }
-                $customer_ledger->date       = $request->invoice_date;
-                $customer_ledger->purchase_return_invoice_id = $invoice->id;
-                $customer_ledger->trx_type   =  2; //Rerurn inv
-                $customer_ledger->customer_id = $request->customer_id;
+                $customer_ledger->date          = $request->invoice_date;
+                $customer_ledger->trx_type      =  2; //Rerurn inv
+                $customer_ledger->customer_id   = $request->customer_id;
+                $customer_ledger->dr            = $total_dr;
+                $customer_ledger->cr            = $request->service_charges ?? 0;
+                $customer_ledger->is_deleted    = 0;
+                $customer_ledger->comment       = '';
                 $customer_ledger->paid_p_return_amount = $invoice->paid_amount;
-                $customer_ledger->dr         = $total_dr;
-                $customer_ledger->cr         = $request->service_charges ?? 0;
+                $customer_ledger->purchase_return_invoice_id = $invoice->id;
                 if ($invoice->invoice_type ==  1 && $invoice->invoice_remaining_amount_after_pay == $invoice->amount_received) {
-                    $customer_ledger->balance     =  0; //balance
+                    $customer_ledger->balance   =  0; //balance
                 } else {
-                    $customer_ledger->balance     =  $request->previous_receivable - $total_dr +  $customer_ledger->cr; //balance
+                    $customer_ledger->balance   =  $request->previous_receivable - $total_dr +  $customer_ledger->cr; //balance
                 }
                 $customer_ledger->created_by = Auth::id();
                 $customer_ledger->save();
@@ -263,22 +263,21 @@ class PurchaseReturnController extends Controller
 
     public function deleteProduct(Request $request)
     {
-        $vs      = VendorStock::where('purchase_return_invoice_id', $request->return_invoice_id)
-            ->where('product_id', $request->product_id)
-            ->where('transaction_type', 3)->orderBy('id', 'DESC')
-            ->first();
+        $balance    = VendorStock::where('product_id', $request->product_id)->orderBy('id', 'DESC')->value('balance'); 
+        $vs         = VendorStock::where('purchase_return_invoice_id', $request->return_invoice_id)
+                                ->where('product_id', $request->product_id)
+                                ->where('transaction_type', 3)->orderBy('id', 'DESC')
+                                ->first();
         if ($vs) {
-            $v_stock = updateStock($vs, $vs->balance,  $request->qty, 1, 'purchase-return', 5);
-            BatchWiseDeleteProduct($request->return_invoice_id, $request->product_invoice_id, $request->qty, 1, 5);
-            StockManagment($v_stock->id, $vs,  $request->qty, 1, 'purchase-return');
-
-            if ($v_stock) {
-                Product::where('id', $v_stock->product_id)->update([
-                    'stock_balance' =>  $v_stock->balance,
-                ]);
-                ProductReturns::where('purchase_return_invoice_id', $request->return_invoice_id)
-                    ->where('product_id', $request->product_id)->where('qty', $request->qty)
-                    ->delete();
+            $returnProduct  =  ProductReturns::where('purchase_return_invoice_id', $request->return_invoice_id)
+                                            ->where('product_id', $request->product_id)->where('qty', $request->qty)->first();
+            $v_stock        = updateStock($vs, $balance,$request->qty, 1,'purchase-return', 5);
+            BatchWiseDeleteProduct('delete-product',$returnProduct, $request->qty, 1, 5);
+            $sMgt            = StockManagment($v_stock->id, $vs,  $request->qty, 1, 'purchase-return'); 
+            if ($v_stock) { 
+               
+                Product::where('id', $sMgt->product_id)->update(['stock_balance' =>  $sMgt->balance]);
+                $returnProduct->delete();
                 return response()->json([
                     'msg'       => 'product removed',
                     'status'    => 'success',
@@ -370,18 +369,20 @@ class PurchaseReturnController extends Controller
         $invoice_products   =  ProductReturns::where('purchase_return_invoice_id', $request->id)->get();
         if($invoice_products){
             foreach($invoice_products as $product){ 
-                $vs     = VendorStock::where('purchase_return_invoice_id', $product->return_invoice_id)
+                $balance    = VendorStock::where('product_id', $product->product_id)->orderBy('id', 'DESC')->value('balance'); 
+
+                $vs         = VendorStock::where('purchase_return_invoice_id', $product->return_invoice_id)
                                         ->where('product_id', $product->product_id)
                                         ->where('transaction_type', 2)->orderBy('id', 'DESC')
                                         ->first(); 
                 if ($vs) {
                     $vs->actual_qty   = $product->qty; 
-                    $v_stock = updateStock($vs, $vs->balance, $product->qty, 1, 'purchase-return', 5); 
+                    $v_stock = updateStock($vs, $balance, $product->qty, 1, 'purchase-return', 5); 
                     BatchWiseDeleteProduct($product->return_invoice_id, $product, $product->qty, 1, 5);
-                    StockManagment($v_stock->id, $vs, $product->qty, 1, 'purchase-return');
-                    if ($v_stock) {
-                        Product::where('id', $v_stock->product_id)->update([
-                            'stock_balance' =>  $v_stock->balance,
+                    $sMgt = StockManagment($v_stock->id, $vs, $product->qty, 1, 'purchase-return');
+                    if ($sMgt) {
+                        Product::where('id', $sMgt->product_id)->update([
+                            'stock_balance' =>  $sMgt->balance,
                         ]); 
                     }  
                     ProductReturns::where('purchase_return_invoice_id', $product->return_invoice_id)->where('product_id', $product->product_id)->where('qty', $product->qty)->delete();

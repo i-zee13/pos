@@ -173,6 +173,8 @@ class SalesReturnController extends Controller
                 $customer_ledger->dr          = $is_net_return ? $total_cr : $request->service_charges  ?? 0;
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
+                $customer_ledger->is_deleted  = 0;
+                $customer_ledger->comment     = '';
                 $customer_ledger->trx_type    = 2;
                 //Return
                 if ($is_net_return) {
@@ -264,18 +266,15 @@ class SalesReturnController extends Controller
                                 ->where('transaction_type', 4)->orderBy('id', 'DESC')
                                 ->first();
         if ($vs) {
-            
-            $v_stock = updateStock($vs, $vs->balance, $request->qty, 2, 'sale-return', 5);
-            BatchWiseDeleteProduct($request->sale_return_invoice_id, $request->product_invoice_id, $request->qty, 2, 5);
-
+           $returnProduct   =  SaleReturnProduct::where('sale_return_invoice_id', $request->sale_return_invoice_id)
+                                                 ->where('product_id', $request->product_id)->where('qty', $request->qty)->first();
+            $v_stock        = updateStock($vs, $vs->balance, $request->qty, 2, 'sale-return', 5);
+            BatchWiseDeleteProduct($request->sale_return_invoice_id, $returnProduct, $request->qty, 2, 5); 
             StockManagment($v_stock->id, $vs, $request->qty, 2, 'sale-return');
-            if ($v_stock) {
-                Product::where('id', $v_stock->product_id)->update([
-                    'stock_balance' =>  $v_stock->balance,
-                ]);
-                SaleReturnProduct::where('sale_return_invoice_id', $request->sale_return_invoice_id)
-                    ->where('product_id', $request->product_id)->where('qty', $request->qty)
-                    ->delete();
+            if ($v_stock) { 
+                
+                Product::where('id', $v_stock->product_id)->update(['stock_balance' =>  $v_stock->balance]);
+                $returnProduct->delete();
                 return response()->json([
                     'msg'       => 'product removed',
                     'status'    => 'success',

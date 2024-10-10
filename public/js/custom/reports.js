@@ -422,6 +422,7 @@ function vendor_Data(element, inv_no, inv_id, label, formattedDate) {
                 <td hidden>${element.id}</td>
                 <td>${inv_no}</td>
                 <td>${formattedDate}</td> 
+                 <td><span style='color:red;font-size: 16px;font-weight: bold;'> ${element.comment ?? ''}</span></td>  
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${drValue}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${crValue}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${balance_text}</td>
@@ -485,7 +486,8 @@ function tableHtml(element, inv_id, inv_no, formattedDate, label, dr_cr, balance
     var RowHTML = ` <tr>
    <td hidden>${element.id}</td>
    <td>${inv_no}</td>
-   <td>${formattedDate}</td> 
+   <td>${formattedDate}</td>
+    <td><span style='color:red;font-size: 16px;font-weight: bold;'> ${element.comment ?? ''}</span></td>  
    <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${dr_val}</td>
    <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${cr_val}</td>
    <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${balance_text}</td>

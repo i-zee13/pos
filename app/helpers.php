@@ -338,14 +338,9 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         $s->expiry_date     =   $purchase->expiry_date ?? null;
     }
     $balance = $stock_qty;
-    if($s->batch_wise_balance != 0){ 
-
+    if($s->batch_wise_balance != 0){  
   
-        $balance                = $In_out_status == 2 ? $s->batch_wise_balance - $stock_qty : $s->batch_wise_balance +  $stock_qty;
-
-
-
-
+        $balance                = $In_out_status == 2 ? $s->batch_wise_balance - $stock_qty : $s->batch_wise_balance +  $stock_qty; 
         // $balance                =   $In_out_status == 2  
         //                                             ? ($s->batch_wise_balance - $previous_qty - $stock_qty) //OUT
         //                                             : ($s->batch_wise_balance - $previous_qty + $stock_qty);//IN
@@ -446,8 +441,8 @@ function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
     //                     FROM stock_batches_items 
     //                     WHERE product_id = $purchase->product_id")[0];   
     $stock = StockManagment::where('product_id', $purchase->product_id)
-        ->where('company_id', $purchase->company_id)
-        ->orderBy('id', 'DESC')->first();
+                            ->where('company_id', $purchase->company_id)
+                            ->orderBy('id', 'DESC')->first();
     if (!$stock) {
         $stock                  = new StockManagment();  
         $stock->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
@@ -462,24 +457,28 @@ function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
     
     // $stock->ttl_avg_cost = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
     $stock->save();  
+    return $stock;
 }
-function BatchWiseDeleteProduct($invoice_id, $product, $qty, $in_out, $type)
+function BatchWiseDeleteProduct($delete_for, $product, $qty, $in_out, $type)
 {
-   
+    // $where      = "1=1 ";
     $expiryDate = $product->expiry_date ?? '0000-00-00';
-
-    $batch  = BatchStockMgt::whereDate("expiry_date" , $expiryDate)->where('product_id', $product->product_id )->first(); 
-         
-    if ($in_out == 1) {
-        $balance =  $batch->batch_wise_balance + $qty;
-    } else if ($in_out == 2) { 
-        $balance =  $batch->batch_wise_balance - $qty;
+    // $where       .= " AND product_id = $product->id AND expiry_date = $expiryDate";
+    // $batch      = DB::select("SELECT * FROM stock_batches_items where $where");
+    $batch  = BatchStockMgt::whereDate("expiry_date" , $expiryDate)->where('product_id', $product->product_id)->first(); 
+    if (!empty($batch)) {
+        
+        if ($in_out == 1) {
+            $balance =  $batch->batch_wise_balance + $qty;
+        } else if ($in_out == 2) { 
+            $balance =  $batch->batch_wise_balance - $qty;
+        }
+        $batch->batch_wise_balance  =  $balance;
+        $batch->qty                 =  $qty;
+        $batch->actual_status       =  $in_out;
+        $batch->trx_type            =  $type;
+        $batch->save();
     }
-    $batch->batch_wise_balance  =  $balance;
-    $batch->qty                 =  $qty;
-    $batch->actual_status       = $in_out;
-    $batch->trx_type            =  $type;
-    $batch->save();
 }
 
 function customerLedger($request,$column){
@@ -507,20 +506,19 @@ function customerLedger($request,$column){
 }
 
 function vendorLedger($request,$column){
-    $balance                    =      VendorLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->value('balance');
-    $c                          =      VendorLedger::where($column, $request->id)->orderBy('id', 'DESC')->first();
-    $cust_ldr                   =      new  VendorLedger();
+    $balance                     =      VendorLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->value('balance');
+    $c                           =      VendorLedger::where($column, $request->id)->orderBy('id', 'DESC')->first();
+    $cust_ldr                    =      new  VendorLedger();
     if($column == 'purchase_return_invoice_id'){
-        $comment = 'Purchase Return Invoice Deleted';
+        $comment                 =      ($request->deleting_product == 1 ? 'Product' : 'Purchase Return Invoice') .' Deleted';
         $cust_ldr->cr            =      $c->dr;
         $cust_ldr->dr            =      0;
         $cust_ldr->purchase_return_invoice_id =  $c->purchase_return_invoice_id;
     }else{
-        $comment = 'Purchase Invoice Deleted';
+        $comment                 =      ($request->deleting_product == 1 ? 'Product' : 'Purchase Invoice') .' Deleted';
         $cust_ldr->dr            =      $c->cr;
         $cust_ldr->cr            =      0;
         $cust_ldr->purchase_invoice_id   =  $c->purchase_invoice_id;
-        
     }
     
     $cust_ldr->balance           = ($balance + $c->dr) - $c->cr;  

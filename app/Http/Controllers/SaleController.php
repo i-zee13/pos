@@ -12,7 +12,7 @@ use App\Models\StockManagment;
 use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class SaleController extends Controller
 {
@@ -173,6 +173,8 @@ class SaleController extends Controller
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
                 $customer_ledger->trx_type    = 1;  //Sale
+                $customer_ledger->is_deleted  = 0;
+                $customer_ledger->comment     = '';
                 $customer_ledger->dr          = $invoice->total_invoice_amount - ($request->hidden_invoice_id ? 0 :  $balance);
                 $customer_ledger->balance     = ($invoice->total_invoice_amount - $customer_ledger->cr); //balance
                 $customer_ledger->created_by  = Auth::id();
@@ -335,17 +337,17 @@ class SaleController extends Controller
             ->where('transaction_type', 2)->orderBy('id', 'DESC')
             ->first();
         if ($vs) {
+            $soldProduct =  ProductSale::where('sale_invoice_id', $request->sale_invoice_id)
+                                        ->where('product_id', $request->product_id)->where('qty', $request->qty)
+                                        ->first();
             $v_stock = updateStock($vs, $vs->balance, $request->qty, 1, 'sale', 5);
-            BatchWiseDeleteProduct($request->sale_invoice_id, $request->product_invoice_id, $request->qty, 1, 5);
+            BatchWiseDeleteProduct($request->sale_invoice_id, $soldProduct, $request->qty, 1, 5);
             StockManagment($v_stock->id, $vs, $request->qty, 1, 'sale');
 
             if ($v_stock) {
-                Product::where('id', $v_stock->product_id)->update([
-                    'stock_balance' =>  $v_stock->balance,
-                ]);
-                ProductSale::where('sale_invoice_id', $request->sale_invoice_id)
-                    ->where('product_id', $request->product_id)->where('qty', $request->qty)
-                    ->delete();
+               
+                Product::where('id', $v_stock->product_id)->update(['stock_balance' =>  $v_stock->balance]);
+                $soldProduct->delete();
                 return response()->json([
                     'msg'       => 'product removed',
                     'status'    => 'success',
