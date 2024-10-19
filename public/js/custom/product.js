@@ -537,7 +537,7 @@ function fetchcompanies() {
     success: function success(response) {
       companies = response.companies;
       $('.body').empty();
-      $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Icon</th><th>Name</th><th>Action</th></tr></thead><tbody></tbody></table>');
+      $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>ID</th><th>Icon</th><th>Name</th><th>Action</th></tr></thead><tbody></tbody></table>');
       $('.mainCatsListTable tbody').empty();
       // var response = JSON.parse(response);
       var sNo = 1;
@@ -546,7 +546,7 @@ function fetchcompanies() {
           value: element.id,
           text: element.company_name
         });
-        $('.mainCatsListTable tbody').append("\n                        <tr>\n                            <td>".concat(key + 1, "</td>\n                            <td> <img src=\"").concat(element['company_icon'] ? '/storage/'.element['company_icon'] : '/images/company.png', "\"  style=\"height:25px; width:25px;\"></td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td>\n                                <button id=\" ").concat(element['id'], " \" class=\"btn btn-default btn-line openDataSidebarForUpdateCompany\">Edit</button>\n                            </td>\n                        </tr>"));
+        $('.mainCatsListTable tbody').append("\n                        <tr>\n                            <td>".concat(element['id'], "</td>\n                            <td> <img src=\"").concat(element['company_icon'] ? '/storage/'.element['company_icon'] : '/images/company.png', "\"  style=\"height:25px; width:25px;\"></td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td>\n                                <button id=\" ").concat(element['id'], " \" class=\"btn btn-default btn-line openDataSidebarForUpdateCompany\">Edit</button>\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();

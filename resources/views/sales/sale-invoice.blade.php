@@ -158,6 +158,7 @@
 
         #invoice-POS .footer-copyright {
             width: 76mm;
+            margin-bottom :5px;
         }
 
         #invoice-POS .footer-copyright .copyright {
@@ -360,15 +361,28 @@
 
             </table>
             @endif
+             <table class="bot-3-table w-50">
+                <tr class="tabletitle">
+                    <th>Refund Policy :</th>
+                </tr>
+                <tr class="body-description-tr">
+                    <td class="tableitem" style="text-align:right"><b>خریدا ہوا بیج نا قابلِ واپسی ہے</b></td>
+                </tr>
+                   <tr class="body-description-tr">
+                    <td  style="text-align:right">اس کے علاؤہ تمام آئٹمز دس دن کے اندر بمعہ بل واپس یا تبدیل ہو جائیں گے شکریہ ۔</td>
+                </tr>
+
+            </table>
             <table class="footer">
                 <tr class="thankyou">
                     <td>Thank for your kind visit </td>
                     <td>{{Auth::user()->name}}(user)</td>
                 </tr>
             </table>
+           
             <table class="footer-copyright">
                 <tr class="copyright">
-                    <td>Software doveloped by {{$developer}}</td>
+                    <td>Software doveloped by <b>{{$developer}}</b></td>
                 </tr>
             </table>
 

@@ -373,12 +373,14 @@ class StockController extends Controller
         $invoice_products   =  ProductPurchase::where('purchase_invoice_id', $request->id)->get();
         if($invoice_products){
             foreach($invoice_products as $k => $product){  
-                $balance    = VendorStock::where('product_id', $request->product_id)->orderBy('id', 'DESC')->value('balance'); 
+                $balance    = VendorStock::where('product_id',$product->product_id)->orderBy('id', 'DESC')->value('balance'); 
                 $prod       = VendorStock::where('purchase_invoice_id', $product->purchase_invoice_id)
                                         ->where('product_id', $product->product_id)
                                         ->where('transaction_type', 1)
                                         ->orderBy('id', 'DESC')
-                                        ->first();  
+                                        ->first(); 
+// dd($balance);
+
                 if ($prod) { 
                     $prod->actual_qty   = $product->qty;
                     $v_stock            = updateStock($prod, $balance,$product->qty, 2, 'purchase', 5);

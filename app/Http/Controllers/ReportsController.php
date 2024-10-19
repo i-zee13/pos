@@ -38,7 +38,7 @@ class ReportsController extends Controller
    public function stockReportList(Request $request)
    {
       
-      $query               =  " 1=1 AND balance > 0 ";
+      $query               =  " 1=1 AND batch_wise_balance > 0 ";
       $current_date        =   date('Y-m-d');
       if (isset($request->company_id)) {
          $query      .= " AND vs.company_id =  $request->company_id";

@@ -247,7 +247,7 @@
             </table>
             <table class="footer-copyright">
                 <tr class="copyright">
-                    <td>Software doveloped by Zeeshan Hamza +92-333-6701313</td>
+                     <td>Software doveloped by <b>{{$developer}}</b></td>
                 </tr>
             </table>
 

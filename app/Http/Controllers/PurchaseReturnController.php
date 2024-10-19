@@ -370,7 +370,6 @@ class PurchaseReturnController extends Controller
         if($invoice_products){
             foreach($invoice_products as $product){ 
                 $balance    = VendorStock::where('product_id', $product->product_id)->orderBy('id', 'DESC')->value('balance'); 
-
                 $vs         = VendorStock::where('purchase_return_invoice_id', $product->return_invoice_id)
                                         ->where('product_id', $product->product_id)
                                         ->where('transaction_type', 2)->orderBy('id', 'DESC')

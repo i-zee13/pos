@@ -248,7 +248,7 @@
             </table>
             <table class="footer-copyright">
                 <tr class="copyright">
-                    <td>Software doveloped by {{$developer}}</td>
+                    <td>Software doveloped by <b>{{$developer}}</b></td>
                 </tr>
             </table>
 

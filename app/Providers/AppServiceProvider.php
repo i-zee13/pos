@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
 
         View::share([
             'organization'              =>  $organization,
-            'developer'                 =>  "Zeeshan Hamza +92-333-6701313",
+            'developer'                 =>  "Storeeo.App +92-333-6701313",
         ]);
     }
 }

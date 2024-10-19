@@ -480,7 +480,7 @@ function fetchcompanies() {
         success :     function(response) {
             companies =  response.companies;
                     $('.body').empty();
-                    $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Icon</th><th>Name</th><th>Action</th></tr></thead><tbody></tbody></table>');
+                    $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>ID</th><th>Icon</th><th>Name</th><th>Action</th></tr></thead><tbody></tbody></table>');
                     $('.mainCatsListTable tbody').empty();
                     // var response = JSON.parse(response);
                     var sNo = 1;
@@ -488,7 +488,7 @@ function fetchcompanies() {
                         selectize.addOption({value:element.id,text:element.company_name});
                         $('.mainCatsListTable tbody').append(`
                         <tr>
-                            <td>${key + 1}</td>
+                            <td>${element['id']}</td>
                             <td> <img src="${element['company_icon'] ? '/storage/'.element['company_icon'] : '/images/company.png'}"  style="height:25px; width:25px;"></td>
                             <td> ${element['company_name']}</td>
                             <td>
