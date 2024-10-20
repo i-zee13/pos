@@ -562,7 +562,7 @@ class ReportsController extends Controller
                                              IFNULL(dr,0) as dr,
                                              trx_type
                                           ")
-         ->whereRaw("DATE(created_at) = '$closing_date' AND customer_id != 5  
+                                          ->whereRaw("DATE(created_at) = '$closing_date' AND customer_id != 5  
                                           ")->get();
       $vendor_payment                  =  DB::table("vendor_ledger")->selectRaw("
                                              customer_id as vendor_id,
@@ -597,11 +597,13 @@ class ReportsController extends Controller
       $records->total_credit_sale_returns     =  collect($saleRecords['sale_returns'])->WHERE('invoice_type', 2)->SUM('return_total_amount');
       $records->total_credit_sale_returns_amount_received     =  collect($saleRecords['sale_returns'])->WHERE('invoice_type', 2)->SUM('paid_amount');
       //END Returns
-      $records->customer_payment = collect($customer_payment)->whereNotIn('customer_id', [5, 8, 97, 170])->where('trx_type', 3)->sum('dr');
-      //Expense
+      $records->customer_payment       = collect($customer_payment)->whereNotIn('customer_id', [5, 8, 97, 170])->where('trx_type', 3)->sum('dr');
+      //Expense 
       $records->expense                =  collect($customer_payment)->WHERE('customer_id', 5)->WHERE('trx_type', 3)->SUM('dr');
       //Opening Balnce
       $records->openning_balance       =  collect($customer_payment)->WHERE('customer_id', 170)->WHERE('trx_type', 3)->SUM('cr');
+
+    
       $records->vendor_payment         =  collect($vendor_payment)->SUM('dr');
       $records->ttl_cash_recovery      =  collect($customer_payment)->whereNotIn('customer_id', [5, 8, 97, 170])->WHERE('trx_type', 3)->SUM('cr');
       $records->ttl_vendor_cash_recovery   =  collect($vendor_payment)->WHERE('customer_id', '!=', 7)->WHERE('trx_type', 3)->SUM('cr');

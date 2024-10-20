@@ -37,7 +37,7 @@ class HomeController extends Controller
             $message = 'Good Evening';
         }
         //get total sale from sale_invoice table 
-        $total_sale = Sale::whereDate('date', date('Y-m-d'))->sum('paid_amount');
+        $total_sale = Sale::whereDate('date', date('Y-m-d'))->sum('product_net_total');
         $total_purchase = PurchaseInvoice::whereDate('date', date('Y-m-d'))->sum('paid_amount'); 
         return view('home', compact('message', 'total_sale', 'total_purchase'));
     }
