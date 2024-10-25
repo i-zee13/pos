@@ -47,15 +47,18 @@ class PurchaseReturnController extends Controller
         $invoice_first_part  =   $parts[0];
         $current_date        =   Carbon::today()->toDateString();
         $products            =   Product::selectRaw('products.*, (SELECT purchase_price FROM products_purchases WHERE product_id = products.id LIMIT 1) as unit_price')
-            ->where('stock_balance', '>', 0)
-            ->get();
+                                            ->where('stock_balance', '>', 0)
+                                            ->get();
 
-        $customers           =   Customer::where('customer_type', 1)
-            ->whereIn('id', function ($query) {
-                $query->select('customer_id')
-                    ->from('purchase_invoices')
-                    ->groupBy('customer_id');
-            })->get();
+        $customers = Customer::where('customer_type', 1)
+                                ->where(function ($query) {
+                                    $query->whereIn('id', function ($subQuery) {
+                                        $subQuery->select('customer_id')
+                                            ->from('purchase_invoices')
+                                            ->groupBy('customer_id');
+                                    }) ;
+                                })
+                                ->get();
 
         return view('purchases.return.create', compact('customers', 'current_date', 'invoice_first_part', 'products', 'invoice_no'));
     }
@@ -80,7 +83,7 @@ class PurchaseReturnController extends Controller
         $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges) - $request->invoice_discount;
         $invoice->invoice_remaining_amount_after_pay  =  $invoice->total_invoice_amount + $invoice->paid_amount;
 
-        $total_dr       =   $invoice->total_invoice_amount +  $invoice->paid_amount  - $request->service_charges;
+        $total_dr                      =   $invoice->total_invoice_amount - $request->service_charges;
 
         $invoice->service_charges      = $request->service_charges;
         $invoice->invoice_discount     = $request->invoice_discount;
@@ -188,7 +191,7 @@ class PurchaseReturnController extends Controller
                 $customer_ledger->trx_type      =  2; //Rerurn inv
                 $customer_ledger->customer_id   = $request->customer_id;
                 $customer_ledger->dr            = $total_dr;
-                $customer_ledger->cr            = $request->service_charges ?? 0;
+                $customer_ledger->cr            = $request->service_charges +  $invoice->paid_amount ?? 0;
                 $customer_ledger->is_deleted    = 0;
                 $customer_ledger->comment       = '';
                 $customer_ledger->paid_p_return_amount = $invoice->paid_amount;

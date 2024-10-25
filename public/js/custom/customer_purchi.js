@@ -5,12 +5,14 @@
  let report_segments = location.href.split('/');
  let current_url = report_segments[3].replace(/[#?]+$/, '');
  let trx_inv = false;
+ let tabIndexCounter = 1;  
+
  $(document).ready(function () {
 
      $('.customer_id').on('change', function () {
-         var id = $('option:selected', this).val();
-         var name = $('option:selected', this).attr('cust-name');
-         var balance = $('option:selected', this).attr('balance');
+         var id         = $('option:selected', this).val();
+         var name       = $('option:selected', this).attr('cust-name');
+         var balance    = $('option:selected', this).attr('balance');
          ledger_balance =   balance >= 0 ? balance + ' DR' : (-balance) + ' CR' 
 
          if (id > 0) {
@@ -21,12 +23,13 @@
                     <td>${id}</td>
                     <td>${name}</td>
                     <td>${ledger_balance}</td>
-                    <td><input type="number" value="0" balance="${balance}" cust-id="${id}" class="inputSale amount-input add-stock-input td-input-amount${id}"   min="0"></td>
+                    <td><input type="number" value="0" balance="${balance}" cust-id="${id}" class="inputSale amount-input add-stock-input td-input-amount${id}"   min="0" tabindex="${tabIndexCounter}"></td>
                     <td class="action-btn-client">
                         <button id="${id}" class="btn smBTN red-bg remove_btn" >Remove</button>
                     </td>
                 </tr>
             `);
+            tabIndexCounter++;
              $('.TeacherAttendanceListTable').DataTable();
              $('.customer_id').children('option[value="' + id + '"]').attr('disabled', true);
              $(".customer_id").val("0").trigger('change');
@@ -80,7 +83,7 @@
             success : function(response){
                             if (response.status == 'success') {
                                 if(type == 'print'){
-                                    var printWindow    = window.open("/print-sale-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
+                                    var printWindow    = window.open("/print-ledger-purchi");
                                     printWindow.onload = function() { printWindow.print(); }; 
                                 }
                                 setTimeout(() => {

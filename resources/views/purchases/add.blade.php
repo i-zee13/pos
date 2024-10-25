@@ -644,9 +644,7 @@
                                         <div class="form-s2">
                                             <select class="form-control formselect form_clear  required customer_id" placeholder="Select Customer" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
                                                 <option value="">Select Customer</option>
-                                                @foreach($customers as $customer)
-                                                <option value="{{$customer->id}}" {{$customer->id == @$invoice->customer_id ? 'selected' : ''}}>{{$customer->id}} - {{$customer->customer_name}}</option>
-                                                @endforeach
+                                                
                                             </select>
                                         </div>
                                     </div>
@@ -696,23 +694,7 @@
                                 <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
 
                             </div>
-                            <!-- <div class="col-auto pr-0">Invoice #
-                          <input type="text" id="" class="inputfileds required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
-                      </div> -->
-                            <!-- <div class="col-auto pr-0">Date
-                          <input type="Date" name="invoice_date" class="inputfileds datefileds new_dob new_form_field " value="{{@$invoice ? $invoice->created_at->format('Y-d-m') : $current_date}}">
-                      </div> -->
-                            <!-- <div class="col-auto pr-0">DOD <input type="Date" name="expected_delivery_date" class="inputfileds datefileds"> </div> -->
-                            <!-- <div class="col-auto pr-0">PO.NO. <input type="text" class="inputfileds" id="poNumForm"></div> -->
-                            <!-- <div class="col-auto pr-0">Invoice Type
-                          <select class="custom-select custom-select-sm form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
-                              <option value="1" {{@$invoice->invoice_type == 1 ? 'sehlected' : ''}}>Net Sale</option>
-                              <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
-                          </select>
-                          @if (@$invoice->customer_id)
-                          <input type="hidden" name="invoice_type" value="{{ @$invoice->invoice_type }}">
-                          @endif
-                      </div> -->
+                           
 
                             <div class="infoDiv">
                                 <form id="purchse-form">
@@ -916,8 +898,7 @@
 </div>
 @endsection
 @push('js')
-<script>
-    var clients = JSON.parse('{!! json_encode($customers)  !!}');
+<script> 
 </script>
 <script src="{{mix('js/custom/stock.js')}}"> </script>
 

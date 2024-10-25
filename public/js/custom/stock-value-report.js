@@ -120,7 +120,7 @@ $('.search-btn').on('click', function () {
                   </td>
               </tr>
           `);
-            $('.ttl_stock_in_hand').html(total_balance);
+            $('.ttl_stock_in_hand').html(addCommas(last_balance.toFixed(2)));
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
 

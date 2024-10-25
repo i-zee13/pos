@@ -91,7 +91,7 @@ $(document).ready(function() {
                 $('input[name="size"]').blur();
 
                 $('input[name="purchase_price"]').focus();
-                $('input[name="purchase_price"]').val(response.product.old_purchase_price.toFixed(2));
+                $('input[name="purchase_price"]').val(response.product.new_purchase_price ? response.product.new_purchase_price : response.product.old_purchase_price.toFixed(2));
                 $('input[name="purchase_price"]').blur();
 
                 $('input[name="sale_price"]').focus();

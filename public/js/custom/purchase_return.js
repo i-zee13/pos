@@ -752,10 +752,10 @@ function grandSum() {
   }, 500);
   if (parseFloat($('.amount_pay_input').val()) < 0) {
     $('.th-hide').hide();
-    $('.cash-return').text('Cash Pay');
+    $('.cash-return').text('Cash Received');
   } else {
     $('.th-hide').show();
-    $('.cash-return').text('Cash Pay');
+    $('.cash-return').text('Cash Received');
   }
 }
 $('body').on('click', '.ProductTable tr', function () {

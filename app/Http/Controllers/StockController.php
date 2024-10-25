@@ -21,10 +21,9 @@ class StockController extends Controller
         $invoice_no   =   getPurchaseInvoice();
         $parts        = explode('-', $invoice_no);
         $invoice_first_part   = $parts[0];
-        $current_date =   Carbon::today()->toDateString();
-        $customers    =   Customer::all();
+        $current_date =   Carbon::today()->toDateString(); 
         $products     =   Product::get();
-        return view('purchases.add', compact('customers', 'current_date', 'products', 'invoice_no', 'invoice_first_part'));
+        return view('purchases.add', compact('current_date', 'products', 'invoice_no', 'invoice_first_part'));
     }
     public function getProduct(Request $request)
     {
@@ -262,9 +261,8 @@ class StockController extends Controller
         }
     }
     public function getVendors()
-    {
-
-        $customers = Customer::where('customer_type', 1)->get(); //1=vendor
+    { 
+        $customers = Customer::where('customer_type', 1)->where('id','!=',6)->get(); //1=vendor
         return response()->json([
             'msg'       => 'Vendor Fetched',
             'status'    => 'success',

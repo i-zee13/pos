@@ -360,48 +360,7 @@ function vendor_Data(element, inv_no, inv_id, label, formattedDate) {
         tableHtml(element, inv_id, inv_no, formattedDate, label, element.cr, firstBalance, "cr")
         tableHtml(element, inv_id, inv_no, formattedDate, label, element.dr, secondBalance, "dr")
 
-        // var firstRowHTML = `
-        //     <tr>
-        //         <td hidden>${element.id}</td>
-        //         <td>${inv_no}</td>
-        //         <td>${formattedDate}</td> 
-        //         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
-        //         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.cr.toLocaleString('en-US')}</td>
-        //         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${firstBalance.toLocaleString('en-US')}</td>
-        //         <td><a class="btn btn-default btn-detail  btn-line"
-        //                 data-inv-id="${inv_id}"
-        //                 data-inv_no="${inv_no}"
-        //                 data-label="${label}"
-        //                 data-id="${element.id}"
-        //                 data-commit="${element.comment ?? 'NA'}"
-        //                 data-cr="${element.cr}"
-        //                 data-dr="${element.dr}"
-        //                 href="javascript:void(0)">Detail</a></td>
-        //     </tr>`;
-        // $('.TeacherAttendanceListTable tbody').append(firstRowHTML);
-
-        // Second iteration: CR skipped, DR present
-
-
-        // var secondRowHTML = `
-        //     <tr>
-        //         <td hidden>${element.id}</td>
-        //         <td>${inv_no}</td>
-        //         <td>${formattedDate}</td> 
-        //         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.dr.toLocaleString('en-US')}</td>
-        //         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
-        //         <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${secondBalance.toLocaleString('en-US')}</td>
-        //         <td><a class="btn btn-default btn-detail  btn-line"
-        //                 data-inv-id="${inv_id}"
-        //                 data-inv_no="${inv_no}"
-        //                 data-label="${label}"
-        //                 data-id="${element.id}"
-        //                 data-commit="${element.comment ?? 'NA'}"
-        //                 data-cr="${element.cr}"
-        //                 data-dr="${element.dr}"
-        //                 href="javascript:void(0)">Detail</a></td>
-        //     </tr>`;
-        // $('.TeacherAttendanceListTable tbody').append(secondRowHTML);
+       
     } else {
         if (element.trx_type == 3) {
             // Only one of CR or DR present or neither

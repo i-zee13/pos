@@ -77,7 +77,7 @@ class ProductController extends Controller
     public function getProducts()
     {
         $data =  Product::selectRaw('products.* , (SELECT company_name FROM companies WHERE id = products.company_id) as company_name')
-            ->orderBy('created_at', 'DESC')->get();
+            ->orderBy('created_at', 'ASC')->get();
         $maxId = Product::withTrashed()->max('id');
         return response()->json([
             'msg'       =>  'Products Fetched',

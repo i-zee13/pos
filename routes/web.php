@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 // Route::post('/next-submit', function (Request $r) {
 //     $name = $r->input('name');
 //     // dd(3434); 
@@ -145,7 +146,6 @@ Route::group(['middleware' => ['auth']], function () {
 
     //Genrate invoice
     Route::get('/print-sale-invoice/{invoice_id}/{customer_id}/{received_amount}', [SaleController::class, 'printInvoice'])->name('print-sale-invoice');
-    Route::get('/print-ledger-purchi/{invoice_id}', [TransactionController::class, 'printPurchi'])->name('print-purchi');
     //Transactions
 
     Route::get('/customer-ledger-jama',     [TransactionController::class, 'customerLedger'])->name('customer-ledger-jama');
@@ -163,6 +163,8 @@ Route::group(['middleware' => ['auth']], function () {
     //Multiple Transtaction of Customer
     Route::get('/ledger-purchi',            [TransactionController::class, 'getLedgerPurchi'])->name('ledger-purchi');
     Route::post('/save-tranasctions',       [TransactionController::class, 'saveTransaction'])->name('save-tranasctions');
+    Route::get('/print-ledger-purchi',      [TransactionController::class, 'printPurchi'])->name('print-purchi');
+
     //Reports
     Route::get('/customer-reports',         [LedgerDetailControlller::class, 'customerReport'])->name('customer-reports');
     Route::get('/vendor-reports',           [LedgerDetailControlller::class, 'vendorReport'])->name('vendor-reports');

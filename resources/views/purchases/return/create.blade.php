@@ -806,7 +806,7 @@
                                         <tr>
                                             <td></td>
                                             <td></td>
-                                            <td align="right" class="cash-return">Cash To Pay </td>
+                                            <td align="right" class="cash-return">Cash Received </td>
                                             <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" value="{{ @$invoice->paid_amount }}"></td>
                                         </tr>
 
@@ -814,7 +814,7 @@
                                         <tr class="cash_return_tr" style="display:none">
                                             <td></td>
                                             <td></td>
-                                            <td align="right">Cash Return</td>
+                                            <td align="right">Cash Remain</td>
                                             <td class="cash_return">{{ @$invoice->cash_return }}</td>
                                         </tr>
 
