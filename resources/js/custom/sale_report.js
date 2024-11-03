@@ -59,7 +59,8 @@ $('.search-btn').on('click', function () {
 
                         </tr>
                     </thead><tbody>
-                </tbody>
+                    </tbody>
+                    <tfoot></tfoot>
                 </table>`);
 
 
@@ -76,20 +77,20 @@ $('.search-btn').on('click', function () {
             var total_sales = 0;
             var ttl_quantity = 0;
             var ttl_product_discount = 0;
-            var ttl_invoice_discount = 0;
+            var ttl_invoice_discount = response.stocks.sale_invoice_record['invoice_discount'];
             //Sale Return Variables
             var total_returns = 0;
             var ttl_return_quantity = 0;
             var ttl_return_product_discount = 0;
             var ttl_return_invoice_discount = 0;
-            response.stocks.sales.forEach((element, key) => {
-                total_sales += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
-                ttl_quantity += element['qty'] ? element['qty'] : 0;
-                ttl_product_discount += element['product_discount'] ? element['product_discount'] : 0;
-                ttl_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
-                var date = new Date(element.expire_date);
-                var formattedDate = date.toDateString();
-                var invoice_no = "";
+            response.stocks.sales.forEach((element, key) => { 
+                total_sales             += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
+
+                ttl_quantity            += element['qty'] ? element['qty'] : 0;
+                ttl_product_discount    += element['product_discount'] ? element['product_discount'] : 0; 
+                var date                =  new Date(element.expire_date);
+                var formattedDate       =  date.toDateString();
+                var invoice_no          =  "";
                 invoice_no = element.invoice_no.split('-');
                 reportTable(invoice_no[0], element)
             });
@@ -111,7 +112,7 @@ $('.search-btn').on('click', function () {
             var grand_total_discount = parseInt(ttl_invoice_discount + ttl_return_invoice_discount);
             var grand_qty = parseInt(ttl_quantity - ttl_return_quantity);
             //Grand Total
-            $('.TeacherAttendanceListTable tbody').append(`
+            $('.TeacherAttendanceListTable tfoot').append(`
             <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
                 <td colspan="3"></td> 
                 <td class="font18">Grand Total :</td>
@@ -296,7 +297,7 @@ function reportTable(invoice_no, element) {
 }
 
 function sale_return_total(ttl_quantity, ttl_product_discount, total, flag) {
-    $('.TeacherAttendanceListTable tbody').append(`
+    $('.TeacherAttendanceListTable tfoot').append(`
     <tr style="background:#eaf1fa ; color:#152e4d" >
         <th colspan="3"></th>
         <th class="font18" align="center">${flag} Total</th>

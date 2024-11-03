@@ -53,6 +53,7 @@ class SaleController extends Controller
     }
     public function saleInvoice(Request $request)
     {  
+        $balance =  0;
         if ($request->hidden_invoice_id) {
             $invoice = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
         } else {
@@ -81,6 +82,8 @@ class SaleController extends Controller
         $invoice->description          = $request->description;
         $invoice->created_by           = Auth::id();
         if ($invoice->save()) {
+        // dd($invoice->total_invoice_amount - ($request->hidden_invoice_id ? 0 :  $balance),($request->hidden_invoice_id ? 0 :  $balance));
+
             if (count($request->sales_product_array) > 0) {
                 $old_ids        = $request->existing_product_ids;
                 foreach ($request->sales_product_array as $key => $sale_product) {
@@ -157,11 +160,14 @@ class SaleController extends Controller
                         ->delete();
                 }
 
-                $customer_ledger       =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->first();
-                if ($customer_ledger) {
-                    $balance           =   $customer_ledger->balance;
-                } else {
-                    $balance           =   0;
+                $ledgerCount      = CustomerLedger::where('customer_id', $request->customer_id)->count();
+                $balance = 0;
+                if ($ledgerCount > 0) {
+                    $balanceQuery = CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC');
+                    if ($request->hidden_invoice_id) {
+                        $balanceQuery->skip(1); 
+                    }
+                    $balance = $balanceQuery->value('balance');
                 }
                 // dd($balance);
                 if ($request->hidden_invoice_id) {
@@ -175,7 +181,7 @@ class SaleController extends Controller
                 $customer_ledger->trx_type    = 1;  //Sale
                 $customer_ledger->is_deleted  = 0;
                 $customer_ledger->comment     = '';
-                $customer_ledger->dr          = $invoice->total_invoice_amount - ($request->hidden_invoice_id ? 0 :  $balance);
+                $customer_ledger->dr          = $invoice->total_invoice_amount - $balance;
                 $customer_ledger->balance     = ($invoice->total_invoice_amount - $customer_ledger->cr); //balance
                 $customer_ledger->created_by  = Auth::id();
                 $customer_ledger->sale_invoice_id = $invoice->id;

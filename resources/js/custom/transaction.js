@@ -69,7 +69,7 @@ $(document).ready(function () {
                 $('#transactionTable tbody').append(`
                 <tr style="background: #152e4d;color: white;">
                     <td style="font-family:bold" >Total:</td>
-                    <td colspan="2">${action == operation+'-ledger-jama' ? cr_sum : dr_sum}</td>
+                    <td colspan="2">${action == operation+'-ledger-jama' ? addCommas(cr_sum) : addCommas(dr_sum)}</td>
                 </tr>
             `);
                 this_btn.closest('tr').find('.total_balance').text((action == operation + '-ledger-jama' ? cr_sum + 'CR' : dr_sum + 'DR'));
@@ -467,7 +467,7 @@ $(document).on('click', `.remove`, function () {
         var inputValue = parseFloat($(this).val());
         total_amount += inputValue;
     });
-    $('.total_ledger_sum').text(total_amount);
+    $('.total_ledger_sum').text(addCommas(total_amount.toFixed(2)));
 })
 $('.close').on('click', function () {
     $(this).remove();
@@ -495,6 +495,6 @@ $(document).on('focusout', '.amount', function () {
         var inputValue = parseFloat($(this).val());
         total_amount += inputValue;
     });
-    $('.total_ledger_sum').text(total_amount);
+    $('.total_ledger_sum').text(addCommas(total_amount));
 
 })

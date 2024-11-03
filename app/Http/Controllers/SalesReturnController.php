@@ -158,12 +158,7 @@ class SalesReturnController extends Controller
                         ->whereNotIn('id', $sale_products_array)
                         ->delete();
                 }
-                // $customer_ledger       =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->first();
-                // if ($customer_ledger) {
-                //     $customer_ledger_balance           =   $customer_ledger->balance;
-                // } else {
-                //     $customer_ledger_balance           =   0;
-                // }
+              
                 if ($request->hidden_invoice_id) {
                     $customer_ledger   =   CustomerLedger::where('sale_return_invoice_id', $request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
                 } else {

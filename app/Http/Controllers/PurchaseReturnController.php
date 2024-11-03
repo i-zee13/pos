@@ -14,8 +14,7 @@ use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Auth;
-use Mockery\Undefined;
+use Auth; 
 
 class PurchaseReturnController extends Controller
 {
@@ -51,13 +50,13 @@ class PurchaseReturnController extends Controller
                                             ->get();
 
         $customers = Customer::where('customer_type', 1)
-                                ->where(function ($query) {
-                                    $query->whereIn('id', function ($subQuery) {
-                                        $subQuery->select('customer_id')
-                                            ->from('purchase_invoices')
-                                            ->groupBy('customer_id');
-                                    }) ;
-                                })
+                                // ->where(function ($query) {
+                                //     $query->whereIn('id', function ($subQuery) {
+                                //         $subQuery->select('customer_id')
+                                //             ->from('purchase_invoices')
+                                //             ->groupBy('customer_id');
+                                //     }) ;
+                                // })
                                 ->get();
 
         return view('purchases.return.create', compact('customers', 'current_date', 'invoice_first_part', 'products', 'invoice_no'));

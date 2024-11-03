@@ -355,6 +355,7 @@ $('.products').change(function () {
     var filter_product = product_list.filter(function (x) {
       return x.id == selected_product;
     });
+    console.log(filter_product);
     var p_price = 0;
     if (filter_product[0].new_purchase_price > 0) {
       p_price = filter_product[0].new_purchase_price;

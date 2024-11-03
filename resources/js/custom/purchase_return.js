@@ -266,7 +266,8 @@ $('.products').change(function () {
     $('.bar-code').val('');
     $('#amount').val('');
     if (selected_product > 0) {
-        var filter_product = product_list.filter(x => x.id == selected_product)
+        var filter_product = product_list.filter(x => x.id == selected_product);
+        console.log(filter_product);
         var p_price = 0;
         if (filter_product[0].new_purchase_price > 0) {
             p_price = filter_product[0].new_purchase_price;

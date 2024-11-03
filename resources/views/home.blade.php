@@ -726,7 +726,7 @@
                 <h4>Todays <span>Expense</span></h4>
                 <h2 class="digit">
                     <small>Pkr.</small>
-                    <span class="amount">{{number_format(0)}}</span>
+                    <span class="amount">{{number_format($total_expense)}}</span>
                      <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="cursor: pointer;">
                         <path d="M12 4.5C7 4.5 2.73 8.55 1 12c1.73 3.45 6 7.5 11 7.5s9.27-4.05 11-7.5c-1.73-3.45-6-7.5-11-7.5zm0 13.5c-3.33 0-6-2.67-6-6s2.67-6 6-6 6 2.67 6 6-2.67 6-6 6zm0-10.5c-2.48 0-4.5 2.02-4.5 4.5S9.52 16.5 12 16.5 16.5 14.48 16.5 12 14.48 8.5 12 8.5z"/>
                     </svg>

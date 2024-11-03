@@ -860,7 +860,7 @@
                             <a href="{{ route('purchase-return.index') }}" type="submit" class="btn btn-primary" id="cancel">Back</a>
                             @else
                             <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
-                            <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>
+                            <!-- <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button> -->
                             <a href="{{ route('purchase-return.index') }}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                             @endif
                         </div>

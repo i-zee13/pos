@@ -164,7 +164,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/ledger-purchi',            [TransactionController::class, 'getLedgerPurchi'])->name('ledger-purchi');
     Route::post('/save-tranasctions',       [TransactionController::class, 'saveTransaction'])->name('save-tranasctions');
     Route::get('/print-ledger-purchi',      [TransactionController::class, 'printPurchi'])->name('print-purchi');
-
     //Reports
     Route::get('/customer-reports',         [LedgerDetailControlller::class, 'customerReport'])->name('customer-reports');
     Route::get('/vendor-reports',           [LedgerDetailControlller::class, 'vendorReport'])->name('vendor-reports');
@@ -187,7 +186,6 @@ Route::group(['middleware' => ['auth']], function () {
     //Profit Report
     Route::get('/profit-report',            [ReportsController::class, 'profitReport'])->name('profit-reports');
     Route::post('/sales-profit-list',       [ReportsController::class, 'saleProfitReportList'])->name('profit-report-list');
-
     // //Total Stock Profit Report
     // Route::get('/stock-profit-report',  [ReportsController::class, 'profitReport'])->name('stock-profit-reports');
     // Route::post('/stock-profit-list',   [ReportsController::class, 'saleProfitReportList'])->name('stock-profit-report-list');

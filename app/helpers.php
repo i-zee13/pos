@@ -396,9 +396,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     $stock->purchase_price  = $purchase->purchase_price;
     $stock->sale_price      = $purchase->sale_price;
     $stock->save(); 
-}
-
-
+} 
 function deleteProductFields($v, $sale, $type, $prod_type = null)
 {
     $v->actual_qty           =  $sale->actual_qty;
@@ -534,4 +532,38 @@ function vendorLedger($request,$column){
     Customer::where('id', $request->customer_id)->update([
         'balance' => $cust_ldr->balance,
     ]);
+}
+function getCustomerBalance($customer_id,$is_exisitng_inv){
+    $ledgerCount      = CustomerLedger::where('customer_id', $customer_id)->count();
+    $balance = 0;
+    if ($ledgerCount > 0) {
+        $balanceQuery = CustomerLedger::where('customer_id', $customer_id)->orderBy('id', 'DESC');
+        if ($is_exisitng_inv) {
+            $balanceQuery->skip(1); 
+        }
+        $balance = $balanceQuery->value('balance');
+    }
+    return $balance;
+}
+if (!function_exists('isEditable')) {
+    function allInvoicesUpdate($customer_id)
+    {
+        CustomerLedger::where('is_editable', 1)
+            ->update(['is_editable' => 0]);
+        VendorLedger::where('is_editable', 1)
+            ->update(['is_editable' => 0]);
+        //Sales
+        SaleInvoice::where('is_editable', 1)
+            ->update(['is_editable' => 0]);
+        SaleReturn::where('is_editable', 1)
+            ->update(['is_editable' => 0]);
+        PurchaseInvoice::where('is_editable', 1)
+            ->update(['is_editable' => 0]);
+        ReturnInvoice::where('is_editable', 1)
+            ->update(['is_editable' => 0]);
+        ProductReplacementInvoice::where('is_editable', 1)
+            ->update(['is_editable' => 0]);
+
+        return true;
+    }
 }

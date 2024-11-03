@@ -60,7 +60,7 @@ $(document).ready(function () {
             $('#transactionTable tbody').append("\n                            <tr id='tr-".concat(data.id, "'>\n                                <td>").concat(data.cpv_no, "</td>\n                                <td>").concat(data.dr, "</td>\n                                <td>").concat(data.comment ? data.comment : 'NA', "</td>\n                            </tr>"));
           }
         });
-        $('#transactionTable tbody').append("\n                <tr style=\"background: #152e4d;color: white;\">\n                    <td style=\"font-family:bold\" >Total:</td>\n                    <td colspan=\"2\">".concat(action == operation + '-ledger-jama' ? cr_sum : dr_sum, "</td>\n                </tr>\n            "));
+        $('#transactionTable tbody').append("\n                <tr style=\"background: #152e4d;color: white;\">\n                    <td style=\"font-family:bold\" >Total:</td>\n                    <td colspan=\"2\">".concat(action == operation + '-ledger-jama' ? addCommas(cr_sum) : addCommas(dr_sum), "</td>\n                </tr>\n            "));
         this_btn.closest('tr').find('.total_balance').text(action == operation + '-ledger-jama' ? cr_sum + 'CR' : dr_sum + 'DR');
         $('.add-more').append("\n                    <div class=\"row _head03\">\n                        <div class=\"col-6\"> \n                        <h5 class=\"\">".concat(customer_name, "</h5>\n                        </div>\n                        <div class=\"col-6\" style=\"text-align:right;\"> \n                        <span> <strong>Balance</strong> : ").concat(response.customer.balance > 0 ? response.customer.balance + ' <strong>DR</strong>' : response.customer.balance + ' <strong>CR</strong>', "</span>\n                        </div>\n                    </div>\n               \n                    <div class=\"row  remove_div\" >\n                        <div class=\"col-md-5 PB-10\">\n                            <div class=\"form-group focused\">\n                                <label class=\"control-label mb-10\">Add Amount *</label>\n                                <input type=\"hidden\" name=\"hidden_cust_balance[]\" value=\"").concat(response.customer.balance, "\">\n                                <input type=\"hidden\" name=\"hidden_cust_id[]\" value=\"").concat(id, "\">\n                                <input type=\"number\" name=\"amount[]\" class=\"form-control field-required amount\" id=\"amount_").concat(id, "\" required tabindex=\"2\" data-customer_id=\"").concat(id, "\">\n                            </div>\n                        </div>\n                        <div class=\"col-md-6 PB-10\">\n                            <div class=\"form-group focused\">\n                                <label class=\"control-label mb-10\">Remarks </label>\n                                <textarea name=\"comment[]\" class=\"form-control remarks_").concat(id, "\" rows=\"6\" tabindex=\"3\"></textarea>\n                            </div>\n                        </div>\n                        <div class=\"col-md-1 PB-10\" style=\"margin-top: 21px;\">\n                            <a type=\"button\" id=\"\" data-customer_id=\"").concat(id, "\" class=\"btn smBTN red-bg remove remove_btn_").concat(id, "\" data-index=\"\" data-quantity=\"\">Remove</a>\n                        </div>\n                    </div>\n                "));
         n++;
@@ -315,7 +315,7 @@ $(document).on('click', ".remove", function () {
     var inputValue = parseFloat($(this).val());
     total_amount += inputValue;
   });
-  $('.total_ledger_sum').text(total_amount);
+  $('.total_ledger_sum').text(addCommas(total_amount.toFixed(2)));
 });
 $('.close').on('click', function () {
   $(this).remove();
@@ -342,7 +342,7 @@ $(document).on('focusout', '.amount', function () {
     var inputValue = parseFloat($(this).val());
     total_amount += inputValue;
   });
-  $('.total_ledger_sum').text(total_amount);
+  $('.total_ledger_sum').text(addCommas(total_amount));
 });
 /******/ })()
 ;

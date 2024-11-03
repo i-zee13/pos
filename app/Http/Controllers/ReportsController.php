@@ -40,10 +40,10 @@ class ReportsController extends Controller
       $query               =  " 1=1 ";
       $current_date        =   date('Y-m-d');
       if (isset($request->company_id)) {
-         $query      .= " AND vs.company_id =  $request->company_id";
+         $query      .= " AND vs.company_id =  $request->company_id ";
       }
       if (isset($request->product_id)) {
-         $query      .= " AND vs.product_id = $request->product_id";
+         $query      .= " AND vs.product_id = $request->product_id ";
       }
       if (isset($request->expiry) && $request->expiry > 0  || $request->is_click == 0) { //is_click = 0 mean on page load get 3 months expires
          $query                .=  "AND batch_wise_balance > 0 ";
@@ -387,6 +387,7 @@ class ReportsController extends Controller
                                                    ORDER BY ps.invoice_no DESC
                                                    ");
       }
+      
       $sales          =  DB::select("
                               SELECT
                                  DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
@@ -417,6 +418,11 @@ class ReportsController extends Controller
                               $query
                               ORDER BY si.invoice_no DESC
                         ");
+      $sale_invoice_records                         =  new stdClass();
+      $sale_invoice_records->total_invoice_amount   =  collect($sales)->unique('invoice_no')->sum('total_invoice_amount'); 
+      $sale_invoice_records->invoice_discount       =  collect($sales)->unique('invoice_no')->sum('invoice_discount'); 
+      $sale_invoice_records->service_charges       =  collect($sales)->unique('invoice_no')->sum('service_charges');  
+      
       $returns        =  DB::select("
                               SELECT
                                  DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
@@ -520,7 +526,7 @@ class ReportsController extends Controller
             ];
          }
       }
-      return ['sales' => $sales, 'sale_returns' => $returns, 'pr_paid_amount' => $purchase_return_paid_amount, 'pr_invc_amount' => $purchase_inv_paid_amount];
+      return ['sales' => $sales, 'sale_returns' => $returns, 'pr_paid_amount' => $purchase_return_paid_amount, 'pr_invc_amount' => $purchase_inv_paid_amount,'sale_invoice_record' => $sale_invoice_records];
    }
    //Purchase Report
    public function purchaseReport()
@@ -561,8 +567,7 @@ class ReportsController extends Controller
                                              IFNULL(dr,0) as dr,
                                              trx_type
                                           ")
-                                          ->whereRaw("DATE(created_at) = '$closing_date' AND customer_id != 5  
-                                          ")->get();
+                                          ->whereRaw("DATE(created_at) = '$closing_date'")->get();
       $vendor_payment                  =  DB::table("vendor_ledger")->selectRaw("
                                              customer_id as vendor_id,
                                              IFNULL(cr,0) as cr,

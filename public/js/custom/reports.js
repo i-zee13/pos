@@ -270,7 +270,7 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
                 <td>${inv_no ?? 'NA'}</td>
                 <td>${formattedDate}</td> 
                 <td>${element.comment ?? ''}</td> 
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.dr.toLocaleString('en-US')}</td>
+            <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.dr.toLocaleString('en-US')}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${firstBalance.toLocaleString('en-US')}</td>
                 <td><a class="btn btn-default btn-detail  btn-line"

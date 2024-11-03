@@ -412,10 +412,13 @@
             });
 
         })
-        // for text type inputs which are required to accept only numeric values
         $(document).on('input', '.only_numerics', function() {
             this.value = this.value.replace(/[^0-9.]/g, '');
-        })
+            if ((this.value.match(/\./g) || []).length > 1) {
+                this.value = this.value.slice(0, -1);  
+            }
+        });
+
         // for text type inputs which are required to accept only aplphabetic values
         $(document).on('input', '.only_alphabets', function() {
             this.value = this.value.replace(/[^a-z]/gi, '');

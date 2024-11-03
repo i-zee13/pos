@@ -1026,6 +1026,8 @@
 </div>
 @endsection
 @push('js')
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
 <script>
     var clients = JSON.parse('{!! json_encode($customers)  !!}');
 </script>
