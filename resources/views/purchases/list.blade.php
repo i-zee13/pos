@@ -36,18 +36,7 @@
                 <a href="{{route('stock-add')}}" type="submit" class="btn btn-primary mr-2 add-new-purchase" style="font-size: 13px;padding: 6px 11px 4px 9px;margin-top: -10px; float: right;">Add New</a>
 
             </div>
-            <!--<div class="preloader"  id="tblLoader">
-    <div class="loading">
-      <div class="bar bar1"></div>
-      <div class="bar bar2"></div>
-      <div class="bar bar3"></div>
-      <div class="bar bar4"></div>
-      <div class="bar bar5"></div>
-      <div class="bar bar6"></div>
-      <div class="bar bar7"></div>
-      <div class="bar bar8"></div>
-    </div>
-  </div> -->
+      
             <div class="body">
                 <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;" id="example">
                     <thead>
@@ -66,7 +55,7 @@
                         @endphp
                         <tr>
                             <td>{{$invoice_first_part}} ({{ $purchase->created_at->format('h:i A') }})</td>
-                            <td>{{$purchase->customer_name}} </td>
+                            <td><b>{{ $purchase->customer_name }}</b></td>
                             <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->paid_amount ? $purchase->paid_amount : 0.00}} </td>
                             <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->product_net_total}} </td>
                             <td>

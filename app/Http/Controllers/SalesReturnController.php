@@ -261,9 +261,11 @@ class SalesReturnController extends Controller
                                 ->where('transaction_type', 4)->orderBy('id', 'DESC')
                                 ->first();
         if ($vs) {
+            $balance    = VendorStock::where('product_id', $request->product_id)->orderBy('id', 'DESC')->value('balance');
+
            $returnProduct   =  SaleReturnProduct::where('sale_return_invoice_id', $request->sale_return_invoice_id)
                                                  ->where('product_id', $request->product_id)->where('qty', $request->qty)->first();
-            $v_stock        = updateStock($vs, $vs->balance, $request->qty, 2, 'sale-return', 5);
+            $v_stock        = updateStock($vs, $balance, $request->qty, 2, 'sale-return', 5);
             BatchWiseDeleteProduct($request->sale_return_invoice_id, $returnProduct, $request->qty, 2, 5); 
             StockManagment($v_stock->id, $vs, $request->qty, 2, 'sale-return');
             if ($v_stock) { 
@@ -294,8 +296,10 @@ class SalesReturnController extends Controller
                                         ->first();
 
                 if ($vs) {
+                    $balance    = VendorStock::where('product_id',$product->product_id)->orderBy('id', 'DESC')->value('balance'); 
+
                     $vs->actual_qty   = $product->qty;
-                    $v_stock = updateStock($vs, $vs->balance, $product->qty, 2, 'sale-return', 4);
+                    $v_stock = updateStock($vs, $balance, $product->qty, 2, 'sale-return', 4);
                     BatchWiseDeleteProduct($product->sale_return_invoice_id, $product, $product->qty, 2, 4);
                     StockManagment($v_stock->id, $vs, $product->qty, 2, 'sale-return');
                     if ($v_stock) {

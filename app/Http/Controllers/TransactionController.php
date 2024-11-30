@@ -164,6 +164,14 @@ class TransactionController extends Controller
    public function saveTransaction(Request $request)
    {
       // dd($request->all());
+      if($request->type == 'print'){
+         $customers = $request->customers ;
+         return response()->json([
+            'msg'            =>  'Ledger Updated',
+            'status'         =>  'success'
+         ]);
+         return response()->view('transactions.bulk-transaction-invoice', compact('customers'));
+      }
       foreach ($request->customers as $key => $customer) {
          isEditable($customer['id']);
          $balance             =     CustomerLedger::where('customer_id', $customer['id'])->where('trx_type', 3)->orderBy('created_at', 'desc')->value('balance');
@@ -234,14 +242,15 @@ class TransactionController extends Controller
          return view('transactions.print', compact('invoice', 'type'));
       }
    }
-   public function printPurchi()
+   public function printPurchi(Request $request,$customers)
    {
+      $customers = json_decode($customers,true);
          $ledgerCount      = 0;  
-         $customers = CustomerLedger::where('customer_ledger.is_editable',1)->where('customer_ledger.comment','Bulk')
-                                             // ->whereDate('customer_ledger.created_at', '!=', Carbon::today()->toDateString())
-                                             ->join('customers','customer_ledger.customer_id','=','customers.id')
-                                             ->select('customer_ledger.*','customers.customer_name')
-                                             ->orderBy('customer_ledger.id', 'DESC')->get(); 
+         // $customers = CustomerLedger::where('customer_ledger.is_editable',1)->where('customer_ledger.comment','Bulk')
+         //                                     // ->whereDate('customer_ledger.created_at', '!=', Carbon::today()->toDateString())
+         //                                     ->join('customers','customer_ledger.customer_id','=','customers.id')
+         //                                     ->select('customer_ledger.*','customers.customer_name')
+         //                                     ->orderBy('customer_ledger.id', 'DESC')->get(); 
        return view('transactions.bulk-transaction-invoice', compact('customers'));
    }
 }

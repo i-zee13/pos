@@ -64,6 +64,7 @@ $('.search-btn').on('click', function () {
                         </tr>
                     </thead><tbody>
                 </tbody>
+                <tfoot></tfoot>
                 </table>`);
             $('.TeacherAttendanceListTable tbody').empty();
             if (response.reports.length == 0) {
@@ -184,7 +185,7 @@ $('.search-btn').on('click', function () {
 
             })
 
-            $('.TeacherAttendanceListTable tbody').append(`
+            $('.TeacherAttendanceListTable tfoot').append(`
                 <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
                     <td class="font18" align="right" colspan="3"></td>
                     <td class="font18" align="center">Grand Total :</td>
@@ -233,7 +234,7 @@ function tableHtml(element, inv_id, formattedDate, label) {
    <td >${element.p_id}</td>
    <td>${formattedDate}</td> 
    <td style="font-weight:bold">${label} ${element.transaction_type == 5 ? '<span class="TS-delete">Deleted</span>': ''} </td> 
-   <td>${element.customer_name}</td> 
+   <td><b>${element.customer_name}</b></td> 
     
    ${element.p_status} 
    <td style="color:${element.p_status ==  1 ? 'green'  : 'red' };font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.p_status == 1 ? element.p_qty : '-'} </td>

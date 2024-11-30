@@ -55,8 +55,9 @@ let segments = location.href.split('/');
                             <th>DR</th>
                             <th>Balance</th>
                         </tr>
-                    </thead><tbody>
-                </tbody>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot></tfoot>
                 </table>`);
             $('.TeacherAttendanceListTable tbody').empty();
             if(response.vendor.length == 0){
@@ -95,8 +96,13 @@ let segments = location.href.split('/');
     if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
         $('.TeacherAttendanceListTable').DataTable().clear().destroy();
     }
-     var table = $('.TeacherAttendanceListTable').DataTable({ 
-         dom    : 'Bfrtip', 
+     var table = $('.TeacherAttendanceListTable').DataTable({  
+         "bSort": false,
+         "bPaginate": false,
+         scrollX: false,
+         scrollY: '400px',
+         scrollCollapse: true,
+         dom: 'Bfrtip',
         buttons : [
             {
                 extend: 'excelHtml5',

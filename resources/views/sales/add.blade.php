@@ -98,7 +98,8 @@
     </div>
     @section('content')
     <style>
-      
+      td{font-weight: bolder}
+      input{font-weight: 700}
         select:focus>option:checked {
             background: #000 !important;
         }
@@ -641,6 +642,11 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <label class="font13 mb-5">Select Customer</label>
+                                         <button type="button" id="fetch-customers" class="btn btn-secondary mr-2" style="padding: 1px 11px 0px 11px;margin-top: 3px;float: right;margin-bottom: 8px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+                                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+                                            </svg></button>
+                                        
                                         <div class="form-s2">
                                             <select class="form-control formselect form_clear  " placeholder="Select Customer" name="customer_id" id="customer_id" {{@$invoice->customer_id ? 'disabled' : ''}}>
                                                 <option value="0">Select Customer</option>
@@ -756,7 +762,12 @@
                         <div class="col-6">
                             <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'sale-edit' ? 'Update' : 'New'}} <span>Sale Invoice</span></h2>
                         </div>
-
+                        <div class="col p-0   d-flex">
+                            <input type="text" value="" data-price="" class="custom-select custom-select-sm  get-product-id" style="height: 28px;border-color: white; width: 100px;margin-top: 11px;font-size:11px" placeholder="Add Product ID">
+                            <span class="ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red;margin-top:5px">
+                            <button type="button" id="update-product-stock" class="btn btn-primary mr-2" style="padding: 3px 20px 0px 19px;margin-top: 10px;" tabindex="8">Get Stock</button>
+                            </span>
+                        </div>
                         <div class="col p-0   d-flex">
                             <input type="number" value="" data-price="" class="custom-select custom-select-sm  calculate_by_amount" style="height: 28px;border-color: white; width: 100px;margin-top: 11px;">
                             <span class="calculate_by_amount_text ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red;margin-top:5px">0</span>
@@ -875,7 +886,7 @@
                                                     <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" >
                                                         <option value="0">Select Product *</option>
                                                         @foreach($products as $product)
-                                                        <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
+                                                        <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}} - {{$product->retail_price}}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -974,9 +985,12 @@
                                             <td></td>
                                         </tr>
                                         <tr style="border:solid 1px #dbdbdb">
-                                            <td class="font18" align="right">Grand Total:</td>
+                                        <td class="totalNo" align="right">
+                                                <span id="total_items">0</span><small>T.Items</small>
+                                            </td>
+                                            
                                             <td class="totalNo" align="right">
-                                                <!-- <span id="total_ctn">0</span><small>CTNS</small> -->
+                                                <span id="total_qtys">0</span><small>Qtys</small>
                                             </td>
                                             <td class="totalNo" align="right"></td>
                                             <td class="totalNo" align="right"><small>Pkr.</small>
@@ -1006,7 +1020,7 @@
                         </div>
                     </div> -->
 
-                        <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
+                        <div class=" " style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
                             @if(request()->query('invoice') == 'detail')
                             <a href="{{route('sales')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
                             @else

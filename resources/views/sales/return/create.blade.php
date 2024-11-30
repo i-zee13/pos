@@ -737,7 +737,7 @@
                                                 </div>
                                             </td>
                                             <td style="width:80px"> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " style=" width: 100%;"></td>
-                                            <td> <input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
+                                            <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
                                             <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px" readonly></td>
                                             <td style="width:80px"><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;width:100%;" tabindex="4" min="0"></td>
                                             <td style="width:100px" class='add- S-input'><input type="number" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;width:100%"></td>
@@ -852,7 +852,7 @@
 
                             </div>
                         </div>
-                        <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
+                        <div class="Action_bottom" style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
                             @if(request()->query('invoice') == 'detail')
                             <a href="{{route('salereturn.index')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
                             @else

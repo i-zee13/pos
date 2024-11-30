@@ -117,16 +117,16 @@ class PurchaseReturnController extends Controller
                     $purchased->sale_price              = $purchase_product['retail_price'];
                     $purchased->created_by              = Auth::id();
                     $previous_qty = ProductReturns::where('purchase_return_invoice_id', $request->hidden_invoice_id)
-                        ->where('product_id', $purchased->product_id)
-                        ->orderBy('id', 'Desc')
-                        ->value('qty');
+                                                    ->where('product_id', $purchased->product_id)
+                                                    ->orderBy('id', 'Desc')
+                                                    ->value('qty');
                     if ($purchased->save()) {
                         $purchased->invoice_no = $invoice->invoice_no;
 
                         $purchased_products_array[] = $purchased->id;
                         $check_stock           =  VendorStock::where('product_id', $purchased->product_id)->orderBy('id', 'DESC')->first();
-                        $balance = 0;
-                        $vendor_id = 0;
+                        $balance               = 0;
+                        $vendor_id             = 0;
                         if ($check_stock) {
                             $vendor_id         =  $check_stock->vendor_id;
                             $balance           =  $check_stock->balance;

@@ -18,12 +18,13 @@ class StockController extends Controller
 {
     public function create()
     {
+    $customers = Customer::where('customer_type',1)->get();
         $invoice_no   =   getPurchaseInvoice();
         $parts        = explode('-', $invoice_no);
         $invoice_first_part   = $parts[0];
         $current_date =   Carbon::today()->toDateString(); 
         $products     =   Product::get();
-        return view('purchases.add', compact('current_date', 'products', 'invoice_no', 'invoice_first_part'));
+        return view('purchases.add', compact('customers','current_date', 'products', 'invoice_no', 'invoice_first_part'));
     }
     public function getProduct(Request $request)
     {
@@ -324,14 +325,9 @@ class StockController extends Controller
         ]);
     }
     public function getVendorBalance(Request $request, $id)
-    {   
-        
+    {
         if ($request->segment == 'purchase-edit') {
-            $url   = $request->purchase_id;
-            preg_match('/^\d+/', $url, $matches);
-            $purchase_id     = $matches[0] ?? null; 
-            $customer_balance  =  VendorLedger::where('customer_id', $id)->where('purchase_invoice_id',$purchase_id)
-            ->orderBy('id', 'DESC')->value('balance');
+            $customer_balance  =  VendorLedger::where('customer_id', $id)->where('is_editable', '!=', 1)->orderBy('id', 'DESC')->value('balance');
             if (!$customer_balance) {
                 $customer_balance = 0;
             }
@@ -382,7 +378,6 @@ class StockController extends Controller
                                         ->where('transaction_type', 1)
                                         ->orderBy('id', 'DESC')
                                         ->first(); 
-// dd($balance);
 
                 if ($prod) { 
                     $prod->actual_qty   = $product->qty;

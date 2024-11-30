@@ -45,6 +45,7 @@ function SaleCloseRecord(close_date) {
             var total_net_sale_returns_invoice_amount = records.total_net_sale_returns_invoice_amount;
             var total_net_sale_invoice_amount = records.total_net_sale_invoice_amount;
             var total_credit_sale_invoice_amount = records.total_credit_sale_invoice_amount;
+            var total_net_sale_discount = records.total_net_sale_discount;
 
             //Openning Balnce
             var openning_balance = records.openning_balance;
@@ -73,9 +74,9 @@ function SaleCloseRecord(close_date) {
             var vendor_cash_recovery = records.ttl_vendor_cash_recovery;
             var ttl_cash_recovery = records.ttl_cash_recovery + credit_sale_receivings + vendor_cash_recovery + (openning_balance);
             // console.log(ttl_cash_recovery)
-            var total_payments = vendor_payment + customer_payment + credit_return_payments + total_pr_paid_amount + total_pr_invc_amount + expense;
-            var ttl_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery) - total_payments) - total_net_sale_returns_invoice_amount;
-            var cash_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery) - total_payments) - total_net_sale_returns_invoice_amount;
+            var total_payments   = vendor_payment + customer_payment + credit_return_payments + total_pr_paid_amount + total_pr_invc_amount + expense;
+            var ttl_in_hand      = ((total_net_sale_invoice_amount + ttl_cash_recovery) - total_net_sale_discount - total_payments) - total_net_sale_returns_invoice_amount;
+            var cash_in_hand     = ((total_net_sale_invoice_amount + ttl_cash_recovery) - total_payments) - total_net_sale_returns_invoice_amount;
             if (ttl_in_hand > 0) {
                 $('.sale-close-btn-modal').removeAttr('disabled');
                 $('.sale-close-btn-modal').attr('ttl_in_hand', ttl_in_hand);
@@ -170,7 +171,7 @@ function SaleCloseRecord(close_date) {
                 $('#saleRecordTable tbody').append(`
                     <tr>
                     <td>${invoice_no[0]}</td>
-                    <td>${element['customer_name']}</td>
+                    <td><b>${element['customer_name']}</b></td>
                     <td>${element['company_name']}</td>
                     <td>${element['product_name']}</td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td>
@@ -188,8 +189,8 @@ function SaleCloseRecord(close_date) {
 $(document).on('click', '.sale-close-btn-modal', function () {
     var ttl_in_hand = $(this).attr('ttl_in_hand');
     if (ttl_in_hand > 0) {
-        $('.cash_in_hand').val(ttl_in_hand).attr('readonly', true);
-        $('.ttl_cash_in_hand').val(ttl_in_hand);
+            $('.cash_in_hand').val(ttl_in_hand).attr('readonly', true);
+            $('.ttl_cash_in_hand').val(ttl_in_hand);
     }
 });
 $(document).on('input', '.closing_cash', function () {

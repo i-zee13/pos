@@ -9,8 +9,8 @@ use App\Models\ProductReplacement;
 use App\Models\ProductReplacementInvoice;
 use App\Models\PurchaseInvoice;
 use App\Models\ReturnInvoice;
-use App\Models\Sale as SaleInvoice; 
-use App\Models\SaleReturn; 
+use App\Models\Sale as SaleInvoice;
+use App\Models\SaleReturn;
 use App\Models\StockManagment;
 use App\Models\VendorLedger;
 use App\Models\VendorStock;
@@ -257,13 +257,13 @@ if (!function_exists('getCustomerBalance')) {
 
 function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type, $transaction_type, $prod_type = null)
 {
-    $sale_price             = $sale->sale_unit_price ?? $sale->sale_price;
+    $sale_price             =  $sale->sale_unit_price ?? $sale->sale_price;
     $total_return_amount    =  $sale->total_sale_amount ?? $sale->return_total_amount;
     $product_unit_price     =  $sale->product_unit_price ?? $sale->purchase_price;
 
     $v                       =  new VendorStock();
     $v->vendor_id            =  $sale->vendor_id;
-    // if ($transaction_type !== 1 || $transaction_type !== 3) {
+    // if ($transaction_type !== 1 || $transaction_type !== 3) {ConfirmBookingButton
     $v->customer_id          =  $sale->customer_id;
     // }
     $v->transaction_type     =  $transaction_type;
@@ -316,20 +316,21 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     // dd($purchase);
     $purchase->expiry_date = $purchase->expiry_date ? $purchase->expiry_date : '0000-00-00';
     $query = BatchStockMgt::where('product_id', $purchase->product_id);
-    if ($existing_inv_id) {
-        $query->where('invoice_id', $existing_inv_id)->orderBy('id', 'ASC');
-    } else if ($transaction_type == 1 || $transaction_type == 4 || $transaction_type == 3) {
+    // if ($existing_inv_id) {
+    //     $query->where('invoice_id', $existing_inv_id)->orderBy('id', 'ASC');
+    // } else
+    if ($transaction_type == 1 || $transaction_type == 4 || $transaction_type == 3) {
         $query->whereDate('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC');
     } else if ($transaction_type == 2) {
         $query->where('batch_wise_balance', '>', 0)->orderBy('expiry_date', 'ASC');
     }
     $s = $query->first();
     if (!$s) {
-        $s = new BatchStockMgt(); 
+        $s = new BatchStockMgt();
         $s->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
         $s->product_name    = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
     }
-    
+
     $previous_qty     =  0;
     if ($existing_inv_id) {
         $previous_qty = $s->qty ?? 0;
@@ -338,24 +339,24 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         $s->expiry_date     =   $purchase->expiry_date ?? null;
     }
     $balance = $stock_qty;
-    if($s->batch_wise_balance != 0){  
-  
-        $balance                = $In_out_status == 2 ? $s->batch_wise_balance - $stock_qty : $s->batch_wise_balance +  $stock_qty; 
+    if ($s->batch_wise_balance != 0) {
+
+        $balance                = $In_out_status == 2 ? $s->batch_wise_balance - $stock_qty : $s->batch_wise_balance +  $stock_qty;
         // $balance                =   $In_out_status == 2  
         //                                             ? ($s->batch_wise_balance - $previous_qty - $stock_qty) //OUT
         //                                             : ($s->batch_wise_balance - $previous_qty + $stock_qty);//IN
         $balance                =   $balance == 0  ? 1  : $balance;
     }
-    $s->ttl_cost_price      =   ($s->unit_cost_price * $balance ) ;
-    if ($In_out_status == 1){
+    $s->ttl_cost_price      =   ($s->unit_cost_price * $balance);
+    if ($In_out_status == 1) {
         $new_cost_price = 0;
-        if($s->unit_cost_price !=   $purchase->purchase_price) {
+        if ($s->unit_cost_price !=   $purchase->purchase_price) {
             $new_cost_price     =   $purchase->purchase_price * $stock_qty;
-        } 
+        }
         $s->unit_cost_price     =   $purchase->purchase_price;
         $s->ttl_cost_price      =   $s->ttl_cost_price + $new_cost_price;
     }
-   
+
     $s->company_id              =   $purchase->company_id;
     $s->product_id              =   $purchase->product_id;
     $s->invoice_id              =   $invoice_id;
@@ -363,40 +364,40 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     $s->actual_qty              =   $purchase->qty;
     $s->actual_status           =   $In_out_status;
     $s->qty                     =   $stock_qty;
-   
+
 
     if (($transaction_type == 2 || $transaction_type == 3) && $balance < 0) {
         $balance                =   abs($balance);
         $s->qty                 =   $s->batch_wise_balance;
-        $s->ttl_cost_price      =   ($s->unit_cost_price * $s->batch_wise_balance) ;
+        $s->ttl_cost_price      =   ($s->unit_cost_price * $s->batch_wise_balance);
         $remaining_qty          =   abs($balance);
         $s->batch_wise_balance  =   0;
         $s->save();
         return BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $remaining_qty, $In_out_status, $transaction_type, $existing_inv_id);
     } else {
         $s->batch_wise_balance  = $balance;
-    }  
+    }
     // $s->ttl_cost_price          = ($s->unit_cost_price * ($s->batch_wise_balance ??  $stock_qty)) ;
     $s->total_balance           = NULL;
     $s->vs_id                   = $vendor_stock_id;
     $s->trx_type                = $transaction_type;
-    $s->avg_cost_price_per_unit = $s->ttl_cost_price / $s->batch_wise_balance;  
-    $s->save(); 
+    $s->avg_cost_price_per_unit = $s->ttl_cost_price / $s->batch_wise_balance;
+    $s->save();
     //Make avrage cost total
     $prod   = DB::select("SELECT 
                             IFNULL(SUM(batch_wise_balance), 0) AS ttl_balance,
                             IFNULL(SUM(IF(batch_wise_balance > 0, ttl_cost_price, 0)), 0) AS ttl_cost
                         FROM stock_batches_items 
-                        WHERE product_id = $purchase->product_id")[0];   
+                        WHERE product_id = $purchase->product_id")[0];
     $stock = StockManagment::where('product_id', $purchase->product_id)
-                            ->where('company_id', $purchase->company_id)
-                            ->orderBy('id', 'DESC')->first();
+        ->where('company_id', $purchase->company_id)
+        ->orderBy('id', 'DESC')->first();
     $stock->ttl_avg_cost    = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
     $stock->ttl_cost        = $prod->ttl_cost > 0 ? $prod->ttl_cost  : 0;
     $stock->purchase_price  = $purchase->purchase_price;
     $stock->sale_price      = $purchase->sale_price;
-    $stock->save(); 
-} 
+    $stock->save();
+}
 function deleteProductFields($v, $sale, $type, $prod_type = null)
 {
     $v->actual_qty           =  $sale->actual_qty;
@@ -432,17 +433,17 @@ function deleteProductFields($v, $sale, $type, $prod_type = null)
 }
 function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
 {
- 
+
     // $prod   = DB::select("SELECT 
     //                         IFNULL(SUM(batch_wise_balance), 0) AS ttl_balance,
     //                         IFNULL(SUM(ttl_cost_price), 0) AS ttl_cost
     //                     FROM stock_batches_items 
     //                     WHERE product_id = $purchase->product_id")[0];   
     $stock = StockManagment::where('product_id', $purchase->product_id)
-                            ->where('company_id', $purchase->company_id)
-                            ->orderBy('id', 'DESC')->first();
+        ->where('company_id', $purchase->company_id)
+        ->orderBy('id', 'DESC')->first();
     if (!$stock) {
-        $stock                  = new StockManagment();  
+        $stock                  = new StockManagment();
         $stock->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
         $stock->product_name    = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
     }
@@ -452,9 +453,9 @@ function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
     $balance                = $In_out_status == 2 ? $stock->balance - $stock_qty : $stock->balance +  $stock_qty;
     $stock->balance         = $balance;
     $stock->vs_id           = $vendor_stock_id;
-    
+
     // $stock->ttl_avg_cost = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
-    $stock->save();  
+    $stock->save();
     return $stock;
 }
 function BatchWiseDeleteProduct($delete_for, $product, $qty, $in_out, $type)
@@ -463,12 +464,11 @@ function BatchWiseDeleteProduct($delete_for, $product, $qty, $in_out, $type)
     $expiryDate = $product->expiry_date ?? '0000-00-00';
     // $where       .= " AND product_id = $product->id AND expiry_date = $expiryDate";
     // $batch      = DB::select("SELECT * FROM stock_batches_items where $where");
-    $batch  = BatchStockMgt::whereDate("expiry_date" , $expiryDate)->where('product_id', $product->product_id)->first(); 
+    $batch  = BatchStockMgt::whereDate("expiry_date", $expiryDate)->where('product_id', $product->product_id)->first();
     if (!empty($batch)) {
-        
         if ($in_out == 1) {
             $balance =  $batch->batch_wise_balance + $qty;
-        } else if ($in_out == 2) { 
+        } else if ($in_out == 2) {
             $balance =  $batch->batch_wise_balance - $qty;
         }
         $batch->batch_wise_balance  =  $balance;
@@ -479,53 +479,55 @@ function BatchWiseDeleteProduct($delete_for, $product, $qty, $in_out, $type)
     }
 }
 
-function customerLedger($request,$column){
+function customerLedger($request, $column)
+{
     $balance                     =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->value('balance');
-    
+
     $c                           =  CustomerLedger::where($column, $request->id)->orderBy('id', 'DESC')->first();
-    $bbalance                    =  $column == 'sale_return_invoice_id' ?  ((-$balance) + $c->dr) - $c->cr :  ($balance + $c->cr) - $c->dr;
+    $bbalance                    =  $column == 'sale_return_invoice_id' ?  ((-$balance) + $c->dr) - $c->cr : ($balance + $c->cr) - $c->dr;
     $cust_ldr                    =  new  CustomerLedger();
     $cust_ldr->cr                =  0;
     $cust_ldr->date              =  $c->invoice_date;
     $cust_ldr->customer_id       =  $c->customer_id;
     $cust_ldr->trx_type          =  4; //Delete Invoice   
     $cust_ldr->is_deleted        =  1; //Delete Invoice    
-    $cust_ldr->comment           =  'Sale Invoice Deleted '; 
+    $cust_ldr->comment           =  'Sale Invoice Deleted ';
     $cust_ldr->cr                =  $c->dr;
-    $cust_ldr->balance           =  $bbalance; 
-    $cust_ldr->created_by        =  Auth::id(); 
+    $cust_ldr->balance           =  $bbalance;
+    $cust_ldr->created_by        =  Auth::id();
     $cust_ldr->save();
     $c->is_deleted               =  1; //Delete Invoice    
     $c->save();
 
     Customer::where('id', $request->customer_id)->update([
         'balance' => $cust_ldr->balance,
-    ]); 
+    ]);
 }
 
-function vendorLedger($request,$column){
+function vendorLedger($request, $column)
+{
     $balance                     =      VendorLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->value('balance');
     $c                           =      VendorLedger::where($column, $request->id)->orderBy('id', 'DESC')->first();
     $cust_ldr                    =      new  VendorLedger();
-    if($column == 'purchase_return_invoice_id'){
-        $comment                 =      ($request->deleting_product == 1 ? 'Product' : 'Purchase Return Invoice') .' Deleted';
+    if ($column == 'purchase_return_invoice_id') {
+        $comment                 =      ($request->deleting_product == 1 ? 'Product' : 'Purchase Return Invoice') . ' Deleted';
         $cust_ldr->cr            =      $c->dr;
         $cust_ldr->dr            =      0;
         $cust_ldr->purchase_return_invoice_id =  $c->purchase_return_invoice_id;
-    }else{
-        $comment                 =      ($request->deleting_product == 1 ? 'Product' : 'Purchase Invoice') .' Deleted';
+    } else {
+        $comment                 =      ($request->deleting_product == 1 ? 'Product' : 'Purchase Invoice') . ' Deleted';
         $cust_ldr->dr            =      $c->cr;
         $cust_ldr->cr            =      0;
         $cust_ldr->purchase_invoice_id   =  $c->purchase_invoice_id;
     }
-    
-    $cust_ldr->balance           = ($balance + $c->dr) - $c->cr;  
+
+    $cust_ldr->balance           = ($balance + $c->dr) - $c->cr;
     $cust_ldr->date              =  $c->invoice_date;
     $cust_ldr->customer_id       =  $c->customer_id;
     $cust_ldr->trx_type          =  4; //Delete Invoice    
     $cust_ldr->is_deleted        =  1; //Delete Invoice    
-    $cust_ldr->comment           =  $comment; 
-    $cust_ldr->created_by        =  Auth::id(); 
+    $cust_ldr->comment           =  $comment;
+    $cust_ldr->created_by        =  Auth::id();
     $cust_ldr->save();
     $c->is_deleted                =  1; //Delete Invoice    
     $c->save();
@@ -533,13 +535,14 @@ function vendorLedger($request,$column){
         'balance' => $cust_ldr->balance,
     ]);
 }
-function getCustomerBalance($customer_id,$is_exisitng_inv){
+function getCustomerBalance($customer_id, $is_exisitng_inv)
+{
     $ledgerCount      = CustomerLedger::where('customer_id', $customer_id)->count();
     $balance = 0;
     if ($ledgerCount > 0) {
         $balanceQuery = CustomerLedger::where('customer_id', $customer_id)->orderBy('id', 'DESC');
         if ($is_exisitng_inv) {
-            $balanceQuery->skip(1); 
+            $balanceQuery->skip(1);
         }
         $balance = $balanceQuery->value('balance');
     }
@@ -566,4 +569,259 @@ if (!function_exists('isEditable')) {
 
         return true;
     }
+}
+// Convert number to digit
+function formatValue($value)
+{
+    $parts = explode('.', $value);
+    $integerPart = convertNumberToWords($parts[0]);
+    $decimalPart = isset($parts[1]) ? " and " . convertDecimalToWords($parts[1]) : "";
+    return $integerPart . $decimalPart;
+}
+function convertNumberToWords($number)
+{
+    $words = [
+        0 => 'Zero',
+        1 => 'One',
+        2 => 'Two',
+        3 => 'Three',
+        4 => 'Four',
+        5 => 'Five',
+        6 => 'Six',
+        7 => 'Seven',
+        8 => 'Eight',
+        9 => 'Nine',
+        10 => 'Ten',
+        11 => 'Eleven',
+        12 => 'Twelve',
+        13 => 'Thirteen',
+        14 => 'Fourteen',
+        15 => 'Fifteen',
+        16 => 'Sixteen',
+        17 => 'Seventeen',
+        18 => 'Eighteen',
+        19 => 'Nineteen',
+        20 => 'Twenty',
+        30 => 'Thirty',
+        40 => 'Forty',
+        50 => 'Fifty',
+        60 => 'Sixty',
+        70 => 'Seventy',
+        80 => 'Eighty',
+        90 => 'Ninety'
+    ];
+
+    $result = '';
+
+    if ($number >= 1000) {
+        $result .= convertNumberToWords(floor($number / 1000)) . " Thousand ";
+        $number %= 1000;
+    }
+
+    if ($number >= 100) {
+        $result .= convertNumberToWords(floor($number / 100)) . " Hundred ";
+        $number %= 100;
+    }
+
+    if ($number >= 20) {
+        $result .= $words[10 * floor($number / 10)] . " ";
+        $number %= 10;
+    }
+
+    if ($number > 0 || $result === '') {
+        $result .= $words[$number] ?? '';
+    }
+
+    return trim($result);
+}
+function convertDecimalToWords($decimal)
+{
+    return $decimal . '/100';
+}
+
+function SaleReportRecords($request = null, $current_date = null, $is_admin_close = null)
+{
+
+    $query = " 1=1";
+    $purchase_return_paid_amount = 0;
+    $purchase_inv_paid_amount    = 0;
+    $query .= " AND ps.deleted_at IS NULL";
+
+    if (isset($request->company_id)) {
+        $query .= " AND ps.company_id = $request->company_id";
+    }
+    if (isset($request->product_id)) {
+        $query .= " AND ps.product_id = $request->product_id";
+    }
+    if (isset($request->customer_id)) {
+        $query .= " AND si.customer_id = $request->customer_id";
+    }
+    if (isset($request->start_date) != '' && isset($request->end_date) != '') {
+        $query .= " AND DATE(ps.created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
+    } else {
+        $query .=  " AND  DATE(ps.created_at) = '$current_date'";
+    }
+    if (isset($request->bill_no)) {
+        $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
+    }
+    if ($is_admin_close == 1) {
+        $purchase_return_paid_amount =  DB::select("
+                                                   SELECT
+                                                   ps.paid_amount
+                                                   FROM
+                                                   purchase_return_invoices as ps
+                                                   WHERE
+                                                   $query
+                                                   ORDER BY ps.invoice_no DESC
+                                                   ");
+        $purchase_inv_paid_amount =  DB::select("
+                                                   SELECT
+                                                   ps.paid_amount
+                                                   FROM
+                                                   purchase_invoices as ps
+                                                   WHERE
+                                                   $query
+                                                   ORDER BY ps.invoice_no DESC
+                                                   ");
+    }
+
+    $sales          =  DB::select("
+                              SELECT
+                                 DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
+                                 pr.product_name,
+                                 co.company_name,
+                                 si.invoice_no,
+                                 si.customer_id,
+                                 IFNULL((SELECT customer_name FROM customers WHERE id = si.customer_id),'NA') as customer_name,
+                                 IFNULL(si.invoice_discount,0) AS invoice_discount,
+                                 si.invoice_type AS invoice_type,
+                                 IFNULL(ps.sale_total_amount+IFNULL(product_discount,0),0) AS sale_total_amount,
+                                 IFNULL(si.total_invoice_amount,0) AS total_invoice_amount,
+                                 IFNULL(si.service_charges,0) AS service_charges,
+                                 IFNULL(ps.qty,0) AS qty,
+                                 IFNULL(ps.product_discount,0) AS product_discount,
+                                 ps.product_id,
+                                 ps.company_id,
+                                 pr.old_purchase_price,
+                                 pr.sale_price,
+                                 si.paid_amount,
+                                 product_net_total
+                              FROM
+                              products_sales as ps
+                              LEFT JOIN sale_invoices si ON si.id = ps.sale_invoice_id
+                              LEFT JOIN products pr ON pr.id = ps.product_id
+                              LEFT JOIN companies co ON co.id = ps.company_id
+                              WHERE
+                              $query
+                              ORDER BY si.invoice_no DESC
+                        ");
+    $sale_invoice_records                         =  new stdClass();
+    $sale_invoice_records->total_invoice_amount   =  collect($sales)->unique('invoice_no')->sum('total_invoice_amount');
+    $sale_invoice_records->invoice_discount       =  collect($sales)->unique('invoice_no')->sum('invoice_discount');
+    $sale_invoice_records->service_charges       =  collect($sales)->unique('invoice_no')->sum('service_charges');
+
+    $returns        =  DB::select("
+                              SELECT
+                                 DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
+                                 pr.product_name,
+                                 co.company_name,
+                                 si.invoice_no,
+                                 si.customer_id,
+                                 IFNULL((SELECT customer_name FROM customers WHERE id = si.customer_id),'NA') as customer_name,
+                                 IFNULL(si.invoice_discount,0) AS invoice_discount,
+                                 si.invoice_type AS invoice_type,
+                                 IFNULL(ps.return_total_amount+IFNULL(product_discount,0),0) AS return_total_amount,
+                                 IFNULL(si.total_invoice_amount,0) AS total_invoice_amount,
+                                 IFNULL(si.service_charges,0) AS service_charges,
+                                 IFNULL(ps.qty,0) AS qty,
+                                 IFNULL(ps.product_discount,0) AS product_discount,
+                                 ps.product_id,
+                                 ps.company_id,
+                                 pr.old_purchase_price,
+                                 pr.sale_price,
+                                 si.paid_amount,
+                                 product_net_total
+
+                              FROM
+                              sale_return_products as ps
+                              LEFT JOIN sale_return_invoices si ON si.id = ps.sale_return_invoice_id
+                              LEFT JOIN products pr ON pr.id = ps.product_id
+                              LEFT JOIN companies co ON co.id = ps.company_id
+                              WHERE
+                              $query
+                              ORDER BY si.invoice_no DESC
+                  ");
+    $replacement    =  DB::select("
+                                    SELECT
+                                       DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
+                                       pr.product_name,
+                                       co.company_name,
+                                       si.invoice_no,
+                                       si.customer_id,
+                                       IFNULL((SELECT customer_name FROM customers WHERE id = si.customer_id),'NA') as customer_name,
+                                       IFNULL(si.invoice_discount,0) AS invoice_discount,
+                                       si.invoice_type AS invoice_type,
+                                       IFNULL(ps.sale_total_amount+IFNULL(product_discount,0),0) AS sale_total_amount,
+                                       IFNULL(si.total_invoice_amount,0) AS total_invoice_amount,
+                                       IFNULL(si.service_charges,0) AS service_charges,
+                                       IFNULL(ps.qty,0) AS qty,
+                                       IFNULL(ps.product_discount,0) AS product_discount,
+                                       ps.product_id,
+                                       ps.company_id,
+                                       ps.product_type
+                                    FROM
+                                    product_replacements as ps
+                                    LEFT JOIN product_replacment_invoices si ON si.id = ps.product_replacement_invoice_id
+                                    LEFT JOIN products pr ON pr.id = ps.product_id
+                                    LEFT JOIN companies co ON co.id = ps.company_id
+                                    WHERE
+                                    $query
+                                    ORDER BY si.invoice_no DESC
+                        ");
+
+    foreach ($replacement as $rep) {
+        if ($rep->product_type == 1) { //Return
+            $returns[] = (object)[
+                'created' => $rep->created,
+                'product_name' => $rep->product_name,
+                'company_name' => $rep->company_name,
+                'invoice_no' => $rep->invoice_no,
+                'customer_id' => $rep->customer_id,
+                'customer_name' => $rep->customer_name,
+                'invoice_discount' => $rep->invoice_discount,
+                'invoice_type' => $rep->invoice_type,
+                'product_net_total' => $rep->sale_total_amount,
+                'return_total_amount' => $rep->sale_total_amount,
+                'total_invoice_amount' => $rep->sale_total_amount,
+                'service_charges' => $rep->service_charges,
+                'qty' => $rep->qty,
+                'product_discount' => $rep->product_discount,
+                'product_id' => $rep->product_id,
+                'company_id' => $rep->company_id,
+                'product_type' => 2,
+            ];
+        } else { //Sale
+
+            $sales[]  = (object)[
+                'created' => $rep->created,
+                'product_name' => $rep->product_name,
+                'company_name' => $rep->company_name,
+                'invoice_no' => $rep->invoice_no,
+                'customer_id' => $rep->customer_id,
+                'customer_name' => $rep->customer_name,
+                'invoice_discount' => $rep->invoice_discount,
+                'invoice_type' => $rep->invoice_type,
+                'product_net_total' => $rep->sale_total_amount,
+                'sale_total_amount' => $rep->sale_total_amount,
+                'total_invoice_amount' => $rep->sale_total_amount,
+                'service_charges' => $rep->service_charges,
+                'qty' => $rep->qty,
+                'product_discount' => $rep->product_discount,
+                'product_id' => $rep->product_id,
+                'company_id' => $rep->company_id,
+                'product_type' => 2,
+            ];
+        }
+    }
+    return ['sales' => $sales, 'sale_returns' => $returns, 'pr_paid_amount' => $purchase_return_paid_amount, 'pr_invc_amount' => $purchase_inv_paid_amount, 'sale_invoice_record' => $sale_invoice_records];
 }

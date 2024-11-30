@@ -98,6 +98,13 @@ class ProductController extends Controller
             'product'   =>   $query
         ]);
     }
+    public function getProductStock($id)
+    {    
+        $stock_balance = Product::where('id',$id)->value('stock_balance');
+            return response()->json([
+                'stock_balance'=> $stock_balance
+            ]);
+    }
     public function deleteProduct(Request $request, $id)
     {
         if ($request->status == 'delete' && Product::where('id', $id)->delete()) {
@@ -129,8 +136,8 @@ class ProductController extends Controller
     {
         $companyId = $request->input('company_id');
         $products = Product::where('company_id', $companyId)
-            ->select('id', 'product_name', 'sale_price', 'new_purchase_price', 'old_purchase_price')
-            ->get();
+                    ->select('id', 'product_name', 'sale_price', 'new_purchase_price', 'old_purchase_price')
+                    ->get();
         return response()->json(['products' => $products]);
     }
 

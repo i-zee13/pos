@@ -560,7 +560,6 @@ class ReportsController extends Controller
       $request                         =  "";
       // $closing_date                    =  "2023-10-07";
       $saleRecords                     =  $this->SaleReportRecords($request, $closing_date, 1);
-
       $customer_payment                =  DB::table("customer_ledger")->selectRaw("
                                              customer_id,
                                              IFNULL(cr,0) as cr,
@@ -573,13 +572,14 @@ class ReportsController extends Controller
                                              IFNULL(cr,0) as cr,
                                              IFNULL(dr,0) as dr,
                                              trx_type 
-                                          ")
-                                          ->whereRaw("DATE(created_at) = '$closing_date' AND trx_type = 3 AND is_deleted = 0")->get(); 
+                                          ")->whereRaw("DATE(created_at) = '$closing_date' AND trx_type = 3 AND is_deleted = 0")->get(); 
       $records                         =  new stdClass();
       $records->total_pr_paid_amount   =  collect($saleRecords['pr_paid_amount'])->SUM('paid_amount'); //Purchase return invc payments
       $records->total_pr_invc_amount   =  collect($saleRecords['pr_invc_amount'])->SUM('paid_amount');  //Purchase invoice payment
       $records->total_invoice_amount   =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('total_invoice_amount');
       $records->total_invoice_discount =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('invoice_discount');
+      $records->total_net_sale_discount=  collect($saleRecords['sales'])->unique('invoice_no')->where('customer_id',8)->SUM('invoice_discount'); //zee
+
       $records->total_service_charges  =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('service_charges');
       $records->total_product_discount =  collect($saleRecords['sales'])->SUM('product_discount');
       $records->total_net_sales        =  collect($saleRecords['sales'])->WHERE('invoice_type', 1)->SUM('sale_total_amount');
@@ -588,7 +588,7 @@ class ReportsController extends Controller
 
       $records->total_net_sale_invoice_amount           =  collect($saleRecords['sales'])->WHERE('invoice_type', 1)->SUM('sale_total_amount');
       $records->total_credit_sale_invoice_amount        =  collect($saleRecords['sales'])->WHERE('invoice_type', 2)->SUM('sale_total_amount');
-      $records->total_net_sale_returns_invoice_amount   =  collect($saleRecords['sale_returns'])->WHERE('invoice_type', 1)->SUM('total_invoice_amount');
+      $records->total_net_sale_returns_invoice_amount   =  collect($saleRecords['sale_returns'])->WHERE('invoice_type', 1)->SUM('total_invoice_amount'); //zee
 
 
       $records->total_credit_sales_amount_received     =  collect($saleRecords['sales'])->WHERE('invoice_type', 2)->unique('invoice_no')->SUM('paid_amount');
