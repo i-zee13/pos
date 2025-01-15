@@ -85,10 +85,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/get-companies', [CompanyController::class, 'getCompanies'])->name('get-companies');
     Route::post('/get-customers', [CustomerController::class, 'getCustomers'])->name('get-customers');
     /** Product Routes */
-    Route::get('/products',             [ProductController::class, 'index'])->name('products');
-    Route::post('/product-store',       [ProductController::class, 'store'])->name('product-store');
-    Route::get('/get-products',         [ProductController::class, 'getProducts'])->name('get-products');
-    Route::get('/get-sub-cat/{catId}',  [ProductController::class, 'getSubCatToUpdate'])->name('get-sub-cat');
+    Route::get('/products', [ProductController::class, 'index'])->name('products');
+    Route::post('/product-store', [ProductController::class, 'store'])->name('product-store');
+    Route::get('/get-products', [ProductController::class, 'getProducts'])->name('get-products');
+    Route::get('/get-sub-cat/{catId}', [ProductController::class, 'getSubCatToUpdate'])->name('get-sub-cat');
     Route::post('/product-delete/{id}', [ProductController::class, 'deleteProduct'])->name('product-delete');
     Route::get('/get-product-stock/{prodcut_id}',    [ProductController::class, 'getProductStock'])->name('get-product-stock');
 
@@ -170,7 +170,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/save-tranasctions',       [TransactionController::class, 'saveTransaction'])->name('save-tranasctions');
     Route::get('/print-ledger-purchi/{customers?}',      [TransactionController::class, 'printPurchi'])->name('print-purchi');
 
-    Route::get('/print-ledger-purchi/{customers?}',  [TransactionController::class, 'printPurchi'])->name('print-purchi');
     //Reports
     Route::get('/customer-reports',         [LedgerDetailControlller::class, 'customerReport'])->name('customer-reports');
     Route::get('/vendor-reports',           [LedgerDetailControlller::class, 'vendorReport'])->name('vendor-reports');

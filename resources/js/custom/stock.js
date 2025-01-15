@@ -103,7 +103,7 @@ $(document).ready(function () {
                                 style="font-size: 13px" min="0" style=" width: 100%;">
                             </td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.prod_discount}</td>
-                             <td class='purchase-product-amount${product.product_id} add- S-input '>${(product.amount - product.prod_discount).toFixed(2)}</td>
+                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount - product.prod_discount}</td>
                             <td  style="width: 80px;"><a style="width: 100%;" type="button" id="${product.product_id}" data-product-invoice="${product.purchase_prod_id}" data-id="${product.purchase_invoice_id}" class="btn smBTN red-bg remove_btn" data-index="" style="${!is_removable ? 'display:none' : ''}" data-stock="${product.stock_in_hand}" data-quantity="${product.qty}">Remove</a></td>
                         </tr>
                     `);
@@ -790,18 +790,11 @@ $(document).on('input', '.amount_received', function () {
 })
 
 function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
-    var sum            = 0;
-    var grandQty       = 0;
-    var productTotal   = 0;
+    var sum = 0;
     purchased_product_array.forEach(function (data, key) {
-        productTotal++
-        sum            += parseFloat(data.amount);
-        grandQty       += parseFloat(data.qty);
+        sum += parseFloat(data.amount)
     });
-     
-    $('.product_net_total').val(addCommas(sum));
-    $('#total_qtys').html(grandQty.toFixed(2));
-    $('#total_items').html(productTotal); 
+    $('.product_net_total').val(sum);
     // sale_total_amount = sum-invoice_discount;
     sum += parseFloat(previous_payable ? previous_payable : 0);
     sum += parseFloat(service_charges ? service_charges : 0);

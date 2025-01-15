@@ -350,15 +350,6 @@
                 @endif
                 @endif
             </table>
-            <table class="bot-3-table w-50">
-                <tr class="tabletitle">
-                    <th>Amount in Words :</th>
-                </tr>
-                <tr class="body-description-tr">
-                    <td class=" tableitem">{{formatValue($invoice->total_invoice_amount)}} Only</td>
-                </tr>
-
-            </table>
             @if($invoice->description)
             <table class="bot-3-table w-50">
                 <tr class="tabletitle">

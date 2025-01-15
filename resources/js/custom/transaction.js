@@ -373,7 +373,7 @@ function fetchLedgers() {
                 $('.subCatsListTable tbody').append(`
                         <tr>
                          <td> ${voucher}</td> 
-                            <td><b> ${element['customer_name']}</b></td>
+                            <td> ${element['customer_name']}</td>
                             <!-- <td class='total_balance'>${ledger_balance}</td> --!>
                             <td>${total_cr_dr}</td>
                             <td> ${element['comment'] ?? 'NA'}</td>

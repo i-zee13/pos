@@ -799,13 +799,59 @@
 
                                 <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
 
-                            </div> 
+                            </div>
+                            <!-- <div class="col-auto pr-0">Invoice #
+                        <input type="text" id="" class="inputfileds required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
+                    </div> -->
+                            <!-- <div class="col-auto pr-0">Date
+                        <input type="Date" name="invoice_date" class="inputfileds datefileds new_dob new_form_field " value="{{@$invoice ? $invoice->created_at->format('Y-d-m') : $current_date}}">
+                    </div> -->
+                            <!-- <div class="col-auto pr-0">DOD <input type="Date" name="expected_delivery_date" class="inputfileds datefileds"> </div> -->
+                            <!-- <div class="col-auto pr-0">PO.NO. <input type="text" class="inputfileds" id="poNumForm"></div> -->
+                            <!-- <div class="col-auto pr-0">Invoice Type
+                        <select class="custom-select custom-select-sm form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                            <option value="1" {{@$invoice->invoice_type == 1 ? 'sehlected' : ''}}>Net Sale</option>
+                            <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
+                        </select>
+                        @if (@$invoice->customer_id)
+                        <input type="hidden" name="invoice_type" value="{{ @$invoice->invoice_type }}">
+                        @endif
+                    </div> -->
+
                             <div class="infoDiv">
                                 <form id="purchse-form">
-                                    <div class="row"> 
+                                    <div class="row">
+                                        <!-- <div class="col-2 pr-0">ID
+                                            <input type="text" id="bar-code" class="inputfileds bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1">
+                                        </div> -->
+
+                                        <!-- <div class="col-auto pr-0 f orm-s2"> Purchase Price
+                                            <select class="inputfileds forms elect products" name="product_name" id="products" tabindex="2">
+                                                <option value="0"> Select Product *</option>
+                                                @foreach($products as $product)
+                                                <option value="{{$product->id}}">{{$product->product_name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div> -->
                                         <input type="text" id="purchase_price" class="inputfileds  purchase_price " placeholder="" name="purchase_price" hidden>
-                                        <input type="text" id="retail _price" class="inputfileds" placeholder="" name="ret ail_price" hidden> 
-                                        <input id="datepicker" type="hidden" class="inputfileds new_dob new_form_field expiry_date " name="expiry_date"> 
+                                        <input type="text" id="retail _price" class="inputfileds" placeholder="" name="ret ail_price" hidden>
+
+                                        <!-- <div class="col-2 pr-0">Quantity *
+                                            <input type="text" id="qty" class="inputfileds only_numerics" placeholder="" name="qty" tabindex="5">
+                                        </div> -->
+                                        <input id="datepicker" type="hidden" class="inputfileds new_dob new_form_field expiry_date " name="expiry_date">
+
+                                        <!-- <div class="col-2 pr-0">Expiry Date
+                                <div>
+                                    <input autocomplete="off" id="datepicker" type="text" class="inputfileds new_dob new_form_field expiry_date " name="expiry_date" tabindex="6">
+                                </div>
+                            </div> -->
+                                        <!-- <input type="text" id="amount" class="inputfileds" placeholder="" name="amount" hidden> -->
+
+
+                                        <!-- <div class="col-md-2 PT-20" id="btns_div">
+                                            <button type="button" id="add-product" class="btn btn-primary mr-2" style="padding: 3px 20px 0px 19px;margin-top: 10px;" tabindex="8">Add</button>
+                                        </div> -->
                                     </div>
                                 </form>
                             </div>

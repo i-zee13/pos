@@ -1,5 +1,4 @@
- import { filter } from 'lodash';
-import swal from 'sweetalert';
+ import swal from 'sweetalert';
 
  var segments = location.href.split('/');
  var queryString = location.search;
@@ -266,62 +265,41 @@ import swal from 'sweetalert';
 
  }
  $('.products').change(function () {
-    var selected_product = $(this).val();
-    data_variable = $(this).val();
-    $('.purchase_price').val('');
-    $('#product-name').val('');
-    $('.qty').val('');
-    $('.bar-code').val('');
-    $('#amount').val('');
-    $('.calculate_by_amount').val('');
-    $('.calculate_by_amount_text').html('0');
-
-    if (selected_product > 0) {
-        var filter_product = product_list.filter(x => x.id == selected_product);
-        updateUI(filter_product[0]);  
-    }
-});
-$(document).on('click','#update-product-stock',function(){
-   var update_product_id =  $('.get-product-id').val();
-    $.ajax({
-        url: `/get-product-stock/${update_product_id}`,
-        type: 'get',
-        success: function(res) {
-            $('.get-product-id').val('');
-        var filter_product = product_list.filter(x => x.id == update_product_id);
-            filter_product[0].stock_balance = res.stock_balance; 
-        },
-        error: function() {
-            console.log('Error retrieving product stock information.');
-        }
-    });
-})
-$(document).on('click','#fetch-customers',function(){
-    getvendors();
-})
-function updateUI(product) {
-    $('.retail_price').text(product.sale_price);
-    $('.calculate_by_amount').attr('data-price', product.sale_price);
-
-    if (product.new_purchase_price > 0) {
-        $('.pp').text(product.new_purchase_price);
-        $('.purchase_price').val(product.new_purchase_price);
-    } else {
-        $('.pp').text(product.old_purchase_price);
-        $('.purchase_price').val(product.old_purchase_price);
-    }
-
-    $('#retail_price').val(product.sale_price);
-    $('.stock_balance').text(product.stock_balance);
-    p_name = product.product_name;
-    product_id = product.id;
-    stock_in_hand = product.stock_balance;
-    purchased_price = product.new_purchase_price ? product.new_purchase_price : product.old_purchase_price;
-    $('.expiry_date').val(product.expiry_date);
-    expiry_date = product.expiry_date;
-    $('.bar-code').val(product.barcode);
-}
-
+     var selected_product = $(this).val();
+     data_variable = $(this).val();
+     $('.purchase_price').val('');
+     $('#product-name').val('');
+     $('.qty').val('');
+     $('.bar-code').val('');
+     $('#amount').val('');
+     $('.calculate_by_amount').val('');
+     $('.calculate_by_amount_text').html('0');
+     if (selected_product > 0) {
+         var filter_product = product_list.filter(x => x.id == selected_product);
+         $('.retail_price').text(filter_product[0].sale_price);
+         $('.calculate_by_amount').attr('data-price', filter_product[0].sale_price);
+         if (filter_product[0].new_purchase_price > 0) {
+             $('.pp').text(filter_product[0].new_purchase_price);
+             $('.purchase_price').val(filter_product[0].new_purchase_price);
+         } else {
+             $('.pp').text(filter_product[0].old_purchase_price);
+             $('.purchase_price').val(filter_product[0].old_purchase_price);
+         }
+         $('#retail_price').val(filter_product[0].sale_price);
+         $('.stock_balance').text(filter_product[0].stock_balance); 
+         p_name = filter_product[0].product_name;
+         product_id = filter_product[0].id;
+         stock_in_hand = filter_product[0].stock_balance;
+         purchased_price = filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price;
+         $('.expiry_date').val(filter_product[0].expiry_date)
+         expiry_date = filter_product[0].expiry_date;
+         $('.bar-code').val(filter_product[0].barcode);
+         // console.log(filter_product)
+         // if (filter_product[0].barcode.length < 5) {
+         //     $('.qty').focus();
+         // } 
+     }
+ });
  let debounceTimer;
  $(document).on('keyup focusout', '.bar-code', function (e) {
     var flag      = false;
@@ -698,7 +676,7 @@ function updateUI(product) {
              $(`.td-input-qty${current_product_id}`).css('border-color', '#dddddd');
              data.amount = new_amount_of_purchase_product - data.prod_discount;
              var invoice_type = $('#invoice_type').val();
-             $(`.purchase-product-amount${current_product_id}`).text(parseFloat(data.amount).toFixed(2))
+             $(`.purchase-product-amount${current_product_id}`).text(data.amount)
              getStockRetail(data.product_id)
              grandSum(previous_payable, service_charges, invoice_discount);
          }
@@ -738,7 +716,7 @@ function updateUI(product) {
              new_amount_of_sale_product = current_product_qty * retail_price;
              data.amount = new_amount_of_sale_product - data.prod_discount;
              getStockRetail(data.product_id)
-             $(`.purchase-product-amount${current_product_id}`).text(parseFloat(data.amount).toFixed(2))
+             $(`.purchase-product-amount${current_product_id}`).text(data.amount)
              grandSum(previous_payable, service_charges);
          }
      })
@@ -759,7 +737,7 @@ function updateUI(product) {
              data.qty = current_product_qty
              new_amount_of_sale_product = (current_product_qty * data.retail_price) - p_discount;
              data.amount = new_amount_of_sale_product;
-             $(`.purchase-product-amount${current_product_id}`).text(parseFloat(data.amount).toFixed(2))
+             $(`.purchase-product-amount${current_product_id}`).text(data.amount)
              grandSum(previous_payable, service_charges);
          }
      })
@@ -769,7 +747,7 @@ function updateUI(product) {
      $("#products").empty();
      $("#products").append(`<option value="0">Select Product</option>`)
      stock_products.forEach(data => {
-         $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}"><b>${data.id}-${data.product_name}</b> - ${data.sale_price}</option>`)
+         $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name}</option>`)
          product_list.push(data);
      });
  }
@@ -840,19 +818,13 @@ function updateUI(product) {
  })
 
  function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
-     var sum            = 0;
-     var grandQty       = 0;
-     var productTotal   = 0;
+     var sum = 0;
      sales_product_array.forEach(function (data, key) {
-         productTotal++
-         sum            += parseFloat(data.amount);
-         grandQty       += parseFloat(data.qty);
+         // console.log(data);
+         sum += parseFloat(data.amount)
      });
-    console.log(productTotal);
-     $('.product_net_total').val(sum.toFixed(2));
-     $('#total_qtys').html(grandQty.toFixed(2));
-     $('#total_items').html(productTotal);
 
+     $('.product_net_total').val(sum);
      // sale_total_amount = sum-invoice_discount;
      sum += parseFloat(previous_payable ? previous_payable : 0);
      sum += parseFloat(service_charges ? service_charges : 0);

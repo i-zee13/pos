@@ -62,9 +62,8 @@ $('.search-btn').on('click', function () {
                             <th>Balance</th>
                             <th>Action</th>
                         </tr>
-                    </thead>
-                    <tbody></tbody>
-                    <tfoot></tfoot> 
+                    </thead><tbody>
+                </tbody>
                 </table>`);
             $('.TeacherAttendanceListTable tbody').empty();
             if (response.vendor.length == 0) {
@@ -215,7 +214,7 @@ $('.search-btn').on('click', function () {
 
             })
 
-            $('.TeacherAttendanceListTable tfoot').append(`
+            $('.TeacherAttendanceListTable tbody').append(`
                 <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
                     <td class="font18" align="right"></td>
                     <td class="font18" align="right"></td>

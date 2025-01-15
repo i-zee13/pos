@@ -32,7 +32,7 @@ $(document).on('click','.search-btn-sales',function(){
                 $('.subCatsListTable tbody').append(`
                     <tr>
                         <td>${invoice[0]} (${sale.created})</td>
-                        <td><b>${sale.customer_name}</b></td>
+                        <td>${sale.customer_name}</td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">
                             ${addCommas(sale.paid_amount)} </td>
                         <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">

@@ -54,8 +54,7 @@
                        @endphp
                 <tr>
                     <td>{{$invoice_first_part}} ({{ $sale->created_at->format('h:i A') }})</td>
-            
-                    <td> @if($sale->customer_id != 8)
+                   <td> @if($sale->customer_id != 8)
                             <b>{{ $sale->customer_name }}</b>
                         @else
                             {{ $sale->customer_name }}

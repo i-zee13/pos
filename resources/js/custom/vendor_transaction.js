@@ -52,17 +52,17 @@ $(document).ready(function () {
                         $('#transactionTable tbody').append(`
                                 <tr id='tr-${data.id}'>
                                     <td>${data.cpv_no}</td> 
-                                    <td><b>${data.dr}</b></td>
-                                    <td><b>${data.comment}</b></td> 
+                                    <td>${data.dr}</td>
+                                    <td>${data.comment}</td> 
                                     </tr>`
                         );
                     }
                     if (action == operation + '-ledger-jama' && data.cr > 0) {
                         $('#transactionTable tbody').append(`
                         <tr id='tr-${data.id}'>
-                            <td><b>${data.crv_no}</b></td> 
-                            <td><b>${data.cr}</b></td>
-                            <td><b>${data.comment}</b></td> 
+                            <td>${data.crv_no}</td> 
+                            <td>${data.cr}</td>
+                            <td>${data.comment}</td> 
                             </tr>`
                         );
                     }
@@ -371,10 +371,10 @@ function fetchLedgers() {
                 $('.subCatsListTable tbody').append(`
                                 <tr>
                                     <td>${voucher}</td> 
-                                    <td><b>${element['customer_name']}</b></td>
+                                    <td>${element['customer_name']}</td>
                                     <!-- <td class='total_balance'>${ledger_balance}</td> -->
-                                    <td><b>${total_cr_dr}</b></td>
-                                    <td>$<b>{element['comment'] ?? 'NA'}</b></td>
+                                    <td>${total_cr_dr}</td>
+                                    <td>${element['comment'] ?? 'NA'}</td>
                                     <td>${moment(element['date']).format('D MMM YYYY')}</td> 
                                     <td>
                                     <button  class="btn btn-default btn-line openDataSidebarForEditCustomerLedger ${element.is_editable == 1 ? '' : 'd-none'}"

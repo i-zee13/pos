@@ -281,18 +281,6 @@ $('.products').change(function () {
     $('#amount').val('');
     if(selected_product > 0){
         var filter_product = product_list.filter(x => x.id == selected_product)
-        if(filter_product[0].stock_balance == 0){
-            function checkFromDB(){
-                $.ajax({
-                    url: `/get-product-stock/${selected_product}`,
-                    type:'get', 
-                    succsess : function(r){
-                        console.log(r)
-
-                    }
-                })
-            }
-        }
         $('.retail_price').text(filter_product[0].sale_price);
         if(filter_product[0].new_purchase_price > 0){
             $('.pp').text(filter_product[0].new_purchase_price);
