@@ -819,11 +819,18 @@
 
  function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
      var sum = 0;
+     var grandQty = 0;
+     var productTotal = 0;
      sales_product_array.forEach(function (data, key) {
-         // console.log(data);
-         sum += parseFloat(data.amount)
-     });
-
+        productTotal++;
+        sum += parseFloat(data.amount);
+        grandQty += parseFloat(data.qty);
+      });
+      console.log(productTotal);
+      $('.product_net_total').val(sum.toFixed(2));
+      $('#total_qtys').html(grandQty.toFixed(2));
+      $('#total_items').html(productTotal);
+    
      $('.product_net_total').val(sum);
      // sale_total_amount = sum-invoice_discount;
      sum += parseFloat(previous_payable ? previous_payable : 0);

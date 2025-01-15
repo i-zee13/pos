@@ -539,7 +539,7 @@ function vendorLedger($request,$column){
 
 function SaleReportRecords($request = null, $current_date, $is_admin_close = null)
    {
-
+      $current_date = date('Y-m-d');
       $query = " 1=1";
       $purchase_return_paid_amount = 0;
       $purchase_inv_paid_amount    = 0;

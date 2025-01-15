@@ -75,12 +75,7 @@ $('.search-btn').on('click', function () {
         $('.TeacherAttendanceListTable').DataTable().clear().destroy();
       }
       var table = $('.TeacherAttendanceListTable').DataTable({
-         "bSort": false,
-         "bPaginate": false,
-         scrollX: false,
-         scrollY: '400px',
-         scrollCollapse: true,
-         dom: 'Bfrtip',
+        dom: 'Bfrtip',
         buttons: [{
           extend: 'excelHtml5',
           text: 'Excel',

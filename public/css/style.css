@@ -3316,8 +3316,8 @@ textarea {
 	border: 0;
 }
 .dropdown-item:hover, .dropdown-item:focus {
-	background-color: #f8f9fa;
-	color: #152e4d
+background-color: #001e35;
+    color: #ffffff;
 }
 ._more-action .dropdown-menu {
 	padding: 0;

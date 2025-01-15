@@ -44,8 +44,13 @@
         .btn{
             border-radius :5px !important;
         }
-        td .comment{
-           
+        td{
+            font-weight: bolder;
+        }
+        input{
+            font-weight: 700
+        }
+        td .comment{ 
             color: #ffffff;
             font-size: 13px; 
             font-family: monospace;

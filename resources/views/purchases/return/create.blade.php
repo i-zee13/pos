@@ -835,16 +835,19 @@
                                             <td></td>
                                         </tr>
                                         <tr style="border:solid 1px #dbdbdb">
-                                            <td class="font18" align="right">Grand Total:</td>
+                                        <td class="totalNo" align="right">
+                                                <span id="total_items">0</span><small>T.Items</small>
+                                            </td>
+                                            
                                             <td class="totalNo" align="right">
-                                                <!-- <span id="total_ctn">0</span><small>CTNS</small> -->
+                                                <span id="total_qtys">0</span><small>Qtys</small>
                                             </td>
                                             <td class="totalNo" align="right"></td>
                                             <td class="totalNo" align="right"><small>Pkr.</small>
                                                 @if (request()->query('invoice') == 'detail')
-                                                <span>{{ $invoice->invoice_remaining_amount_after_pay }}</span>
+                                                    <span>{{ $invoice->invoice_remaining_amount_after_pay }}</span>
                                                 @else
-                                                <span class="grand-total">0</span>
+                                                 <span class="grand-total">0</span>
                                                 @endif
                                             </td>
 

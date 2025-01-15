@@ -664,10 +664,21 @@ $('#customer_id').change(function () {
 
 function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
     var sum = 0;
+    var grandQty = 0;
+    var productTotal = 0;
     returns_product_array.forEach(function (data, key) {
-        //console.log(data);
+        productTotal++;
         sum += parseFloat(data.amount)
-    });
+        grandQty += parseFloat(data.qty);
+    });  
+     console.log(productTotal);
+     $('.product_net_total').val(sum.toFixed(2));
+     $('#total_qtys').html(grandQty.toFixed(2));
+     $('#total_items').html(productTotal);
+   
+
+
+
     $('.product_net_total').val(sum);
     sum -= parseFloat(previous_payable)
     sum += parseFloat(service_charges ? service_charges : 0);
