@@ -48,7 +48,7 @@ $('.search-btn').on('click', function () {
       CurrentRef.attr('disabled', false);
       $('.loader').show();
       $('.teacher_attendance_list').empty();
-      $('.teacher_attendance_list').append("\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th>Date</th>\n                            <th>Transaction Type</th>\n                            <th>CR</th>\n                            <th>DR</th>\n                            <th>Balance</th>\n                        </tr>\n                    </thead><tbody>\n                </tbody>\n                </table>");
+      $('.teacher_attendance_list').append("\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th>Date</th>\n                            <th>Transaction Type</th>\n                            <th>CR</th>\n                            <th>DR</th>\n                            <th>Balance</th>\n                        </tr>\n                    </thead>\n                    <tbody></tbody>\n                    <tfoot></tfoot>\n                </table>");
       $('.TeacherAttendanceListTable tbody').empty();
       if (response.vendor.length == 0) {
         $('#notifDiv').fadeIn();

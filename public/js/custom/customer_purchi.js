@@ -102,7 +102,7 @@
                                 }
                                 setTimeout(() => {
                                     $('#notifDiv').fadeOut(); 
-                                    window.location  = "/sale-add";
+                                    window.location  = "/ledger-purchi";
                                 }, 1500);
                             } else{
                                 current_action.removeAttr('disabled');

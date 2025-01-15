@@ -678,10 +678,10 @@ function grandSum(previous_payable = 0, service_charges = 0, prod_type = 0) {
         prod_type = data.prod_type
         if (data.prod_type == 2) {
             new_sum += parseFloat(data.amount)
-            $('.product_net_total').val(new_sum);
+            $('.product_net_total').val(new_sum.toFixed(2));
         } else {
             return_sum += parseFloat(data.amount)
-            $('.return_total').val(return_sum);
+            $('.return_total').val(return_sum.toFixed(2));
         }
     });
 

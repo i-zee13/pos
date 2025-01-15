@@ -18,12 +18,13 @@ class StockController extends Controller
 {
     public function create()
     {
+    $customers = Customer::where('customer_type',1)->get();
         $invoice_no   =   getPurchaseInvoice();
         $parts        = explode('-', $invoice_no);
         $invoice_first_part   = $parts[0];
         $current_date =   Carbon::today()->toDateString(); 
         $products     =   Product::get();
-        return view('purchases.add', compact('current_date', 'products', 'invoice_no', 'invoice_first_part'));
+        return view('purchases.add', compact('customers','current_date', 'products', 'invoice_no', 'invoice_first_part'));
     }
     public function getProduct(Request $request)
     {

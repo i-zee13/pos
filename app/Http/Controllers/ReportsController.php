@@ -561,7 +561,6 @@ class ReportsController extends Controller
       $request                         =  "";
       // $closing_date                    =  "2023-10-07";
       $saleRecords                     =  $this->SaleReportRecords($request, $closing_date, 1);
-
       $customer_payment                =  DB::table("customer_ledger")->selectRaw("
                                              customer_id,
                                              IFNULL(cr,0) as cr,
@@ -575,8 +574,7 @@ class ReportsController extends Controller
                                              IFNULL(cr,0) as cr,
                                              IFNULL(dr,0) as dr,
                                              trx_type 
-                                          ")
-                                          ->whereRaw("DATE(created_at) = '$closing_date' AND trx_type = 3 AND is_deleted = 0")->get(); 
+                                          ")->whereRaw("DATE(created_at) = '$closing_date' AND trx_type = 3 AND is_deleted = 0")->get(); 
       $records                         =  new stdClass();
       $records->total_pr_paid_amount   =  collect($saleRecords['pr_paid_amount'])->SUM('paid_amount'); //Purchase return invc payments
       $records->total_pr_invc_amount   =  collect($saleRecords['pr_invc_amount'])->SUM('paid_amount');  //Purchase invoice payment

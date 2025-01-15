@@ -84,8 +84,7 @@ $('.search-btn').on('click', function () {
             var ttl_return_product_discount = 0;
             var ttl_return_invoice_discount = 0;
             response.stocks.sales.forEach((element, key) => { 
-                total_sales             += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
-
+                total_sales             += element['sale_total_amount'] ? element['sale_total_amount'] : 0; 
                 ttl_quantity            += element['qty'] ? element['qty'] : 0;
                 ttl_product_discount    += element['product_discount'] ? element['product_discount'] : 0; 
                 var date                =  new Date(element.expire_date);
@@ -109,20 +108,19 @@ $('.search-btn').on('click', function () {
                 });
                 sale_return_total(ttl_return_quantity, ttl_return_product_discount, total_returns, 'Return');
             }
-            var grand_total_discount = parseInt(ttl_invoice_discount + ttl_return_invoice_discount);
-            var grand_qty = parseInt(ttl_quantity - ttl_return_quantity);
+            var grand_total_discount    = parseInt(ttl_invoice_discount + ttl_return_invoice_discount);
+            var grand_qty               = parseInt(ttl_quantity - ttl_return_quantity);
             //Grand Total
             $('.TeacherAttendanceListTable tfoot').append(`
-            <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
-                <td colspan="3"></td> 
-                <td class="font18">Grand Total :</td>
-                <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${addCommas(parseInt(ttl_quantity - ttl_return_quantity))} </td>
-                <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${addCommas(parseInt(ttl_product_discount - ttl_return_product_discount))} </td>
-                <td class="totalNo" colspan="2">
-                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(parseInt(total_sales - total_returns))}</span>
-                </td>
-            </tr>
-        `);
+                    <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+                        <td colspan="3"></td> 
+                        <td class="font18">Grand Total :</td>
+                        <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${addCommas(parseInt(ttl_quantity - ttl_return_quantity))} </td>
+                        <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${addCommas(parseInt(ttl_product_discount - ttl_return_product_discount))} </td>
+                        <td class="totalNo" colspan="2">
+                            <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(parseInt(total_sales - total_returns))}</span>
+                        </td>
+                    </tr>`);
 
 
             $('.ttl_sales').html('<span>Rs.</span>' + addCommas(total_sales - total_returns - grand_total_discount));
@@ -131,8 +129,7 @@ $('.search-btn').on('click', function () {
             $('.ttl_quantity').html(grand_qty ? addCommas(grand_qty) : 0);
             $('.ttl_product_discount').html(ttl_product_discount ? addCommas(ttl_product_discount) : 0);
             $('.ttl_invoice_discount').html(grand_total_discount ? addCommas(grand_total_discount) : 0);
-            $('.ttl_discount').html(total_returns ? addCommas(total_returns) : 0);
-
+            $('.ttl_discount').html(total_returns ? addCommas(total_returns) : 0); 
             $('.loader').hide();
             var title = '';
             if (segments[3] == 'customer-reports') {
@@ -343,13 +340,15 @@ $('.reset-btn').on('click', function () {
 })
 
 function addCommas(nStr) {
-    nStr += "";
-    x = nStr.split(".");
-    x1 = x[0];
-    x2 = x.length > 1 ? "." + x[1] : "";
+    nStr = parseFloat(nStr).toFixed(2);
+
+    var x = nStr.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
     var rgx = /(\d+)(\d{3})/;
     while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, "$1" + "," + "$2");
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
     }
+
     return x1 + x2;
 }

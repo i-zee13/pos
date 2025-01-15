@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProductReplacementInvoice;
 use App\Models\PurchaseInvoice;
 use App\Models\Sale;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\SaleReturn; 
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class HomeController extends Controller
 {
@@ -90,4 +92,5 @@ class HomeController extends Controller
     {
         dd($request->all());
     }
+    
 }

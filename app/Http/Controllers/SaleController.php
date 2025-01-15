@@ -168,7 +168,7 @@ class SaleController extends Controller
                     }
                     $balance = $balanceQuery->value('balance');
                 }
-                // dd($balance);
+                // dd($invoice->total_invoice_amount-$balance);
                 if ($request->hidden_invoice_id) {
                     $customer_ledger   =   CustomerLedger::where('sale_invoice_id', $request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
                 } else {
@@ -324,7 +324,7 @@ class SaleController extends Controller
             $where      =   " SUBSTRING_INDEX(invoice_no, '-', 1) = '$request->bill_no'";
         } else {
             $where      =   " DATE(created_at) != '$current_date'";
-        }
+        } 
         $sales          =   SaleInvoice::selectRaw("
                                 sale_invoices.*,DATE_FORMAT(created_at,'%d-%m-%Y %h:%i %p') as created,
                                 (SELECT cr FROM customer_ledger WHERE sale_invoice_id = sale_invoices.id) as paid_amount,
