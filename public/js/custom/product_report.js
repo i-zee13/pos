@@ -137,9 +137,12 @@ $('.search-btn').on('click', function () {
                 $('.TeacherAttendanceListTable').DataTable().clear().destroy();
             }
             var table = $('.TeacherAttendanceListTable').DataTable({
-                "ordering": false,
-                "paging": false,
-                dom: 'Bfrtip',
+               "bSort": false,
+                 "bPaginate": false,
+                 scrollX: false,
+                 scrollY: '400px',
+                 scrollCollapse: true,
+                 dom: 'Bfrtip',
                 buttons: [{
                         extend: 'excelHtml5',
                         text: 'Excel',

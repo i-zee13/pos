@@ -11,6 +11,9 @@
       <div class="bar bar8"></div>
     </div>
   </div>
+<!-- <div style="min-height: 400px" id="tblLoader">
+    <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
+</div> -->
 <div class="parent-div" style="display:none">
     <div id="product-cl-sec"> <a href="#" id="pl-close" class="close-btn-pl"></a>
         <div class="pro-header-text">Add <span>Product</span></div>
@@ -95,6 +98,10 @@
     </div>
     @section('content')
     <style>
+        select:focus>option:checked {
+            background: #000 !important;
+        }
+
         .OrderWrapper {
             padding: 0 !important;
         }
@@ -227,8 +234,7 @@
         }
 
         .sidebox-content {
-            background-color: #152e4d;
-            color: white;
+            background-color: #fff;
             box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.2);
             overflow-y: auto;
             display: flex;
@@ -600,14 +606,14 @@
 
                 <input type="hidden" id="" value="1" name="form_status">
                 <input type="hidden" id="stock_products" value="{{json_encode($products)}}">
-                <div class="col-md-4 left-sidebox">
-                    <div class="sidebox-content">
+                <div class="col-md-4 left-sidebox ">
+                    <div class="sidebox-content text-white" style="background-color: #152e4d">
                         <div class="CT_sec">
                             <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
                             <div class="col-md-12 PB-10">
                                 <label class="font13 mb-5">Invoice Type</label>
                                 <div class="form-s2">
-                                    <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}} readonly>
+                                    <select class="form-control formselect form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
                                         <option value="1" {{@$invoice->invoice_type == 1 ? 'selected' : ''}}>Net Sale</option>
                                         <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
                                     </select>
@@ -619,8 +625,8 @@
                             <div class="col-md-12 PB-10">
                                 <label class="font13 mb-5">Invoice #</label>
                                 <div class="form-s2">
-                                    <input type="text" id="" class="form-control" value="{{@$invoice_first_part}}" readonly>
-                                    <input type="hidden" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? @$invoice->invoice_no : $invoice_no}}">
+                                    <input type="text" id="" class="form-control" value="{{@$invoice_first_part}}">
+                                    <input type="hidden" id="" class="form-control required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
 
                                 </div>
                             </div>
@@ -671,14 +677,106 @@
                             <!-- <h2 class="title m-0 pb-0">Shipping <span>Details</span></h2> -->
                         </div>
 
+                        <!-- <div class="left_Info_">
+
+                            <div class="row" style="margin-right:-5px; padding-bottom: 20px;">
+                                <div class="col-md-12 PB-10">
+                                    <label class="font13 mb-5">Country Of Origin</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect" placeholder="select Country Of Origin" name="country_of_origin">
+                                            <option disabled selected>Select Country Of Origin</option>
+                                            <option selected value="Pakistan">Pakistan</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 PB-10">
+                                    <label class="font13 mb-5">Port of Loading</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect" placeholder="select Port of Loading" name="port_of_loading">
+                                            <option disabled selected>Select Port of Loading</option>
+
+                                            <option value=" ">Select Port of Lo </option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 PB-10">
+                                    <label class="font13 mb-5">Port of Discharge</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect" placeholder="select Port of Discharge" name="port_of_discharge">
+                                            <option disabled selected>Select Port of Discharge</option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 PB-10">
+                                    <label class="font13 mb-5">Mode of Shipment</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect" placeholder="select Mode of Shipment" name="mode_of_shipment">
+                                            <option disabled selected>Select Mode of Shipment</option>
+                                            <option value="Sea">By Sea</option>
+                                            <option value="Land">By Land</option>
+                                            <option value="Air">By Air</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-12 mb-20 nonFobDiv">
+                                    <label class="font12">Select Route</label>
+                                    <div class="form-s2">
+                                        <select class="form-control sd-type" name="shipping_route" multiple="multiple" style="width: 100%">
+
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-md-12 PB-10">
+                                    <label class="font13 mb-5">Shipped Via</label>
+                                    <div class="form-s2">
+                                        <select class="form-control formselect" placeholder="Select Shipped Via" name="shipment_company">
+                                            <option disabled selected>Select Company Name</option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                </div> -->
+
+
                     </div>
                 </div>
                 <div class="col-md-8 right-sid ebox">
 
                     <div class="row">
-                        <h2 class="title font22 PT-10 mb-10">
-                            Sale<span> Return Invoice</span>
-                        </h2>
+                        <div class="col-6">
+                            <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'sale-edit' ? 'Update' : 'New'}} <span>Sale Invoice</span></h2>
+                        </div>
+
+                        <div class="col p-0   d-flex">
+                            <input type="number" value="" data-price="" class="custom-select custom-select-sm  calculate_by_amount" style="height: 28px;border-color: white; width: 100px;margin-top: 11px;">
+                            <span class="calculate_by_amount_text ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red;margin-top:5px">0</span>
+                        </div>
+                        <!-- <div class="col p-0 text-right">
+                            <select class="custom-select custom-select-sm custom-select-cs" id="currencySelector">
+                                <option sign="$" value="USD" selected>USD - United States Dollar
+                                </option>
+                                <option sign="EUR" value="EUR">EUR - Euro
+                                </option>
+                                <option sign="Rs" value="PKR">PKR - Pakistan Rupees
+                                </option>
+                                <option sign="HK$" value="HKD">HKD — Hong Kong dollar</option>
+                                <option sign="AFN" value="AFN">AFN — Afghani</option>
+                            </select>
+                        </div> -->
+                        <!-- <div class="col-6 PL-10">
+                            <div class="total-amt-top">
+                                <div class="TAM-div"><small>Amount Dues</small><span id="amount_due">0</span></div>
+                            </div>
+                        </div> -->
                     </div>
 
                     <div class="right_Info">
@@ -690,12 +788,58 @@
                                 <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
 
                             </div>
+                            <!-- <div class="col-auto pr-0">Invoice #
+                        <input type="text" id="" class="inputfileds required" placeholder="" name="invoice_no" value="{{@$invoice ? $invoice->invoice_no : $invoice_no}}">
+                    </div> -->
+                            <!-- <div class="col-auto pr-0">Date
+                        <input type="Date" name="invoice_date" class="inputfileds datefileds new_dob new_form_field " value="{{@$invoice ? $invoice->created_at->format('Y-d-m') : $current_date}}">
+                    </div> -->
+                            <!-- <div class="col-auto pr-0">DOD <input type="Date" name="expected_delivery_date" class="inputfileds datefileds"> </div> -->
+                            <!-- <div class="col-auto pr-0">PO.NO. <input type="text" class="inputfileds" id="poNumForm"></div> -->
+                            <!-- <div class="col-auto pr-0">Invoice Type
+                        <select class="custom-select custom-select-sm form_clear required" name="invoice_type" id="invoice_type" value="{{@$invoice->invoice_type}}" {{@$invoice->customer_id ? 'disabled' : ''}}>
+                            <option value="1" {{@$invoice->invoice_type == 1 ? 'sehlected' : ''}}>Net Sale</option>
+                            <option value="2" {{@$invoice->invoice_type == 2 ? 'selected' : ''}}>Add To Ledger</option>
+                        </select>
+                        @if (@$invoice->customer_id)
+                        <input type="hidden" name="invoice_type" value="{{ @$invoice->invoice_type }}">
+                        @endif
+                    </div> -->
+
                             <div class="infoDiv">
                                 <form id="purchse-form">
                                     <div class="row">
+                                        <!-- <div class="col-2 pr-0">ID
+                                            <input type="text" id="bar-code" class="inputfileds bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1">
+                                        </div> -->
+
+                                        <!-- <div class="col-auto pr-0 f orm-s2"> Purchase Price
+                                            <select class="inputfileds forms elect products" name="product_name" id="products" tabindex="2">
+                                                <option value="0"> Select Product *</option>
+                                                @foreach($products as $product)
+                                                <option value="{{$product->id}}">{{$product->product_name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div> -->
                                         <input type="text" id="purchase_price" class="inputfileds  purchase_price " placeholder="" name="purchase_price" hidden>
                                         <input type="text" id="retail _price" class="inputfileds" placeholder="" name="ret ail_price" hidden>
+
+                                        <!-- <div class="col-2 pr-0">Quantity *
+                                            <input type="text" id="qty" class="inputfileds only_numerics" placeholder="" name="qty" tabindex="5">
+                                        </div> -->
                                         <input id="datepicker" type="hidden" class="inputfileds new_dob new_form_field expiry_date " name="expiry_date">
+
+                                        <!-- <div class="col-2 pr-0">Expiry Date
+                                <div>
+                                    <input autocomplete="off" id="datepicker" type="text" class="inputfileds new_dob new_form_field expiry_date " name="expiry_date" tabindex="6">
+                                </div>
+                            </div> -->
+                                        <!-- <input type="text" id="amount" class="inputfileds" placeholder="" name="amount" hidden> -->
+
+
+                                        <!-- <div class="col-md-2 PT-20" id="btns_div">
+                                            <button type="button" id="add-product" class="btn btn-primary mr-2" style="padding: 3px 20px 0px 19px;margin-top: 10px;" tabindex="8">Add</button>
+                                        </div> -->
                                     </div>
                                 </form>
                             </div>
@@ -715,7 +859,6 @@
                                         <tr>
                                             <th class="">ID</th>
                                             <th class="">Select Product</th>
-                                            <th class="">Exp. Date</th>
                                             <th style="">QTY.</th>
                                             <th style="">Unit Price</th>
                                             <th style="">Discount</th>
@@ -726,9 +869,9 @@
                                     <tbody id="productGrid">
                                         <tr>
                                             <td><input type="text" id="bar-code" class="inputSale bar-code" placeholder="" name="bar_code" data-attr='bar_code' tabindex="1"></td>
-                                            <td style="width:200px">
+                                            <td style="width : 200px;max-width: 200px;">
                                                 <div class="form-s2">
-                                                    <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" style="width: 140;">
+                                                    <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2">
                                                         <option value="0">Select Product *</option>
                                                         @foreach($products as $product)
                                                         <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}}</option>
@@ -736,12 +879,11 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td style="width:80px"> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " style=" width: 100%;"></td>
-                                            <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
-                                            <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px" readonly></td>
-                                            <td style="width:80px"><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;width:100%;" tabindex="4" min="0"></td>
-                                            <td style="width:100px" class='add- S-input'><input type="number" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;width:100%"></td>
-                                            <td style="width:100px">
+                                            <td> <input type="text" id="qty" class="inputSale only_numerics qty" placeholder="" name="qty" tabindex="3" min="0"></td>
+                                            <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" readonly></td>
+                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" tabindex="4" min="0"></td>
+                                            <td class='add- S-input ' style="width: 130px;"><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px; width:100%"></td>
+                                            <td style="width: 100px;">
                                                 <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5" style="padding: 5px 15px 5px 15px; background:green;width:100%">Add</button>
                                             </td>
                                         </tr>
@@ -755,7 +897,6 @@
                         <!-- <div class="row">
                         <div class="col-12"><button id="productlist01" class="btn add-product-line list-customer-products"><i class="fa fa-plus"> </i> Add a Product</button></div>
                     </div> -->
-
 
                         <div class="row">
                             <div class="col-12">
@@ -805,8 +946,8 @@
                                         <tr>
                                             <td></td>
                                             <td></td>
-                                            <td align="right" class="cash-return">Cash To Pay </td>
-                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" value="{{@$invoice->paid_amount}}"></td>
+                                            <td align="right" class="cash-return">Cash Recived </td>
+                                            <td><input type="number" class="inputvalue amount_received" id="amount_received" name="amount_received" style="font-size: 13px" placeholder="0.00" value="{{@$invoice->amount_received}}"></td>
                                         </tr>
 
 
@@ -814,16 +955,15 @@
                                             <td></td>
                                             <td></td>
                                             <td align="right">Cash Return</td>
-                                            <td class="cash_return">{{@$invoice->cash_return}}</td>
+                                            <td class="cash_return_amount">{{@$invoice->cash_return}}</td>
                                         </tr>
-
-                                        @if (Route::currentRouteName() == 'purchase-edit')
+                                        @if (Route::currentRouteName() == 'sale-edit')
 
                                         <tr class="th-to-hide" hidden>
                                             <td></td>
                                             <td></td>
                                             <td align="right">Paid</td>
-                                            <td class="paid_amount">{{@$invoice->paid_amount ? @$invoice->paid_amount : 0 }}</td>
+                                            <td class="paid_amount">{{@$invoice->paid_amount}}</td>
                                         </tr>
                                         @endif
                                         <tr>
@@ -842,7 +982,7 @@
                                                 @if(request()->query('invoice') == 'detail')
                                                 <span>{{$invoice->invoice_remaining_amount_after_pay}}</span>
                                                 @else
-                                                <span class="grand-total">0</span>
+                                                <span class="grand-total">0.00</span>
                                                 @endif
                                             </td>
 
@@ -852,13 +992,26 @@
 
                             </div>
                         </div>
-                        <div class="Action_bottom" style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
+
+                        <!-- <div class="row _notesTER">
+                        <div class="col-md-6">
+                            Notes
+                            <textarea class="t  extarea-NOTES" name="performa_notes" rows='2' placeholder="Enter Notes or bank transfer details" style="font-size: 13px"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            Terms
+                            <textarea class="textarea-TERMS" name="performa_terms" rows='2' placeholder="Enter your terms and conditions" style="font-size: 13px"></textarea>
+                        </div>
+                    </div> -->
+
+                        <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">
                             @if(request()->query('invoice') == 'detail')
-                            <a href="{{route('salereturn.index')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
+                            <a href="{{route('sales')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
                             @else
                             <button type="button" id="save" class="btn btn-primary mr-2">Save</button>
                             <button type="button" id="print-invoice" class="btn btn-primary mr-2">Print</button>
-                            <a href="{{route('salereturn.index')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
+                            <a href="{{route('sales')}}" type="submit" class="btn btn-cancel" id="cancel">Cancel</a>
                             @endif
                         </div>
                     </div>
@@ -866,16 +1019,15 @@
 
             </div>
         </form>
-    </div> 
+    </div>
 
 </div>
 </div>
 @endsection
- 
 @push('js')
 <script>
     var clients = JSON.parse('{!! json_encode($customers)  !!}');
 </script>
-<script src="{{mix('js/custom/sale_return.js')}}"> </script>
+<script src="{{mix('js/custom/sale.js')}}"> </script>
 
 @endpush

@@ -60,7 +60,7 @@ if (!function_exists('getPurchaseInvoice')) {
         $year        = date('y');
         $invoice_no  = 1;
         $lastinvoice = PurchaseInvoice::where('date', Carbon::today())->count();
-        $invoice_no  = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+        $invoice_no  = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::now();
 
         return $invoice_no;
     }
@@ -71,7 +71,7 @@ if (!function_exists('getProductReplacementNo')) {
         $invoice_no    = 1;
         $lastinvoice   = ProductReplacementInvoice::where('date', Carbon::today())->count();
 
-        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' .Carbon::now();
 
         return $invoice_no;
     }
@@ -82,7 +82,7 @@ if (!function_exists('getSaleReturnNo')) {
         $invoice_no    = 1;
         $lastinvoice   = SaleReturn::where('date', Carbon::today())->count();
 
-        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::now();
 
         return $invoice_no;
     }
@@ -92,7 +92,7 @@ if (!function_exists('getPurchaseReturnNo')) {
     {
         $invoice_no    = 1;
         $lastinvoice   = ReturnInvoice::where('date', Carbon::today())->count();
-        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::now();
         return $invoice_no;
     }
 }
@@ -316,9 +316,10 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     // dd($purchase);
     $purchase->expiry_date = $purchase->expiry_date ? $purchase->expiry_date : '0000-00-00';
     $query = BatchStockMgt::where('product_id', $purchase->product_id);
-    if ($existing_inv_id) {
-        $query->where('invoice_id', $existing_inv_id)->orderBy('id', 'ASC');
-    } else if ($transaction_type == 1 || $transaction_type == 4 || $transaction_type == 3) {
+    // if ($existing_inv_id) {
+    //     $query->where('invoice_id', $existing_inv_id)->orderBy('id', 'ASC');
+    // } else
+    if ($transaction_type == 1 || $transaction_type == 4 || $transaction_type == 3) {
         $query->whereDate('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC');
     } else if ($transaction_type == 2) {
         $query->where('batch_wise_balance', '>', 0)->orderBy('expiry_date', 'ASC');
@@ -396,7 +397,9 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     $stock->purchase_price  = $purchase->purchase_price;
     $stock->sale_price      = $purchase->sale_price;
     $stock->save(); 
-} 
+}
+
+
 function deleteProductFields($v, $sale, $type, $prod_type = null)
 {
     $v->actual_qty           =  $sale->actual_qty;
@@ -533,37 +536,190 @@ function vendorLedger($request,$column){
         'balance' => $cust_ldr->balance,
     ]);
 }
-function getCustomerBalance($customer_id,$is_exisitng_inv){
-    $ledgerCount      = CustomerLedger::where('customer_id', $customer_id)->count();
-    $balance = 0;
-    if ($ledgerCount > 0) {
-        $balanceQuery = CustomerLedger::where('customer_id', $customer_id)->orderBy('id', 'DESC');
-        if ($is_exisitng_inv) {
-            $balanceQuery->skip(1); 
-        }
-        $balance = $balanceQuery->value('balance');
-    }
-    return $balance;
-}
-if (!function_exists('isEditable')) {
-    function allInvoicesUpdate($customer_id)
-    {
-        CustomerLedger::where('is_editable', 1)
-            ->update(['is_editable' => 0]);
-        VendorLedger::where('is_editable', 1)
-            ->update(['is_editable' => 0]);
-        //Sales
-        SaleInvoice::where('is_editable', 1)
-            ->update(['is_editable' => 0]);
-        SaleReturn::where('is_editable', 1)
-            ->update(['is_editable' => 0]);
-        PurchaseInvoice::where('is_editable', 1)
-            ->update(['is_editable' => 0]);
-        ReturnInvoice::where('is_editable', 1)
-            ->update(['is_editable' => 0]);
-        ProductReplacementInvoice::where('is_editable', 1)
-            ->update(['is_editable' => 0]);
 
-        return true;
-    }
-}
+function SaleReportRecords($request = null, $current_date, $is_admin_close = null)
+   {
+
+      $query = " 1=1";
+      $purchase_return_paid_amount = 0;
+      $purchase_inv_paid_amount    = 0;
+      $query .= " AND ps.deleted_at IS NULL";
+
+      if (isset($request->company_id)) {
+         $query .= " AND ps.company_id = $request->company_id";
+      }
+      if (isset($request->product_id)) {
+         $query .= " AND ps.product_id = $request->product_id";
+      }
+      if (isset($request->customer_id)) {
+         $query .= " AND si.customer_id = $request->customer_id";
+      }
+      if (isset($request->start_date) != '' && isset($request->end_date) != '') {
+         $query .= " AND DATE(ps.created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
+      } else {
+         $query .=  " AND  DATE(ps.created_at) = '$current_date'";
+      }
+      if (isset($request->bill_no)) {
+         $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
+      }
+      if ($is_admin_close == 1) {
+         $purchase_return_paid_amount =  DB::select("
+                                                   SELECT
+                                                   ps.paid_amount
+                                                   FROM
+                                                   purchase_return_invoices as ps
+                                                   WHERE
+                                                   $query
+                                                   ORDER BY ps.invoice_no DESC
+                                                   ");
+         $purchase_inv_paid_amount =  DB::select("
+                                                   SELECT
+                                                   ps.paid_amount
+                                                   FROM
+                                                   purchase_invoices as ps
+                                                   WHERE
+                                                   $query
+                                                   ORDER BY ps.invoice_no DESC
+                                                   ");
+      }
+      
+      $sales          =  DB::select("
+                              SELECT
+                                 DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
+                                 pr.product_name,
+                                 co.company_name,
+                                 si.invoice_no,
+                                 si.customer_id,
+                                 IFNULL((SELECT customer_name FROM customers WHERE id = si.customer_id),'NA') as customer_name,
+                                 IFNULL(si.invoice_discount,0) AS invoice_discount,
+                                 si.invoice_type AS invoice_type,
+                                 IFNULL(ps.sale_total_amount+IFNULL(product_discount,0),0) AS sale_total_amount,
+                                 IFNULL(si.total_invoice_amount,0) AS total_invoice_amount,
+                                 IFNULL(si.service_charges,0) AS service_charges,
+                                 IFNULL(ps.qty,0) AS qty,
+                                 IFNULL(ps.product_discount,0) AS product_discount,
+                                 ps.product_id,
+                                 ps.company_id,
+                                 pr.old_purchase_price,
+                                 pr.sale_price,
+                                 si.paid_amount,
+                                 product_net_total
+                              FROM
+                              products_sales as ps
+                              LEFT JOIN sale_invoices si ON si.id = ps.sale_invoice_id
+                              LEFT JOIN products pr ON pr.id = ps.product_id
+                              LEFT JOIN companies co ON co.id = ps.company_id
+                              WHERE
+                              $query
+                              ORDER BY si.invoice_no DESC
+                        ");
+      $sale_invoice_records                         =  new stdClass();
+      $sale_invoice_records->total_invoice_amount   =  collect($sales)->unique('invoice_no')->sum('total_invoice_amount'); 
+      $sale_invoice_records->invoice_discount       =  collect($sales)->unique('invoice_no')->sum('invoice_discount'); 
+      $sale_invoice_records->service_charges       =  collect($sales)->unique('invoice_no')->sum('service_charges');  
+      
+      $returns        =  DB::select("
+                              SELECT
+                                 DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
+                                 pr.product_name,
+                                 co.company_name,
+                                 si.invoice_no,
+                                 si.customer_id,
+                                 IFNULL((SELECT customer_name FROM customers WHERE id = si.customer_id),'NA') as customer_name,
+                                 IFNULL(si.invoice_discount,0) AS invoice_discount,
+                                 si.invoice_type AS invoice_type,
+                                 IFNULL(ps.return_total_amount+IFNULL(product_discount,0),0) AS return_total_amount,
+                                 IFNULL(si.total_invoice_amount,0) AS total_invoice_amount,
+                                 IFNULL(si.service_charges,0) AS service_charges,
+                                 IFNULL(ps.qty,0) AS qty,
+                                 IFNULL(ps.product_discount,0) AS product_discount,
+                                 ps.product_id,
+                                 ps.company_id,
+                                 pr.old_purchase_price,
+                                 pr.sale_price,
+                                 si.paid_amount,
+                                 product_net_total
+
+                              FROM
+                              sale_return_products as ps
+                              LEFT JOIN sale_return_invoices si ON si.id = ps.sale_return_invoice_id
+                              LEFT JOIN products pr ON pr.id = ps.product_id
+                              LEFT JOIN companies co ON co.id = ps.company_id
+                              WHERE
+                              $query
+                              ORDER BY si.invoice_no DESC
+                  ");
+      $replacement    =  DB::select("
+                                    SELECT
+                                       DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
+                                       pr.product_name,
+                                       co.company_name,
+                                       si.invoice_no,
+                                       si.customer_id,
+                                       IFNULL((SELECT customer_name FROM customers WHERE id = si.customer_id),'NA') as customer_name,
+                                       IFNULL(si.invoice_discount,0) AS invoice_discount,
+                                       si.invoice_type AS invoice_type,
+                                       IFNULL(ps.sale_total_amount+IFNULL(product_discount,0),0) AS sale_total_amount,
+                                       IFNULL(si.total_invoice_amount,0) AS total_invoice_amount,
+                                       IFNULL(si.service_charges,0) AS service_charges,
+                                       IFNULL(ps.qty,0) AS qty,
+                                       IFNULL(ps.product_discount,0) AS product_discount,
+                                       ps.product_id,
+                                       ps.company_id,
+                                       ps.product_type
+                                    FROM
+                                    product_replacements as ps
+                                    LEFT JOIN product_replacment_invoices si ON si.id = ps.product_replacement_invoice_id
+                                    LEFT JOIN products pr ON pr.id = ps.product_id
+                                    LEFT JOIN companies co ON co.id = ps.company_id
+                                    WHERE
+                                    $query
+                                    ORDER BY si.invoice_no DESC
+                        ");
+
+      foreach ($replacement as $rep) {
+         if ($rep->product_type == 1) { //Return
+            $returns[] = (object)[
+               'created' => $rep->created,
+               'product_name' => $rep->product_name,
+               'company_name' => $rep->company_name,
+               'invoice_no' => $rep->invoice_no,
+               'customer_id' => $rep->customer_id,
+               'customer_name' => $rep->customer_name,
+               'invoice_discount' => $rep->invoice_discount,
+               'invoice_type' => $rep->invoice_type,
+               'product_net_total' => $rep->sale_total_amount,
+               'return_total_amount' => $rep->sale_total_amount,
+               'total_invoice_amount' => $rep->sale_total_amount,
+               'service_charges' => $rep->service_charges,
+               'qty' => $rep->qty,
+               'product_discount' => $rep->product_discount,
+               'product_id' => $rep->product_id,
+               'company_id' => $rep->company_id,
+               'product_type' => 2,
+            ];
+         } else { //Sale
+
+            $sales[]  = (object)[
+               'created' => $rep->created,
+               'product_name' => $rep->product_name,
+               'company_name' => $rep->company_name,
+               'invoice_no' => $rep->invoice_no,
+               'customer_id' => $rep->customer_id,
+               'customer_name' => $rep->customer_name,
+               'invoice_discount' => $rep->invoice_discount,
+               'invoice_type' => $rep->invoice_type,
+               'product_net_total' => $rep->sale_total_amount,
+               'sale_total_amount' => $rep->sale_total_amount,
+               'total_invoice_amount' => $rep->sale_total_amount,
+               'service_charges' => $rep->service_charges,
+               'qty' => $rep->qty,
+               'product_discount' => $rep->product_discount,
+               'product_id' => $rep->product_id,
+               'company_id' => $rep->company_id,
+               'product_type' => 2,
+            ];
+         }
+      }
+      return ['sales' => $sales, 'sale_returns' => $returns, 'pr_paid_amount' => $purchase_return_paid_amount, 'pr_invc_amount' => $purchase_inv_paid_amount,'sale_invoice_record' => $sale_invoice_records];
+   }

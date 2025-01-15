@@ -14,7 +14,8 @@ use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Auth; 
+use Auth;
+use Mockery\Undefined;
 
 class PurchaseReturnController extends Controller
 {
@@ -66,12 +67,14 @@ class PurchaseReturnController extends Controller
 
         if ($request->hidden_invoice_id) {
             $invoice = ReturnInvoice::where('id', $request->hidden_invoice_id)->first();
+            $invoice_no = $invoice->invoice_no;
         } else {
             $invoice = new ReturnInvoice();
+            $invoice_no  =   getPurchaseReturnNo();
             isEditable($request->customer_id);
         }
         $invoice->date                 = $request->invoice_date;
-        $invoice->invoice_no           = $request->invoice_no;
+        $invoice->invoice_no           = $invoice_no;
         $invoice->invoice_type         = $request->invoice_type;
         $invoice->customer_id          = $request->customer_id;
         if ($request->invoice_type == 1) {

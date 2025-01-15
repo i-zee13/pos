@@ -86,6 +86,14 @@ class ProductController extends Controller
             'barcode'   =>  $maxId + 1
         ]);
     }
+      public function getProductStock($id)
+    {   
+        // dd()
+        $stock_balance = Product::where('id',$id)->value('stock_balance');
+            return response()->json([
+                'stock_balance'=> $stock_balance
+            ]);
+    }
     public function getSubCatToUpdate($id)
     {
         $query    =  Product::where('products.id', $id)

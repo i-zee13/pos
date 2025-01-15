@@ -65,6 +65,19 @@ class LedgerDetailControlller extends Controller
                                                    ) AS invoice_no
                               
                                        ')->whereRaw("$dateFilter AND customer_id = $request->vendor_id")->get();
+            if ($query->isEmpty()) {
+    // Fetch the last 10 entries if the initial query is empty
+    $query = CustomerLedger::selectRaw('*, DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at,
+                                                   COALESCE( CONCAT("SI ", (SELECT invoice_no FROM sale_invoices WHERE sale_invoices.id = customer_ledger.sale_invoice_id)) ,
+                                                   CONCAT("SR ", (SELECT invoice_no FROM sale_return_invoices WHERE sale_return_invoices.id = customer_ledger.sale_return_invoice_id)),
+                                                   CONCAT("PR ", (SELECT invoice_no FROM product_replacment_invoices WHERE product_replacment_invoices.id = customer_ledger.product_replacement_invoice_id))
+                                                   ) AS invoice_no
+                                       ')
+            ->where('customer_id', $request->vendor_id)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+}
                                        // dd($query);
          // $query      =  CustomerLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();
       }

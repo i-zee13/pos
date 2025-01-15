@@ -19,7 +19,7 @@ class ProductReplacementController extends Controller
     {
         $current_date   =   date('Y-m-d');
         $sales          =   ProductReplacementInvoice::selectRaw('product_replacment_invoices.* ,
-                                        (SELECT cr FROM customer_ledger WHERE sale_invoice_id = product_replacment_invoices.id) as paid_amount,
+                                        (SELECT cr FROM customer_ledger WHERE product_replacement_invoice_id = product_replacment_invoices.id) as paid_amount,
                                         (SELECT customer_name FROM customers WHERE id=product_replacment_invoices.customer_id) as customer_name')
             ->whereRaw("Date(created_at) = '$current_date'")
             ->orderBy('id', 'DESC')
@@ -43,15 +43,17 @@ class ProductReplacementController extends Controller
         // dd($request->all());
         if ($request->hidden_invoice_id) {
             $invoice = ProductReplacementInvoice::where('id', $request->hidden_invoice_id)->first();
+           $invoice_no = $invoice->invoice_no;
             // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received;
         } else {
             $invoice     = new ProductReplacementInvoice();
+             $invoice_no  =   getProductReplacementNo();
             isEditable($request->customer_id);
         }
 
         $invoice->amount_received      = $request->amount_received;
         $invoice->date                 = $request->invoice_date;
-        $invoice->invoice_no           = $request->invoice_no;
+        $invoice->invoice_no           = $invoice_no;
         $invoice->invoice_type         = $request->invoice_type;
         $invoice->customer_id          = $request->customer_id;
         if ($request->invoice_type == 1) {

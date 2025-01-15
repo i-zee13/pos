@@ -736,7 +736,7 @@
                                                 </div>
                                             </td>
                                             <td style="width:100px"> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="3" style=" width: 100%;"></td>
-                                            <td style="width: 80px;"> <input type="number" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="4" min="0" style="width: 100%;"></td>
+                                            <td style="width: 80px;"> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="4" min="0" style="width: 100%;"></td>
                                             <td style="width: 70px;"><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;width:100%;" readonly></td>
                                             <td style="width: 70px;"><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;width:100%;" tabindex="5" min="0"></td>
                                             <td class='add- S-input' style="width:100px"><input type="number" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;width:100%"></td>

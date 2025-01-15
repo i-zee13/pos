@@ -324,14 +324,9 @@ class StockController extends Controller
         ]);
     }
     public function getVendorBalance(Request $request, $id)
-    {   
-        
+    {
         if ($request->segment == 'purchase-edit') {
-            $url   = $request->purchase_id;
-            preg_match('/^\d+/', $url, $matches);
-            $purchase_id     = $matches[0] ?? null; 
-            $customer_balance  =  VendorLedger::where('customer_id', $id)->where('purchase_invoice_id',$purchase_id)
-            ->orderBy('id', 'DESC')->value('balance');
+            $customer_balance  =  VendorLedger::where('customer_id', $id)->where('is_editable', '!=', 1)->orderBy('id', 'DESC')->value('balance');
             if (!$customer_balance) {
                 $customer_balance = 0;
             }
@@ -371,7 +366,7 @@ class StockController extends Controller
 
         return view('purchases.invoice', compact('invoice', 'products', 'customer_balance'));
     }
-    public function deleteInvoice(Request $request)
+     public function deleteInvoice(Request $request)
     {
         $invoice_products   =  ProductPurchase::where('purchase_invoice_id', $request->id)->get();
         if($invoice_products){
@@ -382,7 +377,6 @@ class StockController extends Controller
                                         ->where('transaction_type', 1)
                                         ->orderBy('id', 'DESC')
                                         ->first(); 
-// dd($balance);
 
                 if ($prod) { 
                     $prod->actual_qty   = $product->qty;

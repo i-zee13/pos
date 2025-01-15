@@ -1,8 +1,128 @@
 @extends('layouts.app')
-
-
 @section('content')
 <style>
+  .digit {
+    font-size: 30px;
+    font-weight: normal;
+    line-height: normal;
+    color: #282828;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    line-height: 1;
+    font-family: 'Rationale', sans-serif !important;
+    position: absolute;
+    bottom: 10px;
+    left: 15px
+  }
+
+  .total-sale {
+    padding: 20px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    font-family: 'Rationale', sans-serif !important;
+  }
+
+  .card-heading {
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+  }
+
+  .card-heading span {
+    font-family: 'proximanova-light', sans-serif !important;
+    font-weight: normal;
+  }
+
+  .card-heading:before {
+    background: #152e4d;
+    position: absolute;
+    width: 2px;
+    height: 18px;
+    left: -15px;
+    top: 2px;
+    content: '';
+  }
+
+  .total-sale .card-heading:before {
+    left: -20px;
+    top: 2px
+  }
+
+  .total-sale .total-amount {
+    font-size: 42px;
+    color: #152e4d;
+    padding: 8px 0 8px 0;
+  }
+
+  .total-sale .total-amount span {
+    color: #282828
+  }
+
+  .total-sale .total-amount .per-v {
+    color: #24b314;
+    font-size: 24px;
+    margin-left: 10px;
+  }
+
+  .unit-v {
+    padding-top: 5px;
+    color: #606060;
+  }
+
+  .unit-v span,
+  .total-val span {
+    font-size: 30px;
+    display: block;
+    line-height: 1;
+    color: #282828
+  }
+
+  .total-val {
+    color: #606060;
+    text-align: center;
+    padding: 14px;
+  }
+
+  .total-val span {
+    color: #152e4d;
+    margin-bottom: 5px;
+  }
+
+  .total-sale {
+    padding: 20px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  .total-vals {
+    border: solid 1px #e4e4e4;
+    border-top: solid 1px #152e4d;
+    text-align: center;
+    margin: 0;
+    font-size: 14px;
+    margin-top: 25px;
+  }
+
+  .total-vals .col {
+    border-right: solid 1px #e4e4e4;
+    padding: 20px 8px 16px 8px;
+  }
+
+  .bg-shade {
+    background-color: #f1f1f1;
+  }
+
+  .total-vals span {
+    display: block;
+    font-size: 30px;
+    color: #152e4d;
+    line-height: 1;
+    padding-bottom: 10px;
+  }
+
   .sell360report {
     padding-bottom: 15px
   }
@@ -690,53 +810,83 @@
     <p>Here’s what’s happening today.</p>
   </div>
 </div>
-<div class=" seabinReport">
 <div class="row">
-    <div class="col-md-4">
-        <a class="DashHomeLink" href="#">
-            <div class="card mt-0">
-                <h4>Todays <span>Sale</span></h4>
-                <h2 class="digit">
-                    <small>Pkr.</small>
-                    <span class="amount">{{number_format($total_sale)}}</span>
-                     <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="cursor: pointer;">
-                        <path d="M12 4.5C7 4.5 2.73 8.55 1 12c1.73 3.45 6 7.5 11 7.5s9.27-4.05 11-7.5c-1.73-3.45-6-7.5-11-7.5zm0 13.5c-3.33 0-6-2.67-6-6s2.67-6 6-6 6 2.67 6 6-2.67 6-6 6zm0-10.5c-2.48 0-4.5 2.02-4.5 4.5S9.52 16.5 12 16.5 16.5 14.48 16.5 12 14.48 8.5 12 8.5z"/>
-                    </svg>
-                </h2>
+  <div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="card BookedSales total-sale p-15">
+      <div class="row m-0" id="primUnitWiseSale">
+        <h2 class="card-heading mb-15 ml-5">Daily <span>Turn over</span></h2>
+        <div class="col-12 position-relative p-0">
+          <div class="total-progress" style="position:absolute; top:-15px; right: 15px">
+            <div class="progress progressRounderLiveReport mx-auto" data-value="0"><span class="progress-left"> <span class="progress-bar progress-barColor"> </span> </span>
+              <span class="progress-right"> <span class="progress-bar progress-barColor"></span> </span>
+              <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+                <div class="digitVal">0<small>%</small><span>Profit</span></div>
+              </div>
             </div>
-        </a>
+          </div>
+          <div class="total-amount PT-20" id="revenueLrOverview">
+             <span>Rs.</span>
+             <span class="empty-span" style="cursor: pointer;" data-amount="{{$ttl_in_hand}}">---</span> <span class="hide" style="display: none;">{{number_format($ttl_in_hand)}}</span>
+            <span class="per-v"><i class="fa fa-long-arrow-alt-down" style="color: red"></i> 0% </span>
+          </div>
+        </div> 
+      </div>
+      <div class="row total-vals border-right-0" id="visitsStats">
+        <div class="col"><span class="empty-span" style="cursor: pointer;" data-amount="{{($total_sale - $ttl_sale_return)}}">---</span> <span class="hide" style="display: none;">{{number_format($total_sale - $total_net_sale_returns_invoice_amount)}}</span>Total Sale</div>
+        <div class="col bg-shade"><span class="empty-span" style="cursor: pointer;" data-amount="{{$ttl_sale_return}}">---</span> <span class="hide" style="display: none;">{{number_format($total_net_sale_returns_invoice_amount)}}</span>Total Sale Returns</div>
+        <div class="col"><span class="empty-span" style="cursor: pointer;" data-amount="{{$total_purchase}}">---</span> <span class="hide" style="display: none;">{{number_format($total_purchase)}}</span>Total Purchase</div>
+        <div class="col bg-shade"><span class="empty-span" style="cursor: pointer;" data-amount="{{$expense}}">---</span> <span class="hide" style="display: none;">{{number_format($expense)}}</span>Total Expense</div>
+      </div>
     </div>
-    <div class="col-md-4">
-        <a class="DashHomeLink" href="#">
-            <div class="card mt-0">
-                <h4>Todays <span>Purchase</span></h4>
-                <h2 class="digit">
-                    <small>Pkr.</small>
-                    <span class="amount">{{number_format($total_purchase)}}</span>
-                    <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="cursor: pointer;">
-                        <path d="M12 4.5C7 4.5 2.73 8.55 1 12c1.73 3.45 6 7.5 11 7.5s9.27-4.05 11-7.5c-1.73-3.45-6-7.5-11-7.5zm0 13.5c-3.33 0-6-2.67-6-6s2.67-6 6-6 6 2.67 6 6-2.67 6-6 6zm0-10.5c-2.48 0-4.5 2.02-4.5 4.5S9.52 16.5 12 16.5 16.5 14.48 16.5 12 14.48 8.5 12 8.5z"/>
-                    </svg>
-                </h2>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-4">
-        <a class="DashHomeLink" href="#">
-            <div class="card mt-0">
-                <h4>Todays <span>Expense</span></h4>
-                <h2 class="digit">
-                    <small>Pkr.</small>
-                    <span class="amount">{{number_format($total_expense)}}</span>
-                     <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="cursor: pointer;">
-                        <path d="M12 4.5C7 4.5 2.73 8.55 1 12c1.73 3.45 6 7.5 11 7.5s9.27-4.05 11-7.5c-1.73-3.45-6-7.5-11-7.5zm0 13.5c-3.33 0-6-2.67-6-6s2.67-6 6-6 6 2.67 6 6-2.67 6-6 6zm0-10.5c-2.48 0-4.5 2.02-4.5 4.5S9.52 16.5 12 16.5 16.5 14.48 16.5 12 14.48 8.5 12 8.5z"/>
-                    </svg>
-                </h2>
-            </div>
-        </a>
-    </div>
+  </div>
 </div>
+<!--<div class="seabinReport">-->
+<!--  <div class="row">-->
+<!--    <div class="col-md-4">-->
+<!--      <a class="DashHomeLink" href="#">-->
+<!--        <div class="card mt-0">-->
+<!--          <h4>Todays <span>Sale</span></h4>-->
+<!--          <h2 class="digit">-->
+<!--            <small>Pkr.</small>-->
+<!--            <span class="amount">{{number_format($total_sale)}}</span>-->
+<!--            <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="cursor: pointer;">-->
+<!--              <path d="M12 4.5C7 4.5 2.73 8.55 1 12c1.73 3.45 6 7.5 11 7.5s9.27-4.05 11-7.5c-1.73-3.45-6-7.5-11-7.5zm0 13.5c-3.33 0-6-2.67-6-6s2.67-6 6-6 6 2.67 6 6-2.67 6-6 6zm0-10.5c-2.48 0-4.5 2.02-4.5 4.5S9.52 16.5 12 16.5 16.5 14.48 16.5 12 14.48 8.5 12 8.5z" />-->
+<!--            </svg>-->
+<!--          </h2>-->
+<!--        </div>-->
+<!--      </a>-->
+<!--    </div>-->
+<!--    <div class="col-md-4">-->
+<!--      <a class="DashHomeLink" href="#">-->
+<!--        <div class="card mt-0">-->
+<!--          <h4>Todays <span>Purchase</span></h4>-->
+<!--          <h2 class="digit">-->
+<!--            <small>Pkr.</small>-->
+<!--            <span class="amount">{{number_format($total_purchase)}}</span>-->
+<!--            <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="cursor: pointer;">-->
+<!--              <path d="M12 4.5C7 4.5 2.73 8.55 1 12c1.73 3.45 6 7.5 11 7.5s9.27-4.05 11-7.5c-1.73-3.45-6-7.5-11-7.5zm0 13.5c-3.33 0-6-2.67-6-6s2.67-6 6-6 6 2.67 6 6-2.67 6-6 6zm0-10.5c-2.48 0-4.5 2.02-4.5 4.5S9.52 16.5 12 16.5 16.5 14.48 16.5 12 14.48 8.5 12 8.5z" />-->
+<!--            </svg>-->
+<!--          </h2>-->
+<!--        </div>-->
+<!--      </a>-->
+<!--    </div>-->
+<!--    <div class="col-md-4">-->
+<!--      <a class="DashHomeLink" href="#">-->
+<!--        <div class="card mt-0">-->
+<!--          <h4>Todays <span>Expense</span></h4>-->
+<!--          <h2 class="digit">-->
+<!--            <small>Pkr.</small>-->
+<!--            <span class="amount">{{number_format($expense)}}</span>-->
+<!--            <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="cursor: pointer;">-->
+<!--              <path d="M12 4.5C7 4.5 2.73 8.55 1 12c1.73 3.45 6 7.5 11 7.5s9.27-4.05 11-7.5c-1.73-3.45-6-7.5-11-7.5zm0 13.5c-3.33 0-6-2.67-6-6s2.67-6 6-6 6 2.67 6 6-2.67 6-6 6zm0-10.5c-2.48 0-4.5 2.02-4.5 4.5S9.52 16.5 12 16.5 16.5 14.48 16.5 12 14.48 8.5 12 8.5z" />-->
+<!--            </svg>-->
+<!--          </h2>-->
+<!--        </div>-->
+<!--      </a>-->
+<!--    </div>-->
+<!--  </div>-->
 
-</div>
+<!--</div>-->
 <div class="col-12 h_dash">
   <div class="col-lg-12 col-md-12 col-sm-12">
     <h2 class="_head01 HomeHead">Shortcuts <span></span></h2>
@@ -771,24 +921,92 @@
 
   </div>
 </div>
-
 @endsection
 @push('js')
-<script>
-$(document).ready(function() {
-    $(".eye-icon").on("click", function() {
-        const amountSpan = $(this).siblings(".amount");
-        const isHidden = amountSpan.is(":hidden");
+<script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.0.7/countUp.umd.min.js"></script>
 
-        if (isHidden) {
-            amountSpan.show(); // Show the amount
-        } else {
-            amountSpan.hide(); // Hide the amount
-        }
-    });
+<script>
+  $(document).ready(function() {
+    $(".empty-span").on("click", function () {
+    const emptySpan = $(this); // Reference to the clicked empty-span
+    const nextSpan = emptySpan.next(".hide"); // Select the next sibling with class 'hide'
+    var totalAmount = $(this).attr('data-amount');
+    // Hide the empty span and show the hide span
+    emptySpan.hide();
+    nextSpan.show();
+      let count = 0; // Start counting from 0
+      
+      
+        const options = {
+      startVal: 0, // Start from 0
+      decimalPlaces: 0, // No decimal places
+      duration: 3, // Animation duration (in seconds)
+    };
+
+    const counter = new countUp.CountUp(nextSpan[0], totalAmount, options);
+
+    // Start the counter
+    if (!counter.error) {
+      counter.start();
+    } else {
+      console.error(counter.error);
+    }
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    //   const duration = 3000; // Animation duration in milliseconds
+    //   const interval = 100; // Interval between each increment in milliseconds
+    //   const step = Math.ceil(totalAmount / (duration / interval)); // Calculate the increment step
     
+    //   const counter = setInterval(function () {
+    //     count += step;
+    
+    //     if (count >= totalAmount) {
+    //       count = totalAmount; // Cap the count at the totalAmount
+    //       clearInterval(counter); // Stop the counter
+    //     }
+    
+    //     nextSpan.text(`${count.toLocaleString()}`); // Format the number with commas
+    //   }, interval);
+  });
+
+  // When the hide span (value) is clicked
+  $(".hide").on("click", function () {
+    const hideSpan = $(this); // Reference to the clicked hide span
+    const prevSpan = hideSpan.prev(".empty-span"); // Select the previous sibling with class 'empty-span'
+
+    // Hide the hide span and show the empty span
+    hideSpan.hide();
+    prevSpan.show();
+  });
+    $(".eye-icon").on("click", function() {
+      const amountSpan = $(this).siblings(".amount");
+      const isHidden = amountSpan.is(":hidden");
+
+      if (isHidden) {
+        amountSpan.show(); // Show the amount
+      } else {
+        amountSpan.hide(); // Hide the amount
+      }
+    });
+
     // Initially hide the amounts
     $(".amount").hide();
-});
- </script>
+  });
+</script>
 @endpush

@@ -35,6 +35,35 @@
             width: 159px;
         }
     }
+    @media only screen and (max-width:575px) {
+        .Product-Filter .col-auto {
+            width: 100% !important;
+        }
+
+        ._cust_filter {
+            margin-top: 10px;
+            width: 100% !important;
+            padding: 0 !important;
+        }
+
+        .CL-Product {
+            width: 100% !important;
+            padding-right: 2px !important;
+            margin: 0 !important;
+        }
+
+        .col-auto {
+            padding: 0 12px 0px !important;
+        }
+
+        .col-auto .CL-Product.inputmonth.focused {
+            margin-top: 10px !important;
+        }
+
+        .Product-Filter .btn-primary {
+            margin-top: 10px !important;
+        }
+    }
 </style>
 
 <div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -111,7 +140,7 @@
             <form id="search-form">
                 <div class="row">
 
-                    <div class="col pr-0">
+                    <div class="col-auto pr-0">
 
                         <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
                             <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
@@ -120,7 +149,7 @@
                         <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
                             <input type="date" autocomplete="off" class="form-control end_date" placeholder="End Date" name="end_date" value="">
                         </div>
-                        <div class="_cust_filter col-4">
+                        <div class="_cust_filter">
                             <div class="form-s2">
                                 <select class="form-control formselect vendor_id" name="vendor_id">
                                     <option value="">Select {{$ledger_for}}</option>
@@ -130,14 +159,29 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-auto pl-0" style="float:right;">
+                        <style>
+                            .reset-btn {
+                                box-shadow: none;
+                            }
 
+                            .reset-btn:hover {
+                                color: white !important;
+                            }
+
+                            .Product-Filter .btn-primary {
+                                float: none;
+                            }
+                        </style>
+                            <button type="button" class="btn btn-primary m-0 reset-btn"> Reset</button>
+                            <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
+                        </div>
                     </div>
-                    <div class="col-auto pl-0">
-                        <button type="button" class="btn btn-primary m-0 reset-btn"> Reset</button>
-                    </div>
-                    <div class="col-auto pl-0">
-                        <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
-                    </div>
+
+
+                </div>
+                <div class="row" style="margin-bottom: 5px;">
+
                 </div>
             </form>
             <div class="clearfix"></div>

@@ -54,9 +54,10 @@
                     <tr>
                         <th>Invoice #</th>
                         <th>Customer Name</th>
-                        <th>Paid</th>
-                        <th>Product Net Total</th>
-                        <!-- <th>Invoice Total</th> -->
+                        <th>Pay/Receive</th>
+                        <th>Sale (OUT) </th>
+                        <th>Sale (IN)</th>
+                         <th>Invoice Total</th> 
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -69,7 +70,9 @@
                     <td>{{$invoice_first_part}} ({{ $sale->created_at->format('h:i A') }})</td>
                     <td>{{$sale->customer_name}}</td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->paid_amount ?? 0.00}} </td>
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total +$sale->service_charges - $sale->invoice_discount}} </td>
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total + $sale->service_charges - $sale->invoice_discount}} </td>
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_return_total}} </td>
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total - $sale->product_return_total}} </td>
                     <td>
                         
                         <a id="{{$sale->id}}" class="btn btn-default {{$sale->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$sale->is_editable== 1 ? route('ProductReplacement.edit' ,['id'=>$sale->id]) : route('ProductReplacement.edit' ,['id'=>$sale->id ,'invoice' => 'detail'])}}">{{$sale->is_editable== 1  ? 'Edit'  : "Detail" }}</a>

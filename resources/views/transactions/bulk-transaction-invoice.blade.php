@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Customer Ledger Purchi</title>
+    <title>Customer Ledger</title>
     <style>
         @media print {
             .page-break {
@@ -195,13 +195,12 @@
         </center><!--End InvoiceTop-->
         <div id="mid">
             <div class="info">
-               Customer Ledger Purchi
+               Customers Ledger Slip
             </div>
         </div><!--End Invoice Mid-->
         <div id="bot">
             <table class="bot-1-table">
-                <tr>
-                     
+                <tr> 
                     <td class="bot-1-table-td">Bill No: <b>00</b></td>
                     <td class="bot-1-table-td">Date: {{date('d-m-Y')}}</td>
                     <td class="bot-1-table-td">Time: {{ date('h:i A') }}</td>
@@ -209,27 +208,24 @@
             </table>
             <table class="bot-2-table">
                 <tr>
-                    <td>Customer: <span style="text-transform:capitalize">Customer Ledger Purchi</span></td>
+                    <td>Customer: <span style="text-transform:capitalize">customers Ledger</span></td>
                 </tr>
             </table>
             <table class="bot-3-table">
                 <tr class="tabletitle">
                     <th>ID</th>
-                    <th>Customer Name</th>
-                    <th>Cr</th>
+                    <th>Customer Name</th> 
                     <th>Balance</th>
-                     
                 </tr>
                 @php 
                 $sumCr = 0;
                 @endphp
-                @foreach ($customers as $key=>$customer)
-                @php  $sumCr += $customer->cr; @endphp
+                @foreach ($customers as $key=>$customer) 
+                @php  $sumCr += $customer['balance']; @endphp
                 <tr class="body-description-tr">
-                    <td class="other-des-td">{{$customer->customer_id}}</td>
-                    <td class="tableitem">{{$customer->customer_name}}</td>
-                    <td class="other-des-td">{{$customer->cr}}</td>
-                    <td class="other-des-td">{{abs($customer->balance)}}</td>
+                    <td class="other-des-td">{{$customer['id']}}</td>
+                    <td class="tableitem">{{$customer['name']}}</td> 
+                    <td class="other-des-td">{{abs($customer['balance'])}}</td>
                 </tr>
                 @endforeach
             </table>
@@ -240,14 +236,12 @@
                     <td class="net-total">Net Total : {{$sumCr}}</td>
                 </tr>
             </table>
-            <table class="bot-5-table">
-               
+            <table class="bot-5-table"> 
                 <tr>
-                    <td class="payable-heading">Total Purchi :</td>
+                    <td class="payable-heading">Total Receivables :</td>
                     <td>{{number_format($sumCr,2)}}</td>
                 </tr>       
-            </table>
-             
+            </table> 
             <table class="footer">
                 <tr class="thankyou">
                     <td>Thank for your kind visit </td>

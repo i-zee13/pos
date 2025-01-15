@@ -37,7 +37,7 @@ $('.search-btn').on('click', function () {
     }
     CurrentRef = $(this);
     CurrentRef.attr('disabled', 'disabled');
-    url = '/report-list';
+    url = '/report-list';   
     $(`#search-form`).ajaxSubmit({
         type: 'POST',
         url: url,
@@ -164,9 +164,12 @@ $('.search-btn').on('click', function () {
                 $('.TeacherAttendanceListTable').DataTable().clear().destroy();
             }
             var table = $('.TeacherAttendanceListTable').DataTable({
-                "ordering": false,
-                "paging": false,
-                dom: 'Bfrtip',
+                  "bSort": false,
+                 "bPaginate": false,
+                 scrollX: false,
+                 scrollY: '400px',
+                 scrollCollapse: true,
+                 dom: 'Bfrtip',
                 buttons: [{
                         extend: 'excelHtml5',
                         text: 'Excel',
@@ -287,13 +290,16 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
 
         // Second iteration: CR skipped, DR present
 
-
+        var comment = '';
+        if(element.comment){
+          comment  = `<span class="comment"> ${element.comment ?? ''}</span>`; 
+        }
         var secondRowHTML = `
             <tr>
                 <td hidden>${element.id}</td>
                 <td>${inv_no  ?? 'NA'}</td>
                 <td>${formattedDate}</td> 
-                <td>${element.comment ?? ''}</td>  
+                <td>${comment}</td>  
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.cr.toLocaleString('en-US')}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${secondBalance.toLocaleString('en-US')}</td>
@@ -313,7 +319,10 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
         // Only one of CR or DR present or neither
         var crValue = element.cr ? element.cr.toLocaleString('en-US') : '0';
         var drValue = element.dr ? element.dr.toLocaleString('en-US') : '0';
-
+        var comment = '';
+        if(element.comment){
+          comment = `<span class="comment"> ${element.comment ?? ''}</span>`;    
+        }
         var balance_text = '';
         if (element.balance >= 0) {
             balance_text = (element.balance).toLocaleString('en-US') + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>";
@@ -327,7 +336,7 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
                 <td hidden>${element.id}</td>
                 <td>${inv_no  ?? 'NA'}</td>
                 <td>${formattedDate}</td> 
-                 <td><span style='color:red;font-size: 16px;font-weight: bold;'> ${element.comment ?? ''}</span></td>  
+                 <td>${comment}</td>  
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${drValue}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${crValue}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${balance_text}</td>

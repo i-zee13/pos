@@ -49,13 +49,15 @@ class SalesReturnController extends Controller
         $is_net_return = false;
         if ($request->hidden_invoice_id) {
             $invoice = SaleReturn::where('id', $request->hidden_invoice_id)->first();
+              $invoice_no = $invoice->invoice_no;
         } else {
             $invoice     = new SaleReturn();
+              $invoice_no  =   getSaleReturnNo();
             isEditable($request->customer_id);
         }
         $invoice->amount_received      = $request->amount_received;
         $invoice->date                 = $request->invoice_date;
-        $invoice->invoice_no           = $request->invoice_no;
+        $invoice->invoice_no           = $invoice_no;
         $invoice->invoice_type         = $request->invoice_type;
         $invoice->customer_id          = $request->customer_id;
         $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges) - $request->invoice_discount;
@@ -158,7 +160,12 @@ class SalesReturnController extends Controller
                         ->whereNotIn('id', $sale_products_array)
                         ->delete();
                 }
-              
+                // $customer_ledger       =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->first();
+                // if ($customer_ledger) {
+                //     $customer_ledger_balance           =   $customer_ledger->balance;
+                // } else {
+                //     $customer_ledger_balance           =   0;
+                // }
                 if ($request->hidden_invoice_id) {
                     $customer_ledger   =   CustomerLedger::where('sale_return_invoice_id', $request->hidden_invoice_id)->orderBy('id', 'DESC')->first();
                 } else {
@@ -253,7 +260,7 @@ class SalesReturnController extends Controller
         
         return view('sales.sale-invoice', compact('invoice', 'products', 'customer_balance'));
     }
-    public function deleteProduct(Request $request)
+     public function deleteProduct(Request $request)
     {
 
         $vs      = VendorStock::where('sale_return_id', $request->sale_return_invoice_id)
@@ -261,9 +268,11 @@ class SalesReturnController extends Controller
                                 ->where('transaction_type', 4)->orderBy('id', 'DESC')
                                 ->first();
         if ($vs) {
+            $balance    = VendorStock::where('product_id', $request->product_id)->orderBy('id', 'DESC')->value('balance');
+
            $returnProduct   =  SaleReturnProduct::where('sale_return_invoice_id', $request->sale_return_invoice_id)
                                                  ->where('product_id', $request->product_id)->where('qty', $request->qty)->first();
-            $v_stock        = updateStock($vs, $vs->balance, $request->qty, 2, 'sale-return', 5);
+            $v_stock        = updateStock($vs, $balance, $request->qty, 2, 'sale-return', 5);
             BatchWiseDeleteProduct($request->sale_return_invoice_id, $returnProduct, $request->qty, 2, 5); 
             StockManagment($v_stock->id, $vs, $request->qty, 2, 'sale-return');
             if ($v_stock) { 
@@ -294,8 +303,10 @@ class SalesReturnController extends Controller
                                         ->first();
 
                 if ($vs) {
+                    $balance    = VendorStock::where('product_id',$product->product_id)->orderBy('id', 'DESC')->value('balance'); 
+
                     $vs->actual_qty   = $product->qty;
-                    $v_stock = updateStock($vs, $vs->balance, $product->qty, 2, 'sale-return', 4);
+                    $v_stock = updateStock($vs, $balance, $product->qty, 2, 'sale-return', 4);
                     BatchWiseDeleteProduct($product->sale_return_invoice_id, $product, $product->qty, 2, 4);
                     StockManagment($v_stock->id, $vs, $product->qty, 2, 'sale-return');
                     if ($v_stock) {

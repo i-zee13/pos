@@ -53,16 +53,17 @@ class SaleController extends Controller
     }
     public function saleInvoice(Request $request)
     {  
-        $balance =  0;
         if ($request->hidden_invoice_id) {
-            $invoice = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
+            $invoice                    = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
+            $invoice->invoice_no        = $request->invoice_no;
         } else {
-            $invoice     = new SaleInvoice();
+            $invoice      = new SaleInvoice();
             isEditable($request->customer_id);
+            $invoice_no   =   getInvoice();
+            $invoice->invoice_no       = $invoice_no;
         }
         $invoice->amount_received      = $request->amount_received;
-        $invoice->date                 = $request->invoice_date;
-        $invoice->invoice_no           = $request->invoice_no;
+        $invoice->date                 = $request->invoice_date; 
         $invoice->invoice_type         = $request->invoice_type;
         $invoice->customer_id          = $request->customer_id;
         if ($request->invoice_type == 1) {
@@ -80,10 +81,8 @@ class SaleController extends Controller
         $invoice->is_editable          = 1;
         $invoice->status               = $request->invoice_type;
         $invoice->description          = $request->description;
-        $invoice->created_by           = Auth::id();
+        $invoice->created_by           = Auth::id(); 
         if ($invoice->save()) {
-        // dd($invoice->total_invoice_amount - ($request->hidden_invoice_id ? 0 :  $balance),($request->hidden_invoice_id ? 0 :  $balance));
-
             if (count($request->sales_product_array) > 0) {
                 $old_ids        = $request->existing_product_ids;
                 foreach ($request->sales_product_array as $key => $sale_product) {
@@ -160,7 +159,7 @@ class SaleController extends Controller
                         ->delete();
                 }
 
-                $ledgerCount      = CustomerLedger::where('customer_id', $request->customer_id)->count();
+              $ledgerCount      = CustomerLedger::where('customer_id', $request->customer_id)->count();
                 $balance = 0;
                 if ($ledgerCount > 0) {
                     $balanceQuery = CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC');
@@ -181,7 +180,7 @@ class SaleController extends Controller
                 $customer_ledger->trx_type    = 1;  //Sale
                 $customer_ledger->is_deleted  = 0;
                 $customer_ledger->comment     = '';
-                $customer_ledger->dr          = $invoice->total_invoice_amount - $balance;
+                $customer_ledger->dr          =  $invoice->total_invoice_amount - $balance;
                 $customer_ledger->balance     = ($invoice->total_invoice_amount - $customer_ledger->cr); //balance
                 $customer_ledger->created_by  = Auth::id();
                 $customer_ledger->sale_invoice_id = $invoice->id;
@@ -339,14 +338,15 @@ class SaleController extends Controller
     public function deleteProduct(Request $request)
     {
         $vs      = VendorStock::where('sale_invoice_id', $request->sale_invoice_id)
-            ->where('product_id', $request->product_id)
-            ->where('transaction_type', 2)->orderBy('id', 'DESC')
-            ->first();
+                    ->where('product_id', $request->product_id)
+                    ->where('transaction_type', 2)->orderBy('id', 'DESC')
+                    ->first();
+        $current_balance = VendorStock::where('product_id', $request->product_id)->orderBy('id', 'DESC')->value('balance');
         if ($vs) {
             $soldProduct =  ProductSale::where('sale_invoice_id', $request->sale_invoice_id)
                                         ->where('product_id', $request->product_id)->where('qty', $request->qty)
                                         ->first();
-            $v_stock = updateStock($vs, $vs->balance, $request->qty, 1, 'sale', 5);
+            $v_stock = updateStock($vs, $current_balance, $request->qty, 1, 'sale', 5);
             BatchWiseDeleteProduct($request->sale_invoice_id, $soldProduct, $request->qty, 1, 5);
             StockManagment($v_stock->id, $vs, $request->qty, 1, 'sale');
 
@@ -378,7 +378,8 @@ class SaleController extends Controller
                                         ->first();
                 if ($vs) {
                     $vs->actual_qty   = $product->qty; 
-                    $v_stock = updateStock($vs, $vs->balance, $product->qty, 1, 'sale', 5);
+                    $current_balance =  VendorStock::where('product_id', $product->product_id)->orderBy('id', 'DESC')->value('balance');
+                    $v_stock = updateStock($vs, $current_balance, $product->qty, 1, 'sale', 5);
                     BatchWiseDeleteProduct($product->sale_invoice_id, $product, $product->qty, 1, 5);
                     StockManagment($v_stock->id, $vs, $product->qty, 1, 'sale');
                     if ($v_stock) {

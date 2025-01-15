@@ -54,7 +54,11 @@
                        @endphp
                 <tr>
                     <td>{{$invoice_first_part}} ({{ $sale->created_at->format('h:i A') }})</td>
-                    <td>{{$sale->customer_name}}</td>
+                   <td> @if($sale->customer_id != 8)
+                            <b>{{ $sale->customer_name }}</b>
+                        @else
+                            {{ $sale->customer_name }}
+                        @endif</td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->paid_amount}} </td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total +$sale->service_charges - $sale->invoice_discount}} </td>
                     <!-- <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td> -->

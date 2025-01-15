@@ -38,7 +38,21 @@
         /* body {
             display: none
         } */
-
+        .sidebox-content, .right_Info{
+            border-radius :10px;
+        }
+        .btn{
+            border-radius :5px !important;
+        }
+        td .comment{
+           
+            color: #ffffff;
+            font-size: 13px; 
+            font-family: monospace;
+            padding: 4px 10px;
+            background: #152e4d;
+            border-radius: 5px;
+        }
         #notifDiv {
             display: none;
             background: red;
@@ -284,6 +298,12 @@
 .right_Info{
     padding-bottom: 15px !important;
 }
+ @media only screen and (max-width:575px) {
+    
+     .navbar-brand-img{ 
+            height: 50px !important;
+     }
+ }
     </style>
     <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('/css/jquery.steps.css')}}" rel="stylesheet">
@@ -412,13 +432,10 @@
             });
 
         })
+        // for text type inputs which are required to accept only numeric values
         $(document).on('input', '.only_numerics', function() {
             this.value = this.value.replace(/[^0-9.]/g, '');
-            if ((this.value.match(/\./g) || []).length > 1) {
-                this.value = this.value.slice(0, -1);  
-            }
-        });
-
+        })
         // for text type inputs which are required to accept only aplphabetic values
         $(document).on('input', '.only_alphabets', function() {
             this.value = this.value.replace(/[^a-z]/gi, '');

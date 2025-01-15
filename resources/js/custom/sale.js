@@ -132,7 +132,8 @@
              $('.amount_received').trigger('input');
          }, 500);
         
-         let rowCount = $('#designationsTable tbody tr').length + 1; 
+         let rowCount = $('#designationsTable tbody tr').length + 1;
+         console.log(retail_price);
          tableHtml(product_id, p_name, retail_price, purchased_price, stock_in_hand, amount, qty)
          
          grandSum(previous_payable, service_charges);
@@ -255,7 +256,7 @@
 
      $('#retail_price').val(filter_product[0].sale_price);
 
-     $('.stock_balance').text((filter_product[0].stock_balance).toFixed(2));
+     $('.stock_balance').text(filter_product[0].stock_balance);
      if (filter_product[0].new_purchase_price > 0) {
          $('.pp').text(filter_product[0].new_purchase_price);
      } else {
@@ -823,16 +824,16 @@
          sum += parseFloat(data.amount)
      });
 
-     $('.product_net_total').val(sum.toFixed(2));
+     $('.product_net_total').val(sum);
      // sale_total_amount = sum-invoice_discount;
      sum += parseFloat(previous_payable ? previous_payable : 0);
      sum += parseFloat(service_charges ? service_charges : 0);
-     
+
      sale_total_amount = sum - invoice_discount;
      console.log('grand sum ', sale_total_amount - $('.paid_amount').text(), sale_total_amount, $('.paid_amount').text())
      grand_total = sale_total_amount;
-     $('.grand-total').text(addCommas((sale_total_amount - $('.amount_received').val()).toFixed(2)));
-     $('.amount_pay_input').val(sale_total_amount.toFixed(2));
+     $('.grand-total').text(addCommas(sale_total_amount - $('.amount_received').val()));
+     $('.amount_pay_input').val(sale_total_amount);
      // $('.amount_pay_input').val(sale_total_amount) ;
 
      if (parseFloat($('.amount_pay_input').val()) < 0) {
@@ -852,7 +853,7 @@
      retail_price = $('#retail_price').val();
      amount = qty * retail_price;
      // console.log(retail_price,qty)
-     $('#amount').val(amount.toFixed(2));
+     $('#amount').val(amount);
  }
  $(document).on('input', '.amount_received', function () {
      var amount_to_recive = 0
@@ -862,10 +863,10 @@
          amount_to_recive = $(this).val();
          cash_return = result;
      }
-     $('.cash_return').text(cash_return.toFixed(2));
-     $('.cash_return_amount').text(cash_return.toFixed(2))
+     $('.cash_return').text(cash_return);
+     $('.cash_return_amount').text(cash_return)
      var saleTotal = sale_total_amount - $('.amount_received').val();
-     $('.grand-total').text(addCommas((saleTotal < 0 ? sale_total_amount : saleTotal).toFixed(2)));
+     $('.grand-total').text(addCommas(saleTotal < 0 ? sale_total_amount : saleTotal));
      // $('.grand-total').text(addCommas(sale_total_amount - amount_to_recive));
  })
  $('.service_charges_input').on('input', function () {
@@ -897,23 +898,18 @@
      var amount = parseFloat($(this).val());
      var price = parseFloat($(this).attr('data-price'));
      var quantity = amount / price;
-     $('.calculate_by_amount_text').text(quantity.toFixed(4));
+     $('.calculate_by_amount_text').text(quantity.toFixed(2));
  });
 
  function tableHtml(product_id, p_name, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0, is_removable = true, sale_prod_id = null) {
-    retail_price    = Math.round(retail_price * 100) / 100;
-    purchased_price = Math.round(purchased_price * 100) / 100;
-    stock_in_hand = Math.round(stock_in_hand * 100) / 100;
-    amount = Math.round(amount * 100) / 100;
-    
-    $('#designationsTable tbody').append(`
+     $('#designationsTable tbody').append(`
     <tr id='tr-${product_id}' data-prod_id ="${product_id}">
         <td>${product_id}</td>
         <td>${p_name}</td>
         <td><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product_id}" data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
         <td><input type="number" value="${retail_price}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
         <td><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
-        <td class='purchase-product-amount${product_id} add- S-input '>${amount.toFixed(2)}</td>
+        <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
         <td  style="width:80px;"><a type="button" id="${product_id}" data-id="${invoice_id}" class="btn smBTN red-bg remove_btn" data-product-invoice="${sale_prod_id}" data-index="" data-quantity="${qty}" style="width:100%; ${!is_removable ? 'display:none' : ''}" >Remove</a></td>
     `);
  }

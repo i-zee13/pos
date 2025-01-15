@@ -95,6 +95,11 @@
     </div>
     @section('content')
     <style>
+     td{font-weight: bolder}
+      input{font-weight: 700}
+        select:focus>option:checked {
+            background: #000 !important;
+        }
         .container {
             max-width: 1370px;
         }
@@ -846,9 +851,12 @@
                                             <td></td>
                                         </tr>
                                         <tr style="border:solid 1px #dbdbdb">
-                                            <td class="font18" align="right">Grand Total:</td>
                                             <td class="totalNo" align="right">
-                                                <!-- <span id="total_ctn">0</span><small>CTNS</small> -->
+                                                <span id="total_items">0</span><small>T.Items</small>
+                                            </td>
+                                            
+                                            <td class="totalNo" align="right">
+                                                <span id="total_qtys">0</span><small>Qtys</small>
                                             </td>
                                             <td class="totalNo" align="right"></td>
                                             <td class="totalNo" align="right"><small>Pkr.</small>

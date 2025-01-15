@@ -3500,6 +3500,34 @@
     ._cust_filter {
         width: 250px !important;
     }
+     @media only screen and (max-width:575px) {
+        .Product-Filter .col-auto {
+            width: 100% !important;
+        }
+
+        ._cust_filter {
+            width: 100% !important;
+            padding: 0 !important;
+        }
+
+        .CL-Product {
+            width: 100% !important;
+            padding-right: 2px !important;
+            margin: 0 !important;
+        }
+
+        .col-auto.hide {
+            padding: 0 12px 0px !important;
+        }
+
+        .col-auto.hide .CL-Product.inputmonth.focused {
+            margin-top: 10px !important;
+        }
+
+        .Product-Filter .btn-primary {
+            margin-top: 10px !important;
+        }
+    }
 </style>
 <!-- Body -->
 <div class="header-body">
@@ -3527,11 +3555,20 @@
 <div class="row">
     <div class="col-lg-12">
         <div class="Product-Filter">
-            <form id="search-form">
+           <form id="search-form">
                 <div class="row">
 
-                    <div class="col pr-0">
-                        <div class="_cust_filter col-4">
+                    <div class="col-auto pr-0">
+                        <div class="_cust_filter col-md-3">
+                            <div class="form-s2">
+                                <select class="form-control formselect report_type" name="report_type">
+                                    <option value="">Report Type</option>
+                                    <option value="1">Sale Profit</option>
+                                    <option value="2">Stock Profit</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="_cust_filter col-md-3">
                             <div class="form-s2">
                                 <select class="form-control formselect company_id" name="company_id">
                                     <option value="">Select Company</option>
@@ -3541,7 +3578,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter col-4">
+                        <div class="_cust_filter col-md-3">
                             <div class="form-s2">
                                 <select class="form-control formselect product_id" name="product_id">
                                     <option value="">Select Product</option>
@@ -3551,39 +3588,20 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter col-4">
-                            <div class="form-s2">
-                                <select class="form-control formselect customer_id" name="customer_id">
-                                    <option value="">Select Customer</option>
-                                    @foreach($customers as $customer)
-                                    <option value="{{$customer->id}}">{{$customer->id}}-{{$customer->customer_name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
+
                         <style>
                             .CL-Product input {
                                 height: 31px !important;
                             }
                         </style>
-                         <div class="_cust_filter col-4">
-                            <div class="form-s2">
-                                <select class="form-control formselect report_type" name="report_type">
-                                    <option value="">Report Type</option>
-                                    <option value="1">Sale Profit</option>
-                                    <option value="2">Stock Profit</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="CL-Product inputmonth" style="width:250px;padding-top: 0px;margin-left:2px">
+
+                        <div class="CL-Product inputmonth hide" style="width:250px;padding-top: 0px;margin-left:2px;display:none">
                             <i class="fa fa-search" style="top: 8px"></i>
                             <input type="text" class="form-control" placeholder="Bill #" name="bill_no">
                         </div>
 
                     </div>
-                </div>
-                <div class="row" style="margin-bottom: 10px;">
-                    <div class="col-auto" style="padding: 0px">
+                    <div class="col-auto hide" style="padding: 0px;display:none">
                         <div class="CL-Product inputmonth" style="width:250px;margin-left:11px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
                             <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
                         </div>
@@ -3591,8 +3609,7 @@
                             <input type="date" autocomplete="off" class="form-control end_date" placeholder="End Date" name="end_date">
                         </div>
                     </div>
-
-                    <div class="col-auto p-0">
+                    <div class="col-auto" style="float:right;">
                         <style>
                             .reset-btn {
                                 box-shadow: none;
@@ -3601,13 +3618,19 @@
                             .reset-btn:hover {
                                 color: white !important;
                             }
+
+                            .Product-Filter .btn-primary {
+                                float: none;
+                            }
                         </style>
+                        <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
                         <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#152e4d !important"> Reset</button>
                     </div>
-                    <div class="col-auto pl-0">
-                        <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
-                    </div>
                 </div>
+                <div class="row" style="margin-bottom: 10px;">
+
+                </div>
+
             </form>
             <div class="clearfix"></div>
         </div>

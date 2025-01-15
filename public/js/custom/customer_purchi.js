@@ -29,19 +29,32 @@
                     </td>
                 </tr>
             `);
-            tabIndexCounter++;
+            tabIndexCounter++; 
              $('.TeacherAttendanceListTable').DataTable();
              $('.customer_id').children('option[value="' + id + '"]').attr('disabled', true);
              $(".customer_id").val("0").trigger('change');
              $(".customer_id").select2(); // Initialize Select2 here
          }
+         
      });
-
+     $(document).on('input', '.amount-input', function() {
+        calculateTotal();
+    });
+    function calculateTotal() {
+        let total = 0;
+        $('.amount-input').each(function() {
+            const amount = parseFloat($(this).val()) || 0;
+            total += amount;
+        });
+        $('.total-purchi').text(total.toFixed(2)); // Adjust the location as needed
+    }
      $(document).on('click', '.remove_btn', function () {
          var id = $(this).attr('id');
          $("#tr-" + id).remove();
          $('.customer_id').children('option[value="' + id + '"]').attr('disabled', false);
          $(".customer_id").select2();
+        calculateTotal();
+
      });
 
      $("#print-invoice").on('click',function(){
@@ -77,13 +90,14 @@
             type : 'post',
             url  : '/save-tranasctions',
             data : {
+                        type: type,
                         customers: customers,
                         _token: $('meta[name="csrf_token"]').attr('content'),
                     },
             success : function(response){
                             if (response.status == 'success') {
                                 if(type == 'print'){
-                                    var printWindow    = window.open("/print-ledger-purchi");
+                                    var printWindow    = window.open(`/print-ledger-purchi/${JSON.stringify(customers)}`);
                                     printWindow.onload = function() { printWindow.print(); }; 
                                 }
                                 setTimeout(() => {

@@ -69,7 +69,7 @@ class ReportsController extends Controller
                                    stock_batches_items vs
                                  WHERE
                                      $query
-                             ");
+                             "); 
       } else {
 
          $records = DB::select("
@@ -342,7 +342,7 @@ class ReportsController extends Controller
          'stocks'  => $records
       ]);
    }
-   public function SaleReportRecords($request, $current_date, $is_admin_close = null)
+  public function SaleReportRecords($request, $current_date, $is_admin_close = null)
    {
 
       $query = " 1=1";
@@ -524,8 +524,9 @@ class ReportsController extends Controller
                'company_id' => $rep->company_id,
                'product_type' => 2,
             ];
+           
          }
-      }
+      } 
       return ['sales' => $sales, 'sale_returns' => $returns, 'pr_paid_amount' => $purchase_return_paid_amount, 'pr_invc_amount' => $purchase_inv_paid_amount,'sale_invoice_record' => $sale_invoice_records];
    }
    //Purchase Report
@@ -567,7 +568,8 @@ class ReportsController extends Controller
                                              IFNULL(dr,0) as dr,
                                              trx_type
                                           ")
-                                          ->whereRaw("DATE(created_at) = '$closing_date'")->get();
+                                          ->whereRaw("DATE(created_at) = '$closing_date'
+                                          ")->get();
       $vendor_payment                  =  DB::table("vendor_ledger")->selectRaw("
                                              customer_id as vendor_id,
                                              IFNULL(cr,0) as cr,
@@ -580,6 +582,7 @@ class ReportsController extends Controller
       $records->total_pr_invc_amount   =  collect($saleRecords['pr_invc_amount'])->SUM('paid_amount');  //Purchase invoice payment
       $records->total_invoice_amount   =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('total_invoice_amount');
       $records->total_invoice_discount =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('invoice_discount');
+      $records->total_net_sale_discount=  collect($saleRecords['sales'])->unique('invoice_no')->where('customer_id',8)->SUM('invoice_discount');
       $records->total_service_charges  =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('service_charges');
       $records->total_product_discount =  collect($saleRecords['sales'])->SUM('product_discount');
       $records->total_net_sales        =  collect($saleRecords['sales'])->WHERE('invoice_type', 1)->SUM('sale_total_amount');
@@ -587,8 +590,8 @@ class ReportsController extends Controller
 
 
       $records->total_net_sale_invoice_amount           =  collect($saleRecords['sales'])->WHERE('invoice_type', 1)->SUM('sale_total_amount');
-      $records->total_credit_sale_invoice_amount        =  collect($saleRecords['sales'])->WHERE('invoice_type', 2)->SUM('sale_total_amount');
-      $records->total_net_sale_returns_invoice_amount   =  collect($saleRecords['sale_returns'])->WHERE('invoice_type', 1)->SUM('total_invoice_amount');
+      $records->total_credit_sale_invoice_amount        =  collect($saleRecords['sales'])->WHERE('invoice_type', 2)->unique('invoice_no')->SUM('sale_total_amount');
+      $records->total_net_sale_returns_invoice_amount   =  collect($saleRecords['sale_returns'])->WHERE('invoice_type', 1)->unique('invoice_no')->SUM('total_invoice_amount');
 
 
       $records->total_credit_sales_amount_received     =  collect($saleRecords['sales'])->WHERE('invoice_type', 2)->unique('invoice_no')->SUM('paid_amount');

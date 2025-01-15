@@ -75,7 +75,12 @@ $('.search-btn').on('click', function () {
         $('.TeacherAttendanceListTable').DataTable().clear().destroy();
       }
       var table = $('.TeacherAttendanceListTable').DataTable({
-        dom: 'Bfrtip',
+         "bSort": false,
+         "bPaginate": false,
+         scrollX: false,
+         scrollY: '400px',
+         scrollCollapse: true,
+         dom: 'Bfrtip',
         buttons: [{
           extend: 'excelHtml5',
           text: 'Excel',
@@ -113,6 +118,20 @@ $('.search-btn').on('click', function () {
     }
   });
 });
+//  $('.course_id').on('change',function(){
+//     var course_id = $(this).val();
+//     var batch =  batches.filter(x => x.course_id == course_id);
+//     if(batch){
+//         $('.batch_id').empty();
+//         $('.batch_id').append(`<option value="">Select Batch Code</option>`);
+//         $('.session_id').empty();
+//         $('.session_id').append(`<option value="">Select Session Code</option>`)
+//         batch.forEach(data => {
+//             $('.batch_id').append(`<option value="${data.id}" >${data.batch_code}</option>`);
+//         });
+//     }
+//  })
+
 $('.reset-btn').on('click', function () {
   $('.vendor_id').val('').trigger('change');
   $('#search-form')[0].reset();

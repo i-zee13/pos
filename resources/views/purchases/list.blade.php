@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+ 
 <div class="header">
  
     <!-- Body -->
@@ -66,7 +67,7 @@
                         @endphp
                         <tr>
                             <td>{{$invoice_first_part}} ({{ $purchase->created_at->format('h:i A') }})</td>
-                            <td>{{$purchase->customer_name}} </td>
+                            <td><b>{{ $purchase->customer_name }}</b></td>
                             <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->paid_amount ? $purchase->paid_amount : 0.00}} </td>
                             <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->product_net_total}} </td>
                             <td>

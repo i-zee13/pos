@@ -774,7 +774,7 @@
                                         </td>
                                         <td> <input type="date" id="expiry_date" class="inputSale p_expiry_date  expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="3"></td>
                                         <!-- Assigning tabindex for the input fields -->
-                                        <td><input type="number" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="4" min="0" data-product-type="1"></td>
+                                        <td><input type="text" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="4" min="0" data-product-type="1"></td>
                                         <td><input type="number" id="retail_price" class="inputSale retail_price" placeholder="" name="retail_price" style="font-size: 13px;" readonly></td>
                                         <td><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;" tabindex="5" min="0"></td>
                                         <td class='add-S-input'><input type="text" id="amount" class="inputSale amount" placeholder="" name="amount" style="font-size: 13px;"></td>
@@ -835,7 +835,7 @@
                                         <td style="width : 80px;"> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="9" style=" width:100%;"></td>
 
                                         <!-- Assigning tabindex for the input fields -->
-                                        <td style="width : 80px;"><input type="number" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="10" min="0" style=" width:100%;" data-product-type="2"></td>
+                                        <td style="width : 80px;"><input type="text" id="qty" class="inputSale only_numerics product_main_qty_input" placeholder="" name="qty" tabindex="10" min="0" style=" width:100%;" data-product-type="2"></td>
                                         <td style="width : 80px;"><input type="number" id="retail_price" class="inputSale retail_price" placeholder="" name="retail_price" style="font-size: 13px;width:100%" readonly></td>
                                         <td style="width : 80px;"><input type="number" id="discount" class="inputSale discount" placeholder="" name="discount" style="font-size: 13px;width:100%" tabindex="10" min="0"></td>
                                         <td style="width : 80px;" class='add-S-input'><input type="text" id="amount" class="inputSale  amount" placeholder="" name="amount" style="font-size: 13px; width:100%"></td>
@@ -955,7 +955,7 @@
 
 
 
-                    <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 25px" id="btns_div">
+                    <div class="" style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 25px" id="btns_div">
                         @if(request()->query('invoice') == 'detail')
                         <a href="{{route('ProductReplacement.index')}}" type="submit" class="btn btn-primary" id="cancel">Back</a>
                         @else

@@ -1,10 +1,22 @@
-  @extends('layouts.app')
-  <div style="min-height: 400px" id="tblLoader">
-      <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">
+  @extends('layouts.app') 
+ <div class="preloader"  id="tblLoader">
+    <div class="loading">
+      <div class="bar bar1"></div>
+      <div class="bar bar2"></div>
+      <div class="bar bar3"></div>
+      <div class="bar bar4"></div>
+      <div class="bar bar5"></div>
+      <div class="bar bar6"></div>
+      <div class="bar bar7"></div>
+      <div class="bar bar8"></div>
+    </div>
   </div>
   <div class="parent-div" style="display:none">
       @section('content')
       <style>
+      td{
+          font-weight:bolder;
+      }
           select:focus>option:checked {
               background: #000 !important;
           }
@@ -496,7 +508,7 @@
               top: 0px !important;
           }
       </style>
-       
+      
       <div class="container-fluid">
           <form id="form" enctype="multipart/form-data" class="">
               @csrf
@@ -601,10 +613,9 @@
                                       <thead>
                                           <tr>
                                               <th class="">ID</th>
-                                              <th class="">Product Name</th>
-                                              <th style="">P.Price</th>
-                                              <th style="">R.Price</th>
+                                              <th class="">Product Name</th> 
                                               <th style="">Expiry D.</th>
+                                              <th style="">R.Price</th>
                                               <th style="">QTY.</th>
                                               <th style="">Discount</th>
                                               <th class="">Total</th>
@@ -638,13 +649,13 @@
                                           <tr id='tr-{{ $product->product_id }}'>
                                               <td>{{ $product->product_id }}</td>
                                               <td>{{ $product->product_name }}</td>
-                                              <td> <input readonly type="number" value="{{ $product->purchase_price }}" class="inputSale" name="new_purchase_price " tabindex="3"  min="0"></td>
-                                              <td> <input readonly type="number" value="{{ $product->sale_price }}" class="inputSale price-input add-stock-input td-{{ $product->product_id }}" min="0"></td>
+                                              <!--<td> <input readonly type="number" value="{{ $product->purchase_price }}" class="inputSale" name="new_purchase_price " tabindex="3"  min="0"></td>-->
                                               <td> <input readonly type="date" id="expiry_date" class="inputSale expiry_date" value="{{ $product->expiry_date }}" name="expiry_date " tabindex="5" style=" width: 95;"></td>
-                                              <td> <input readonly type="number" value="{{$product->qty}}" class="inputSale qty-input add-stock-input td-input-qty{{ $product->product_id }}" min="0"></td>
-                                              <td> <input readonly type="number" value="{{ $product->product_discount }}" class="inputSale discount-input add-stock-input td-{{ $product->product_id }}" style="font-size: 13px" min="0"></td>
-                                              <td class='purchase-product-amount{{ $product->product_id }} add-S-input'>{{$product_total_amount}}</td>
-
+                                              <td> {{ number_format($product->sale_price,2) }}</td>
+                                              <td> {{$product->qty}}</td>
+                                              <td> {{ $product->product_discount }}</td>
+                                              <td style="width:80px;"> {{number_format($product_total_amount,2)}}</td>
+                                              
                                           </tr>
                                           @endforeach
 
@@ -661,7 +672,7 @@
                                               <td></td>
                                               <td></td>
                                               <td align="right">Net Total</td>
-                                              <td> <input readonly type="number" class="inputvalue product_net_total" name="product_net_total" style="font-size: 13px" value="{{$invoice->total_invoice_amount}}" readonly></td>
+                                              <td> <input readonly type="number" class="inputvalue product_net_total" name="product_net_total" style="font-size: 13px" value="{{$invoice->product_net_total}}" readonly></td>
                                           </tr>
                                           <tr class="th-to-hide">
                                               <td></td>
@@ -672,7 +683,7 @@
                                           <tr class="previous_payable_tr" @if ($invoice->invoice_type != 2) style="display:none" @endif >
                                               <td></td>
                                               <td></td>
-                                              <td align="right" class="previous_payable_heading">{{ $invoice->previous_receivable > 0 ? 'Previous Payable' : 'Previous Receivable' }}</td>
+                                              <td align="right" class="previous_payable_heading">Previous Receivable </td>
                                               <td class=" ">{{ $invoice->previous_receivable }} {{$invoice->previous_receivable > 0 ? 'DR' : 'CR'}}</td>
                                           </tr>
 
@@ -689,7 +700,7 @@
                                               <td align="right">Net Amount</td>
 
                                               <td>
-                                                  {{$invoice->invoice_remaining_amount_after_pay}}
+                                                  {{number_format($invoice->invoice_remaining_amount_after_pay,2)}}
                                               </td>
                                           </tr>
 
@@ -703,7 +714,7 @@
                                           <tr class="th-to-hide">
                                               <td></td>
                                               <td></td>
-                                              <td align="right">Paid</td>
+                                              <td align="right">Received</td>
                                               <td> <input readonly type="number" class="inputvalue " id="paid_amount" name="paid_amount" style="font-size: 13px" placeholder="0.00" min="0" value="{{@$invoice->paid_amount ? @$invoice->paid_amount : 0 }}"></td>
                                           </tr>
                                           <tr style="border:solid 1px #dbdbdb">
@@ -713,7 +724,7 @@
                                               </td>
                                               <td class="totalNo" align="right"></td>
                                               <td class="totalNo" align="right"><small>Pkr.</small>
-                                                  <span>{{$invoice->invoice_remaining_amount_after_pay}}</span>
+                                                  <span>{{number_format($invoice->invoice_remaining_amount_after_pay,2)}}</span>
                                               </td>
                                           </tr>
                                       </tbody>

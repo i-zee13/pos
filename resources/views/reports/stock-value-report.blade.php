@@ -3497,8 +3497,47 @@
         text-align: center;
     }
 
-    ._cust_filter {
-        width: 250px !important;
+      @media only screen and (max-width:575px) {
+        .Product-Filter .col-auto {
+            width: 100% !important;
+        }
+
+        ._cust_filter {
+            width: 100% !important;
+            padding: 5px !important;
+            margin-bottom: 0px !important
+        }
+
+        .CL-Product {
+            width: 100% !important;
+            /* padding-right: 2px !important;
+             */
+            margin-left: 5px !important;
+        }
+
+        .col-auto {
+            padding: 0 12px 0px !important;
+        }
+
+        .col-auto.CL-Product.inputmonth.focused {
+            margin-top: 10px !important;
+        }
+
+        .Product-Filter .btn-primary {
+            margin-top: 10px !important;
+        }
+    }
+
+    .CL-Product input {
+        height: 31px !important;
+    }
+
+    .reset-btn {
+        box-shadow: none;
+    }
+
+    .reset-btn:hover {
+        color: white !important;
     }
 </style>
 <!-- Body -->
@@ -3530,15 +3569,13 @@
             <form id="search-form">
                 <div class="row">
                     <div class="col-auto">
-                        <div class="CL-Product inputmonth" style="width:180px;margin-left:11px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
+                        <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
                             <input type="date" autocomplete="off" class="form-control " placeholder="Start Date" name="start_date" value="{{date('Y-m-d')}}">
                         </div>
-                        <div class="CL-Product inputmonth" style="width:180px;margin-left: 0px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
+                        <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
                             <input type="date" autocomplete="off" class="form-control" placeholder="End Date" name="end_date" value="{{date('Y-m-d')}}">
                         </div>
-                    </div>
-                    <div class="col p-0">
-                        <div class="_cust_filter col-md-3" style="width: 180px!important">
+                        <div class="_cust_filter ">
                             <div class="form-s2">
                                 <select class="form-control formselect company_id" name="company_id">
                                     <option value="">Select Company</option>
@@ -3548,7 +3585,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter col-md-3" style="width: 210px!important">
+                        <div class="_cust_filter ">
                             <div class="form-s2">
                                 <select class="form-control formselect product_id" name="product_id">
                                     <option value="">Select Product</option>
@@ -3558,7 +3595,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter col-md-3" style="width: 170px!important">
+                        <div class="_cust_filter ">
                             <div class="form-s2">
                                 <select class="form-control formselect product_id filter_by_value" name="filter_by_value">
                                     <option value="">Select Value</option>
@@ -3567,27 +3604,14 @@
                                 </select>
                             </div>
                         </div>
-                        <style>
-                            .CL-Product input {
-                                height: 31px !important;
-                            }
-                      
-                            .reset-btn {
-                                box-shadow: none;
-                            }
-
-                            .reset-btn:hover {
-                                color: white !important;
-                            }
-                        </style>
-                        <div style="float: right;">
-                        <button type="button" class="btn btn-primary m-0 search-btn" style=" margin-right:10px !important"> Search</button>
-                        <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#152e4d !important"> Reset</button>
-
+                        <div class="col-auto" style="float:right;">
+                            <button type="button" class="btn btn-primary m-0 search-btn" style=" margin-right:10px !important"> Search</button>
+                            <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#152e4d !important"> Reset</button>
                         </div>
                     </div>
+
                 </div>
-                
+
             </form>
             <div class="clearfix"></div>
         </div>

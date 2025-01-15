@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-<style>
+<!-- <style>
     .TS-delete {
         background: #d71919;
         border-color: #e71717;
@@ -3509,7 +3509,92 @@
     ._cust_filter {
         width: 250px !important;
     }
+    
+</style> -->
+<style>
+     .TS-delete {
+        background: #d71919;
+        border-color: #e71717;
+        color: #ffffff;
+        border-radius: 2px;
+        padding: 4px 4px;
+        font-size: 9px;
+    }
+    .dt-buttons .dt-button,
+    .dt-buttons .dt-button:hover {
+        background: linear-gradient(90deg, #040725 0%, #040725 100%) !important;
+        border: none !important;
+        color: #fff !important;
+        outline: none !important;
+        padding: 5px 10px !important;
+        line-height: 1 !important;
+        font-size: 13px !important;
+        letter-spacing: 1px
+    }
+
+    .Product-Filter .btn-primary {
+        font-size: 14px !important;
+        padding: 4px 20px !important;
+    }
+
+    .no-info {
+        display: flex;
+        height: 8.125rem;
+        opacity: 0.4;
+        font-size: 0.9375rem;
+        text-align: center;
+    }
+    .btn-outline-primary {
+        border-color: #152e4d;
+        color: #152e4d;
+        padding:5px;
+        font-size: 12px;
+    }
+    ._cust_filter {
+        width: 218px !important;
+    }
+    .btn-outline-primary:hover {
+        background-color: #152e4d;
+        border-color: #152e4d;
+        color: #fff;
+    }
+    @media (max-width: 1366px) {
+        ._cust_filter {
+            width: 159px;
+        }
+    }
+    @media only screen and (max-width:575px) {
+        .Product-Filter .col-auto {
+            width: 100% !important;
+        }
+
+        ._cust_filter {
+            margin-bottom: 0px;
+            margin-top: 10px;
+            width: 100% !important;
+            padding: 0 !important;
+        }
+
+        .CL-Product {
+            width: 100% !important;
+            padding-right: 2px !important;
+            margin: 0 !important;
+        }
+
+        .col-auto {
+            padding: 0 12px 0px !important;
+        }
+
+        .col-auto .CL-Product.inputmonth.focused {
+            margin-top: 10px !important;
+        }
+
+        .Product-Filter .btn-primary {
+            margin-top: 10px !important;
+        }
+    }
 </style>
+
 <!-- Body -->
 <div class="header-body">
     <div class="row  ">
@@ -3539,10 +3624,10 @@
             <form id="search-form">
                 <div class="row">
 
-                    <div class="col pr-0">
+                    <div class="col-auto pr-0">
 
 
-                        <div class="_cust_filter col-4">
+                        <div class="_cust_filter">
                             <div class="form-s2">
                                 <select class="form-control formselect product_id" name="product_id">
                                     <option value="">Select Product</option>
@@ -3558,27 +3643,21 @@
                                 height: 31px !important;
                             }
                         </style>
-                        <div>
-                            <div class="custom-control custom-checkbox mr-sm-2">
-                                <input type="checkbox" id="current-date" name="is_current_date" heading="Filter by" class="custom-control-input access_rights_headings" value="1">
-                                <label class="custom-control-label" for="current-date" style="font-weight:bolder">Current Date</label>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="row" style="margin-bottom: 10px;">
-
-                    <div class="col-auto" style="padding: 0px">
+                       
                         <div class="CL-Product inputmonth" style="width:250px;margin-left:11px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
                             <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
                         </div>
                         <div class="CL-Product inputmonth" style="width:250px;margin-left: 0px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
                             <input type="date" autocomplete="off" class="form-control end_date" placeholder="End Date" name="end_date">
                         </div>
-                    </div>
-
-                    <div class="col-auto p-0">
+                        <div class="_cust_filter">
+                            <div class="custom-control custom-checkbox mr-sm-2">
+                                <input type="checkbox" id="current-date" class="btn-check"   autocomplete="off" name="is_current_date" value="1">
+                                <label class="btn btn-outline-primary" for="current-date">Current Date</label><br>
+                            </div>
+                            
+                        </div>
+                        <div class="col-auto p-0" style="float:right;">
                         <style>
                             .reset-btn {
                                 box-shadow: none;
@@ -3587,12 +3666,23 @@
                             .reset-btn:hover {
                                 color: white !important;
                             }
+
+                            .Product-Filter .btn-primary {
+                                float: none;
+                            }
                         </style>
                         <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#152e4d !important"> Reset</button>
-                    </div>
-                    <div class="col-auto pl-0">
                         <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
                     </div>
+                    </div>
+
+                </div>
+                <div class="row" style="margin-bottom: 10px;">
+
+                   
+
+                   
+                    
                 </div>
             </form>
             <div class="clearfix"></div>

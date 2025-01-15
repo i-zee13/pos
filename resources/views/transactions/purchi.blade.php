@@ -90,8 +90,7 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-0" style="padding-top:7px;padding-bottom:7px ">
-                <!-- <button type="submit" class="btn btn-cancel" data-dismiss="modal" aria-label="Close">Close</button> -->
+            <div class="modal-footer border-0" style="padding-top:7px;padding-bottom:7px "> 
 
             </div>
         </div>
@@ -176,6 +175,16 @@
                     </thead>
                     <tbody>
                     </tbody>
+                    <tfoot> 
+                <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+                    <td class="font18" align="right" colspan="2"></td>
+                    <td class="font18" align="center">Grand Total :</td>
+                    <td class="totalNo" >
+                        <span class="total-purchi" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">0.00</span>
+                    </td>
+                    <td class="font18" align="right" colspan="1"></td>
+                </tr>
+             </tfoot>
                 </table>
             </div>
             <div style="background-color: #f6f6f6; padding:10px; margin-top: 15px; margin-bottom: 0px; text-align: right; margin-bottom: 1px" id="btns_div">

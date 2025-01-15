@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AdminSaleClose;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Auth;
+use Auth,DB;
 
 class AdminSaleCloseController extends Controller
 {
@@ -27,6 +27,13 @@ class AdminSaleCloseController extends Controller
             $new_close->created_by      =   Auth::user()->id;
             $new_close->created_at      =   Carbon::now();
             if($new_close->save()){
+                DB::statement("UPDATE customer_ledger SET is_editable = 0 WHERE is_editable = 1;");
+                DB::statement("UPDATE vendor_ledger SET is_editable = 0 WHERE is_editable = 1;");
+                DB::statement("UPDATE sale_invoices SET is_editable = 0 WHERE is_editable = 1;");
+                DB::statement("UPDATE sale_return_invoices SET is_editable = 0 WHERE is_editable = 1;");
+                DB::statement("UPDATE purchase_invoices SET is_editable = 0 WHERE is_editable = 1;");
+                DB::statement("UPDATE purchase_return_invoices SET is_editable = 0 WHERE is_editable = 1;");
+                DB::statement("UPDATE product_replacment_invoices SET is_editable = 0 WHERE is_editable = 1;");
                 return response()->JSON([
                     'status'            =>  'success',
                     'msg'               =>  'sale close successfully'
