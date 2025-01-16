@@ -358,7 +358,7 @@
         <h4 class="card-header-title">
           Top 5 Customer Recoveries
         </h4>
-        <a href="{{route('customer-reports')}}" class="small">View all</a>
+        <a href="project-overview.html" class="small">View all</a>
       </div>
       <div class="card-body">
         <!-- List group -->
@@ -370,7 +370,7 @@
                 <img class="_user_Pimage" src="images/avatar.svg" alt=""> 
               
                 <h5 class="mb-1">
-                  <a href="#">{{$cust->customer_name}}</a>
+                  <a href="project-overview.html">{{$cust->customer_name}}</a>
                 </h5>
                
               </div>
