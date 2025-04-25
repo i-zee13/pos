@@ -772,6 +772,7 @@ function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
 
 }
 
+
 function productRetailAmount() {
     retail_price = $('#retail_price').val();
     amount = qty * retail_price;

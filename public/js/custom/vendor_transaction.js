@@ -250,14 +250,19 @@ $(document).ready(function () {
     openSidebar();
   });
 });
+$(document).on('change', '.date_wise', function () {
+  fetchLedgers($(this).val());
+});
 function fetchLedgers() {
+  var select_date = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   $.ajax({
     type: 'post',
     url: '/get-ledgers-list',
     data: {
       _token: $('meta[name="csrf_token"]').attr('content'),
       current_url: action,
-      operation: operation
+      operation: operation,
+      date: select_date
     },
     success: function success(response) {
       $('.body').empty();

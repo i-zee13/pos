@@ -47,6 +47,8 @@ $('.search-btn').on('click', function () {
         },
         success: function (response) {
             CurrentRef.attr('disabled', false);
+            var stock = $('.product_id option:selected').attr('data-stock');
+            $('.prod-bal-div').html(`Stk In Hand : ${stock}`); 
             $('.loader').show();
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
@@ -137,9 +139,12 @@ $('.search-btn').on('click', function () {
                 $('.TeacherAttendanceListTable').DataTable().clear().destroy();
             }
             var table = $('.TeacherAttendanceListTable').DataTable({
-                "ordering": false,
-                "paging": false,
-                dom: 'Bfrtip',
+               "bSort": false,
+                 "bPaginate": false,
+                 scrollX: false,
+                 scrollY: '400px',
+                 scrollCollapse: true,
+                 dom: 'Bfrtip',
                 buttons: [{
                         extend: 'excelHtml5',
                         text: 'Excel',

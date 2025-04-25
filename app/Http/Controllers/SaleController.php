@@ -24,7 +24,7 @@ class SaleController extends Controller
         $invoice_first_part =   $parts[0];
         $current_date       =   Carbon::today()->toDateString();
         $customers          =   Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
-        $products           =   Product::get();
+        $products           =   Product::where('stock_balance','>',0)->get();
         return view('sales.add', compact('customers', 'current_date', 'invoice_no', 'products', 'invoice_first_part'));
     }
     public function getVendors()
@@ -212,8 +212,11 @@ class SaleController extends Controller
     public function editSale($id)
     {
         $customers          =     Customer::where('customer_type', 2)->select('id', 'customer_name', 'balance')->get();
-        $products           =     Product::get();
-        $invoice            =     SaleInvoice::where('id', $id)->first();
+        $products           =     Product::where('stock_balance','>',0)->get();
+       $invoice = SaleInvoice::where('id', $id)->first();
+        // if($invoice && $invoice->is_editable == 0){ // Or $invoice->is_editable != 1
+        //     return redirect()->back()->with('error', 'This invoice is not currently editable.');
+        // }
         $parts              =     explode('-', $invoice->invoice_no);
         $invoice_first_part =     $parts[0];
         $purchasd_products  =     ProductSale::where('sale_invoice_id', $id)

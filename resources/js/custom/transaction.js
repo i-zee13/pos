@@ -334,15 +334,18 @@ $(document).ready(function () {
         openSidebar();
     });
 });
-
-function fetchLedgers() {
+$(document).on('change','.date_wise',function(){
+    fetchLedgers($(this).val());
+  })
+function fetchLedgers(select_date = null) {
     $.ajax({
         type: 'post',
         url: '/get-ledgers-list',
         data: {
             _token: $('meta[name="csrf_token"]').attr('content'),
             current_url: action,
-            operation: operation
+            operation: operation,
+            date:select_date,
         },
         success: function (response) {
             $('.body').empty();
@@ -364,10 +367,12 @@ function fetchLedgers() {
             $('.subCatsListTable tbody').empty();
             var sNo = 1;
             response.customers.forEach((element, key) => {
+                console.log(element);
                 var total_cr_dr = 0;
-                var voucher = '';
-                total_cr_dr = action == 'customer-ledger-jama' ? element.rec[0].total_cr ?? '0' : element.rec[0].total_dr ?? '0';
-                voucher = action == 'customer-ledger-jama' ? element.crv_no ?? '0' : element.cpv_no ?? '0'
+                var voucher     = '';
+                total_cr_dr     = action == 'customer-ledger-jama' ? element.rec[0].total_cr ?? '0' : element.rec[0].total_dr ?? '0';
+                console.log(action,total_cr_dr)
+                voucher         = action == 'customer-ledger-jama' ? element.crv_no ?? '0' : element.cpv_no ?? '0'
                 ledger_balance = element['balance'] >= 0 ? element['balance'] + ' DR' : (-element['balance']) + ' CR'
 
                 $('.subCatsListTable tbody').append(`

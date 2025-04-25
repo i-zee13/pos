@@ -332,14 +332,18 @@ $(document).ready(function () {
         openSidebar();
     });
 });
-function fetchLedgers() {
+$(document).on('change','.date_wise',function(){
+    fetchLedgers($(this).val());
+  })
+function fetchLedgers(select_date = null) {
     $.ajax({
         type: 'post',
         url: '/get-ledgers-list',
         data: {
             _token: $('meta[name="csrf_token"]').attr('content'),
             current_url: action,
-            operation: operation
+            operation: operation,
+            date:select_date
         },
         success: function (response) {
             $('.body').empty();

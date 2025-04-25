@@ -278,7 +278,7 @@ footer.sticky-footer .copyright {
 	background-color: #fff;
 	border: none;
 	padding: 0px;
-	border-radius: 0px;
+	border-radius: 10px !important;
 	position: relative;
 	box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.2);
 }

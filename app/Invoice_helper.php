@@ -342,47 +342,75 @@ if (!function_exists('PurchaseReportList')) {
 if (!function_exists('ProductReportList')) {
    function ProductReportList($request, $current_date)
    {
-      $query = " 1=1 AND actual_qty > 0";
-      if (isset($request->company_id)) {
-         $query .= " AND ps.company_id = $request->company_id";
-      }
-      if (isset($request->product_id)) {
-         $query .= " AND ps.product_id = $request->product_id";
-      }
-      if (isset($request->customer_id)) {
-         $query .= " AND si.customer_id = $request->customer_id";
-      }
-      if (isset($request->start_date) != '' && isset($request->end_date) != '' && !$request->is_current_date) {
-         $query .= " AND DATE(ps.created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
-      } else {
-         $query .=  " AND  DATE(ps.created_at) = '$current_date'";
-      }
-      if (isset($request->bill_no)) {
-         $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
-      }
-      $reports = DB::select("
-                           SELECT
-                              ps.*,
-                              pr.product_name,
-                              co.company_name,
-                              CASE
-                                 WHEN ps.vendor_id IS NOT NULL THEN (SELECT customer_name FROM customers WHERE id = ps.vendor_id)
-                                 WHEN ps.customer_id IS NOT NULL THEN (SELECT customer_name FROM customers WHERE id = ps.customer_id)
-                                 ELSE 'NA'
-                              END as customer_name,
-                              ps.id AS p_id,
-                              ps.actual_qty AS p_qty,
-                              ps.balance AS p_balance,
-                              ps.actual_status AS p_status
-                           FROM
-                              vendor_stocks as ps
-                           JOIN products pr ON pr.id = ps.product_id
-                           JOIN companies co ON co.id = ps.company_id
-                           WHERE 
-                              $query
-                           ORDER BY p_id ASC
-                     ");
-
-      return $reports;
+       $query = " 1=1 AND actual_qty > 0";
+       if (isset($request->company_id)) {
+           $query .= " AND ps.company_id = $request->company_id";
+       }
+       if (isset($request->product_id)) {
+           $query .= " AND ps.product_id = $request->product_id";
+       }
+       if (isset($request->customer_id)) {
+           $query .= " AND si.customer_id = $request->customer_id";
+       }
+       if (isset($request->start_date) != '' && isset($request->end_date) != '' && !$request->is_current_date) {
+           $query .= " AND DATE(ps.created_at) BETWEEN '$request->start_date' AND '$request->end_date'";
+       } else {
+           $query .=  " AND  DATE(ps.created_at) = '$current_date'";
+       }
+       if (isset($request->bill_no)) {
+           $query .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
+       }
+   
+       // Main query
+       $reports = DB::select("
+                              SELECT
+                                 ps.*,
+                                 pr.product_name,
+                                 co.company_name,
+                                 CASE
+                                    WHEN ps.vendor_id IS NOT NULL THEN (SELECT customer_name FROM customers WHERE id = ps.vendor_id)
+                                    WHEN ps.customer_id IS NOT NULL THEN (SELECT customer_name FROM customers WHERE id = ps.customer_id)
+                                    ELSE 'NA'
+                                 END as customer_name,
+                                 ps.id AS p_id,
+                                 ps.actual_qty AS p_qty,
+                                 ps.balance AS p_balance,
+                                 ps.actual_status AS p_status
+                              FROM
+                                 vendor_stocks as ps
+                              JOIN products pr ON pr.id = ps.product_id
+                              JOIN companies co ON co.id = ps.company_id
+                              WHERE 
+                                 $query
+                              ORDER BY p_id ASC
+                        ");
+   
+       // If the main query returns an empty result, fetch the last 5 entries
+       if (empty($reports)) {
+           $reports = DB::select("
+                                  SELECT
+                                     ps.*,
+                                     pr.product_name,
+                                     co.company_name,
+                                     CASE
+                                        WHEN ps.vendor_id IS NOT NULL THEN (SELECT customer_name FROM customers WHERE id = ps.vendor_id)
+                                        WHEN ps.customer_id IS NOT NULL THEN (SELECT customer_name FROM customers WHERE id = ps.customer_id)
+                                        ELSE 'NA'
+                                     END as customer_name,
+                                     ps.id AS p_id,
+                                     ps.actual_qty AS p_qty,
+                                     ps.balance AS p_balance,
+                                     ps.actual_status AS p_status
+                                  FROM
+                                     vendor_stocks as ps
+                                  JOIN products pr ON pr.id = ps.product_id
+                                  JOIN companies co ON co.id = ps.company_id
+                                  ORDER BY ps.created_at DESC
+                                  LIMIT 5
+                                ");
+       }
+   
+       return $reports;
    }
+   
 }

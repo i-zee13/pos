@@ -34,8 +34,8 @@ class TransactionController extends Controller
    }
 
    public function getCustomerLedgers(Request $request)
-   {
-
+   { 
+     $request['date'] = $request->date != null ? $request->date :  Carbon::today();
       if ($request->operation == 'vendor') {
          $customers  =  VendorLedger::selectRaw('vendor_ledger.*,
                                        (SELECT customer_name FROM customers WHERE id = vendor_ledger.customer_id) as customer_name,
@@ -43,18 +43,19 @@ class TransactionController extends Controller
                                        ->leftjoin(DB::raw('(SELECT customer_id, MAX(id) as max_id FROM vendor_ledger GROUP BY customer_id) as t'), function ($join) {
                                           $join->on('vendor_ledger.customer_id', '=', 't.customer_id')
                                              ->on('vendor_ledger.id', '=', 't.max_id');
-                                       })->whereDate('created_at', Carbon::today())
-                                       ->groupby('customer_id')
+                                       })->whereDate('date', $request->date ?? Carbon::today())
+                                       ->groupby('vendor_ledger.customer_id')
                                        ->orderBy('vendor_ledger.id', 'DESC');
+        
          if (str_contains($request->current_url, 'vendor-ledger-jama')) {
             $customers = $customers->where('cr', '>', 0)->where('crv_no', '!=', '')->get();
          } else {
-            $customers = $customers->where('dr', '>', 0)->where('cpv_no', '!=', '')->get();
+            $customers = $customers->where('dr', '>', 0)->where('cpv_no', '!=', '')->whereNotIn('vendor_ledger.customer_id',[114])->get();
          }
-         $customers   = collect($customers)->filter(function ($item) {
+         $customers   = collect($customers)->filter(function ($item) use($request) {
             $item->rec = $item->selectRaw('SUM(cr) as total_cr , SUM(dr) as total_dr')->where('trx_type', 3)
-               ->whereDate('created_at', Carbon::today())
-               ->where('customer_id', $item->customer_id)
+               ->whereDate('created_at', $request->date ?? Carbon::today())
+               ->where('vendor_ledger.customer_id', $item->customer_id)
                ->orderBy('vendor_ledger.id', 'DESC')
                ->get();
             return $item;
@@ -63,21 +64,21 @@ class TransactionController extends Controller
          $customers  =  CustomerLedger::selectRaw('customer_ledger.*,
                                                  (SELECT customer_name FROM customers WHERE id = customer_ledger.customer_id) as customer_name,
                                                  (SELECT balance FROM customers WHERE id = customer_ledger.customer_id) as customer_balance')
-            ->leftjoin(DB::raw('(SELECT customer_id, MAX(id) as max_id FROM customer_ledger GROUP BY customer_id) as t'), function ($join) {
-               $join->on('customer_ledger.customer_id', '=', 't.customer_id')
-                  ->on('customer_ledger.id', '=', 't.max_id');
-            })
-            ->whereDate('date', Carbon::today())
-            ->groupby('customer_id')
-            ->orderBy('customer_ledger.id', 'DESC');
+                                       ->leftjoin(DB::raw('(SELECT customer_id, MAX(id) as max_id FROM customer_ledger GROUP BY customer_id) as t'), function ($join) {
+                                          $join->on('customer_ledger.customer_id', '=', 't.customer_id')
+                                             ->on('customer_ledger.id', '=', 't.max_id');
+                                       })
+                                       ->whereDate('date', "$request->date" ?? Carbon::today())
+                                       ->groupby('customer_id')
+                                       ->orderBy('customer_ledger.id', 'DESC');
          if (str_contains($request->current_url, 'customer-ledger-jama')) {
             $customers = $customers->where('cr', '>', 0)->where('crv_no', '!=', '')->get();
          } else {
             $customers = $customers->where('dr', '>', 0)->where('cpv_no', '!=', '')->get();
          }
-         $customers   = collect($customers)->filter(function ($item) {
+         $customers   = collect($customers)->filter(function ($item) use($request){
             $item->rec = $item->selectRaw('SUM(cr) as total_cr , SUM(dr) as total_dr')->where('trx_type', 3)
-               ->whereDate('created_at', Carbon::today())
+               ->whereDate('created_at', $request->date ?? Carbon::today())
                ->where('customer_id', $item->customer_id)
                ->orderBy('customer_ledger.id', 'DESC')
                ->get();

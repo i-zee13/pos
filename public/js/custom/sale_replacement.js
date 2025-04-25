@@ -761,10 +761,10 @@ function grandSum() {
     prod_type = data.prod_type;
     if (data.prod_type == 2) {
       new_sum += parseFloat(data.amount);
-      $('.product_net_total').val(new_sum);
+      $('.product_net_total').val(new_sum.toFixed(2));
     } else {
       return_sum += parseFloat(data.amount);
-      $('.return_total').val(return_sum);
+      $('.return_total').val(return_sum.toFixed(2));
     }
   });
   grandtotal(new_sum - return_sum);
@@ -777,9 +777,9 @@ function grandtotal(sum) {
   sale_total_amount = sum - invoice_discount;
   setTimeout(function () {
     $('.grand-total').text(addCommas(sale_total_amount - $('.amount_received').val()));
-    $('.amount_pay_input').val(sale_total_amount);
+    $('.amount_pay_input').val(sale_total_amount.toFixed(2));
   }, 500);
-  $('.amount_pay_input').val(sale_total_amount);
+  $('.amount_pay_input').val(sale_total_amount.toFixed(2));
   if (parseFloat($('.amount_pay_input').val()) < 0) {
     $('.th-hide').hide();
     $('.cash-return').text('Cash Paid');

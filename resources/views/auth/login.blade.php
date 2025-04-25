@@ -102,6 +102,8 @@
               @enderror
               <!-- Icon -->
               <span class="input-group-text">
+
+
                 <i class="fe fe-eye"></i>
               </span>
 
@@ -109,16 +111,16 @@
           </div>
 
           <!-- Submit -->
-          <button type="submit" class="btn btn-lg w-100 btn-dark mb-3" fdprocessedid="nxu92" tabindex="3">
-            {{ __('Login') }}
+          <button type="submit" class="btn btn-lg w-100 btn-dark mb-3" fdprocessedid="nxu92" tabindex="3" style="background:#2c7be5">
+            {{ __('Sign In') }}
           </button>
 
           <!-- Link -->
-          <!-- <div class="text-center">
-            <small class="text-muted text-center">
-              Don't have an account yet? <a href="{{ route('password.request') }}">Sign up</a>.
-            </small>
-          </div> -->
+          <!--<div class="text-center">-->
+          <!--  <small class="text-muted text-center">-->
+          <!--    Don't have an account yet? <a href="{{ route('password.request') }}">Sign up</a>.-->
+          <!--  </small>-->
+          <!--</div>-->
 
         </form>
 

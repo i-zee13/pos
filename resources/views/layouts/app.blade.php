@@ -33,8 +33,24 @@
     <link rel="stylesheet" href="{{asset('/assets/css/theme.bundle.css')}}" id="stylesheetLight">
     <link rel="stylesheet" href="{{asset('/assets/css/theme-dark.bundle.css')}}" id="stylesheetDark" disabled="">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css')}}"> -->
-
+  <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{asset('/css/jquery.steps.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="{{asset('/css/selectize.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('/css/style.css?v=7.1')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('/css/menu.css?v=6.4')}}" />
+    <link rel="stylesheet" type="text/css" href="{{asset('/css/product.css?v=8.1')}}" />
+    <link rel="stylesheet" type="text/css" href="{{asset('/css/jquery.mCustomScrollbar.css')}}" />
+    <link rel="stylesheet" href="{{asset('/css/animate.css')}}">
+    <script src="{{asset('/js/moment.js')}}"></script>
     <style>
+  
+     .prod-bal-div{
+        float: right;   
+        color: #152e4d;
+        font-weight: bolder;
+        font-family:'Rationale', sans-serif !important;
+        font-size: 18px;
+        }
         /* body {
             display: none
         } */
@@ -44,13 +60,14 @@
         .btn{
             border-radius :5px !important;
         }
-        td{
-            font-weight: bolder;
+         td{
+            font-weight: bolder !important;
         }
         input{
             font-weight: 700
         }
-        td .comment{ 
+       .comment{
+           
             color: #ffffff;
             font-size: 13px; 
             font-family: monospace;
@@ -257,7 +274,10 @@
     -webkit-animation: wcLoading 1.5s ease-in-out infinite;
     animation:wcLoading 1.5s ease-in-out infinite;
 }
-
+#content-wrapper, body{
+    /* background-color: #f1f1f1; */
+    background-color: #fff;
+}
 .loading .bar1 {
     -webkit-animation-delay: 0.1s;
     animation-delay: 0.1s;
@@ -309,22 +329,16 @@
             height: 50px !important;
      }
  }
+ .select2-container--open .select2-dropdown--above, .select2-container--open .select2-dropdown--below {
+    font-weight: bolder;}
     </style>
-    <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
-    <link href="{{asset('/css/jquery.steps.css')}}" rel="stylesheet">
-    <link rel="stylesheet" href="{{asset('/css/selectize.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('/css/style.css?v=7.1')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('/css/menu.css?v=6.4')}}" />
-    <link rel="stylesheet" type="text/css" href="{{asset('/css/product.css?v=8.1')}}" />
-    <link rel="stylesheet" type="text/css" href="{{asset('/css/jquery.mCustomScrollbar.css')}}" />
-    <link rel="stylesheet" href="{{asset('/css/animate.css')}}">
-    <script src="{{asset('/js/moment.js')}}"></script>
+  
 
     <!-- Title -->
     <title>Store</title>
 </head>
 
-<body style="display: block;">
+<body style="display: block;font-family: system-ui !important;">
     @php $close_routes = closeRoute() @endphp
     @php $is_close = isClose();
     $is_container = 0;

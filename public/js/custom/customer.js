@@ -316,7 +316,11 @@ function fetchcustomers() {
     // var response = JSON.parse(response);
     var sNo = 1;
     data.forEach(function (element, key) {
-      $('.mainCatsListTable tbody').append("\n            <tr>\n                <td>".concat(key + 1, "</td>\n                <td>").concat(element['customer_name'], "</td>\n                <td>").concat(element['cnic_no'] ? element['cnic_no'] : 'NA', "</td>\n                <td>").concat(element['phone_no'] ? element['phone_no'] : 'NA', "</td>\n                <td>").concat(element['whatsapp_no'] ? element['whatsapp_no'] : 'NA', "</td>\n                <td>").concat(element['address'] ? element['address'].substring(0, 40) + '...' : 'NA', "</td> \n                <td>\n                    <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdatecustomer\">Edit</button>\n                    <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg deleteMaincustomer delete_cat\" name=\"main_cat\" title=\"Delete\">Delete</button>\n                    \n                </td>\n            </tr>"));
+      var btnDel = "";
+      if (!element.balance) {
+        btnDel = "  <button type=\"button\" id=\"".concat(element['id'], "\" class=\"btn btn-default red-bg deleteMaincustomer delete_cat\" name=\"main_cat\" title=\"Delete\">Delete</button>");
+      }
+      $('.mainCatsListTable tbody').append("\n            <tr>\n                <td>".concat(key + 1, "</td>\n                <td>").concat(element['customer_name'], "</td>\n                <td>").concat(element['cnic_no'] ? element['cnic_no'] : 'NA', "</td>\n                <td>").concat(element['phone_no'] ? element['phone_no'] : 'NA', "</td>\n                <td>").concat(element['whatsapp_no'] ? element['whatsapp_no'] : 'NA', "</td>\n                <td>").concat(element['address'] ? element['address'].substring(0, 40) + '...' : 'NA', "</td> \n                <td>\n                    <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdatecustomer\">Edit</button>\n                    ").concat(btnDel, "\n                </td>\n            </tr>"));
     });
     $('#tblLoader').hide();
     $('.body').fadeIn();

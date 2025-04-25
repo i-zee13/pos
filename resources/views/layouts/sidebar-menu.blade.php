@@ -356,6 +356,11 @@
                   Expense
                 </a>
               </li>
+               <li class="nav-item">
+                <a href="{{route('ledger')}}" class="nav-link ">
+                  Daily Ledger
+                </a>
+              </li>
 
             </ul>
           </div>

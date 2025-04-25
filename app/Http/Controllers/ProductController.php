@@ -89,9 +89,9 @@ class ProductController extends Controller
       public function getProductStock($id)
     {   
         // dd()
-        $stock_balance = Product::where('id',$id)->value('stock_balance');
+        $new_prod = Product::where('id',$id)->first();
             return response()->json([
-                'stock_balance'=> $stock_balance
+                'new_prod'=> $new_prod
             ]);
     }
     public function getSubCatToUpdate($id)

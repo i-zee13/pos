@@ -72,22 +72,25 @@ $(document).on('mouseenter', '.show_purchase', function () {
 });
 
 function addCommas(nStr) {
-    // Parse the input and round off to two decimal places
-    nStr = parseFloat(nStr).toFixed(2);
+    nStr = parseFloat(nStr); // Parse, but don't round yet
 
-    // Split into whole and decimal parts
-    let x = nStr.split('.');
+    let x = nStr.toString().split('.'); // Convert to string and split
     let x1 = x[0];
     let x2 = x.length > 1 ? '.' + x[1] : '';
 
-    // Regular expression to add commas
     let rgx = /(\d+)(\d{3})/;
     while (rgx.test(x1)) {
         x1 = x1.replace(rgx, '$1' + ',' + '$2');
     }
 
+    // Remove .00 if present
+    if (x2 === '.00') {
+      x2 = '';
+    }
+
     return x1 + x2;
 }
+ 
 
 $(document).on('click', '.btn-invoice-delete', function() {
     deleteRef       = $(this);

@@ -859,7 +859,8 @@
                         </div>
                         <style>
                             .ProductTable tbody tr:hover td {
-                                background: #152e4d !important; 
+                                background: #152e4d !important;
+
                                 color: white !important;
                             }
                         </style>

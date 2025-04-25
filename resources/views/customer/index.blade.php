@@ -106,6 +106,12 @@
 </div>
 @endsection
 @section('content')
+<style>
+      td{
+        font-size: 14px;
+
+        }
+</style>
 <!-- HEADER -->
 <div class="header">
     <!-- Body -->

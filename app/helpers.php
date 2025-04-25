@@ -486,7 +486,7 @@ function customerLedger($request,$column){
     $balance                     =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->value('balance');
     
     $c                           =  CustomerLedger::where($column, $request->id)->orderBy('id', 'DESC')->first();
-    $bbalance                    =  $column == 'sale_return_invoice_id' ?  ((-$balance) + $c->dr) - $c->cr :  ($balance + $c->cr) - $c->dr;
+    $bbalance                    =  $column == 'sale_return_invoice_id' ?  abs(((-$balance) + $c->dr) - $c->cr) :  ($balance + $c->cr) - $c->dr;
     $cust_ldr                    =  new  CustomerLedger();
     $cust_ldr->cr                =  0;
     $cust_ldr->date              =  $c->invoice_date;
@@ -539,7 +539,7 @@ function vendorLedger($request,$column){
 
 function SaleReportRecords($request = null, $current_date, $is_admin_close = null)
    {
-      $current_date = date('Y-m-d');
+
       $query = " 1=1";
       $purchase_return_paid_amount = 0;
       $purchase_inv_paid_amount    = 0;

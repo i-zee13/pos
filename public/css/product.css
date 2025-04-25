@@ -886,9 +886,12 @@ input:focus+.slider {
    .inputmonth {
 	width: 215;
   }
-  
+  .grand-total{
+      color:#12ff12;
+  }
   .table thead th {
-	background-color: #f6f6f6;
+	 color: white;
+    background-color: #152e4d;
   }
   
   .topstats{margin-top: 0px; font-size: 13px; margin-bottom: 15px;}

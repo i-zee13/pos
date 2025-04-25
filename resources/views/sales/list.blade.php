@@ -39,9 +39,9 @@
             <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;" id="example">
                 <thead>
                     <tr>
+                        <th>Invoice#</th>
                         <th>Customer Name</th>
-                        <th>Invoice #</th>
-                        <th>Received</th>
+                        <th>Received</th> <th>Desciption</th>
                         <th>Product Net Total</th>
                         <!-- <th>Invoice Total</th> -->
                         <th>Action</th>
@@ -59,7 +59,7 @@
                         @else
                             {{ $sale->customer_name }}
                         @endif</td>
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->paid_amount}} </td>
+                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->paid_amount}} </td> <td>{{$sale->description}}</td>
                     <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total +$sale->service_charges - $sale->invoice_discount}} </td>
                     <!-- <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td> -->
                     <td>

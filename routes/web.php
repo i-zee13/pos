@@ -234,4 +234,8 @@ Route::group(['middleware' => ['auth']], function () {
   Route::post('/update-user-password',      [ProfileController::class, 'update_user_password'])->name('admin.update-user-password');
   Route::post('/update-user-profile-pic',   [ProfileController::class, 'update_user_profile_pic'])->name('admin.update-user-profile-pic');
   
+      Route::get('/ledger',                   [LedgerDetailControlller::class, 'ledger'])->name('ledger');
+    Route::post('/get-ledgers',              [LedgerDetailControlller::class, 'getLedgers'])->name('get-ledgers');
+
+  
 });

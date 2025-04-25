@@ -172,6 +172,11 @@
 </div>
 @endsection
 @section('content')
+<style>
+ .dataTable td{
+          font-family: 'system-ui' !important;
+        }
+</style>
 <?php $transc_for  = request()->segment(1) == 'customer-reports' ? 'Customer' : 'Vendor' ;  ?>
 
 <style>
@@ -218,9 +223,13 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div class="header mb-0">
-                <a class="btn add_button openDataSidebarForAddCustomerLedger customer-ledger-jama-banam"><i class="fa fa-plus"></i> Add New</a>
+             <div class="header mb-0 d-flex">
                 <h2>Customer Cash {{request()->segment(1) == 'customer-ledger-jama' ? ' Jama ( جمع )' : ' Banam ( بنام )'}}</h2>
+                <a class="btn add_button openDataSidebarForAddCustomerLedger customer-ledger-jama-banam"><i class="fa fa-plus"></i> Add New</a>
+
+                <div class="CL-Product inputmonth" style="margin-left: 14px;top: -5px;"><i class="fa fa-calendar-alt"></i>
+                    <input type="date" autocomplete="off" class="form-control date_wise" placeholder="Start Date" name="date_wise">
+                </div>
             </div>
            <div style="min-height: 400px" id="tblLoader">
                 <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">

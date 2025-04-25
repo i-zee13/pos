@@ -253,14 +253,19 @@ $(document).ready(function () {
     openSidebar();
   });
 });
+$(document).on('change', '.date_wise', function () {
+  fetchLedgers($(this).val());
+});
 function fetchLedgers() {
+  var select_date = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   $.ajax({
     type: 'post',
     url: '/get-ledgers-list',
     data: {
       _token: $('meta[name="csrf_token"]').attr('content'),
       current_url: action,
-      operation: operation
+      operation: operation,
+      date: select_date
     },
     success: function success(response) {
       $('.body').empty();
@@ -269,9 +274,11 @@ function fetchLedgers() {
       var sNo = 1;
       response.customers.forEach(function (element, key) {
         var _element$rec$0$total_, _element$rec$0$total_2, _element$crv_no, _element$cpv_no, _element$comment;
+        console.log(element);
         var total_cr_dr = 0;
         var voucher = '';
         total_cr_dr = action == 'customer-ledger-jama' ? (_element$rec$0$total_ = element.rec[0].total_cr) !== null && _element$rec$0$total_ !== void 0 ? _element$rec$0$total_ : '0' : (_element$rec$0$total_2 = element.rec[0].total_dr) !== null && _element$rec$0$total_2 !== void 0 ? _element$rec$0$total_2 : '0';
+        console.log(action, total_cr_dr);
         voucher = action == 'customer-ledger-jama' ? (_element$crv_no = element.crv_no) !== null && _element$crv_no !== void 0 ? _element$crv_no : '0' : (_element$cpv_no = element.cpv_no) !== null && _element$cpv_no !== void 0 ? _element$cpv_no : '0';
         ledger_balance = element['balance'] >= 0 ? element['balance'] + ' DR' : -element['balance'] + ' CR';
         $('.subCatsListTable tbody').append("\n                        <tr>\n                         <td> ".concat(voucher, "</td> \n                            <td> ").concat(element['customer_name'], "</td>\n                            <!-- <td class='total_balance'>").concat(ledger_balance, "</td> --!>\n                            <td>").concat(total_cr_dr, "</td>\n                            <td> ").concat((_element$comment = element['comment']) !== null && _element$comment !== void 0 ? _element$comment : 'NA', "</td>\n                            <td> ").concat(moment(element['date']).format('D MMM YYYY'), "</td>\n                            <td>\n                                <button  class=\"btn btn-default btn-line openDataSidebarForEditCustomerLedger ").concat(element.is_editable == 1 ? '' : 'd-none', "\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                            comment=\"").concat(element['comment'], "\"\n                                    >Edit</button>\n                                    <button  class=\"btn btn-default btn-line openDataSidebarForUpdateCustomerLedger\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Add Payment</button>\n                            </td>\n                        </tr>"));

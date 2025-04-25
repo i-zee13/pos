@@ -319,7 +319,7 @@
 
 <div class="row _user-TS" style="margin-top:15px">
   <div class="col-md-12 _dashTOP"> <img class="_user_Pimage" src="images/avatar.svg" alt="">
-    <h2 class="_head01">{{$message}}, Mr.{{Auth::user()->name}} <span>👋</span></h2>
+    <h2 class="_head01">{{$message}}, Mr.{{Auth::user()->name}}  </h2>
     <p>Here’s what’s happening today.</p>
   </div>
 </div>
@@ -358,7 +358,7 @@
         <h4 class="card-header-title">
           Top 5 Customer Recoveries
         </h4>
-        <a href="{{route('customer-reports')}}" class="small">View all</a>
+       <a href="{{route('customer-reports')}}" class="small">View all</a>
       </div>
       <div class="card-body">
         <!-- List group -->
@@ -375,9 +375,9 @@
                
               </div>
               <div class="col-auto">
-                <span class="card-text small text-body-secondary total-sale" style="font-weight: 600;">
-                  {{number_format($cust->balance,2)}}
-                </span> 
+                <span class="card-text small text-body-secondary total-sale empty-span"  style="font-weight: 600;cursor: pointer;" data-amount="{{$cust->balance}}">---</span>
+                 <span class="hide" style="display: none;font-weight:600"> {{number_format($cust->balance,2)}} </span> 
+               
               </div>
             </div>
           </div>

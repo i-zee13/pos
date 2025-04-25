@@ -1,7 +1,11 @@
 @extends('layouts.app')
 @section('data-sidebar')
 {{-- Confirmation Modal --}}
-
+<style>
+ .dataTable td{
+          font-family: 'system-ui' !important;
+        }
+</style>
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content top-borderRed">
@@ -201,9 +205,12 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div class="header mb-0">
-                <a class="btn add_button openDataSidebarForAddCustomerLedger vendor-ledger-jama-banam"><i class="fa fa-plus"></i> Add New</a>
+            <div class="header mb-0 d-flex">
                 <h2>Vendor Cash {{request()->segment(1) == 'vendor-ledger-jama' ? '( جمع )'  :' ( بنام )'}}</h2>
+                <a class="btn add_button openDataSidebarForAddCustomerLedger vendor-ledger-jama-banam"><i class="fa fa-plus"></i> Add New</a>
+                <div class="CL-Product inputmonth" style="margin-left: 14px;top: -5px;"><i class="fa fa-calendar-alt"></i>
+                    <input type="date" autocomplete="off" class="form-control date_wise" placeholder="Start Date" name="date_wise">
+                </div>
             </div>
            <div style="min-height: 400px" id="tblLoader">
                 <img src="/images/loader.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">

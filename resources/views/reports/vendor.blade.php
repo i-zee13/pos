@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <style>
+
     .dt-buttons .dt-button,
     .dt-buttons .dt-button:hover {
         background: linear-gradient(90deg, #040725 0%, #040725 100%) !important;
@@ -33,6 +34,35 @@
     @media (max-width: 1366px) {
         ._cust_filter {
             width: 159px;
+        }
+    }
+    @media only screen and (max-width:575px) {
+        .Product-Filter .col-auto {
+            width: 100% !important;
+        }
+
+        ._cust_filter {
+            margin-top: 10px;
+            width: 100% !important;
+            padding: 0 !important;
+        }
+
+        .CL-Product {
+            width: 100% !important;
+            padding-right: 2px !important;
+            margin: 0 !important;
+        }
+
+        .col-auto {
+            padding: 0 12px 0px !important;
+        }
+
+        .col-auto .CL-Product.inputmonth.focused {
+            margin-top: 10px !important;
+        }
+
+        .Product-Filter .btn-primary {
+            margin-top: 10px !important;
         }
     }
 </style>
@@ -111,7 +141,7 @@
             <form id="search-form">
                 <div class="row">
 
-                    <div class="col pr-0">
+                    <div class="col-auto pr-0">
 
                         <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
                             <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
@@ -120,24 +150,39 @@
                         <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
                             <input type="date" autocomplete="off" class="form-control end_date" placeholder="End Date" name="end_date" value="">
                         </div>
-                        <div class="_cust_filter col-4">
+                        <div class="_cust_filter">
                             <div class="form-s2">
                                 <select class="form-control formselect vendor_id" name="vendor_id">
                                     <option value="">Select {{$ledger_for}}</option>
                                     @foreach($vendors as $vendor)
-                                    <option value="{{$vendor->id}}">{{$vendor->id}} - {{$vendor->customer_name}}</option>
+                                    <option value="{{$vendor->id}}" data-balance="{{$vendor->balance}}">{{$vendor->id}} - {{$vendor->customer_name}}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+                        <div class="col-auto pl-0" style="float:right;">
+                        <style>
+                            .reset-btn {
+                                box-shadow: none;
+                            }
 
+                            .reset-btn:hover {
+                                color: white !important;
+                            }
+
+                            .Product-Filter .btn-primary {
+                                float: none;
+                            }
+                        </style>
+                            <button type="button" class="btn btn-primary m-0 reset-btn"> Reset</button>
+                            <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
+                        </div>
                     </div>
-                    <div class="col-auto pl-0">
-                        <button type="button" class="btn btn-primary m-0 reset-btn"> Reset</button>
-                    </div>
-                    <div class="col-auto pl-0">
-                        <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
-                    </div>
+
+
+                </div>
+                <div class="row" style="margin-bottom: 5px;">
+
                 </div>
             </form>
             <div class="clearfix"></div>
@@ -150,6 +195,7 @@
         <div class="card">
             <div class="header m-0">
                 <h2>{{$ledger_for}} <span>Area</span></h2>
+                 <span class="prod-bal-div">0.0</span>
             </div>
             <div style="min-height: 400px; display: none;" class="loader">
                 <img src="images/loading.gif" width="30px" height="auto" style="position: absolute; left: 50%; top: 45%;">

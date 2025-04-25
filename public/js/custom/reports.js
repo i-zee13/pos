@@ -48,6 +48,22 @@ $('.search-btn').on('click', function () {
         success: function (response) {
             CurrentRef.attr('disabled', false);
             $('.loader').show();
+             
+            var balanceType;
+            if (current_url == 'customer-reports') {
+                balanceType = Number(stock) > 0 
+                    ? `<span style="color: green;"> DR</span>` 
+                    : `<span style="color: red;"> CR</span>`;
+            } else {
+                balanceType = Number(stock) > 0 
+                    ? `<span style="color: red;"> CR</span>` 
+                    : `<span style="color: green;"> DR</span>`;
+            } 
+            
+            
+               var stock = $('.vendor_id option:selected').attr('data-balance');
+            $('.prod-bal-div').html(`Previous Balance : ${addCommas(stock)} ${balanceType}`); 
+            console.log(current_url);
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
@@ -57,8 +73,8 @@ $('.search-btn').on('click', function () {
                             <th>Invoice #</th>
                             <th>Date</th>
                             <th>Comment</th>
-                            <th>Debit</th>
-                            <th>Credit</th>
+                            <th style="color:red">Outgoing</th>
+                            <th style="color:rgb(11, 246, 11)">Incoming</th>
                             <th>Balance</th>
                             <th>Action</th>
                         </tr>
@@ -255,6 +271,13 @@ $('.reset-btn').on('click', function () {
 })
 
 function customer_Data(element, inv_no, inv_id, label, formattedDate) {
+    var comment = '';
+    if((element.invoice_comment !='' &&  element.invoice_comment != null)){
+      comment  = `<span class="comment"> ${element.invoice_comment}</span>`; 
+    }else if((element.comment != '' && element.comment != null)){
+        comment  = `<span class="comment"> ${element.comment}</span>`; 
+    }
+    console.log(comment)
     if (element.cr && element.dr) {
         // Both CR and DR present
         // First iteration: CR present, DR skipped 
@@ -272,8 +295,8 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
                 <td hidden>${element.id}</td>
                 <td>${inv_no ?? 'NA'}</td>
                 <td>${formattedDate}</td> 
-                <td>${element.comment ?? ''}</td> 
-            <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.dr.toLocaleString('en-US')}</td>
+                <td>${comment}</td> 
+                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.dr.toLocaleString('en-US')}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${firstBalance.toLocaleString('en-US')}</td>
                 <td><a class="btn btn-default btn-detail  btn-line"
@@ -290,10 +313,7 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
 
         // Second iteration: CR skipped, DR present
 
-        var comment = '';
-        if(element.comment){
-          comment  = `<span class="comment"> ${element.comment ?? ''}</span>`; 
-        }
+       
         var secondRowHTML = `
             <tr>
                 <td hidden>${element.id}</td>
@@ -319,10 +339,7 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
         // Only one of CR or DR present or neither
         var crValue = element.cr ? element.cr.toLocaleString('en-US') : '0';
         var drValue = element.dr ? element.dr.toLocaleString('en-US') : '0';
-        var comment = '';
-        if(element.comment){
-          comment = `<span class="comment"> ${element.comment ?? ''}</span>`;    
-        }
+         
         var balance_text = '';
         if (element.balance >= 0) {
             balance_text = (element.balance).toLocaleString('en-US') + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>";
@@ -353,7 +370,6 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
         $('.TeacherAttendanceListTable tbody').append(rowHTML);
     }
 }
-
 function vendor_Data(element, inv_no, inv_id, label, formattedDate) {
     if (element.cr && element.dr) {
         // Both CR and DR present

@@ -817,7 +817,7 @@
      }
  })
 
- function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
+  function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
      var sum = 0;
      var grandQty = 0;
      var productTotal = 0;
