@@ -689,7 +689,7 @@
                 </div>
                 <div class="col-md-9 right-sid ebox">
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Update' : 'New'}} Purchase <span>Invoice</span></h2>
                         </div>
 
@@ -727,7 +727,7 @@
                             }
                         </style>
                         <div class="row">
-                            <div class="col-12" id="table-container">
+                            <div class="col-12 table-responsive" id="table-container">
                                 <table class="ProductTable table  " id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <thead>
                                         <tr>

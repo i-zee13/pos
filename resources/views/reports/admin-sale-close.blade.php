@@ -592,6 +592,18 @@
 
                                         <strong class="digit angro_fertilizer">Loading...</strong>
                                     </div>
+                                    <div class="np_khareed_div" style="display: none;">
+                                      <span>خرید NP</span>
+                                        <strong class="digit"></strong>
+
+                                        <strong class="digit np_khareed">Loading...</strong>
+                                    </div>
+                                    <div class="gandum_khareed_khata_div" style="display: none;">
+                                       <span>گندم خرید کھاتہ</span>
+                                        <strong class="digit"></strong>
+
+                                        <strong class="digit gandum_khareed_khata">Loading...</strong>
+                                    </div>
                                     <div class="fazul_qadir_div" style="display: none;">
                                         <span>فضل القادر : </span>
                                         <strong class="digit"></strong>
@@ -669,6 +681,12 @@
                                         <strong class="digit"></strong>
 
                                         <strong class="digit wilkan_chemicals">Loading...</strong>
+                                    </div>
+                                    <div class="gawara_khata_div" style="display: none;">
+                                        <span> گوارا خرید کھاتہ  </span>
+                                        <strong class="digit"></strong>
+
+                                        <strong class="digit gawara_khata">Loading...</strong>
                                     </div>
                                     <div class="swat_agro_chemicals_div" style="display: none;">
                                         <span>سوات ایگرو کیمیکلز : </span>
@@ -850,6 +868,11 @@
                                         <span>گندم : </span>
                                         <strong class="digit gandom_qty">Loading...</strong>
                                         <strong class="digit gandom">Loading...</strong>
+                                    </div>
+                                    <div class="gandum_khareed_khata_receive_div" style="display: none;">
+                                        <span>گندم خرید کھاتہ : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit gandum_khareed_khata_receive">Loading...</strong>
                                     </div>
                                     <div class="kapas_div" style="display: none;">
                                         <span>بنولہ </span>

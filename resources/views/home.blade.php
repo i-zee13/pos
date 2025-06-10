@@ -358,7 +358,7 @@
         <h4 class="card-header-title">
           Top 5 Customer Recoveries
         </h4>
-       <a href="{{route('customer-reports')}}" class="small">View all</a>
+       <a href="{{route('all-customer-ledger')}}" class="small">View all</a>
       </div>
       <div class="card-body">
         <!-- List group -->

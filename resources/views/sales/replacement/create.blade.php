@@ -736,7 +736,7 @@
                                 <h5 class="title PT-10 in-out" style=" background-color: green; ">IN</h2>
                             </div>
                         </div>
-                        <div class="col-12" id="table-container" style="min-height:150px;">
+                        <div class="col-12 table-responsive" id="table-container" style="min-height:150px;">
                             <table class="ProductTable table designationsTable" id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <thead>
                                     <tr>
@@ -805,7 +805,7 @@
                                 <h5 class="title PT-10 in-out" style=" background-color: red; ">OUT</h2>
                             </div>
                         </div>
-                        <div class="col-12" id="table-container">
+                        <div class="col-12 table-responsive" id="table-container">
                             <table class="ProductTable table designationsTable" id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <thead>
                                     <tr>

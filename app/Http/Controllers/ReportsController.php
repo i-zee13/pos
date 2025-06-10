@@ -700,8 +700,9 @@ $records->dap =$records->dap - $records->dap_r;
       $records->sir_murtaza_sahib_receive       =  collect($customer_payment)->where('customer_id',157)->sum('cr');
       $records->master_khalid_faroq_shah_receive=  collect($customer_payment)->where('customer_id',242)->sum('cr');
       $records->karaya_dokan_receive            =  collect($customer_payment)->where('customer_id',115)->SUM('cr');
+      $records->gandum_khareed_khata_receive   =  collect($customer_payment)->where('customer_id',115)->SUM('cr');
         
-      $records->mutafariq_udhar_banam          =  collect($customer_payment)->whereNotIn('customer_id',[5,8,49,97,114,115,356,107,113,126,145,157,170,48,242])->SUM('dr');
+      $records->mutafariq_udhar_banam          =  collect($customer_payment)->whereNotIn('customer_id',[5,8,49,97,114,115,356,107,113,126,145,157,170,48,242,413])->SUM('dr');
       $records->salries_banam                  =  collect($customer_payment)->where('customer_id',114)->SUM('dr'); 
       $records->fazul_qadir_banam              =  collect($customer_payment)->where('customer_id',48)->SUM('dr'); 
       $records->shafiq_karyana_banam           =  collect($customer_payment)->where('customer_id',49) ->sum('dr');
@@ -714,12 +715,14 @@ $records->dap =$records->dap - $records->dap_r;
       $records->karaya_dokan_banam             =  collect($customer_payment)->where('customer_id',115)->SUM('dr');
       // $records->mutafariq_udhar_banam  =  collect($customer_payment)->whereNotIn('customer_id',[5,8,97,170,356,48])->SUM('dr'); 
      $excluded_vendors = [
-          7,8, 9, 17,18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 33, 34, 36,135, 138,
-          278, 285, 298, 264,288, 306, 311, 312, 315, 323, 340, 343, 366, 374, 377, 379, 387, 394
+          7,8, 9, 17,18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 33, 34, 36,135, 138,346,
+          278, 285,294 ,298, 264,288, 306, 311, 312, 315, 323, 340, 343, 366, 374, 377, 379, 387, 394,413
       ];
 
   // ✅ **Mapping Vendor IDs with Correct Column Names**
   $vendors = [
+      346 => "gawara_khata",
+      294 => "np_khareed",
       264 => "petrol_khata",
       33  => "abdul_shakoor_exchange",
       312 => "habib_bank_abdul_shakoor",
@@ -755,7 +758,8 @@ $records->dap =$records->dap - $records->dap_r;
       25  => "bayer",
       26  => "fmc",
       27  => "agro_mark", 
-      29  => "advance_agro_tech"
+      29  => "advance_agro_tech",
+      413 => "gandum_khareed_khata"
   ];
      $ttl_vendror_dr = 0;
      // Sum DR values for each vendor dynamically
@@ -774,7 +778,7 @@ $records->dap =$records->dap - $records->dap_r;
       $records->open_khad           =  collect($customer_payment)->where('customer_id',356)->SUM('dr');
       $records->ttl_purchase_cr     =  collect($vendor_payment)->whereNotIn('vendor_id', [7,311,285,288])->WHERE('trx_type', 3)->sum('cr'); 
       $records->hbl_m_waqas_jama    =  collect($vendor_payment)->where('vendor_id', 311)->WHERE('trx_type', 3)->sum('cr'); 
-      $records->ubl_m_waqas_jama  =  collect($vendor_payment)->where('vendor_id', 285)->WHERE('trx_type', 3)->sum('cr');     
+      $records->ubl_m_waqas_jama    =  collect($vendor_payment)->where('vendor_id', 285)->WHERE('trx_type', 3)->sum('cr');     
 
       $records->customer_banam      = collect([
                                                 $records->fazul_qadir_banam,
@@ -785,9 +789,8 @@ $records->dap =$records->dap - $records->dap_r;
                                                 $records->imran_niazi_banam,
                                                 $records->sir_murtaza_sahib_banam,
                                                 $records->master_khalid_faroq_shah_banam
-                                          ])->sum();
-
-      $records->customer_receive     = collect([
+                                          ])->sum(); 
+      $records->customer_receive    = collect([
                                              $records->fazul_qadir_receive,
                                              $records->shafiq_karyana_receive,
                                              $records->abdul_ghaffar_ghar_receive,

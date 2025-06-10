@@ -296,4 +296,15 @@ foreach ($customerLgr as $entry) {
          'mutafriq_udhar_receive' => $cr,
       ]);
    }
+   public function allCustomerLedger()
+   {
+     $whereNotIN = [105,107,115,170,5,47,48,49,114,126,157,242,271,356];
+
+      $credit_customers = Customer::where('customer_type', 2)->where('balance', '>', 0)->get(); 
+      $debit_customers  = Customer::where('customer_type', 2)->where('balance', '<', 0)->get(); 
+      
+      $total_credit     = Customer::where('customer_type', 2)->where('balance', '>', 0)->whereNotIn('id',$whereNotIN)->sum('balance');
+      $total_debit      = Customer::where('customer_type', 2)->where('balance', '<', 0)->whereNotIn('id',$whereNotIN)->sum('balance'); 
+      return view('reports.all-customer-ledger', compact('credit_customers', 'debit_customers', 'total_debit', 'total_credit'));
+   }
 }

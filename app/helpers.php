@@ -392,8 +392,10 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     $stock = StockManagment::where('product_id', $purchase->product_id)
                             ->where('company_id', $purchase->company_id)
                             ->orderBy('id', 'DESC')->first();
-    $stock->ttl_avg_cost    = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
-    $stock->ttl_cost        = $prod->ttl_cost > 0 ? $prod->ttl_cost  : 0;
+    // $stock->ttl_avg_cost    = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
+    // $stock->ttl_cost        = $prod->ttl_cost > 0 ? $prod->ttl_cost  : 0;
+    $stock->ttl_avg_cost    =  0;
+    $stock->ttl_cost        =  0;
     $stock->purchase_price  = $purchase->purchase_price;
     $stock->sale_price      = $purchase->sale_price;
     $stock->save(); 

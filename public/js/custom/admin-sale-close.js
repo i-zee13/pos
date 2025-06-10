@@ -39,21 +39,21 @@ console.log(records['petrol_khata']);
             //TOTAL TURN OVER 
             // Define all item names (including amounts and quantities)
             var items = [
-                "mutafirq_udhar_receive", "mutafirq_sody", "mutafariq_udhar_banam", 
+                "mutafirq_udhar_receive", "mutafirq_sody", "mutafariq_udhar_banam", "gawara_khata",
                 "sody_khareed","beej_khareed", "bank_payments", "ttl_in", "ttl_out", "total_meezan","ilyas_bakhtawar",
                     // All Banam (dr) Customers
                     "fazul_qadir_banam", "shafiq_karyana_banam", "abdul_ghaffar_ghar_banam",
                     "ammar_abdullah_ghar_banam", "imdad_khata_banam", "imran_niazi_banam",
                     "sir_murtaza_sahib_banam", "master_khalid_faroq_shah_banam","karaya_dokan_banam","karaya_dokan_receive",
                     // All Vendor Names
-                    "petrol_khata", "abdul_shakoor_exchange", "habib_bank_abdul_shakoor",'hbl_m_waqas_jama','ubl_m_waqas_jama',
-                    "dawaj_khareed", "angro_fertilizer", "fouji_fertilizer",
+                    "petrol_khata", "abdul_shakoor_exchange", "habib_bank_abdul_shakoor",'hbl_m_waqas_jama','ubl_m_waqas_jama','gandum_khareed_khata_receive',
+                    "dawaj_khareed", "angro_fertilizer", "fouji_fertilizer","np_khareed",
                     "fatima_flink_ventilators", "wilkan_center_cotton", "tcs_tcs_wadha",
                     "nmlf", "abl_ka", "ubl_waqas", "mcb_ka","mcb_ka_jama", "bank_al_habib_ka",
                     "bop_card_loss", "hbl_m_waqas", "abdul_shakoor_habib_bank",
                     "sarhad_punjab_cash", "alfalah_bank_card", "tameerat_khata",
                     "tameerat_khata", "imported_pura_khata", "bop_bank",
-                    "sonehri_bank", "askari_bank", "amanat_bank", "baghban_chemical","salries_banam",
+                    "sonehri_bank", "askari_bank", "amanat_bank", "baghban_chemical","salries_banam","gandum_khareed_khata",
 
                     // Additional Vendors (Last Image)
                     "wilkan_chemicals", "swat_agro_chemicals", "agro_lux",

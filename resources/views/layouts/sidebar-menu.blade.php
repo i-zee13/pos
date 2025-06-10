@@ -91,18 +91,18 @@
       <ul class="navbar-nav ">
         <li class="nav-item">
           <a class="nav-link collapsed" href="#sidebarclient" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarclient">
-            <i class="fa fa-briefcase" aria-hidden="true"></i> Clients
+            <i class="fa fa-users" aria-hidden="true"></i> Clients
           </a>
           <div class="collapse" id="sidebarclient">
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
                 <a href="{{route('vendors.index')}}" class="nav-link ">
-                  Vendors
+                  <i class="fa fa-user" aria-hidden="true"></i>  Vendors
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('customer.index')}}" class="nav-link ">
-                  Customers
+                   <i class="fa fa-user" aria-hidden="true"></i> Customers
                 </a>
               </li>
             </ul>
@@ -126,16 +126,19 @@
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
                 <a href="{{route('company.index')}}" class="nav-link ">
+                   <i class="fa fa-book" aria-hidden="true"></i> 
                   Companies
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('products')}}" class="nav-link ">
+                   <i class="fa fa-codepen" aria-hidden="true"></i> 
                   Products
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('change-price')}}" class="nav-link ">
+                   <i class="fa fa-refresh" aria-hidden="true"></i> 
                   Change Price
                 </a>
               </li>
@@ -152,16 +155,19 @@
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
                 <a href="{{route('stock-add')}}" class="nav-link add-new-purchase">
+                   <i class="fa fa-shopping-cart" aria-hidden="true"></i> 
                   Add New
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('purchases')}}" class="nav-link ">
+                   <i class="fa fa-shopping-bag" aria-hidden="true"></i> 
                   List
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#sidebarPurchaseReturnDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarPurchaseReturnDropDown">
+                   <i class="fa fa-minus-square" aria-hidden="true"></i> 
                   Returns
                 </a>
                 <div class="collapse" id="sidebarPurchaseReturnDropDown" style="">
@@ -194,11 +200,13 @@
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
                 <a href="{{route('sale-add')}}" class="nav-link add-new-sale">
+                   <i class="fa fa-shopping-cart" aria-hidden="true"></i> 
                   Add New
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('sales')}}" class="nav-link ">
+                   <i class="fa fa-shopping-bag" aria-hidden="true"></i> 
                   Today List
                 </a>
               </li>
@@ -209,17 +217,20 @@
               </li>
               <li class="nav-item">
                 <a href="#sidebarSaleReturnDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSaleReturnDropDown">
+                   <i class="fa fa-minus-square" aria-hidden="true"></i> 
                   Returns
                 </a>
                 <div class="collapse" id="sidebarSaleReturnDropDown" style="">
                   <ul class="nav nav-sm flex-column">
                     <li class="nav-item">
                       <a href="{{route('salereturn.create')}}" class="nav-link add-sale-return">
+                     
                         Add New
                       </a>
                     </li>
                     <li class="nav-item">
                       <a href="{{route('salereturn.index')}}" class="nav-link ">
+                       
                         List
                       </a>
                     </li>
@@ -229,17 +240,20 @@
               </li>
               <li class="nav-item">
                 <a href="#sidebarProductReplacementDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProductReplacementDropDown">
+                   <i class="fa fa-repeat" aria-hidden="true"></i> 
                   Replacements
                 </a>
                 <div class="collapse" id="sidebarProductReplacementDropDown" style="">
                   <ul class="nav nav-sm flex-column">
                     <li class="nav-item">
                       <a href="{{route('ProductReplacement.create')}}" class="nav-link add-replacement">
+                   <i class="fa fa-check-square" aria-hidden="true"></i> 
                         Add New
                       </a>
                     </li>
                     <li class="nav-item">
                       <a href="{{route('ProductReplacement.index')}}" class="nav-link ">
+                   <i class="fa fa-check-square" aria-hidden="true"></i> 
                         List
                       </a>
                     </li>
@@ -262,6 +276,7 @@
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
                 <a href="#sidebarCustomerLedger" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarCustomerLedger">
+                   <i class="fa fa-users" aria-hidden="true"></i> 
                   Customers
                 </a>
                 <div class="collapse" id="sidebarCustomerLedger" style="">
@@ -281,6 +296,7 @@
               </li>
               <li class="nav-item">
                 <a href="#sidebarVendorLedger" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarVendorLedger">
+                   <i class="fa fa-check-square" aria-hidden="true"></i> 
                   Vendors
                 </a>
                 <div class="collapse" id="sidebarVendorLedger" style="">
@@ -300,6 +316,7 @@
               </li>
               <li class="nav-item">
                 <a href="{{route('ledger-purchi')}}" class="nav-link ">
+                   <i class="fa fa-upload" aria-hidden="true"></i> 
                   Bulk Transactions
                 </a>
               </li>
@@ -318,17 +335,20 @@
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
                 <a href="#sidebarStockDropDown" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarStockDropDown">
+                   <i class="fa fa-map" aria-hidden="true"></i> 
                   Stock Report
                 </a>
                 <div class="collapse" id="sidebarStockDropDown" style="">
                   <ul class="nav nav-sm flex-column">
                     <li class="nav-item">
                       <a href="{{route('stock-reports')}}" class="nav-link ">
+                   
                         Expiry Report
                       </a>
                     </li>
                     <li class="nav-item">
                       <a href="{{route('stock-value-report')}}" class="nav-link ">
+                   
                         Value Report
                       </a>
                     </li>
@@ -338,26 +358,31 @@
 
               <li class="nav-item">
                 <a href="{{route('sale-reports')}}" class="nav-link ">
+                   <i class="fa fa-slack" aria-hidden="true"></i> 
                   Sale
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('purchase-reports')}}" class="nav-link ">
+                   <i class="fa fa-sliders" aria-hidden="true"></i> 
                   Purchase
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('profit-reports')}}" class="nav-link ">
+                   <i class="fa fa-check-square" aria-hidden="true"></i> 
                   Profit
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('expense-report')}}" class="nav-link ">
+                   <i class="fa fa-inbox" aria-hidden="true"></i> 
                   Expense
                 </a>
               </li>
                <li class="nav-item">
                 <a href="{{route('ledger')}}" class="nav-link ">
+                   <i class="fa fa-pie-chart" aria-hidden="true"></i> 
                   Daily Ledger
                 </a>
               </li>
@@ -377,16 +402,19 @@
             <ul class="nav nav-sm flex-column">
               <li class="nav-item">
                 <a href="{{route('customer-reports')}}" class="nav-link ">
+                   <i class="fa fa-user" aria-hidden="true"></i> 
                   Customers
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('vendor-reports')}}" class="nav-link ">
+                   <i class="fa fa-check-square" aria-hidden="true"></i> 
                   Vendors
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('product-reports')}}" class="nav-link ">
+                   <i class="fa fa-trello" aria-hidden="true"></i> 
                   Products
                 </a>
               </li>

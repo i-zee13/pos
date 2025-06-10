@@ -106,10 +106,7 @@
             opacity: 0;
         }
 
-        /* .select2 {
-            width: 100% !important;
-            z-index: 999
-        } */
+      
 
         .dz-image img {
             width: 100%;
@@ -206,24 +203,24 @@
             left: 0;right: 0;top: 0;bottom: 0;}
 
             @-webkit-keyframes wcLoading {
-    0% {
-        -webkit-transform: scaleY(0.1);
-        transform: scaleY(0.1);
-        background: var(--white);
-    }
+                0% {
+                    -webkit-transform: scaleY(0.1);
+                    transform: scaleY(0.1);
+                    background: var(--white);
+                }
 
-    50% {
-        -webkit-transform: scaleY(1);
-        transform: scaleY(1);
-        background: #001e35;
-    }
+                50% {
+                    -webkit-transform: scaleY(1);
+                    transform: scaleY(1);
+                    background: #001e35;
+                }
 
-    100% {
-        -webkit-transform: scaleY(0.1);
-        transform: scaleY(0.1);
-        background: transparent;
-    }
-}
+                100% {
+                    -webkit-transform: scaleY(0.1);
+                    transform: scaleY(0.1);
+                    background: transparent;
+                }
+            }
 
 @keyframes wcLoading {
     0% {
@@ -328,6 +325,20 @@
      .navbar-brand-img{ 
             height: 50px !important;
      }
+      .left-sidebox{
+          max-width: 320px !important;
+     }
+     div#btns_div{
+        padding:5px !important;
+     }
+     table.totalValues {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    span.select2-dropdown.select2-dropdown--below{
+            width: 170px !important;
+    }
  }
  .select2-container--open .select2-dropdown--above, .select2-container--open .select2-dropdown--below {
     font-weight: bolder;}
@@ -346,7 +357,7 @@
     <div id="notifDiv">
     </div>
 
-    @if(request()->segment(1) != 'stock-add' && request()->segment(1) != 'purchase-edit' && request()->segment(1) != 'sale-add'
+    @if(request()->segment(1) != 'stock-add' && request()->segment(1) != 'purchase-edit' && request()->segment(1) != 'sale-add' && request()->segment(1) != 'test-sale'
     && request()->segment(1) != 'sale-edit' && request()->segment(1) != 'sale-return' && request()->segment(1) != 'add-return'
     && request()->segment(1) != 'edit-sale-return' && request()->segment(1) != 'product-replacement-create' && request()->segment(1) != 'product-replacement-edit'
     && request()->segment(1) != 'detail' && request()->segment(1) != 'purchase-return-edit' && request()->segment(1) != 'sale-detail')
