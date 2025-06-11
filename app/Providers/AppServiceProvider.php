@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Organization;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\URL;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -32,5 +33,8 @@ class AppServiceProvider extends ServiceProvider
             'organization'              =>  $organization,
             'developer'                 =>  "Storeeo.App +92-333-6701313",
         ]);
+
+        // Set the default tenant for URL generation
+        // URL::defaults(['tenant' => request()->route('tenant')]);
     }
 }

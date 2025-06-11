@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Route as FacadesRoute;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -111,6 +112,7 @@ class CustomerController extends Controller
     }
     public function getCustomers(Request $request)
     { 
+        dd(DB::connection()->getDatabaseName());
         if($request->route == 'vendors'){
             $customers = Customer::where('customer_type',1)->get();
         }else{

@@ -562,6 +562,9 @@
         }
     </script>
     <script src="{{asset('/js/custom/master.js')}}"> </script>
+    <script>
+        const currentTenant = "{{ request()->route('tenant') }}";
+    </script>
 </body>
 
 </html>

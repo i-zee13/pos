@@ -49,7 +49,7 @@
         </p>
 
         <!-- Form -->
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('login', ['tenant' => $tenant]) }}">
           @csrf
 
           <!-- Email address -->
@@ -83,11 +83,7 @@
 
               </div>
               <div class="col-auto">
-                @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="form-text small text-muted">
-                  {{ __('Forgot Your Password?') }}
-                </a>
-                @endif
+              
               </div>
             </div>
             <!-- Input group -->
@@ -115,12 +111,8 @@
             {{ __('Sign In') }}
           </button>
 
-          <!-- Link -->
-          <!--<div class="text-center">-->
-          <!--  <small class="text-muted text-center">-->
-          <!--    Don't have an account yet? <a href="{{ route('password.request') }}">Sign up</a>.-->
-          <!--  </small>-->
-          <!--</div>-->
+         
+        
 
         </form>
 
@@ -128,7 +120,7 @@
       <div class="col-12 col-md-7 col-lg-6 col-xl-8 d-none d-lg-block">
 
         <!-- Image -->
-        <div class="bg-cover h-100 min-vh-100 mt-n1 me-n3" style="background-image: url(assets/images/auth-side-cover.avif); z-index = 1;opacity: 0.5;"></div>
+        <div class="bg-cover h-100 min-vh-100 mt-n1 me-n3" style="background-image: url(assets/images/auth-side-cover.avif); z-index: 1;opacity: 0.5;"></div>
 
       </div>
     </div> <!-- / .row -->

@@ -17514,7 +17514,8 @@ $(document).on('click', '.remove_btn', function () {
         var thisRef = $(_this);
         deleteRef.attr('disabled', 'disabled');
         deleteRef.text('Processing...');
-        $.ajax({
+        if(sale_invoice_id > 0){
+           $.ajax({
           type: 'DELETE',
           url: '/delete-product-from-sale',
           data: {
@@ -17553,6 +17554,8 @@ $(document).on('click', '.remove_btn', function () {
             }
           }
         });
+        }
+       
       }
     });
   } else {
