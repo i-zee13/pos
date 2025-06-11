@@ -17503,7 +17503,7 @@ $(document).on('click', '.remove_btn', function () {
   var sale_invoice_id = $(this).attr('data-id');
   var product_invoice_id = $(this).attr('data-product-invoice');
   var q = $(this).attr('data-quantity');
-  if (segments[3] == 'sale-edit' && sale_invoice_id != undefined) {
+  if (segments[3] == 'sale-edit' && sale_invoice_id != undefined  && sale_invoice_id > 0) {
     sweetalert__WEBPACK_IMPORTED_MODULE_1___default()({
       title: "Are you sure?",
       icon: "warning",

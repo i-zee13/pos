@@ -179,7 +179,7 @@
      var product_invoice_id = $(this).attr('data-product-invoice');
 
      var q = $(this).attr('data-quantity');
-     if (segments[3] == 'sale-edit' && sale_invoice_id != undefined) {
+     if (segments[3] == 'sale-edit' && sale_invoice_id != undefined && sale_invoice_id > 0) {
          swal({
                  title: "Are you sure?",
                  icon: "warning",
