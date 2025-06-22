@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\PostalCode;
 use App\Models\Organization;
 use App\Models\OrganizationLocation;
@@ -14,12 +15,15 @@ class OrganizationController extends Controller
    public function index(Request $r)
    {
 
-      $data           =  Organization::leftjoin('postal_codes', 'organization.postal_code_id', '=', 'postal_codes.id')
-         ->select('organization.*', 'postal_codes.postal_code')->first();
-      return view('organization.index', compact('data'));
+      $data       =  Organization::leftjoin('postal_codes', 'organization.postal_code_id', '=', 'postal_codes.id')->select('organization.*', 'postal_codes.postal_code')->first();
+     
+      $vendors    = Customer::where('customer_type',1)->get();
+      $custs      = Customer::where('customer_type',2)->get();
+      return view('organization.index', compact('data','vendors','custs'));
    }
    public function store(Request $request)
    {
+       
 
       $regex = '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/';
       $validator       =   $this->validate($request, [
@@ -69,6 +73,20 @@ class OrganizationController extends Controller
             ]);
          }
       }
+      $customers = Customer::whereIn('id', $request->customers)
+                              ->select('id', 'customer_name')
+                              ->get()
+                              ->mapWithKeys(function ($customer) {
+                                 return [$customer->id => preg_replace('/[^a-z0-9]/', 'and', strtolower($customer->customer_name))];
+                              })
+                              ->toJson();
+      $vendors = Customer::whereIn('id', $request->vendors)
+                              ->select('id', 'customer_name')
+                              ->get()
+                              ->mapWithKeys(function ($vendor) {
+                                 return [$vendor->id => preg_replace('/[^a-z0-9]/', 'and', strtolower($vendor->customer_name))];
+                              })
+                              ->toJson(); 
       $data->name             =   $request->name;
       $data->phone_number     =   $request->phone_number;
       $data->fb_link          =   $request->fb_link;
@@ -81,7 +99,8 @@ class OrganizationController extends Controller
       $data->country_id       =   $request->country_id;
       $data->state_id         =   $request->state_id;
       $data->city_id          =   $request->city_id;
-
+      $data->vendors          =   $vendors;
+      $data->customers        =   $customers;
       $data->created_at       =    date('Y-m-d H:i:s');
       $data->created_by       =    Auth::user()->id;
       $data->updated_by       =    Auth::user()->id;

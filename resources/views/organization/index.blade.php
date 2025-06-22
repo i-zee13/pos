@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<link rel="stylesheet" type="text/css" href="{{asset('/css/fselect.css')}}">
 <style>
   .pt-7 {
     padding-top: 7px !important
@@ -314,6 +315,38 @@
                     @endif
 
 
+                    <div class="header w-100  ">
+                      <h2>DSR <span>Filters</span></h2>
+                    </div>
+                    <div class="col-4 posm_list">
+                      <label class="font12 mb-5">Select Vendors</label>
+                      <div class="form-group" style="height: auto">
+                        <select class="reports-select posm_list_select" placeholder="Select POSM" style="width: 100%" name="vendors[]" id="vendors" multiple="multiple">
+                          @foreach($vendors as $vendor)  
+                          <option value="{{ $vendor->id }}" class="posm-list"
+                                @if($data && $data->vendors && in_array($vendor->id, array_keys(json_decode($data->vendors, true) ?? []))) 
+                                      selected 
+                                  @endif
+                          >{{$vendor->id}}- {{ $vendor->customer_name }}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-4 posm_list">
+                      <label class="font12 mb-5">Select Customers</label>
+                      <div class="form-group" style="height: auto">
+                        <select class="reports-select posm_list_select" placeholder="Select POSM" style="width: 100%" name="customers[]" id="customers" multiple="multiple">
+                          <option value="0">All Entities</option>
+                          @foreach($custs as $cust)
+                              <option value="{{ $cust->id }}" class="posm-list" 
+                                  @if($data && $data->customers && in_array($cust->id, array_keys(json_decode($data->customers, true) ?? []))) 
+                                      selected 
+                                  @endif
+                              >{{ $cust->customer_name }}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                    </div>
 
 
                   </div>
@@ -353,7 +386,14 @@
 </div>
 @endsection
 @push('js')
+<script src="{{asset('js/fselect.js')}}"></script>
 <script src="{{asset('js/custom/organization.js')}}">
 </script>
-
+<script>
+  (function($) {
+    $(function() {
+      window.fs_test = $('.reports-select').fSelect();
+    });
+  })(jQuery);
+</script>
 @endpush

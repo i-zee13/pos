@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
+use App\Models\Organization;
 use App\Models\Product;
 use App\Models\ProductSale;
 use App\Models\Stock;
@@ -17,6 +18,10 @@ use stdClass;
 require app_path('Invoice_helper.php');
 class ReportsController extends Controller
 {
+   public $organization;
+   public function __construct(Organization $organization) {
+      $this->organization = $organization->first();
+   }
 
    public function customerReport()
    {
@@ -554,7 +559,8 @@ class ReportsController extends Controller
       $companies  =   Company::select('id', 'company_name')->get();
       $products   =   Product::select('id', 'product_name')->get();
       $customers  =   Customer::select('id', 'customer_name')->where('customer_type', 2)->get();
-      return view('reports.admin-sale-close', compact(['companies', 'products', 'customers']));
+      $organization = $this->organization;
+      return view('reports.admin-sale-close', compact(['companies', 'products', 'customers','organization']));
    }
     public function adminSaleCloseRecord($closing_date)
    {
@@ -583,66 +589,66 @@ class ReportsController extends Controller
       //Opening Balnce
       $records->openning_balance       =  collect($customer_payment)->WHERE('customer_id', 170)->WHERE('trx_type', 3)->SUM('cr');
 
-      $records->dawai    = collect($saleRecords['sales'])->whereIn('company_id', [35, 36])->sum('sale_total_amount');
-      $records->dawai_qty = collect($saleRecords['sales'])->whereIn('company_id', [35, 36])->sum('qty');
+      $records->dawai      = collect($saleRecords['sales'])->whereIn('company_id', [35, 36])->sum('sale_total_amount');
+      $records->dawai_qty  = collect($saleRecords['sales'])->whereIn('company_id', [35, 36])->sum('qty');
 
-      $records->beej     = collect($saleRecords['sales'])->whereIn('company_id', [14, 60])->sum('sale_total_amount');
-      $records->beej_qty = collect($saleRecords['sales'])->whereIn('company_id', [14, 60])->sum('qty');
+      $records->beej       = collect($saleRecords['sales'])->whereIn('company_id', [14, 60])->sum('sale_total_amount');
+      $records->beej_qty   = collect($saleRecords['sales'])->whereIn('company_id', [14, 60])->sum('qty');
 
-      $records->gandom   = collect($saleRecords['sales'])->whereIn('company_id', [39])->sum('sale_total_amount');
+      $records->gandom     = collect($saleRecords['sales'])->whereIn('company_id', [39])->sum('sale_total_amount');
       $records->gandom_qty = collect($saleRecords['sales'])->whereIn('company_id', [39])->sum('qty');
 
-      $records->kapas    = collect($saleRecords['sales'])->whereIn('company_id', [40])->sum('sale_total_amount');
-      $records->kapas_qty = collect($saleRecords['sales'])->whereIn('company_id', [40])->sum('qty');
+      $records->kapas      = collect($saleRecords['sales'])->whereIn('company_id', [40])->sum('sale_total_amount');
+      $records->kapas_qty  = collect($saleRecords['sales'])->whereIn('company_id', [40])->sum('qty');
 
-      $records->dhaan    = collect($saleRecords['sales'])->whereIn('company_id', [41])->sum('sale_total_amount');
-      $records->dhaan_qty = collect($saleRecords['sales'])->whereIn('company_id', [41])->sum('qty');
+      $records->dhaan      = collect($saleRecords['sales'])->whereIn('company_id', [41])->sum('sale_total_amount');
+      $records->dhaan_qty  = collect($saleRecords['sales'])->whereIn('company_id', [41])->sum('qty');
 
-      $records->dap_25kg = collect($saleRecords['sales'])->whereIn('company_id', [42])->sum('sale_total_amount');
+      $records->dap_25kg   = collect($saleRecords['sales'])->whereIn('company_id', [42])->sum('sale_total_amount');
       $records->dap_25kg_qty = collect($saleRecords['sales'])->whereIn('company_id', [42])->sum('qty');
 
-      $records->dap      = collect($saleRecords['sales'])->whereIn('company_id', [4])->sum('sale_total_amount');
-      $records->dap_qty = collect($saleRecords['sales'])->whereIn('company_id', [4])->sum('qty');
+      $records->dap        = collect($saleRecords['sales'])->whereIn('company_id', [4])->sum('sale_total_amount');
+      $records->dap_qty    = collect($saleRecords['sales'])->whereIn('company_id', [4])->sum('qty');
 
         $records->dap      = collect($saleRecords['sales'])->whereIn('company_id', [4])->sum('sale_total_amount');
-        $records->dap_r      = collect($saleRecords['sale_returns'])->whereIn('company_id', [4])->sum('return_total_amount');
-        $records->dap_qty_r = collect($saleRecords['sale_returns'])->whereIn('company_id', [4])->sum('qty');
+        $records->dap_r    = collect($saleRecords['sale_returns'])->whereIn('company_id', [4])->sum('return_total_amount');
+        $records->dap_qty_r= collect($saleRecords['sale_returns'])->whereIn('company_id', [4])->sum('qty');
 
 
-$records->dap =$records->dap - $records->dap_r;
- $records->dap_qty =  $records->dap_qty- $records->dap_qty_r;
-      $records->urea            = collect($saleRecords['sales'])->whereIn('company_id', [3])->sum('sale_total_amount');
-      $records->urea_return     = collect($saleRecords['sale_returns'])->whereIn('company_id', [3])->sum('return_total_amount');
+      $records->dap        =  $records->dap - $records->dap_r;
+      $records->dap_qty    =  $records->dap_qty- $records->dap_qty_r;
+      $records->urea       = collect($saleRecords['sales'])->whereIn('company_id', [3])->sum('sale_total_amount');
+      $records->urea_return= collect($saleRecords['sale_returns'])->whereIn('company_id', [3])->sum('return_total_amount');
       
-      $records->urea = $records->urea - $records->urea_return;
-      $records->urea_qty = collect($saleRecords['sales'])->whereIn('company_id', [3])->sum('qty') ?? 0;
+      $records->urea       = $records->urea - $records->urea_return;
+      $records->urea_qty   = collect($saleRecords['sales'])->whereIn('company_id', [3])->sum('qty') ?? 0;
       $records->urea_qty_r = collect($saleRecords['sale_returns'])->whereIn('company_id', [3])->sum('qty') ?? 0;
 
-      $records->urea_qty = $records->urea_qty - $records->urea_qty_r;
+      $records->urea_qty   = $records->urea_qty - $records->urea_qty_r;
 
-      $records->can      = collect($saleRecords['sales'])->whereIn('company_id', [5])->sum('sale_total_amount');
-      $records->can_qty = collect($saleRecords['sales'])->whereIn('company_id', [5])->sum('qty');
+      $records->can        = collect($saleRecords['sales'])->whereIn('company_id', [5])->sum('sale_total_amount');
+      $records->can_qty    = collect($saleRecords['sales'])->whereIn('company_id', [5])->sum('qty');
 
-      $records->np       = collect($saleRecords['sales'])->whereIn('company_id', [6])->sum('sale_total_amount');
-      $records->np_qty = collect($saleRecords['sales'])->whereIn('company_id', [6])->sum('qty');
+      $records->np         = collect($saleRecords['sales'])->whereIn('company_id', [6])->sum('sale_total_amount');
+      $records->np_qty     = collect($saleRecords['sales'])->whereIn('company_id', [6])->sum('qty');
 
-      $records->ssp      = collect($saleRecords['sales'])->whereIn('company_id', [7])->sum('sale_total_amount');
-      $records->ssp_qty = collect($saleRecords['sales'])->whereIn('company_id', [7])->sum('qty');
+      $records->ssp        = collect($saleRecords['sales'])->whereIn('company_id', [7])->sum('sale_total_amount');
+      $records->ssp_qty    = collect($saleRecords['sales'])->whereIn('company_id', [7])->sum('qty');
 
-      $records->zarkhez  = collect($saleRecords['sales'])->whereIn('company_id', [8])->sum('sale_total_amount');
+      $records->zarkhez    = collect($saleRecords['sales'])->whereIn('company_id', [8])->sum('sale_total_amount');
       $records->zarkhez_qty = collect($saleRecords['sales'])->whereIn('company_id', [8])->sum('qty');
 
-      $records->sop      = collect($saleRecords['sales'])->where('company_id', 9)->sum('sale_total_amount');
-      $records->sop_qty = collect($saleRecords['sales'])->where('company_id', 9)->sum('qty');
+      $records->sop        = collect($saleRecords['sales'])->where('company_id', 9)->sum('sale_total_amount');
+      $records->sop_qty    = collect($saleRecords['sales'])->where('company_id', 9)->sum('qty');
 
-      $records->jimsam   = collect($saleRecords['sales'])->where('company_id', 10)->sum('sale_total_amount');
+      $records->jimsam     = collect($saleRecords['sales'])->where('company_id', 10)->sum('sale_total_amount');
       $records->jimsam_qty = collect($saleRecords['sales'])->where('company_id', 10)->sum('qty');
 
-      $records->sm_urea  = collect($saleRecords['sales'])->where('company_id', 11)->sum('sale_total_amount');
+      $records->sm_urea    = collect($saleRecords['sales'])->where('company_id', 11)->sum('sale_total_amount');
       $records->sm_urea_qty = collect($saleRecords['sales'])->where('company_id', 11)->sum('qty');
 
-      $records->mop      = collect($saleRecords['sales'])->where('company_id', 12)->sum('sale_total_amount');
-      $records->mop_qty = collect($saleRecords['sales'])->where('company_id', 12)->sum('qty');
+      $records->mop        = collect($saleRecords['sales'])->where('company_id', 12)->sum('sale_total_amount');
+      $records->mop_qty    = collect($saleRecords['sales'])->where('company_id', 12)->sum('qty');
 
       $ttl_sale                  = collect($saleRecords['sales'])->SUM('sale_total_amount');
     
@@ -689,8 +695,8 @@ $records->dap =$records->dap - $records->dap_r;
       // dd($saleRecords['sales']); 
       // $records->mutafirq_udhar_receive       =  collect($customer_payment)->whereNotIn('customer_id',[5, 8, 97, 170,48])->SUM('cr');
       $records->mutafirq_udhar_receive          =  collect($customer_payment)->whereNotIn('customer_id',[5,8,49,97,105,107,113,115,126,145,157,170,48,242])->SUM('cr');
+     
       $records->ilyas_bakhtawar                 =  collect($customer_payment)->where('customer_id',105)->SUM('cr');
-    
       $records->fazul_qadir_receive             =  collect($customer_payment)->where('customer_id',48)->SUM('cr');
       $records->shafiq_karyana_receive          =  collect($customer_payment)->where('customer_id',49) ->sum('cr');
       $records->abdul_ghaffar_ghar_receive      =  collect($customer_payment)->where('customer_id',107)->sum('cr');
@@ -700,9 +706,10 @@ $records->dap =$records->dap - $records->dap_r;
       $records->sir_murtaza_sahib_receive       =  collect($customer_payment)->where('customer_id',157)->sum('cr');
       $records->master_khalid_faroq_shah_receive=  collect($customer_payment)->where('customer_id',242)->sum('cr');
       $records->karaya_dokan_receive            =  collect($customer_payment)->where('customer_id',115)->SUM('cr');
-      $records->gandum_khareed_khata_receive   =  collect($customer_payment)->where('customer_id',115)->SUM('cr');
+      $records->gandum_khareed_khata_receive    =  collect($customer_payment)->where('customer_id',115)->SUM('cr');
         
       $records->mutafariq_udhar_banam          =  collect($customer_payment)->whereNotIn('customer_id',[5,8,49,97,114,115,356,107,113,126,145,157,170,48,242,413])->SUM('dr');
+      
       $records->salries_banam                  =  collect($customer_payment)->where('customer_id',114)->SUM('dr'); 
       $records->fazul_qadir_banam              =  collect($customer_payment)->where('customer_id',48)->SUM('dr'); 
       $records->shafiq_karyana_banam           =  collect($customer_payment)->where('customer_id',49) ->sum('dr');
@@ -740,7 +747,7 @@ $records->dap =$records->dap - $records->dap_r;
       306 => "bop_card_loss",
       311 => "hbl_m_waqas",
       312 => "abdul_shakoor_habib_bank",
-      315 => "sarhad_punjab_cash",
+      315 => "sarhad_punjab_guds",
       323 => "alfalah_bank_card",
       340 => "tameerat_khata",
       343 => "baghban_chemical",
@@ -761,25 +768,30 @@ $records->dap =$records->dap - $records->dap_r;
       29  => "advance_agro_tech",
       413 => "gandum_khareed_khata"
   ];
-     $ttl_vendror_dr = 0;
-     // Sum DR values for each vendor dynamically
-     foreach ($vendors as $vendor_id => $column_name) {
+        
+      $vendors_data = json_decode($this->organization->vendors, true);
+      $records->vendors = array_values($vendors_data); // Just the names
+      $ttl_vendror_dr = 0;
+     $vendors_data = $vendors;
+      // Sum DR values for each vendor dynamically
+      foreach ($vendors_data as $vendor_id => $column_name) {
          $records->$column_name = collect($vendor_payment)->where('vendor_id', $vendor_id)->sum('dr');
-         $ttl_vendror_dr +=  $records->$column_name;
-        
-     }  
-     $records->mcb_ka_jama = collect($vendor_payment)->where('vendor_id', 288)->sum('cr');
-     $records->mcb_ka = collect($vendor_payment)->where('vendor_id', 288)->sum('dr');
-     $records->beej_khareed = collect($vendor_payment)->where('vendor_id', 28)->where('trx_type', 3)->sum('dr');
-     // Sum DR values for all non-excluded vendors
-     $records->ttl_purchase_dr = collect($vendor_payment) ->whereNotIn('vendor_id', $excluded_vendors)->where('trx_type', 3) ->sum('dr'); 
-         
-        
-      $records->open_khad           =  collect($customer_payment)->where('customer_id',356)->SUM('dr');
+      // dump( $records->$column_name);
+          $ttl_vendror_dr +=  $records->$column_name;
+      }  
+      // dump($ttl_vendror_dr);
+     $records->open_khad            =  collect($customer_payment)->where('customer_id',356)->SUM('dr');
+     
+     
+     
+     
+     $records->beej_khareed         = collect($vendor_payment)->where('vendor_id', 28)->where('trx_type', 3)->sum('dr');
+     $records->mcb_ka_jama          = collect($vendor_payment)->where('vendor_id', 288)->sum('cr');
+     $records->hbl_m_waqas_jama     =  collect($vendor_payment)->where('vendor_id', 311)->WHERE('trx_type', 3)->sum('cr'); 
+     $records->ubl_m_waqas_jama     =  collect($vendor_payment)->where('vendor_id', 285)->WHERE('trx_type', 3)->sum('cr');     
+     
+     $records->ttl_purchase_dr      = collect($vendor_payment) ->whereNotIn('vendor_id', $excluded_vendors)->where('trx_type', 3) ->sum('dr'); 
       $records->ttl_purchase_cr     =  collect($vendor_payment)->whereNotIn('vendor_id', [7,311,285,288])->WHERE('trx_type', 3)->sum('cr'); 
-      $records->hbl_m_waqas_jama    =  collect($vendor_payment)->where('vendor_id', 311)->WHERE('trx_type', 3)->sum('cr'); 
-      $records->ubl_m_waqas_jama    =  collect($vendor_payment)->where('vendor_id', 285)->WHERE('trx_type', 3)->sum('cr');     
-
       $records->customer_banam      = collect([
                                                 $records->fazul_qadir_banam,
                                                 $records->shafiq_karyana_banam,
@@ -817,7 +829,7 @@ $records->dap =$records->dap - $records->dap_r;
     //   dd($ttl_sale,$total_categorized_sales,$records->total_invoice_discount);
       $records->mutafirq_sody = $ttl_sale - $total_categorized_sales; 
       $records->ttl_in        = $records->ilyas_bakhtawar+ $ttl_sale + $records->openning_balance + $records->mutafirq_udhar_receive + $records->customer_receive + $records->ubl_m_waqas_jama + $records->hbl_m_waqas_jama + $records->karaya_dokan_receive + $records->mcb_ka_jama;
-      $records->ttl_out       = $ttl_vendror_dr + ($records->ttl_purchase_dr - $records->ttl_purchase_cr + $records->open_khad ) +  $records->mutafariq_udhar_banam +   $records->expense   + $records->beej_khareed + $records->customer_banam + $records->karaya_dokan_banam + $records->salries_banam + $records->mcb_ka;
+      $records->ttl_out       = $ttl_vendror_dr + ($records->ttl_purchase_dr - $records->ttl_purchase_cr + $records->open_khad ) +  $records->mutafariq_udhar_banam +   $records->expense   + $records->beej_khareed + $records->customer_banam + $records->karaya_dokan_banam + $records->salries_banam ;
       
       $records->sody_khareed  = ($records->ttl_purchase_dr - $records->ttl_purchase_cr + $records->open_khad); 
     //  dd($records->sody_khareed, 'ttl vendor dr : '. $ttl_vendror_dr , 'ttl purchase dr : '. $records->ttl_purchase_dr , 'ttl purchase cr : '.$records->ttl_purchase_cr, 'open khad  : '. $records->open_khad , 'mutafariq udhar banam : '.  $records->mutafariq_udhar_banam ,  'Expense : '. $records->expense  , 'Return : '. $records->total_net_sale_returns   , 'beej : '. $records->beej_khareed, 'customer banam : '. $records->customer_banam);

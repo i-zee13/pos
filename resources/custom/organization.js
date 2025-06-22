@@ -9,7 +9,7 @@ let error_url;
 
 $(document).ready(function () {
     geographical_data();
-    getLocation();
+    // getLocation();
     $(".save_form").on('click', function () {
 
         let dirty = false;
@@ -98,6 +98,8 @@ $(document).ready(function () {
         //     }, 3000);
         //     return;
         // }
+    //add code for appending selected customers
+
         $('#form').ajaxSubmit({
             type: 'post',
             url: '/organization/store',
@@ -303,7 +305,7 @@ $(document).ready(function () {
                     $('input[name="longitude"]').val('');
                     $('input[name="location_postal_code_id"]').val('');
 
-                    getLocation();
+                    // getLocation();
                     closeSidebar();
                 }
             },
@@ -501,11 +503,11 @@ $(document).ready(function () {
                         setTimeout(() => {
                             $('#notifDiv').fadeOut();
                         }, 3000);
-                        getLocation();
+                        // getLocation();
                     }
                 });
             } else {
-                getLocation();
+                // getLocation();
             }
         });
     })

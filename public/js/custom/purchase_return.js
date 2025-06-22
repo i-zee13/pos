@@ -736,18 +736,17 @@ function grandSum() {
   var service_charges = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   var discount = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
   var sum = 0;
-   var grandQty = 0;
-    var productTotal = 0;
-    returns_product_array.forEach(function (data, key) {
-        productTotal++;
-        sum += parseFloat(data.amount)
-        grandQty += parseFloat(data.qty);
-    });  
-     console.log(productTotal);
-     $('.product_net_total').val(sum.toFixed(2));
-     $('#total_qtys').html(grandQty.toFixed(2));
-     $('#total_items').html(productTotal);
-   
+  var grandQty = 0;
+  var productTotal = 0;
+  returns_product_array.forEach(function (data, key) {
+    productTotal++;
+    sum += parseFloat(data.amount);
+    grandQty += parseFloat(data.qty);
+  });
+  console.log(productTotal);
+  $('.product_net_total').val(sum.toFixed(2));
+  $('#total_qtys').html(grandQty.toFixed(2));
+  $('#total_items').html(productTotal);
   $('.product_net_total').val(sum);
   sum -= parseFloat(previous_payable);
   sum += parseFloat(service_charges ? service_charges : 0);
