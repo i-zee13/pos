@@ -298,18 +298,20 @@ class ProductReplacementController extends Controller
     public function deleteInvoice(Request $request)
     {
         $invoice_products   =  ProductReplacement::where('product_replacement_invoice_id', $request->id)->get();
-        if($invoice_products){
-            foreach($invoice_products as $product){ 
+        if($invoice_products){ 
+            foreach($invoice_products as $key => $product){ 
                 $vs     = VendorStock::where('product_replacement_invoice_id', $product->product_replacement_invoice_id)
                                         ->where('product_id', $product->product_id)
                                          ->orderBy('id', 'DESC')
                                         ->first();
                 if ($vs) {
                     $vs->actual_qty     =   $product->qty; 
-                    $product_type       =   $product->product_type; 
-                    $invoice_type       =   $product_type ==  1 ? 'purchase' : 'sale';
-                    $v_stock            = updateStock($vs, $vs->balance, $product->qty, $product_type, $invoice_type, 5);
-                    BatchWiseDeleteProduct($product->product_replacement_invoice_id, $product->id, $product->qty, $product_type, 5);
+                    $product_type       =   $product->product_type == 1 ? 2 : 1; 
+                    $invoice_type       =   $product_type ==  1 ? 'sale' : 'purchae'; 
+                    $current_balance    =   VendorStock::where('product_id', $product->product_id)->orderBy('id', 'DESC')->value('balance');
+
+                    $v_stock            =   updateStock($vs, $current_balance, $product->qty, $product_type, 'replacement', 5);
+                    BatchWiseDeleteProduct($product->product_replacement_invoice_id, $product, $product->qty, $product_type, 5);
                     StockManagment($v_stock->id, $vs, $product->qty, $product_type, $invoice_type);
                     if ($v_stock) {
                         Product::where('id', $v_stock->product_id)->update([
@@ -318,10 +320,11 @@ class ProductReplacementController extends Controller
                         
                     }  
                 }
-             }
-            ProductReplacement::where('product_replacement_invoice_id', $product->product_replacement_invoice_id)
+                 ProductReplacement::where('product_replacement_invoice_id', $product->product_replacement_invoice_id)
                                     ->where('product_id', $product->product_id)->where('qty', $product->qty)
                                     ->delete();
+             }
+           
             ProductReplacementInvoice::where('id',$request->id)->delete(); 
             return response()->json([
                 'msg'       => 'product removed',
