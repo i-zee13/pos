@@ -559,7 +559,7 @@ class ReportsController extends Controller
     public function adminSaleCloseRecord($closing_date)
    {
       $request                         =  "";
-      // $closing_date                    =  "2025-06-21";
+      // $closing_date                    =  "2025-06-24";
       // $closing_date                    =  "2023-10-07";
       $saleRecords                     =  $this->SaleReportRecords($request, $closing_date, 1);
 // dd(collect($saleRecords['sales'])->sum('sale_total_amount'));
@@ -570,7 +570,9 @@ class ReportsController extends Controller
                                              trx_type
                                           ")
                                           ->whereRaw("DATE(created_at) = '$closing_date' AND  is_deleted = 0
-                                          ")->get();
+                                          ")->whereNotIn('customer_id',[5,8,49,97,114,115,356,107,113,126,145,157,170,48,242,413])->get();
+                                          
+                                          
       $vendor_payment                  =  DB::table("vendor_ledger")->selectRaw("
                                              customer_id as vendor_id,
                                              IFNULL(cr,0) as cr,
@@ -764,7 +766,7 @@ class ReportsController extends Controller
      $ttl_vendror_dr = 0;
      // Sum DR values for each vendor dynamically
      foreach ($vendors as $vendor_id => $column_name) {
-         $records->$column_name = collect($vendor_payment)->where('vendor_id', $vendor_id)->sum('dr');
+        $records->$column_name = collect($vendor_payment)->where('vendor_id', $vendor_id)->sum('dr');
          $ttl_vendror_dr +=  $records->$column_name;
         
      }  
@@ -802,7 +804,7 @@ class ReportsController extends Controller
                                        ])->sum();
 
       // Sum of all categorized sales
-      $total_categorized_sales   = collect([ 
+      $total_categorized_sales      = collect([ 
                                        $records->dawai,$records->beej, $records->gandom, $records->kapas, $records->dhaan,
                                        $records->dap_25kg, $records->dap, $records->urea, $records->can, $records->np,
                                        $records->ssp, $records->zarkhez, $records->sop, $records->jimsam, 
@@ -819,8 +821,10 @@ class ReportsController extends Controller
       // dd($records->total_net_sale_returns,$records->total_credit_sale_returns);
       // dd($ttl_sale,$total_categorized_sales,$records->mutafirq_sody,$records->mutafirq_sody-$records->total_net_sale_returns);
       $records->ttl_in        = $records->ilyas_bakhtawar + $ttl_sale + $records->openning_balance + $records->mutafirq_udhar_receive + $records->customer_receive + $records->ubl_m_waqas_jama + $records->hbl_m_waqas_jama + $records->karaya_dokan_receive + $records->mcb_ka_jama;
-      $records->ttl_out       = $ttl_vendror_dr + 
-                                 ($records->ttl_purchase_dr - $records->ttl_purchase_cr + $records->open_khad )
+      
+      
+       $records->ttl_out       = $ttl_vendror_dr + 
+                                 ($records->ttl_purchase_dr - $records->ttl_purchase_cr + $records->open_khad)
                                  + $records->mutafariq_udhar_banam 
                                  + $records->expense   
                                  + $records->beej_khareed 
@@ -828,6 +832,18 @@ class ReportsController extends Controller
                                  + $records->karaya_dokan_banam 
                                  + $records->salries_banam 
                                  + $records->mcb_ka;
+                                 
+                        // dd(   $records->ttl_in  - $records->ttl_out ,   $ttl_vendror_dr
+                        //          ,'purhaese dr = '. $records->ttl_purchase_dr 
+                        //          ,'purhchase cr = '. $records->ttl_purchase_cr 
+                        //          ,'open khad = '. $records->open_khad
+                        //          ,'mutafriq udhar = '. $records->mutafariq_udhar_banam 
+                        //          ,'expense = '. $records->expense   
+                        //          ,'beej khared = '. $records->beej_khareed 
+                        //          ,'customer banam = '. $records->customer_banam 
+                        //          ,'karya = '. $records->karaya_dokan_banam 
+                        //          ,'salary = '. $records->salries_banam 
+                        //          ,' = '. $records->mcb_ka);
       
       $records->sody_khareed  = ($records->ttl_purchase_dr - $records->ttl_purchase_cr + $records->open_khad); 
     //  dd($records->sody_khareed, 'ttl vendor dr : '. $ttl_vendror_dr , 'ttl purchase dr : '. $records->ttl_purchase_dr , 'ttl purchase cr : '.$records->ttl_purchase_cr, 'open khad  : '. $records->open_khad , 'mutafariq udhar banam : '.  $records->mutafariq_udhar_banam ,  'Expense : '. $records->expense  , 'Return : '. $records->total_net_sale_returns   , 'beej : '. $records->beej_khareed, 'customer banam : '. $records->customer_banam);

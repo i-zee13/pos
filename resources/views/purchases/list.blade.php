@@ -55,6 +55,7 @@
                         <tr>
                             <th>Invoice #</th>
                             <th>Vendor Name</th>
+                            <th>Description</th>
                             <th>Paid</th>
                             <th>Amount</th>
                             <th>Action</th>
@@ -68,6 +69,7 @@
                         <tr>
                             <td>{{$invoice_first_part}} ({{ $purchase->created_at->format('h:i A') }})</td>
                             <td><b>{{ $purchase->customer_name }}</b></td>
+                            <td>{{$purchase->description}}</td>
                             <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->paid_amount ? $purchase->paid_amount : 0.00}} </td>
                             <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->product_net_total}} </td>
                             <td>

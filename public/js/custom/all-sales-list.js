@@ -43,7 +43,7 @@ $(document).on('click','.search-btn-sales',function(){
 
                             <a id="$sale->id"
                                 class="btn btn-default ${sale.is_editable == 1 ? 'btn-line' : ''}"
-                                href="${sale.is_editable == 1 ? '/sale-edit/'+sale.id : '/sale-detail/'+sale.id}">${sale.is_editable == 1 ? 'Edit' : 'Detail'}</a>
+                                href="/sale-edit/${sale.id}?invoice=detail">${sale.is_editable == 1 ? 'Edit' : 'Detail'}</a>
                             <!-- <a id="${sale.id}" class="btn btn-default " href="route('sale-detail', ['id' => $sale->id])">Detail</a> -->
                             <button id="${sale.id}" data-invoice="${sale.id}"
                                 data-customer-id="${sale.customer_id}"

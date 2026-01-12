@@ -93,16 +93,17 @@ class TransactionController extends Controller
       ]);
    }
    public function store(Request $request)
-   {
-      if ($request->operation == 'vendor') {
+   { 
+        if ($request->operation == 'vendor') {
 
          foreach ($request->hidden_cust_id as $key => $customer) {
-            $balance                =   $request->hidden_cust_balance[$key];
+            $balance             =  VendorLedger::where('customer_id', $customer)->where('is_editable', '!=',1)->orderBy('created_at', 'desc')->value('balance'); 
             if ($request->action == 'edit') {
-               $ledger              =   VendorLedger::where('customer_id', $customer)->where('is_editable', 1)->where('trx_type', 3)->orderBy('created_at', 'desc')->first();
+               $ledger           =   VendorLedger::where('customer_id', $customer)->where('is_editable', 1)->where('trx_type', 3)->orderBy('created_at', 'desc')->first();
             } else {
+               $ledger           =   new VendorLedger();
                isEditable($customer);
-               $ledger              =   new VendorLedger();
+               $balance          =  VendorLedger::where('customer_id', $customer)->where('is_editable', '!=',1)->orderBy('created_at', 'desc')->value('balance'); 
             }
             if ($request->amount_to == 1) {  //1 = CR Ledger-jama
                $ledger->cpv_no   =  getVendorCpvNo();
@@ -120,19 +121,23 @@ class TransactionController extends Controller
             $ledger->comment        =   $request->comment[$key];    //Remarks of Payment
             $ledger->date           =   $request->transaction_date;
             $ledger->created_by     =   Auth::user()->id;
+            $ledger->created_at     = Carbon::now()->addMinutes(11);
             if ($ledger->save()) {
                Customer::where('id', $customer)->update(['balance' => $ledger->balance]);
             }
          }
       } else {
 
-         foreach ($request->hidden_cust_id as $key => $customer) {
-            $balance                =   $request->hidden_cust_balance[$key];
+         foreach ($request->hidden_cust_id as $key => $customer) { 
+            $balance                =  CustomerLedger::where('customer_id', $customer)->where('is_editable', '!=',1)->orderBy('created_at', 'desc')->value('balance');
             if ($request->action == 'edit') {
-               $ledger              = CustomerLedger::where('customer_id', $customer)->where('is_editable', 1)->where('trx_type', 3)->orderBy('created_at', 'desc')->first();
+               $ledger              =   CustomerLedger::where('customer_id', $customer)->where('is_editable', 1)->where('trx_type', 3)->orderBy('created_at', 'desc')->first();
             } else {
                $ledger              =   new CustomerLedger();
                isEditable($customer);
+               CustomerLedger::where('customer_id', $customer)
+                   ->update(['is_editable' => 0]);
+               $balance             =  CustomerLedger::where('customer_id', $customer)->where('is_editable', '!=',1)->orderBy('created_at', 'desc')->value('balance');
             }
             if ($request->amount_to == 1) {     //1 = CR Ledger-jama
                $ledger->crv_no   =  getCrvNo();
@@ -150,6 +155,7 @@ class TransactionController extends Controller
          $ledger->comment     =   $request->comment[$key];    //Remarks of Payment
          $ledger->date        =   $request->transaction_date;
          $ledger->created_by  =   Auth::user()->id;
+         $ledger->created_at     = Carbon::now()->addMinutes(11);
          if ($ledger->save()) {
             // dd($ledger);
             Customer::where('id', $customer)->update(['balance' => $ledger->balance]);
@@ -163,8 +169,7 @@ class TransactionController extends Controller
       ]);
    }
    public function saveTransaction(Request $request)
-   {
-      // dd($request->all());
+   { 
        if($request->type == 'print'){
          $customers = $request->customers;
          return response()->json([
@@ -174,7 +179,7 @@ class TransactionController extends Controller
       }
       foreach ($request->customers as $key => $customer) {
          isEditable($customer['id']);
-         $balance             =     CustomerLedger::where('customer_id', $customer['id'])->where('trx_type', 3)->orderBy('created_at', 'desc')->value('balance');
+         $balance             =     CustomerLedger::where('customer_id', $customer['id'])->orderBy('created_at', 'desc')->value('balance');
          $ledger              =     new CustomerLedger();
          $ledger->crv_no      =     getCrvNo();
          $ledger->balance     =     $customer['balance'] - $customer['receiving_amount'];
@@ -183,7 +188,9 @@ class TransactionController extends Controller
          $ledger->trx_type    =     3;
          $ledger->is_editable =     1;
          $ledger->comment     =     "Bulk";
-         $ledger->date        =     Carbon::now();
+         $ledger->date        =     Carbon::now()->addMinutes(11);
+         $ledger->created_at  =     Carbon::now()->addMinutes(11);
+         
          $ledger->created_by  =     Auth::user()->id;
          if ($ledger->save()) {
             Customer::where('id', $customer['id'])->update(['balance' => $ledger->balance]);

@@ -891,10 +891,10 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td> <input type="text" id="qty" class="inputSale only_numerics qty" placeholder="" name="qty" tabindex="3" min="0"></td>
-                                            <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" readonly></td>
-                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" tabindex="4" min="0"></td>
-                                            <td class='add- S-input ' style="width: 130px;"><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px; width:100%"></td>
+                                            <td><input type="text" id="qty" class="inputSale only_numerics qty" placeholder="" name="qty" tabindex="3" min="0"></td>
+                                            <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" tabindex="4"></td>
+                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" min="0"></td>
+                                            <td class='add- S-input' style="width: 130px;"><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px; width:100%"></td>
                                             <td style="width: 100px;">
                                                 <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5" style="padding: 5px 15px 5px 15px; background:green;width:100%">Add</button>
                                             </td>

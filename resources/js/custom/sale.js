@@ -1,4 +1,5 @@
- import swal from 'sweetalert';
+ import { filter } from 'lodash';
+import swal from 'sweetalert';
 
  var segments = location.href.split('/');
  var queryString = location.search;
@@ -29,8 +30,13 @@
  let invoice_discount = 0;
  let data_variable = '';
  let grand_total = '';
- $(document).ready(function () {
-
+ $(document).ready(function () { 
+    console.log(segments);
+    if (segments[3] == "sale-add") {
+         setTimeout(() => {
+             $('#customer_id').val('8').trigger('change');
+         }, 2000);
+     } 
      $('.parent-div').show();
      $('#tblLoader').hide();
      $('#bar-code').focus();
@@ -38,11 +44,8 @@
      customer_ledger = JSON.parse($('#customer_ledger').val());
      getProducts();
      $('.display').show();
-     if (segments[3] == "sale-add") {
-         setTimeout(() => {
-             $('#customer_id').val('8').trigger('change');
-         }, 2000);
-     } else if (segments[3] == 'sale-edit') {
+     
+      if (segments[3] == 'sale-edit') {
          var is_removable = true;
          if (queryString.includes('invoice=detail')) {
              is_removable = false;
@@ -147,7 +150,7 @@
      $('#bar-code').val('');
      $('.products').val(0).trigger('change');
      $('#new_purchase_price').val('');
-    //  $('#retail_price').val('');
+     $('#retail_price').val(''); 
      $('#discount').val('');
      $('#bar-code').focus();
      data_variable = '';
@@ -515,7 +518,7 @@
              'grand_total': grand_total,
              'sale_total_amount': sale_total_amount,
              'status': 1, //status
-             'sales_product_array': sales_product_array,
+             'sales_product_array': JSON.stringify(sales_product_array),
              'existing_product_ids': existing_product_ids
          },
          success: function (response) {
@@ -580,7 +583,7 @@
              'grand_total': grand_total,
              'sale_total_amount': sale_total_amount,
              'status': 1, //status
-             'sales_product_array': sales_product_array,
+            'sales_product_array': JSON.stringify(sales_product_array),
              'existing_product_ids': existing_product_ids
          },
          success: function (response) {
@@ -630,6 +633,31 @@
          }
      })
  })
+ $(document).on('click', '#update-product-stock', function () {
+    var update_product_id = $('.get-product-id').val();
+    $.ajax({
+      url: "/get-product-stock/".concat(update_product_id),
+      type: 'get',
+      success: function success(res) {
+        console.log(res);
+        $('.get-product-id').val('');
+        var filter_product = product_list.filter(function (x) {
+          return x.id == update_product_id;
+        });
+        console.log(filter_product);
+        if (filter_product.length > 0) {  
+            filter_product[0].stock_balance = res.new_prod.stock_balance;
+        } else {
+            console.log(res.new_prod);
+            stock_products.push(res.new_prod);
+            getProducts()
+        }
+      },
+      error: function error() {
+        console.log('Error retrieving product stock information.');
+      }
+    });
+  });
  $(document).on('input', '.qty-input', function () {
 
      var update_qty = $(this).val();
@@ -747,7 +775,8 @@
      $("#products").empty();
      $("#products").append(`<option value="0">Select Product</option>`)
      stock_products.forEach(data => {
-         $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name}</option>`)
+        console.log(data);
+         $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name} Rs-${data.sale_price}</option>`)
          product_list.push(data);
      });
  }
@@ -831,7 +860,7 @@
       $('#total_qtys').html(grandQty.toFixed(2));
       $('#total_items').html(productTotal);
     
-     $('.product_net_total').val(sum);
+     $('.product_net_total').val(sum.toFixed(2));
      // sale_total_amount = sum-invoice_discount;
      sum += parseFloat(previous_payable ? previous_payable : 0);
      sum += parseFloat(service_charges ? service_charges : 0);
@@ -839,8 +868,8 @@
      sale_total_amount = sum - invoice_discount;
      console.log('grand sum ', sale_total_amount - $('.paid_amount').text(), sale_total_amount, $('.paid_amount').text())
      grand_total = sale_total_amount;
-     $('.grand-total').text(addCommas(sale_total_amount - $('.amount_received').val()));
-     $('.amount_pay_input').val(sale_total_amount);
+     $('.grand-total').text(addCommas((sale_total_amount - $('.amount_received').val()).toFixed(2)));
+     $('.amount_pay_input').val(sale_total_amount.toFixed(2));
      // $('.amount_pay_input').val(sale_total_amount) ;
 
      if (parseFloat($('.amount_pay_input').val()) < 0) {
@@ -860,8 +889,11 @@
      retail_price = $('#retail_price').val();
      amount = qty * retail_price;
      // console.log(retail_price,qty)
-     $('#amount').val(amount);
+     $('#amount').val(amount.toFixed(2));
  }
+ $(document).on('input', '#retail_price', function () {
+    productRetailAmount();
+ });
  $(document).on('input', '.amount_received', function () {
      var amount_to_recive = 0
      var cash_return = 0
@@ -873,7 +905,7 @@
      $('.cash_return').text(cash_return);
      $('.cash_return_amount').text(cash_return)
      var saleTotal = sale_total_amount - $('.amount_received').val();
-     $('.grand-total').text(addCommas(saleTotal < 0 ? sale_total_amount : saleTotal));
+     $('.grand-total').text(addCommas((saleTotal < 0 ? sale_total_amount : saleTotal).toFixed(2)));
      // $('.grand-total').text(addCommas(sale_total_amount - amount_to_recive));
  })
  $('.service_charges_input').on('input', function () {
@@ -901,12 +933,17 @@
  // });
 
  $(document).on('input', '.calculate_by_amount', function () {
-     console.log($(this).attr('data-price'));
-     var amount = parseFloat($(this).val());
-     var price = parseFloat($(this).attr('data-price'));
-     var quantity = amount / price;
-     $('.calculate_by_amount_text').text(quantity.toFixed(2));
- });
+    var amount = parseFloat($(this).val());
+    var price = parseFloat($(this).attr('data-price'));
+
+    if (!price || !amount) return;
+
+    var quantity = amount / price;
+
+    var quantityFixed = Math.round(quantity * 10000) / 10000;
+
+    $('.calculate_by_amount_text').text(quantityFixed.toFixed(4));
+});
 
  function tableHtml(product_id, p_name, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0, is_removable = true, sale_prod_id = null) {
      $('#designationsTable tbody').append(`
@@ -916,7 +953,7 @@
         <td><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product_id}" data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
         <td><input type="number" value="${retail_price}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
         <td><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
-        <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
+        <td class='purchase-product-amount${product_id} add- S-input '>${amount.toFixed(2)}</td>
         <td  style="width:80px;"><a type="button" id="${product_id}" data-id="${invoice_id}" class="btn smBTN red-bg remove_btn" data-product-invoice="${sale_prod_id}" data-index="" data-quantity="${qty}" style="width:100%; ${!is_removable ? 'display:none' : ''}" >Remove</a></td>
     `);
  }

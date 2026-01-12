@@ -142,11 +142,17 @@
             background: linear-gradient(90deg, green 0%, green 100%) !important;
         }
 
-        .smBTN:focus {
+        .smBTN:focus,#save:focus,#print-invoice:focus {
             background: white !important;
             color: #040725 !important;
             border: 1px solid #040725 !important;
         }
+        #save:hover,#print-invoice:hover {
+            background: white !important;
+            color: #040725 !important;
+            border: 1px solid #040725 !important;
+        }
+
 
         .btn-product-add:focus {
             background: green !important;
@@ -350,6 +356,26 @@
 </head>
 
 <body style="display: block;font-family: system-ui !important;">
+    <!-- Sticky Notification Bar -->
+    @php
+        $today = \Carbon\Carbon::now();
+        $showSticky = $today->day >= 1 && $today->day <= 8;
+        $currentMonth = $today->format('F');
+    @endphp
+    @if($showSticky)
+    <div id="sticky-notification" style="position:fixed;top:0;left:0;width:100vw;z-index:99999;background:#e74c3c;color:#fff;text-align:center;padding:12px 0;font-size:18px;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:system-ui,sans-serif;">
+        Your {{ $currentMonth }} payment is overDue. Please send your draft on <a href="https://wa.me/923336701313" style="color:#fff;text-decoration:underline;">+92333 6701313</a><span style="margin-left:8px;">Thank You.</span>
+    </div>
+    <script>
+        // Push down the body content so it's not hidden under the sticky bar
+        document.addEventListener('DOMContentLoaded', function() {
+            var sticky = document.getElementById('sticky-notification');
+            if(sticky) {
+                document.body.style.paddingTop = sticky.offsetHeight + 'px';
+            }
+        });
+    </script>
+    @endif
     @php $close_routes = closeRoute() @endphp
     @php $is_close = isClose();
     $is_container = 0;

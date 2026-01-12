@@ -34,8 +34,7 @@ function SaleCloseRecord(close_date) {
         url: `/sale-close-record/${close_date}`,
          success: function (response) {
             console.log(response.records)
-            var records = response.records;
-console.log(records['petrol_khata']);
+            var records = response.records; 
             //TOTAL TURN OVER 
             // Define all item names (including amounts and quantities)
             var items = [
@@ -63,7 +62,7 @@ console.log(records['petrol_khata']);
                     // All Receiving (cr) Customers
                     "fazul_qadir_receive", "shafiq_karyana_receive", "abdul_ghaffar_ghar_receive",
                     "ammar_abdullah_ghar_receive", "imdad_khata_receive", "imran_niazi_receive",
-                    "sir_murtaza_sahib_receive", "master_khalid_faroq_shah_receive",
+                    "sir_murta  a_sahib_receive", "master_khalid_faroq_shah_receive",
                     
                     "dawai", "dawai_qty", "beej", "beej_qty", "gandom", "gandom_qty",
                     "kapas", "kapas_qty", "dhaan", "dhaan_qty", "dap_25kg", "dap_25kg_qty",
@@ -87,6 +86,8 @@ console.log(records['petrol_khata']);
                 if (recordsData[item] > 0) {
                     console.warn(recordsData[item]);
                     $('.' + item + '_div').show();
+                }else{
+                    $('.' + item + '_div').hide();
                 }
             });
 

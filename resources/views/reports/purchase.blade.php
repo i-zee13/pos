@@ -3678,5 +3678,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/purchase_report.js') }}"></script>
+<script src="{{ mix('js/custom/purchase_report.js') }}"></script>
 @endpush

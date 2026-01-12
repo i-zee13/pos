@@ -735,13 +735,13 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td style="width:100px"> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " tabindex="3" style=" width: 100%;"></td>
-                                            <td style="width: 80px;"> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="4" min="0" style="width: 100%;"></td>
+                                            <td style="width:100px"> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " style=" width: 100%;"></td>
+                                            <td style="width: 80px;"> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0" style="width: 100%;"></td>
                                             <td style="width: 70px;"><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;width:100%;" readonly></td>
-                                            <td style="width: 70px;"><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;width:100%;" tabindex="5" min="0"></td>
+                                            <td style="width: 70px;"><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;width:100%;" min="0"></td>
                                             <td class='add- S-input' style="width:100px"><input type="number" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px;width:100%"></td>
                                             <td style="width: 80px;">
-                                                <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="6" style="padding: 5px 15px 5px 15px; background:green;width:100%">Add</button>
+                                                <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="4" style="padding: 5px 15px 5px 15px; background:green;width:100%">Add</button>
                                             </td>
                                         </tr>
 

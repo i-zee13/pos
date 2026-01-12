@@ -310,6 +310,7 @@ class PurchaseReturnController extends Controller
                                                 purchase_return_invoices.customer_id ,
                                                 purchase_return_invoices.created_at ,
                                                 purchase_return_invoices.paid_amount,
+                                                purchase_return_invoices.description,
                                                 (SELECT customer_name FROM customers WHERE id=purchase_return_invoices.customer_id) as customer_name')
             ->whereRaw("Date(created_at) = '$current_date'")
             ->orderBy('id', 'DESC')

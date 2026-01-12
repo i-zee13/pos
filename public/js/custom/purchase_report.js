@@ -77,9 +77,8 @@ $('.search-btn').on('click', function () {
           ttl_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
           var date = new Date(element.expire_date);
           var formattedDate = date.toDateString();
-          var invoice_no = "";
-          invoice_no = element.invoice_no.split('-');
-          reportTable(invoice_no[0], element);
+          var invoicePrefix = element.invoice_no ? element.invoice_no.split('-')[0] : null;
+          reportTable(invoicePrefix, element);
         });
         $('.TeacherAttendanceListTable').fadeIn();
         sale_return_total(ttl_quantity, ttl_product_discount, total_sales, 'Purchase');

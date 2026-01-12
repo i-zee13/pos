@@ -143,32 +143,27 @@ if (!function_exists('isEditable')) {
     function isEditable($customer_id)
     {
         CustomerLedger::where('customer_id', $customer_id)
-            ->whereDate('created_at', Carbon::today())
-            ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         VendorLedger::where('customer_id', $customer_id)
-            ->whereDate('created_at', Carbon::today())
-            ->where('is_editable', 1)
+            
             ->update(['is_editable' => 0]);
         //Sales
         SaleInvoice::where('customer_id', $customer_id)
-            ->whereDate('created_at', Carbon::today())
-            ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         SaleReturn::where('customer_id', $customer_id)
-            ->whereDate('created_at', Carbon::today())
+            
             ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         PurchaseInvoice::where('customer_id', $customer_id)
-            ->whereDate('created_at', Carbon::today())
+            
             ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         ReturnInvoice::where('customer_id', $customer_id)
-            ->whereDate('created_at', Carbon::today())
+          
             ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         ProductReplacementInvoice::where('customer_id', $customer_id)
-            ->whereDate('created_at', Carbon::today())
+          
             ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
 
@@ -314,8 +309,8 @@ function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type,
 function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stock_qty, $In_out_status, $transaction_type, $existing_inv_id =  null)
 {
     // dd($purchase);
-    $purchase->expiry_date = $purchase->expiry_date ? $purchase->expiry_date : '0000-00-00';
-    $query = BatchStockMgt::where('product_id', $purchase->product_id);
+    $purchase->expiry_date  = $purchase->expiry_date ? $purchase->expiry_date : '0000-00-00';
+    $query                  = BatchStockMgt::where('product_id', $purchase->product_id);
     // if ($existing_inv_id) {
     //     $query->where('invoice_id', $existing_inv_id)->orderBy('id', 'ASC');
     // } else
@@ -324,7 +319,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     } else if ($transaction_type == 2) {
         $query->where('batch_wise_balance', '>', 0)->orderBy('expiry_date', 'ASC');
     }
-    $s = $query->first();
+    $s = $query->first(); 
     if (!$s) {
         $s = new BatchStockMgt(); 
         $s->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
@@ -382,6 +377,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     $s->vs_id                   = $vendor_stock_id;
     $s->trx_type                = $transaction_type;
     $s->avg_cost_price_per_unit = $s->ttl_cost_price / $s->batch_wise_balance;  
+     
     $s->save(); 
     //Make avrage cost total
     $prod   = DB::select("SELECT 

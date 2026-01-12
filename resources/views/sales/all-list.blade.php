@@ -70,8 +70,7 @@
     </div>
 @endsection
 @push('js')
-    <script src="/js/custom/all-sales-list.js"></script>
-    <script>
+<script src="/js/custom/all-sales-list.js?v={{config('app.version')}}"></script>    <script>
         
     </script>
 @endpush
