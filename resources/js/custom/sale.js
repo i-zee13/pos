@@ -658,59 +658,120 @@ import swal from 'sweetalert';
       }
     });
   });
- $(document).on('input', '.qty-input', function () {
+  
+$(document).on('input', '.qty-input', function () {
+    var update_qty = $(this).val();
+    var current_product_id = $(this).attr('data-id');
+    var current_product_qty = '';
+    var product_amount = $(this).attr('data-value');
+    var current_product_price = 0;
+    $('.amount_received').val($('.paid_amount').text());
+    setTimeout(function () {
+      $('.amount_received').trigger('input');
+    }, 500);
+    var new_amount_of_purchase_product = 0;
+  //   if (update_qty < 0) {
+  //     $(this).val('');
+  //     $(this).css('border-color', 'red');
+  //     $(this).focus();
+  //     $('#notifDiv').fadeIn();
+  //     $('#notifDiv').css('background', 'red');
+  //     $('#notifDiv').text('Qty should be greater then 0.');
+  //     setTimeout(function () {
+  //       $('#notifDiv').fadeOut();
+  //     }, 3000);
+  //     return;
+  //   }
+    $(".purchase-product-amount".concat(current_product_id)).empty();
+    sales_product_array.filter(function (data) {
+      if (data.product_id == current_product_id) {
+        p_price = data.retail_price;
+        data.qty = update_qty;
+        current_product_qty = data.stock_in_hand;
+        current_product_price = p_price;
+        if (parseInt(update_qty) > parseInt(current_product_qty)) {
+          // update_qty      = update_qty.replace(update_qty, current_product_qty)
+          $(".td-input-qty".concat(current_product_id)).val(current_product_qty).css('border-color', 'red').focus();
+          $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then ' + current_product_qty);
+          setTimeout(function () {
+            $('#notifDiv').fadeOut();
+          }, 3000);
+          new_amount_of_purchase_product = current_product_qty * current_product_price;
+        } else {
+          new_amount_of_purchase_product = update_qty * current_product_price;
+        }
+        $(".td-input-qty".concat(current_product_id)).css('border-color', '#dddddd');
+        data.amount = new_amount_of_purchase_product - data.prod_discount;
+        var invoice_type = $('#invoice_type').val();
+        $(".purchase-product-amount".concat(current_product_id)).text(parseFloat(data.amount).toFixed(2));
+        getStockRetail(data.product_id);
+        grandSum(previous_payable, service_charges, invoice_discount);
+      }
+    });
+  });
+//  $(document).on('input', '.qty-input', function () {
 
-     var update_qty = $(this).val();
-     var current_product_id = $(this).attr('data-id');
-     var current_product_qty = '';
-     var product_amount = $(this).attr('data-value')
-     var current_product_price = 0;
-     $('.amount_received').val($('.paid_amount').text());
-     setTimeout(() => {
-         $('.amount_received').trigger('input');
-     }, 500);
+//      var update_qty = $(this).val();
+//      var current_product_id = $(this).attr('data-id');
+//      var current_product_qty = '';
+//      var product_amount = $(this).attr('data-value')
+//      var current_product_price = 0;
+//      $('.amount_received').val($('.paid_amount').text());
+//      setTimeout(() => {
+//          $('.amount_received').trigger('input');
+//      }, 500);
 
-     var new_amount_of_purchase_product = 0;
-     if (update_qty < 0) {
-         $(this).val('')
-         $(this).css('border-color', 'red');
-         $(this).focus();
-         $('#notifDiv').fadeIn();
-         $('#notifDiv').css('background', 'red');
-         $('#notifDiv').text('Qty should be greater then 0.');
-         setTimeout(() => {
-             $('#notifDiv').fadeOut();
-         }, 3000);
-         return;
-     }
-     $(`.purchase-product-amount${current_product_id}`).empty();
-     sales_product_array.filter(function (data) {
-         if (data.product_id == current_product_id) {
-             p_price = data.retail_price
-             data.qty = update_qty;
-             current_product_qty = data.stock_in_hand;
-             current_product_price = p_price;
-             if (parseInt(update_qty) > parseInt(current_product_qty)) {
-                 // update_qty      = update_qty.replace(update_qty, current_product_qty)
-                 $(`.td-input-qty${current_product_id}`).val(current_product_qty).css('border-color', 'red').focus();
-                 $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then ' + current_product_qty);
-                 setTimeout(() => {
-                     $('#notifDiv').fadeOut();
-                 }, 3000);
-                 new_amount_of_purchase_product = current_product_qty * current_product_price;
-             } else {
-                 new_amount_of_purchase_product = update_qty * current_product_price;
-             }
-             $(`.td-input-qty${current_product_id}`).css('border-color', '#dddddd');
-             data.amount = new_amount_of_purchase_product - data.prod_discount;
-             var invoice_type = $('#invoice_type').val();
-             $(`.purchase-product-amount${current_product_id}`).text(data.amount)
-             getStockRetail(data.product_id)
-             grandSum(previous_payable, service_charges, invoice_discount);
-         }
-     })
+//      var new_amount_of_purchase_product = 0;
+//      if (update_qty < 0) {
+//          $(this).val('')
+//          $(this).css('border-color', 'red');
+//          $(this).focus();
+//          $('#notifDiv').fadeIn();
+//          $('#notifDiv').css('background', 'red');
+//          $('#notifDiv').text('Qty should be greater then 0.');
+//          setTimeout(() => {
+//              $('#notifDiv').fadeOut();
+//          }, 3000);
+//          return;
+//      }
+//     $(`.purchase-product-amount${current_product_id}`).empty();
+//     sales_product_array.filter(function (data) {
+//         if (data.product_id == current_product_id) {
+//             p_price = data.retail_price;
+//             var original_qty = data.qty;
+            
+//             current_product_qty = data.stock_in_hand;
+//             current_product_price = p_price;
+            
+            
+//             var available_stock = parseInt(current_product_qty);
+//             if (data.sale_prod_id && data.sale_prod_id !== '') {
+//                 available_stock = parseInt(current_product_qty) + parseInt(original_qty);
+//             }
+            
+//             if (parseInt(update_qty) > available_stock) {
+//                 // update_qty      = update_qty.replace(update_qty, available_stock)
+//                 $(`.td-input-qty${current_product_id}`).val(available_stock).css('border-color', 'red').focus();
+//                 $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then ' + available_stock);
+//                 setTimeout(() => {
+//                     $('#notifDiv').fadeOut();
+//                 }, 3000);
+//                 new_amount_of_purchase_product = available_stock * current_product_price;
+//                 // data.qty = available_stock;
+//             } else {
+//                 // data.qty = update_qty;
+//                 new_amount_of_purchase_product = update_qty * current_product_price;
+//             }
+//              $(`.td-input-qty${current_product_id}`).css('border-color', '#dddddd');
+//              data.amount = new_amount_of_purchase_product - data.prod_discount;
+//              var invoice_type = $('#invoice_type').val();
+//              $(`.purchase-product-amount${current_product_id}`).text(data.amount)
+//              getStockRetail(data.product_id)
+//              grandSum(previous_payable, service_charges, invoice_discount);
+//          }
+//      })
 
- })
+//  })
  $('body').on('click', '.ProductTable tr', function () {
 
      var htmlContent = $(this).html();
@@ -727,7 +788,9 @@ import swal from 'sweetalert';
  // $('.retail_price').text(0);
  // $('.stock_balance').text(0);
  // });
-
+ $(document).on('click', '#fetch-customers', function () {
+    getvendors();
+  });
  $(document).on('input', '.price-input', function () {
      $('.amount_received').val($('.paid_amount').text());
 
@@ -953,7 +1016,7 @@ import swal from 'sweetalert';
         <td><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product_id}" data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
         <td><input type="number" value="${retail_price}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
         <td><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
-        <td class='purchase-product-amount${product_id} add- S-input '>${amount.toFixed(2)}</td>
+        <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
         <td  style="width:80px;"><a type="button" id="${product_id}" data-id="${invoice_id}" class="btn smBTN red-bg remove_btn" data-product-invoice="${sale_prod_id}" data-index="" data-quantity="${qty}" style="width:100%; ${!is_removable ? 'display:none' : ''}" >Remove</a></td>
     `);
  }
