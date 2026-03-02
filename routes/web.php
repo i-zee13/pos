@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminSaleCloseController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseReturnController;
@@ -82,6 +83,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/', [HomeController::class,   'index'])->name('home');
     Route::get('/home', [HomeController::class,   'index'])->name('home');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/get-companies', [CompanyController::class, 'getCompanies'])->name('get-companies');
     Route::post('/get-customers', [CustomerController::class, 'getCustomers'])->name('get-customers');
     /** Product Routes */

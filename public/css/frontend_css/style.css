@@ -144,7 +144,7 @@ textarea {
 .who-we-are h2,
 .header-about .header-about-content h2 {
 	font-size: 60px;
-	color: #a1c95c;
+	color: #0038ba;
 	margin: 0;
 	padding: 0;
 	position: relative;
@@ -159,7 +159,7 @@ textarea {
 	bottom: -25px;
 	height: 2px;
 	width: 28px;
-	background: #a1c95c;
+	background: #0038ba;
 	left: 0;
 	z-index: 1;
 }
@@ -199,12 +199,12 @@ textarea {
 }
 
 .org-color {
-	color: #a1c95c
+	color: #0038ba
 }
 
 .head-btn {
-	color: #a1c95c;
-	border: solid 2px #a1c95c;
+	color: #0038ba;
+	border: solid 2px #0038ba;
 	font-size: 16px;
 	border-radius: 0;
 	background-color: transparent;
@@ -216,7 +216,7 @@ textarea {
 
 .head-btn:Hover,
 .head-btn:focus {
-	background-color: #a1c95c !important;
+	background-color: #0038ba !important;
 	text-decoration: none;
 	color: #101010
 }
@@ -235,7 +235,7 @@ textarea {
 }
 
 .content-wrapper h1 span {
-	color: #a1c95c;
+	color: #0038ba;
 }
 
 .content-wrapper h1::before {
@@ -245,7 +245,7 @@ textarea {
 	bottom: -25px;
 	height: 2px;
 	width: 28px;
-	background: #a1c95c;
+	background: #0038ba;
 	left: 0;
 	z-index: 1;
 }
@@ -282,7 +282,7 @@ textarea {
 }
 
 .year-exp span {
-	color: #a1c95c
+	color: #0038ba
 }
 
 .w-section {
@@ -308,23 +308,23 @@ textarea {
 
 .w-btn:HOVER {
 	background-color: #101010;
-	color: #a1c95c;
+	color: #0038ba;
 	-webkit-transition: all .1s ease;
 	transition: all .5s ease
 }
 
 .y-btn {
-	color: #a1c95c;
+	color: #0038ba;
 	font-size: 14px;
 	border-radius: 0;
 	text-transform: uppercase;
 	font-weight: 600;
 	padding: 6px 20px;
-	border: solid 2px #a1c95c
+	border: solid 2px #0038ba
 }
 
 .y-btn:HOVER {
-	background-color: #a1c95c;
+	background-color: #0038ba;
 	color: #101010;
 	-webkit-transition: all .1s ease;
 	transition: all .5s ease
@@ -348,7 +348,7 @@ textarea {
 .our-exp h3,
 .head-im {
 	font-size: 24px;
-	color: #a1c95c;
+	color: #0038ba;
 	position: relative;
 	margin-bottom: 40px
 }
@@ -360,7 +360,7 @@ textarea {
 	bottom: -22px;
 	height: 2px;
 	width: 28px;
-	background: #a1c95c;
+	background: #0038ba;
 	left: 0;
 	z-index: 1;
 }
@@ -858,7 +858,7 @@ textarea {
 }
 
 #floating-label .form-control:focus {
-	border-color: #a1c95c !important;
+	border-color: #0038ba !important;
 }
 
 #floating-label .control-label {
@@ -1022,7 +1022,7 @@ textarea {
 	border-radius: 1px;
 	height: 2px;
 	width: 25px;
-	background: #a1c95c;
+	background: #0038ba;
 	position: absolute;
 	display: block;
 	content: ''
@@ -1084,7 +1084,7 @@ textarea {
 }
 
 ._cosultation-form .custom-control-label::before {
-	border-color: #a1c95c !important;
+	border-color: #0038ba !important;
 	background-color: transparent !important;
 	border-radius: 0 !important
 }
@@ -1111,7 +1111,7 @@ textarea {
 
 .Footer h4 {
 	font-size: 20px;
-	color: #a1c95c;
+	color: #0038ba;
 	margin: 0;
 	padding: 0;
 	position: relative;
@@ -1125,7 +1125,7 @@ textarea {
 	bottom: -20px;
 	height: 2px;
 	width: 28px;
-	background: #a1c95c;
+	background: #0038ba;
 	left: 0;
 	z-index: 1;
 }
@@ -1147,7 +1147,7 @@ textarea {
 	top: 9px;
 	height: 2px;
 	width: 12px;
-	background: #a1c95c;
+	background: #0038ba;
 }
 
 .Footer ul li a {
@@ -1157,7 +1157,7 @@ textarea {
 }
 
 .Footer ul li a:hover {
-	color: #a1c95c;
+	color: #0038ba;
 }
 
 .f-phone {
@@ -1177,7 +1177,7 @@ textarea {
 .emailto:HOVER,
 .copy-right a:hover {
 	text-decoration: underline;
-	color: #a1c95c;
+	color: #0038ba;
 }
 
 .copy-right {
@@ -1217,7 +1217,7 @@ textarea {
 }
 
 .social-f a:HOVER {
-	color: #a1c95c
+	color: #0038ba
 }
 
 .social-f .fa {
@@ -1269,7 +1269,7 @@ textarea {
 	bottom: -25px;
 	height: 2px;
 	width: 28px;
-	background: #a1c95c;
+	background: #0038ba;
 	left: 0;
 	z-index: 1;
 }
@@ -1285,7 +1285,7 @@ textarea {
 .team-section h3 {
 	font-size: 20px;
 	font-weight: 600;
-	color: #a1c95c;
+	color: #0038ba;
 	margin-bottom: 15px
 }
 
@@ -1298,7 +1298,7 @@ textarea {
 
 ._testimonail ._qm {
 	font-size: 200px;
-	color: #a1c95c;
+	color: #0038ba;
 	position: absolute;
 	top: 30px;
 	left: 0;
@@ -1340,7 +1340,7 @@ textarea {
 	display: block;
 	bottom: -25px;
 	left: 0;
-	color: #a1c95c;
+	color: #0038ba;
 	text-align: center;
 	z-index: 1;
 	background-image: url(../images/review-com.svg);
@@ -1375,11 +1375,11 @@ textarea {
 .con-info h4 {
 	margin-bottom: 40px;
 	font-size: 24px;
-	color: #a1c95c
+	color: #0038ba
 }
 
 .con-info .fa {
-	color: #a1c95c;
+	color: #0038ba;
 	float: left;
 	margin-top: 2px;
 	margin-bottom: 25px;
@@ -1451,7 +1451,7 @@ textarea {
 }
 
 .CB-account-tab .nav-link.active {
-	background-color: #a1c95c !important;
+	background-color: #0038ba !important;
 	color: #fff;
 	font-size: 12px;
 	padding: 12px 10px 12px 20px !important
@@ -1467,7 +1467,7 @@ textarea {
 	position: absolute;
 	pointer-events: none;
 	border-color: rgba(224, 224, 224, 0);
-	border-right-color: #a1c95c;
+	border-right-color: #0038ba;
 	border-width: 21px;
 	margin-top: -21px;
 }
@@ -1482,7 +1482,7 @@ textarea {
 }
 
 .YB-right {
-	border-right: solid 2px #a1c95c
+	border-right: solid 2px #0038ba
 }
 
 .BGP {
@@ -1537,8 +1537,8 @@ textarea {
 }
 
 .CB_info .w-btn:HOVER {
-	background-color: #a1c95c;
-	border: solid 2px #a1c95c;
+	background-color: #0038ba;
+	border: solid 2px #0038ba;
 	color: #101010;
 	-webkit-transition: all .1s ease;
 	transition: all .5s ease
@@ -1656,7 +1656,7 @@ textarea {
 	bottom: -10px;
 	height: 2px;
 	width: 28px;
-	background: #a1c95c;
+	background: #0038ba;
 	left: 0;
 	z-index: 1;
 }
@@ -1678,7 +1678,7 @@ textarea {
 }
 
 .email-phone i {
-	color: #a1c95c;
+	color: #0038ba;
 }
 
 .progress {
@@ -1688,7 +1688,7 @@ textarea {
 }
 
 .progress-bar {
-	background-color: #a1c95c;
+	background-color: #0038ba;
 	font-weight: bold;
 	font-size: 11px;
 }
@@ -1725,7 +1725,7 @@ textarea {
 	right: 0;
 	height: 60%;
 	width: 100%;
-	background-color: #a1c95c;
+	background-color: #0038ba;
 	z-index: -1;
 }
 
@@ -1754,7 +1754,7 @@ textarea {
 }
 
 .dropzone:hover {
-	border: 1px dashed #a1c95c;
+	border: 1px dashed #0038ba;
 }
 
 .letter-spacing-0 {
@@ -1936,7 +1936,7 @@ strong {
    background-color: rgb(147, 147, 147); border:solid 2px rgb(147, 147, 147) !important;
 }    
 .collapseInfo .collapse-btn:hover {
-   border:solid 2px #a1c95c !important;
+   border:solid 2px #0038ba !important;
 }
 .collapseInfo .delete-action:hover, .collapseInfo .delete-action:focus{background-color: #f12300 !important; color: #fff !important;
 	 border: solid 2px #f12300 !important;}
@@ -2741,7 +2741,7 @@ strong {
 }
 .select2-container--open .select2-dropdown--above, .select2-container--open .select2-dropdown--below {
 	border: solid 1px #c5c5c5 !important;
-	border-bottom: solid 2px #a1c95c !important;
+	border-bottom: solid 2px #0038ba !important;
 	box-shadow: 0 2px 15px rgba(0, 0, 0, .175) !important;
 	border-radius:0;
 }
@@ -2809,7 +2809,7 @@ strong {
 	box-sizing: content-box;
 }
 .sa-icon.sa-success {
-	border-color: #a1c95c;
+	border-color: #0038ba;
 }
 .sa-icon.sa-success::before,
 .sa-icon.sa-success::after {
@@ -3078,7 +3078,7 @@ strong {
     position: relative;
 }
 .success-div .success-msg h1::before {
-    border-top: 0.063rem solid #a1c95c;
+    border-top: 0.063rem solid #0038ba;
     content: "";
     left: 50%; right: 0;
     bottom: -0.938rem;

@@ -5,8 +5,38 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Storeeo.app | The Ultimate POS & Business Management Software</title>
+    <meta name="title" content="Storeeo.app | The Ultimate POS & Business Management Software">
+    <meta name="description" content="Storeeo.app is a powerful cloud-based POS software that helps businesses manage sales, inventory, invoices, and customer data efficiently. Boost your retail or restaurant business with real-time insights and automation.">
+    <meta name="keywords" content="Storeeo.app, POS software, cloud-based POS, inventory management, business automation, sales tracking, best POS system, online invoicing, retail POS, restaurant POS">
+    <meta name="author" content="Storeeo.app">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta name="language" content="English">
+
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://storeeo.app/">
+  <meta property="og:title" content="Storeeo.app | The Ultimate POS & Business Management Software">
+  <meta property="og:description" content="Simplify your business operations with Storeeo.app. A cloud-based POS system that enables seamless sales, invoicing, and inventory tracking. Try it now!">
+  <meta property="og:image" content="https://storeeo.app/files/logo-blue.png">
+  <meta property="og:site_name" content="Storeeo.app">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://storeeo.app/">
+  <meta property="twitter:title" content="Storeeo.app | The Ultimate POS & Business Management Software">
+  <meta property="twitter:description" content="Manage your business efficiently with Storeeo.app, the all-in-one cloud POS software for sales, invoicing, and inventory tracking.">
+  <meta property="twitter:image" content="https://storeeo.app/files/logo-blue.png">
+  <meta property="twitter:site" content="@StoreeoApp">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="https://storeeo.app/favicon.ico" type="image/x-icon">
+
+
+
+    <meta name="distribution" content="global"> <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="csrf_token" content="{{ csrf_token() }}">
     <!-- Favicon -->
     <link rel="shortcut icon" href="https://dashkit.goodthemes.co/assets/favicon/favicon.ico" type="image/x-icon">

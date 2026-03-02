@@ -11,6 +11,7 @@ use App\Models\ReturnInvoice;
 use App\Models\Sale as SaleInvoice;
 use App\Models\SaleReturn;
 use App\Models\SaleReturnProduct;
+use Illuminate\Support\Facades\DB;
 
 if (!function_exists('getSaleInv')) {
    function getSaleInv($id)
@@ -295,7 +296,7 @@ if (!function_exists('PurchaseReportList')) {
                               LEFT JOIN companies co ON co.id = ps.company_id
                               WHERE
                               $query 
-                              ORDER BY si.invoice_no ASC
+                              ORDER BY ps.created_at ASC
                         ");
                         // dd($purchases);
       $returns        =  DB::select("
@@ -325,7 +326,7 @@ if (!function_exists('PurchaseReportList')) {
                               LEFT JOIN companies co ON co.id = ps.company_id
                               WHERE
                               $query 
-                              ORDER BY si.invoice_no ASC
+                              ORDER BY ps.created_at ASC
                   ");
       $report = [];
       if ($request->report_type == 1) {
@@ -402,10 +403,11 @@ if (!function_exists('ProductReportList')) {
                                      ps.balance AS p_balance,
                                      ps.actual_status AS p_status
                                   FROM
-                                     vendor_stocks as ps
+                                    vendor_stocks as ps
                                   JOIN products pr ON pr.id = ps.product_id
                                   JOIN companies co ON co.id = ps.company_id
-                                  ORDER BY ps.created_at DESC
+                                  WHERE ps.product_id = $request->product_id
+                                  ORDER BY p_id ASC
                                   LIMIT 5
                                 ");
        }
