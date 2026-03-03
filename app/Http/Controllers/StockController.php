@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BatchStockMgt;
 use App\Models\Customer;
+use App\Models\Godown;
 use App\Models\Product;
 use App\Models\ProductPurchase;
 use App\Models\PurchaseInvoice;
@@ -23,7 +24,9 @@ class StockController extends Controller
         $invoice_first_part   = $parts[0];
         $current_date =   Carbon::today()->toDateString(); 
         $products     =   Product::get();
-        return view('purchases.add', compact('current_date', 'products', 'invoice_no', 'invoice_first_part'));
+        // Load active godowns for purchase allocation
+        $godowns      =   Godown::where('is_active', true)->orderBy('name')->get();
+        return view('purchases.add', compact('current_date', 'products', 'invoice_no', 'invoice_first_part', 'godowns'));
     }
     public function getProduct(Request $request)
     {
@@ -75,8 +78,7 @@ class StockController extends Controller
         $stock = StockManagment::where('product_id', $purchase->product_id)
             ->where('company_id', $purchase->company_id)
             ->orderBy('id', 'DESC')->first();
-        // if ($stock->vs_id == $vendor_stock_id) {
-        // }
+        
 
         if (!$stock) {
             $stock = new StockManagment();
@@ -117,10 +119,16 @@ class StockController extends Controller
         $invoice->product_net_total    = $request->product_net_total;
         $invoice->previous_receivable  = $request->previous_receivable;
         $invoice->is_editable          = 1;
+        // store selected godown on invoice (nullable)
+        $invoice->godown_id            = $request->input('godown_id') ?: null;
         $invoice->status               = $request->invoice_type;
         $invoice->description          = $request->description;
         $invoice->created_by           = Auth::id();
         if ($invoice->save()) {
+            // Selected godown for this purchase (may be null/empty)
+            $selectedGodownId = $request->input('godown_id');
+            // Default shop godown (used for sale screen stock)
+            $shopGodownId = Godown::where('type', 'shop')->orderBy('id')->value('id');
             if (count($request->purchased_product_array) > 0) {
                 foreach ($request->purchased_product_array as $purchase_product) {
                     $flag = true;
@@ -137,13 +145,13 @@ class StockController extends Controller
                     } else {
                         $purchased->purchase_price  = $purchase_product['old_price'];
                     }
-
+                    $purchased->godown_id                   = $invoice->godown_id;
                     $purchased->purchase_invoice_id     = $invoice->id;
                     $purchased->product_id              = $purchase_product['product_id'];
                     $purchased->vendor_id               = $request->customer_id;
                     $purchased->expiry_date             = $purchase_product['expiry_date'];
                     $purchased->purchased_total_amount  = $purchase_product['amount'];
-                    $purchased->company_id              = Product::where('id', $purchase_product['product_id'])->value('company_id');
+                        $purchased->company_id              = Product::where('id', $purchase_product['product_id'])->value('company_id');
                     $purchased->qty                     = $purchase_product['qty'];
                     $purchased->product_discount        = $purchase_product['prod_discount'];
                     $purchased->sale_price              = $purchase_product['sale_price'];
@@ -189,15 +197,32 @@ class StockController extends Controller
                             StockManagment($v_stock->id, $purchased, $change_qty_value, $In_out_status, 'purchase');
                             if ($v_stock->save()) {
                                 $purchased->vendor_stock_id = $v_stock->id;
-                                Product::where('id', $v_stock->product_id)->update([
-                                    'stock_balance' =>  $v_stock->balance,
-                                ]);
+
+                                // Keep products.stock_balance in sync only for SHOP godown, using delta not VendorStock balance
+                                if (!$selectedGodownId || ($shopGodownId && (int)$selectedGodownId === (int)$shopGodownId)) {
+                                    if ($In_out_status == 2) { // OUT (e.g. reduce qty on edit)
+                                        Product::where('id', $v_stock->product_id)->decrement('stock_balance', $change_qty_value);
+                                    } else { // IN (new qty or increase)
+                                        Product::where('id', $v_stock->product_id)->increment('stock_balance', $change_qty_value);
+                                    }
+                                }
+
+                                // Update per-godown stock record
+                                $godownForStock = $selectedGodownId ?: $shopGodownId;
+                                if ($godownForStock && $purchased->company_id) {
+                                    updateGodownStock(
+                                        $godownForStock,
+                                        $purchased->company_id,
+                                        $purchased->product_id,
+                                        $change_qty_value,
+                                        $In_out_status
+                                    );
+                                }
                             }
                         }
                         BatchWiseStockManagment($vs_id,  $invoice->id, $purchased, $change_qty_value, $In_out_status, 1, $request->hidden_invoice_id);
                         //Update Product Price
-                        $product              = Product::where('id', $purchased->product_id)->first();
-                        $company_id           = $product->company_id;
+                        $product              = Product::where('id', $purchased->product_id)->first(); 
                         $product->expiry_date = $purchased->expiry_date;
                         $product->sale_price  = $purchased->sale_price;
                         if ($purchase_product['new_price'] != '') {
@@ -306,8 +331,9 @@ class StockController extends Controller
             ->where('trx_type', '=', 1)
             ->where('purchase_invoice_id', $invoice->id)
             ->orderBy('id', 'DESC')->first();
-        // dd($invoice->paid_amount);
-        return view('purchases.add', compact('invoice', 'customers', 'products', 'customers', 'get_vendor_ledger', 'invoice_first_part'));
+        // Load active godowns so we can select the correct one in edit screen
+        $godowns            =     Godown::where('is_active', true)->orderBy('name')->get();
+        return view('purchases.add', compact('invoice', 'customers', 'products', 'customers', 'get_vendor_ledger', 'invoice_first_part', 'godowns'));
     }
     public function getPurchaseProduct($id)
     {

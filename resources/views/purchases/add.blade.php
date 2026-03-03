@@ -653,7 +653,28 @@
                                             </select>
                                         </div>
                                     </div>
-
+                                </div>
+                            </div>
+                            <div class="form-wrap p-0">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label class="font13 mb-5">Select Godown</label>
+                                        <div class="form-s2">
+                                            <select class="form-control formselect form_clear required" name="godown_id" id="godown_id">
+                                                <option value="">Select Godown</option>
+                                                @isset($godowns)
+                                                    @foreach($godowns as $godown)
+                                                        <option value="{{ $godown->id }}" {{ (isset($invoice) && $invoice->godown_id == $godown->id) ? 'selected' : '' }}>{{ $godown->name }}</option>
+                                                    @endforeach
+                                                @endisset
+                                            </select>
+                                            @if(isset($invoice) && $invoice->godown_id)
+                                                <input type="hidden" id="current_godown_id" value="{{ $invoice->godown_id }}">
+                                            @else
+                                                <input type="hidden" id="current_godown_id" value="">
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-wrap p-0">

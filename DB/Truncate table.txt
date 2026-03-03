@@ -26,7 +26,7 @@ TRUNCATE vendor_stocks;
 TRUNCATE vendor_stock_managment;
 TRUNCATE stock_batches_items;
 
-
+    
 TRUNCATE customer_ledger;
 TRUNCATE vendor_ledger;
 
@@ -42,3 +42,49 @@ ALTER TABLE `vendor_stock_managment` ADD `ttl_avg_cost` DOUBLE NOT NULL DEFAULT 
 ALTER TABLE `vendor_stock_managment` ADD `ttl_cost` DOUBLE NOT NULL DEFAULT '0' AFTER `ttl_avg_cost`;
 ALTER TABLE `vendor_stock_managment` ADD `purchase_price` DOUBLE NULL AFTER `product_id`, ADD `sale_price` DOUBLE NULL AFTER `purchase_price`;
 
+
+-- 1) Core stock / movement tables
+ALTER TABLE `vendor_stocks`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `product_id`;
+
+ALTER TABLE `vendor_stock_managment`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `product_id`;
+
+ALTER TABLE `stock_batches_items`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `product_id`;
+
+ALTER TABLE `stocks`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `product_id`;
+
+-- 2) Purchase-side detail tables
+ALTER TABLE `products_purchases`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `company_id`;
+
+ALTER TABLE `products_returns`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `company_id`;
+
+-- 3) Sale-side detail tables
+ALTER TABLE `products_sales`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `company_id`;
+
+ALTER TABLE `sale_return_products`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `company_id`;
+
+ALTER TABLE `product_replacements`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `company_id`;
+
+-- 4) Invoice headers (optional but recommended)
+ALTER TABLE `purchase_invoices`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `customer_id`;
+
+ALTER TABLE `sale_invoices`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `customer_id`;
+
+ALTER TABLE `purchase_return_invoices`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `customer_id`;
+
+ALTER TABLE `sale_return_invoices`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `customer_id`;
+
+ALTER TABLE `product_replacment_invoices`
+  ADD COLUMN `godown_id` BIGINT UNSIGNED NULL AFTER `customer_id`;

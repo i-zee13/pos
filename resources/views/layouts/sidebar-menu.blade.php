@@ -78,6 +78,27 @@
             <i class="fa fa-home" aria-hidden="true"></i> Dashboard
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#sidebarStockAllocation" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarStockAllocation">
+            <i class="fa fa-exchange" aria-hidden="true"></i> Stock Allocation
+          </a>
+          <div class="collapse" id="sidebarStockAllocation">
+            <ul class="nav nav-sm flex-column">
+              <li class="nav-item">
+                <a href="{{ route('godowns.index') }}" class="nav-link ">
+                  <i class="fa fa-building" aria-hidden="true"></i>
+                  Godowns
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('stock-transfers') }}" class="nav-link ">
+                  <i class="fa fa-random" aria-hidden="true"></i>
+                  Transfer
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
       </ul>
       <!-- Divider -->
       <hr class="navbar-divider my-3">

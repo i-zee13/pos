@@ -24,6 +24,7 @@ let segment = '';
 var deleteRef = '';
 var expiry_date = '';
 let existing_product_ids = [];
+let godown_id = 0;
 var p_price = '';
 let total_return_qty = 0;
 let paid_amount = 0;
@@ -112,8 +113,11 @@ $(document).ready(function () {
             }
         })
 
+        // current godown for this invoice (if any)
+        godown_id = $('#current_godown_id').val() || 0;
     }
     getvendors();
+    getGodowns();
     $('.add-more-btn').attr('href', '#');
     $('.new_form_field').addClass('required_client');
     $('#client_type').attr('disabled', true);
@@ -480,7 +484,8 @@ function saleSave(current_action, type) {
             'purchased_total': purchased_total,
             'status': 2, //status
             'purchased_product_array': purchased_product_array,
-            'existing_product_ids': existing_product_ids
+            'existing_product_ids': existing_product_ids,
+            'godown_id': $('#godown_id').val()
         },
         success: function (response) {
             if ("success") {
@@ -604,6 +609,31 @@ function getvendors() {
             $("#customer_id").val(customer_id).trigger('change');
         }
     })
+}
+
+function getGodowns() {
+    if (!$('#godown_id').length) {
+        return;
+    }
+    $("#godown_id").empty();
+    $.ajax({
+        url: `/godowns`,
+        type: 'get',
+        dataType: 'json',
+        success: function (response) {
+            $("#godown_id").append(`<option value="">Select Godown</option>`);
+            if (response.godowns) {
+                response.godowns.forEach(function (g) {
+                    $("#godown_id").append(
+                        `<option value="${g.id}" ${parseInt(g.id) === parseInt(godown_id) ? 'selected' : ''}>${g.name}</option>`
+                    );
+                });
+            }
+            if (godown_id) {
+                $("#godown_id").val(godown_id);
+            }
+        }
+    });
 }
 $('.customer_id').change(function () {
     var total_paid_for_net_sale = 0;

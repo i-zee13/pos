@@ -155,9 +155,26 @@ class SaleController extends Controller
 
                             if ($v_stock->save()) {
                                 $sale->vendor_stock_id = $v_stock->id;
-                                Product::where('id', $v_stock->product_id)->update([
-                                    'stock_balance' =>  $v_stock->balance,
-                                ]);
+
+                                // Adjust products.stock_balance using delta (shop stock), not VendorStock balance
+                                if ($In_out_status == 2) { // OUT (normal sale or increase qty)
+                                    Product::where('id', $v_stock->product_id)->decrement('stock_balance', $change_qty_value);
+                                } else { // IN (decrease qty on edit)
+                                    Product::where('id', $v_stock->product_id)->increment('stock_balance', $change_qty_value);
+                                }
+
+                                // Decrease stock in godowns_stocks for shop godown
+                                $shopGodownId = \App\Models\Godown::where('type', 'shop')->orderBy('id')->value('id');
+                                $companyId = $sale->company_id;
+                                if ($shopGodownId && $companyId) {
+                                    updateGodownStock(
+                                        $shopGodownId,
+                                        $companyId,
+                                        $sale->product_id,
+                                        $change_qty_value,
+                                        $In_out_status // 2 = OUT for sale, 1 = IN when editing downwards
+                                    );
+                                }
                             }
                         }
                         BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, 2, $request->hidden_invoice_id);

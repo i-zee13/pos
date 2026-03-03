@@ -14,6 +14,7 @@ use App\Models\SaleReturn;
 use App\Models\StockManagment;
 use App\Models\VendorLedger;
 use App\Models\VendorStock;
+use App\Models\GodownStock;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -351,7 +352,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         $s->unit_cost_price     =   $purchase->purchase_price;
         $s->ttl_cost_price      =   $s->ttl_cost_price + $new_cost_price;
     }
-   
+    $s->godown_id               =   $purchase->godown_id;
     $s->company_id              =   $purchase->company_id;
     $s->product_id              =   $purchase->product_id;
     $s->invoice_id              =   $invoice_id;
@@ -447,6 +448,7 @@ function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
         $stock->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
         $stock->product_name    = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
     }
+    $stock->godown_id       = $purchase->godown_id;
     $stock->company_id      = $purchase->company_id;
     $stock->product_id      = $purchase->product_id;
     $stock->purchase_price  = $purchase->purchase_price;
@@ -457,6 +459,38 @@ function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
     // $stock->ttl_avg_cost = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
     $stock->save();  
     return $stock;
+}
+
+/**
+ * Update or create per-godown stock record.
+ *
+ * @param int|null $godown_id
+ * @param int|null $company_id
+ * @param int|null $product_id
+ * @param float    $stock_qty
+ * @param int      $In_out_status 1 = IN, 2 = OUT
+ * @return GodownStock|null
+ */
+function updateGodownStock($godown_id, $company_id, $product_id, $stock_qty, $In_out_status = 1)
+{
+    if (!$godown_id || !$company_id || !$product_id || !$stock_qty) {
+        return null;
+    }
+
+    $record = GodownStock::firstOrNew([
+        'godown_id'  => $godown_id,
+        'company_id' => $company_id,
+        'product_id' => $product_id,
+    ]);
+
+    $current = $record->stock ?? 0;
+    $record->stock = $In_out_status == 2
+        ? $current - $stock_qty
+        : $current + $stock_qty;
+
+    $record->save();
+
+    return $record;
 }
 function BatchWiseDeleteProduct($delete_for, $product, $qty, $in_out, $type)
 {

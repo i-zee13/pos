@@ -19,6 +19,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SalesReturnController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\GodownController;
+use App\Http\Controllers\StockTransferController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -63,6 +65,7 @@ Route::get('/', function () {
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
     Route::Resource('/company', CompanyController::class);
+    Route::resource('/godowns', GodownController::class)->names('godowns');
     Route::Resource('/customer', CustomerController::class);
     Route::Resource('/vendors', CustomerController::class);
     Route::Resource('/AccessRights',   AccessRights::class); 
@@ -101,6 +104,10 @@ Route::group(['middleware' => ['auth']], function () {
     //End Shahid
     /** Stock Routes */
     Route::get('/stock-add',                            [StockController::class, 'create'])->name('stock-add');
+    // Stock Transfers
+    Route::get('/stock-transfers',                      [StockTransferController::class, 'index'])->name('stock-transfers');
+    Route::post('/stock-transfers',                     [StockTransferController::class, 'store'])->name('stock-transfers.store');
+    Route::get('/godown-products/{godown}',             [StockTransferController::class, 'products'])->name('godown-products');
     Route::get('/get-vendors',                          [StockController::class, 'getVendors'])->name('get-vendors');
     // Route::post('/get-product'           ,[StockController::class, 'getProduct'])->name('get-product');
     Route::get('/get-vendor-balance/{id}',              [StockController::class, 'getVendorBalance'])->name('get-vendor-balance');
