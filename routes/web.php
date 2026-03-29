@@ -189,6 +189,10 @@ Route::group(['middleware' => ['auth']], function () {
     //Product Ledeger
     Route::get('/product-reports',          [LedgerDetailControlller::class, 'productReports'])->name('product-reports');
     Route::post('/product-list',            [LedgerDetailControlller::class, 'productList'])->name('product-list');
+    
+    //Godown Ledger
+    Route::get('/godown-ledger',            [LedgerDetailControlller::class, 'godownLedger'])->name('godown-ledger');
+    Route::post('/godown-ledger-list',      [LedgerDetailControlller::class, 'godownLedgerList'])->name('godown-ledger-list');
 
     Route::get('/stock-reports',            [ReportsController::class, 'stockReport'])->name('stock-reports');
     Route::post('/stocks',                  [ReportsController::class, 'stockReportList'])->name('stock-report-list');

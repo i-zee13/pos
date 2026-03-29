@@ -68,19 +68,9 @@ class StockTransferController extends Controller
                 }
 
                 // Decrease from_godown, increase to_godown
+                // updateGodownStock will automatically sync products.stock_balance if godown is shop
                 updateGodownStock($fromGodown, $companyId, $item['product_id'], $item['qty'], 2);
                 updateGodownStock($toGodown, $companyId, $item['product_id'], $item['qty'], 1);
-
-                // If transfer touches shop godown, also sync products.stock_balance
-                if ($shopGodownId) {
-                    if ($fromGodown == $shopGodownId) {
-                        // Stock moving out of shop
-                        Product::where('id', $item['product_id'])->decrement('stock_balance', $item['qty']);
-                    } elseif ($toGodown == $shopGodownId) {
-                        // Stock moving into shop
-                        Product::where('id', $item['product_id'])->increment('stock_balance', $item['qty']);
-                    }
-                }
 
                 StockTransferItem::create([
                     'stock_transfer_id' => $transfer->id,

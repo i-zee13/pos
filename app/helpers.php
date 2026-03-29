@@ -489,7 +489,17 @@ function updateGodownStock($godown_id, $company_id, $product_id, $stock_qty, $In
         : $current + $stock_qty;
 
     $record->save();
-
+    
+    // Only update products.stock_balance if this is the shop godown
+    $shopGodownId = \App\Models\Godown::where('type', 'shop')->orderBy('id')->value('id');
+    if ($shopGodownId && (int)$godown_id === (int)$shopGodownId) {
+        if ($In_out_status == 2) { // OUT - decrement
+            Product::where('id', $product_id)->decrement('stock_balance', $stock_qty);
+        } else { // IN - increment
+            Product::where('id', $product_id)->increment('stock_balance', $stock_qty);
+        }
+    }
+    
     return $record;
 }
 function BatchWiseDeleteProduct($delete_for, $product, $qty, $in_out, $type)

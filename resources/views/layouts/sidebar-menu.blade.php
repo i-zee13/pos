@@ -439,6 +439,12 @@
                   Products
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{route('godown-ledger')}}" class="nav-link ">
+                   <i class="fa fa-building" aria-hidden="true"></i> 
+                  Godowns
+                </a>
+              </li>
             </ul>
           </div>
         </li>

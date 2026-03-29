@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
+use App\Models\Godown;
 use App\Models\Product;
 use App\Models\VendorLedger;
 use Illuminate\Http\Request;
@@ -43,6 +44,25 @@ class LedgerDetailControlller extends Controller
          'reports'  => $records
       ]);
    }
+   public function godownLedger()
+   {
+      $ledger_for = 'Godown';
+      $companies  =   Company::select('id', 'company_name')->get();
+      $products   =   Product::select('id', 'product_name')->get();
+      $godowns    =   Godown::where('is_active', true)->orderBy('name')->get();
+      return view('reports.godown', compact('products', 'companies', 'godowns', 'ledger_for'));
+   }
+   public function godownLedgerList(Request $request)
+   {
+      $current_date     =  date('Y-m-d');
+      $records          =  GodownLedgerList($request, $current_date);
+
+      return response()->json([
+         'msg'     => 'Godown ledger list fetched',
+         'status'  => 'success',
+         'reports'  => $records
+      ]);
+   }
    public function reportList(Request $request)
    {
       $dateFilter    =  " 1=1";
@@ -72,13 +92,13 @@ class LedgerDetailControlller extends Controller
                                 )->whereRaw("$dateFilter AND customer_id = ?", [$request->vendor_id])->get();                                      
 
             if ($query->isEmpty()) {
-                // Fetch the last 10 entries if the initial query is empty
+                // Initial date range had no rows; show a small recent window instead
               $lastDebitId = CustomerLedger::where('customer_id', $request->vendor_id)
                            ->where('dr', '>', 0)
                            ->orderBy('created_at', 'desc')
                            ->value('id');
-                       
-                       $query = CustomerLedger::selectRaw('*, 
+
+                       $fallback = CustomerLedger::selectRaw('*, 
                                                            DATE_FORMAT(created_at, "%h:%i %p") as formatted_created_at, 
                                                            (SELECT sale_invoices.description 
                                                                FROM sale_invoices 
@@ -90,10 +110,11 @@ class LedgerDetailControlller extends Controller
                                                                CONCAT("PR ", (SELECT invoice_no FROM product_replacment_invoices WHERE product_replacment_invoices.id = customer_ledger.product_replacement_invoice_id LIMIT 1))
                                                            ) AS invoice_no'
                                                        )
-                           ->where('customer_id', $request->vendor_id)
-                           ->where('id', '>=', $lastDebitId)
-                           ->limit(5)
-                           ->get();
+                           ->where('customer_id', $request->vendor_id);
+                       // value('id') is null when this customer has no dr > 0 rows; where('id','>=', null) throws InvalidArgumentException
+                       $query = $lastDebitId !== null
+                           ? $fallback->where('id', '>=', $lastDebitId)->limit(5)->get()
+                           : $fallback->orderBy('id', 'desc')->limit(5)->get();
             }
                                        // dd($query);
          // $query      =  CustomerLedger::whereRaw("$dateFilter AND customer_id = $request->vendor_id")->orderBy('id', 'DESC')->get();

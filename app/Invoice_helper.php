@@ -416,3 +416,59 @@ if (!function_exists('ProductReportList')) {
    }
    
 }
+
+if (!function_exists('GodownLedgerList')) {
+   function GodownLedgerList($request, $current_date)
+   {
+       // Query godowns_stocks table directly to get current stock levels
+       $query = " 1=1 ";
+       
+       // Godown filter is required - if not selected, return empty
+       if (!isset($request->godown_id) || $request->godown_id == '') {
+           return [];
+       }
+       
+       $query .= " AND gs.godown_id = {$request->godown_id}";
+       
+       // Product filter (optional)
+       if (isset($request->product_id) && $request->product_id != '') {
+           $query .= " AND gs.product_id = {$request->product_id}";
+       }
+       
+       // Company filter (optional)
+       if (isset($request->company_id) && $request->company_id != '') {
+           $query .= " AND gs.company_id = {$request->company_id}";
+       }
+   
+       // Query to get current stock levels from godowns_stocks
+       $reports = DB::select("
+          SELECT
+             gs.id AS p_id,
+             gs.updated_at AS transaction_date,
+             gs.stock AS p_qty,
+             gs.stock AS p_balance,
+             1 AS p_status,
+             pr.product_name,
+             pr.id AS product_id,
+             co.company_name,
+             co.id AS company_id,
+             g.name AS godown_name,
+             g.id AS godown_id,
+             g.type AS godown_type,
+             'Stock Balance' AS customer_name,
+             'Current Stock' AS invoice_no,
+             'Stock' AS transaction_type
+          FROM
+             godowns_stocks as gs
+          JOIN products pr ON pr.id = gs.product_id
+          JOIN companies co ON co.id = gs.company_id
+          JOIN godowns g ON g.id = gs.godown_id
+          WHERE 
+             $query
+             AND gs.stock > 0
+          ORDER BY pr.product_name ASC, co.company_name ASC
+       ");
+   
+       return $reports;
+   }
+}

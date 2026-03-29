@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BatchStockMgt;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
+use App\Models\Godown;
 use App\Models\Product;
 use App\Models\ProductSale;
 use App\Models\Sale as SaleInvoice;
@@ -156,15 +157,8 @@ class SaleController extends Controller
                             if ($v_stock->save()) {
                                 $sale->vendor_stock_id = $v_stock->id;
 
-                                // Adjust products.stock_balance using delta (shop stock), not VendorStock balance
-                                if ($In_out_status == 2) { // OUT (normal sale or increase qty)
-                                    Product::where('id', $v_stock->product_id)->decrement('stock_balance', $change_qty_value);
-                                } else { // IN (decrease qty on edit)
-                                    Product::where('id', $v_stock->product_id)->increment('stock_balance', $change_qty_value);
-                                }
-
-                                // Decrease stock in godowns_stocks for shop godown
-                                $shopGodownId = \App\Models\Godown::where('type', 'shop')->orderBy('id')->value('id');
+                                // Update godowns_stocks for shop godown (updateGodownStock will sync products.stock_balance)
+                                $shopGodownId = Godown::where('type', 'shop')->orderBy('id')->value('id');
                                 $companyId = $sale->company_id;
                                 if ($shopGodownId && $companyId) {
                                     updateGodownStock(
@@ -376,13 +370,29 @@ class SaleController extends Controller
             $soldProduct =  ProductSale::where('sale_invoice_id', $request->sale_invoice_id)
                                         ->where('product_id', $request->product_id)->where('qty', $request->qty)
                                         ->first();
+            // Reverse this sale item from vendor/global stock & batch-wise stock
             $v_stock = updateStock($vs, $current_balance, $request->qty, 1, 'sale', 5);
             BatchWiseDeleteProduct($request->sale_invoice_id, $soldProduct, $request->qty, 1, 5);
             StockManagment($v_stock->id, $vs, $request->qty, 1, 'sale');
 
             if ($v_stock) {
+                // 1) Keep SHOP godown stock in sync (godowns_stocks)
+                $shopGodownId = \App\Models\Godown::where('type', 'shop')->orderBy('id')->value('id');
+                $companyId = $vs->company_id;
+                if ($shopGodownId && $companyId) {
+                    // IN to shop because we are removing a sale
+                    updateGodownStock(
+                        $shopGodownId,
+                        $companyId,
+                        $v_stock->product_id,
+                        $request->qty,
+                        1 // IN
+                    );
+                }
+
+                // 2) Mirror SHOP stock into products.stock_balance using delta (do NOT use VendorStock balance)
                
-                Product::where('id', $v_stock->product_id)->update(['stock_balance' =>  $v_stock->balance]);
+
                 $soldProduct->delete();
                 return response()->json([
                     'msg'       => 'product removed',
@@ -409,13 +419,24 @@ class SaleController extends Controller
                 if ($vs) {
                     $vs->actual_qty   = $product->qty; 
                     $current_balance =  VendorStock::where('product_id', $product->product_id)->orderBy('id', 'DESC')->value('balance');
+                    // Reverse this sale line from vendor/global stock & batch-wise stock
                     $v_stock = updateStock($vs, $current_balance, $product->qty, 1, 'sale', 5);
                     BatchWiseDeleteProduct($product->sale_invoice_id, $product, $product->qty, 1, 5);
                     StockManagment($v_stock->id, $vs, $product->qty, 1, 'sale');
                     if ($v_stock) {
-                        Product::where('id', $v_stock->product_id)->update([
-                            'stock_balance' =>  $v_stock->balance,
-                        ]); 
+                        // Keep SHOP godown stock in sync (updateGodownStock will sync products.stock_balance)
+                        $shopGodownId = \App\Models\Godown::where('type', 'shop')->orderBy('id')->value('id');
+                        $companyId = $vs->company_id;
+                        if ($shopGodownId && $companyId) {
+                            // IN to shop because we are deleting a sale
+                            updateGodownStock(
+                                $shopGodownId,
+                                $companyId,
+                                $v_stock->product_id,
+                                $product->qty,
+                                1 // IN
+                            );
+                        }
                         
                     }  
                     ProductSale::where('sale_invoice_id', $product->sale_invoice_id)->where('product_id', $product->product_id)->where('qty', $product->qty)->delete();

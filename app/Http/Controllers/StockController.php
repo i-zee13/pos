@@ -198,16 +198,7 @@ class StockController extends Controller
                             if ($v_stock->save()) {
                                 $purchased->vendor_stock_id = $v_stock->id;
 
-                                // Keep products.stock_balance in sync only for SHOP godown, using delta not VendorStock balance
-                                if (!$selectedGodownId || ($shopGodownId && (int)$selectedGodownId === (int)$shopGodownId)) {
-                                    if ($In_out_status == 2) { // OUT (e.g. reduce qty on edit)
-                                        Product::where('id', $v_stock->product_id)->decrement('stock_balance', $change_qty_value);
-                                    } else { // IN (new qty or increase)
-                                        Product::where('id', $v_stock->product_id)->increment('stock_balance', $change_qty_value);
-                                    }
-                                }
-
-                                // Update per-godown stock record
+                                // Update per-godown stock record (updateGodownStock will sync products.stock_balance for shop godown)
                                 $godownForStock = $selectedGodownId ?: $shopGodownId;
                                 if ($godownForStock && $purchased->company_id) {
                                     updateGodownStock(
