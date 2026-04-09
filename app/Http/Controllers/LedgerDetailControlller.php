@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
+use App\Models\Godown;
 use App\Models\Product;
 use App\Models\VendorLedger;
 use Illuminate\Http\Request;
@@ -39,6 +40,25 @@ class LedgerDetailControlller extends Controller
 
       return response()->json([
          'msg'     => 'Product report list fetched',
+         'status'  => 'success',
+         'reports'  => $records
+      ]);
+   }
+   public function godownLedger()
+   {
+      $ledger_for = 'Godown';
+      $companies  =   Company::select('id', 'company_name')->get();
+      $products   =   Product::select('id', 'product_name')->get();
+      $godowns    =   Godown::where('is_active', true)->orderBy('name')->get();
+      return view('reports.godown', compact('products', 'companies', 'godowns', 'ledger_for'));
+   }
+   public function godownLedgerList(Request $request)
+   {
+      $current_date     =  date('Y-m-d');
+      $records          =  GodownLedgerList($request, $current_date);
+
+      return response()->json([
+         'msg'     => 'Godown ledger list fetched',
          'status'  => 'success',
          'reports'  => $records
       ]);

@@ -99,7 +99,7 @@ class SalesReturnController extends Controller
                     $sale->product_id          = $sale_product['product_id'];
                     $sale->purchase_price      = $sale_product['purchased_price'];
                     $sale->qty                 = $sale_product['qty'];
-                    $sale->expiry_date         = $sale_product['expiry_date'] ?? 0000-00-00;
+                    $sale->expiry_date         = $sale_product['expiry_date'] ?? '0000-00-00';
                     $sale->return_total_amount = $sale_product['amount'];
                     $sale->product_discount    = $sale_product['prod_discount'];
                     $sale->created_by          = FacadesAuth::id();
@@ -151,8 +151,8 @@ class SalesReturnController extends Controller
                                     'stock_balance' =>  $v_stock->balance,
                                 ]);
                             }
+                            BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, 4, $request->hidden_invoice_id);
                         }
-                        BatchWiseStockManagment($vs_id,  $invoice->id, $sale, $sale->qty, 1, 4, $request->hidden_invoice_id);
                     }
                 }
                 if ($request->hidden_invoice_id) {

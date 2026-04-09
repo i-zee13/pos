@@ -159,8 +159,8 @@ class SaleController extends Controller
                                     'stock_balance' =>  $v_stock->balance,
                                 ]);
                             }
+                            BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, 2, $request->hidden_invoice_id);
                         }
-                        BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, 2, $request->hidden_invoice_id);
                     }
                 }
                 if ($request->hidden_invoice_id) {
