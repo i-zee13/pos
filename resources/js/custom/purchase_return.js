@@ -82,6 +82,36 @@ $(document).ready(function () {
     $('.add-more-btn').attr('href', '#');
     $('.new_form_field').addClass('required_client');
 })
+
+// Filter product dropdown by selected godown (server source of truth: godowns_stocks)
+function loadGodownProducts(godownId) {
+    godownId = parseInt(godownId || 0);
+    if (!godownId) {
+        // fall back to full list present at page load
+        product_list = [];
+        getProducts();
+        return;
+    }
+    $("#products").empty().append(`<option value="0">Select Product</option>`);
+    product_list = [];
+    $.ajax({
+        url: `/godown-products/${godownId}`,
+        type: 'get',
+        success: function (res) {
+            if (res.products && res.products.length > 0) {
+                res.products.forEach(p => {
+                    // Keep shape compatible with existing code (id, product_name, qty)
+                    $("#products").append(`<option value="${p.id}" data-name="${p.product_name}" data-qty="${p.stock}">${p.id}-${p.product_name}</option>`);
+                    product_list.push({ id: p.id, product_name: p.product_name, qty: p.stock });
+                });
+            }
+        }
+    });
+}
+
+$(document).on('change', '#godown_id', function () {
+    loadGodownProducts($(this).val());
+});
 $('#add-product').on('click', function () {
     var is_in_array = returns_product_array.filter(x => x.product_id == data_variable);
 
