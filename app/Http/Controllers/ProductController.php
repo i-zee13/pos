@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -19,17 +19,32 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $duplicateField = '';
-        // $barcodeArray = explode(',', $request->barcode);
+        $hiddenId = (int) $request->input('hidden_product_id', 0);
 
+        $barcodeValues = [];
+        if ($request->filled('barcode_span')) {
+            $barcodeValues[] = $request->barcode_span;
+        }
+        if ($request->has('barcode')) {
+            $raw = $request->barcode;
+            if (is_array($raw)) {
+                $barcodeValues = array_merge($barcodeValues, $raw);
+            } else {
+                $barcodeValues[] = $raw;
+            }
+        }
+        $barcodeValues = array_values(array_unique(array_filter($barcodeValues, function ($b) {
+            return $b !== null && $b !== '';
+        })));
 
         if (Product::where('company_id', $request->company_id)
             ->where('product_name', $request->hidden_product_name)
-            ->where('id', '!=', $request->hidden_product_id)
+            ->where('id', '!=', $hiddenId)
             ->exists()
         ) {
             $duplicateField = 'Product Name with same  Company already Exist';
-        } elseif (Product::whereIn('barcode', $request->barcode)
-            ->where('id', '!=', $request->hidden_product_id)
+        } elseif (!empty($barcodeValues) && Product::whereIn('barcode', $barcodeValues)
+            ->where('id', '!=', $hiddenId)
             ->exists()
         ) {
             $duplicateField = 'barcode already Exist';
@@ -64,7 +79,8 @@ class ProductController extends Controller
                 return response()->json([
                     'msg'   => 'Product Added',
                     'status' =>  'success',
-                    'next_product_id' => $next_product_id
+                    'next_product_id' => $next_product_id,
+                    'product_id' => $product->id,
                 ]);
             } else {
                 return response()->json([

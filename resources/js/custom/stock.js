@@ -123,6 +123,136 @@ $(document).ready(function () {
     $('#client_type').attr('disabled', true);
 })
 
+// ----------------------------
+// Quick add: Company + Product
+// ----------------------------
+function cpLoadCompanies(selectedId = 0) {
+    if (!$('#cp_company_id').length) return;
+    $('#cp_company_id').empty().append(`<option value="0">Select Company</option>`);
+    $.ajax({
+        url: `/get-companies`,
+        type: 'get',
+        success: function (response) {
+            if (response.companies) {
+                response.companies.forEach(c => {
+                    $('#cp_company_id').append(`<option value="${c.id}">${c.company_name}</option>`);
+                });
+            }
+            if (selectedId && parseInt(selectedId) > 0) {
+                $('#cp_company_id').val(selectedId).trigger('change');
+            }
+        }
+    });
+}
+
+function cpResetModal() {
+    $('#cpNewCompanyWrap').hide();
+    $('#cp_company_name').val('');
+    $('#cp_barcode').val('');
+    $('#cp_product_name').val('');
+    $('#cp_size').val('');
+    $('#cp_purchase_price').val('');
+    $('#cp_sale_price').val('');
+}
+
+$(document).on('click', '#openCompanyProductModal', function () {
+    cpResetModal();
+    cpLoadCompanies();
+    $('#companyProductModal').modal('show');
+});
+
+$(document).on('click', '#cpShowNewCompany', function () {
+    $('#cpNewCompanyWrap').toggle();
+    $('#cp_company_name').focus();
+});
+
+$(document).on('click', '#cpSaveCompany', function () {
+    const name = ($('#cp_company_name').val() || '').trim();
+    if (!name) {
+        $('#notifDiv').fadeIn().css('background', 'red').text('Company name is required');
+        setTimeout(() => $('#notifDiv').fadeOut(), 2500);
+        return;
+    }
+    $.ajax({
+        type: 'POST',
+        url: '/company',
+        data: {
+            _token: $('meta[name="csrf_token"]').attr('content'),
+            hidden_company_name: name
+        },
+        success: function (res) {
+            if (res.status === 'success') {
+                $('#notifDiv').fadeIn().css('background', 'green').text('Company added');
+                setTimeout(() => $('#notifDiv').fadeOut(), 2500);
+                $('#cpNewCompanyWrap').hide();
+                $('#cp_company_name').val('');
+                const newCompanyId = res.company_id ? parseInt(res.company_id, 10) : 0;
+                cpLoadCompanies(newCompanyId > 0 ? newCompanyId : 0);
+            } else {
+                $('#notifDiv').fadeIn().css('background', 'red').text(res.msg === 'duplicate' ? 'Company already exists' : 'Unable to add company');
+                setTimeout(() => $('#notifDiv').fadeOut(), 3000);
+            }
+        }
+    });
+});
+
+$(document).on('click', '#cpSaveProduct', function () {
+    const companyId = parseInt($('#cp_company_id').val() || 0);
+    const productName = ($('#cp_product_name').val() || '').trim();
+    const size = ($('#cp_size').val() || '').trim();
+    const purchasePrice = ($('#cp_purchase_price').val() || '').trim();
+    const salePrice = ($('#cp_sale_price').val() || '').trim();
+    const barcode = ($('#cp_barcode').val() || '').trim();
+
+    if (!companyId) {
+        $('#notifDiv').fadeIn().css('background', 'red').text('Please select a company');
+        setTimeout(() => $('#notifDiv').fadeOut(), 2500);
+        return;
+    }
+    if (!productName || !size || purchasePrice === '' || salePrice === '') {
+        $('#notifDiv').fadeIn().css('background', 'red').text('Please fill required product fields');
+        setTimeout(() => $('#notifDiv').fadeOut(), 2500);
+        return;
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: '/product-store',
+        data: {
+            _token: $('meta[name="csrf_token"]').attr('content'),
+            company_id: companyId,
+            hidden_product_name: productName,
+            size: size,
+            purchase_price: purchasePrice,
+            sale_price: salePrice,
+            barcode_span: barcode
+        },
+        success: function (res) {
+            if (res.status === 'success') {
+                $('#notifDiv').fadeIn().css('background', 'green').text('Product added');
+                setTimeout(() => $('#notifDiv').fadeOut(), 2500);
+
+                // Refresh products list and preselect the new product
+                product_list = [];
+                getProducts();
+                const newId = res.product_id ? parseInt(res.product_id, 10) : (res.next_product_id ? parseInt(res.next_product_id, 10) - 1 : 0);
+                if (newId > 0) {
+                    setTimeout(() => {
+                        $('#products').val(String(newId)).trigger('change');
+                    }, 600);
+                }
+                $('#companyProductModal').modal('hide');
+            } else if (res.msg === 'duplicate' || res.status === 'error') {
+                $('#notifDiv').fadeIn().css('background', 'red').text(res.duplicate_msg || 'Duplicate product');
+                setTimeout(() => $('#notifDiv').fadeOut(), 3500);
+            } else {
+                $('#notifDiv').fadeIn().css('background', 'red').text('Unable to add product');
+                setTimeout(() => $('#notifDiv').fadeOut(), 3000);
+            }
+        }
+    });
+});
+
 $('#datepicker , #datepicker2').datepicker({
         autoclose: true,
         todayHighlight: true,

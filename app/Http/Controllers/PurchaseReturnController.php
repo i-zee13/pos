@@ -11,10 +11,11 @@ use App\Models\PurchaseReturn;
 use App\Models\ReturnInvoice;
 use App\Models\Stock;
 use App\Models\VendorStock;
+use App\Models\Godown;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Mockery\Undefined;
 
 class PurchaseReturnController extends Controller
@@ -59,8 +60,9 @@ class PurchaseReturnController extends Controller
                                 //     }) ;
                                 // })
                                 ->get();
+        $godowns = Godown::where('is_active', true)->orderBy('name')->get();
 
-        return view('purchases.return.create', compact('customers', 'current_date', 'invoice_first_part', 'products', 'invoice_no'));
+        return view('purchases.return.create', compact('customers', 'current_date', 'invoice_first_part', 'products', 'invoice_no', 'godowns'));
     }
     public function store(Request $request)
     {
@@ -96,6 +98,7 @@ class PurchaseReturnController extends Controller
         $invoice->status               = $request->invoice_type;
         $invoice->description          = $request->description;
         $invoice->created_by           = Auth::id();
+        $invoice->godown_id            = $request->input('godown_id') ?: null;
         if ($invoice->save()) {
             if (count($request->returns_product_array) > 0) {
                 foreach ($request->returns_product_array as $purchase_product) {
@@ -119,6 +122,7 @@ class PurchaseReturnController extends Controller
                     $purchased->product_discount        = $purchase_product['prod_discount'];
                     $purchased->sale_price              = $purchase_product['retail_price'];
                     $purchased->created_by              = Auth::id();
+                    $purchased->godown_id               = $invoice->godown_id;
                     $previous_qty = ProductReturns::where('purchase_return_invoice_id', $request->hidden_invoice_id)
                         ->where('product_id', $purchased->product_id)
                         ->orderBy('id', 'Desc')
@@ -159,12 +163,21 @@ class PurchaseReturnController extends Controller
                             StockManagment($v_stock->id, $purchased, $change_qty_value, $In_out_status, 'purchase_return');
                             if ($v_stock->save()) {
                                 $purchased->vendor_stock_id = $v_stock->id;
-                                Product::where('id', $v_stock->product_id)->update([
-                                    'stock_balance' =>  $v_stock->balance,
-                                ]);
+                                // Apply return to selected godown (falls back to shop if not provided).
+                                $godownForReturn = $invoice->godown_id ?: Godown::where('type', 'shop')->orderBy('id')->value('id');
+                                $companyId = $purchased->company_id;
+                                if ($godownForReturn && $companyId) {
+                                    updateGodownStock(
+                                        $godownForReturn,
+                                        $companyId,
+                                        $purchased->product_id,
+                                        $change_qty_value,
+                                        $In_out_status
+                                    );
+                                }
                             }
                         }
-                        BatchWiseStockManagment($vs_id,  $invoice->id, $purchased, $purchased->qty, $In_out_status, 3, $request->hidden_invoice_id);
+                        BatchWiseStockManagment($vs_id, $invoice->id, $purchased, $change_qty_value, $In_out_status, 3, $request->hidden_invoice_id);
                         $check_stock    = VendorStock::where('product_id', $purchased->product_id)->orderBy('id', 'DESC')->first();
                         if ($check_stock) {
                             $balance    =   $check_stock->balance;
@@ -322,6 +335,7 @@ class PurchaseReturnController extends Controller
 
         $customers          =     Customer::where('customer_type', 1)->select('id', 'customer_name', 'balance')->get();
         $products           =     Product::withoutTrashed()->get();
+        $godowns            =     Godown::where('is_active', true)->orderBy('name')->get();
         $invoice            =     ReturnInvoice::where('id', $id)->first();
         $parts              =     explode('-', $invoice->invoice_no);
         $invoice_first_part =     $parts[0];
@@ -333,7 +347,7 @@ class PurchaseReturnController extends Controller
             ->where('purchase_return_invoice_id', $invoice->id)
             ->orderBy('id', 'DESC')->first();
         // dd($invoice->paid_amount);
-        return view('purchases.return.create', compact('invoice', 'customers', 'products', 'customers', 'get_vendor_ledger', 'invoice_first_part'));
+        return view('purchases.return.create', compact('invoice', 'customers', 'products', 'customers', 'get_vendor_ledger', 'invoice_first_part', 'godowns'));
     }
     public function getPurchaseReturnProduct($id)
     {

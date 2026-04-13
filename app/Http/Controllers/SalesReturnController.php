@@ -10,6 +10,7 @@ use App\Models\SaleReturn;
 use App\Models\SaleReturnProduct;
 use App\Models\Stock;
 use App\Models\VendorStock;
+use App\Models\Godown;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 // use Auth;
@@ -147,12 +148,21 @@ class SalesReturnController extends Controller
 
 
                             if ($v_stock->save()) {
-                                Product::where('id', $v_stock->product_id)->update([
-                                    'stock_balance' =>  $v_stock->balance,
-                                ]);
+                                // Sale return always goes to SHOP godown stock (and products.stock_balance mirrors SHOP only)
+                                $shopGodownId = Godown::where('type', 'shop')->orderBy('id')->value('id');
+                                $companyId = $sale->company_id;
+                                if ($shopGodownId && $companyId) {
+                                    updateGodownStock(
+                                        $shopGodownId,
+                                        $companyId,
+                                        $sale->product_id,
+                                        $change_qty_value,
+                                        $In_out_status // 1 = IN on return, 2 = OUT when editing return qty down
+                                    );
+                                }
                             }
                         }
-                        BatchWiseStockManagment($vs_id,  $invoice->id, $sale, $sale->qty, 1, 4, $request->hidden_invoice_id);
+                        BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, 4, $request->hidden_invoice_id);
                     }
                 }
                 if ($request->hidden_invoice_id) {

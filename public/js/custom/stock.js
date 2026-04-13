@@ -113,6 +113,7 @@ var segment = '';
 var deleteRef = '';
 var expiry_date = '';
 var existing_product_ids = [];
+var godown_id = 0;
 var p_price = '';
 var total_return_qty = 0;
 var paid_amount = 0;
@@ -181,12 +182,155 @@ $(document).ready(function () {
         // $(`#tr-${product.product_id} .qty-input`).trigger('input');
       }
     });
-  }
 
+    // current godown for this invoice (if any)
+    godown_id = $('#current_godown_id').val() || 0;
+  }
   getvendors();
+  getGodowns();
   $('.add-more-btn').attr('href', '#');
   $('.new_form_field').addClass('required_client');
   $('#client_type').attr('disabled', true);
+});
+
+// ----------------------------
+// Quick add: Company + Product
+// ----------------------------
+function cpLoadCompanies() {
+  var selectedId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  if (!$('#cp_company_id').length) return;
+  $('#cp_company_id').empty().append("<option value=\"0\">Select Company</option>");
+  $.ajax({
+    url: "/get-companies",
+    type: 'get',
+    success: function success(response) {
+      if (response.companies) {
+        response.companies.forEach(function (c) {
+          $('#cp_company_id').append("<option value=\"".concat(c.id, "\">").concat(c.company_name, "</option>"));
+        });
+      }
+      if (selectedId && parseInt(selectedId) > 0) {
+        $('#cp_company_id').val(selectedId).trigger('change');
+      }
+    }
+  });
+}
+function cpResetModal() {
+  $('#cpNewCompanyWrap').hide();
+  $('#cp_company_name').val('');
+  $('#cp_barcode').val('');
+  $('#cp_product_name').val('');
+  $('#cp_size').val('');
+  $('#cp_purchase_price').val('');
+  $('#cp_sale_price').val('');
+}
+$(document).on('click', '#openCompanyProductModal', function () {
+  cpResetModal();
+  cpLoadCompanies();
+  $('#companyProductModal').modal('show');
+});
+$(document).on('click', '#cpShowNewCompany', function () {
+  $('#cpNewCompanyWrap').toggle();
+  $('#cp_company_name').focus();
+});
+$(document).on('click', '#cpSaveCompany', function () {
+  var name = ($('#cp_company_name').val() || '').trim();
+  if (!name) {
+    $('#notifDiv').fadeIn().css('background', 'red').text('Company name is required');
+    setTimeout(function () {
+      return $('#notifDiv').fadeOut();
+    }, 2500);
+    return;
+  }
+  $.ajax({
+    type: 'POST',
+    url: '/company',
+    data: {
+      _token: $('meta[name="csrf_token"]').attr('content'),
+      hidden_company_name: name
+    },
+    success: function success(res) {
+      if (res.status === 'success') {
+        $('#notifDiv').fadeIn().css('background', 'green').text('Company added');
+        setTimeout(function () {
+          return $('#notifDiv').fadeOut();
+        }, 2500);
+        $('#cpNewCompanyWrap').hide();
+        $('#cp_company_name').val('');
+        var newCompanyId = res.company_id ? parseInt(res.company_id, 10) : 0;
+        cpLoadCompanies(newCompanyId > 0 ? newCompanyId : 0);
+      } else {
+        $('#notifDiv').fadeIn().css('background', 'red').text(res.msg === 'duplicate' ? 'Company already exists' : 'Unable to add company');
+        setTimeout(function () {
+          return $('#notifDiv').fadeOut();
+        }, 3000);
+      }
+    }
+  });
+});
+$(document).on('click', '#cpSaveProduct', function () {
+  var companyId = parseInt($('#cp_company_id').val() || 0);
+  var productName = ($('#cp_product_name').val() || '').trim();
+  var size = ($('#cp_size').val() || '').trim();
+  var purchasePrice = ($('#cp_purchase_price').val() || '').trim();
+  var salePrice = ($('#cp_sale_price').val() || '').trim();
+  var barcode = ($('#cp_barcode').val() || '').trim();
+  if (!companyId) {
+    $('#notifDiv').fadeIn().css('background', 'red').text('Please select a company');
+    setTimeout(function () {
+      return $('#notifDiv').fadeOut();
+    }, 2500);
+    return;
+  }
+  if (!productName || !size || purchasePrice === '' || salePrice === '') {
+    $('#notifDiv').fadeIn().css('background', 'red').text('Please fill required product fields');
+    setTimeout(function () {
+      return $('#notifDiv').fadeOut();
+    }, 2500);
+    return;
+  }
+  $.ajax({
+    type: 'POST',
+    url: '/product-store',
+    data: {
+      _token: $('meta[name="csrf_token"]').attr('content'),
+      company_id: companyId,
+      hidden_product_name: productName,
+      size: size,
+      purchase_price: purchasePrice,
+      sale_price: salePrice,
+      barcode_span: barcode
+    },
+    success: function success(res) {
+      if (res.status === 'success') {
+        $('#notifDiv').fadeIn().css('background', 'green').text('Product added');
+        setTimeout(function () {
+          return $('#notifDiv').fadeOut();
+        }, 2500);
+
+        // Refresh products list and preselect the new product
+        product_list = [];
+        getProducts();
+        var newId = res.product_id ? parseInt(res.product_id, 10) : res.next_product_id ? parseInt(res.next_product_id, 10) - 1 : 0;
+        if (newId > 0) {
+          setTimeout(function () {
+            $('#products').val(String(newId)).trigger('change');
+          }, 600);
+        }
+        $('#companyProductModal').modal('hide');
+      } else if (res.msg === 'duplicate' || res.status === 'error') {
+        $('#notifDiv').fadeIn().css('background', 'red').text(res.duplicate_msg || 'Duplicate product');
+        setTimeout(function () {
+          return $('#notifDiv').fadeOut();
+        }, 3500);
+      } else {
+        $('#notifDiv').fadeIn().css('background', 'red').text('Unable to add product');
+        setTimeout(function () {
+          return $('#notifDiv').fadeOut();
+        }, 3000);
+      }
+    }
+  });
 });
 $('#datepicker , #datepicker2').datepicker({
   autoclose: true,
@@ -525,7 +669,8 @@ function saleSave(current_action, type) {
       'status': 2,
       //status
       'purchased_product_array': purchased_product_array,
-      'existing_product_ids': existing_product_ids
+      'existing_product_ids': existing_product_ids,
+      'godown_id': $('#godown_id').val()
     },
     success: function success(response) {
       if (true) {
@@ -637,6 +782,28 @@ function getvendors() {
         vendors.push(data);
       });
       $("#customer_id").val(customer_id).trigger('change');
+    }
+  });
+}
+function getGodowns() {
+  if (!$('#godown_id').length) {
+    return;
+  }
+  $("#godown_id").empty();
+  $.ajax({
+    url: "/godowns",
+    type: 'get',
+    dataType: 'json',
+    success: function success(response) {
+      $("#godown_id").append("<option value=\"\">Select Godown</option>");
+      if (response.godowns) {
+        response.godowns.forEach(function (g) {
+          $("#godown_id").append("<option value=\"".concat(g.id, "\" ").concat(parseInt(g.id) === parseInt(godown_id) ? 'selected' : '', ">").concat(g.name, "</option>"));
+        });
+      }
+      if (godown_id) {
+        $("#godown_id").val(godown_id);
+      }
     }
   });
 }

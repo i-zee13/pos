@@ -708,6 +708,11 @@
                         <div class="col-md-6">
                             <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Update' : 'New'}} Purchase <span>Invoice</span></h2>
                         </div>
+                        <div class="col-md-6 text-right">
+                            <button type="button" class="btn btn-primary btn-line" id="openCompanyProductModal" style="margin-top: 6px;">
+                                Add Company / Product
+                            </button>
+                        </div>
 
                     </div>
 
@@ -789,6 +794,91 @@
                                     </tbody>
                                 </table>
 
+                            </div>
+                        </div>
+
+                        <!-- Company + Product quick add modal -->
+                        <div class="modal fade" id="companyProductModal" tabindex="-1" role="dialog" aria-labelledby="companyProductModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 720px;">
+                                <div class="modal-content top_border">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="companyProductModalLabel">Add Company & Product</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h6 style="font-weight: 700; margin-bottom: 8px;">Company</h6>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-group">
+                                                    <label class="font12 mb-1">Select Company</label>
+                                                    <select class="form-control formselect" id="cp_company_id">
+                                                        <option value="0">Select Company</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4" style="display:flex;align-items:end;">
+                                                <button type="button" class="btn btn-primary" id="cpShowNewCompany" style="width:100%;">Add New Company</button>
+                                            </div>
+
+                                            <div class="col-md-12" id="cpNewCompanyWrap" style="display:none;">
+                                                <div class="form-group">
+                                                    <label class="font12 mb-1">New Company Name *</label>
+                                                    <input type="text" class="form-control" id="cp_company_name" placeholder="Company name">
+                                                </div>
+                                                <div class="form-group" style="text-align:right;">
+                                                    <button type="button" class="btn btn-primary" id="cpSaveCompany">Save Company</button>
+                                                </div>
+                                                <hr />
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h6 style="font-weight: 700; margin-bottom: 8px;">Product</h6>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="font12 mb-1">Barcode</label>
+                                                    <input type="text" class="form-control" id="cp_barcode" placeholder="e.g. 12345">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="font12 mb-1">Product Name *</label>
+                                                    <input type="text" class="form-control" id="cp_product_name" placeholder="Product name">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label class="font12 mb-1">Size *</label>
+                                                    <input type="text" class="form-control" id="cp_size" placeholder="Size">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label class="font12 mb-1">Purchase Price *</label>
+                                                    <input type="number" class="form-control" id="cp_purchase_price" min="0" step="0.01">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label class="font12 mb-1">Sale Price *</label>
+                                                    <input type="number" class="form-control" id="cp_sale_price" min="0" step="0.01">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12" style="text-align:right;">
+                                                <button type="button" class="btn btn-primary" id="cpSaveProduct">Save Product</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer" style="justify-content:flex-end;">
+                                        <button type="button" class="btn btn-cancel" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

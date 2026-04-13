@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class CompanyController extends Controller
 {
@@ -26,7 +26,7 @@ class CompanyController extends Controller
             } else {
                 $company_icon = '';
             }
-            Company::create([
+            $company = Company::create([
                 'company_name' => $request->hidden_company_name,
                 'company_icon' => $company_icon,
                 'created_by' => Auth::user()->id,
@@ -34,6 +34,7 @@ class CompanyController extends Controller
             return response()->json([
                 'msg' => 'Added',
                 'status' => 'success',
+                'company_id' => $company->id,
             ]);
         }
     }
