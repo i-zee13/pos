@@ -29,6 +29,7 @@ let service_charges = 0;
 let invoice_discount = 0;
 let data_variable = '';
 let grand_total = 0;
+let selected_godown_id = 0;
 
 $(document).ready(function () {
 
@@ -40,6 +41,10 @@ $(document).ready(function () {
     vendors = JSON.parse($('#vendors').val());
     getProducts();
     $('.display').show();
+    selected_godown_id = parseInt($('#godown_id').val() || $('#current_godown_id').val() || 0);
+    if (selected_godown_id) {
+        loadGodownProducts(selected_godown_id);
+    }
     if (segments[3] == 'purchase-return-edit') {
         customer_id = $('#curren_customer_id').val();
         var invoice_id = $('#hidden_invoice_id').val();
@@ -82,6 +87,42 @@ $(document).ready(function () {
     $('.add-more-btn').attr('href', '#');
     $('.new_form_field').addClass('required_client');
 })
+
+// Filter product dropdown by selected godown stock (source of truth: godowns_stocks)
+function loadGodownProducts(godownId) {
+    godownId = parseInt(godownId || 0);
+    selected_godown_id = godownId;
+
+    $("#products").empty();
+    if (!godownId) {
+        $("#products").append(`<option value="0">Select Godown First</option>`);
+        product_list = [];
+        return;
+    }
+
+    $("#products").append(`<option value="0">Select Product</option>`);
+    product_list = [];
+    $.ajax({
+        url: `/godown-products/${godownId}`,
+        type: 'get',
+        success: function (res) {
+            if (res.products && res.products.length > 0) {
+                res.products.forEach(p => {
+                    // Normalize godown stock to the same property existing code expects
+                    p.stock_balance = p.stock;
+                    $("#products").append(
+                        `<option value="${p.id}" data-name="${p.product_name}" data-qty="${p.stock}">${p.id}-${p.product_name}</option>`
+                    );
+                    product_list.push(p);
+                });
+            }
+        }
+    });
+}
+
+$(document).on('change', '#godown_id', function () {
+    loadGodownProducts($(this).val());
+});
 
 // Filter product dropdown by selected godown (server source of truth: godowns_stocks)
 function loadGodownProducts(godownId) {
@@ -630,11 +671,8 @@ $(document).on('input', '.discount-input', function () {
 
 function getProducts() {
     $("#products").empty();
-    $("#products").append(`<option value="0">Select Product</option>`)
-    stock_products.forEach(data => {
-        $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name}</option>`)
-        product_list.push(data);
-    });
+    $("#products").append(`<option value="0">Select Godown First</option>`);
+    product_list = [];
 }
 
 function getvendors() {

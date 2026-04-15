@@ -94,7 +94,16 @@ class StockTransferController extends Controller
         $stocks = GodownStock::where('godown_id', $godownId)
             ->where('stock', '>', 0)
             ->join('products', 'products.id', '=', 'godowns_stocks.product_id')
-            ->select('products.id', 'products.product_name', 'godowns_stocks.stock')
+            ->select(
+                'products.id',
+                'products.product_name',
+                'products.sale_price',
+                'products.new_purchase_price',
+                'products.old_purchase_price',
+                'products.barcode',
+                'products.expiry_date',
+                'godowns_stocks.stock'
+            )
             ->orderBy('products.product_name')
             ->get();
 

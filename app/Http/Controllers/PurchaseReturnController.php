@@ -47,9 +47,10 @@ class PurchaseReturnController extends Controller
         $parts               =   explode('-', $invoice_no);
         $invoice_first_part  =   $parts[0];
         $current_date        =   Carbon::today()->toDateString();
-        $products            =   Product::selectRaw('products.*, (SELECT purchase_price FROM products_purchases WHERE product_id = products.id LIMIT 1) as unit_price')
-                                            ->where('stock_balance', '>', 0)
-                                            ->get();
+        // Do NOT filter by products.stock_balance here (that is SHOP stock only).
+        // Purchase return products should be filtered by selected godown (handled via /godown-products/{godown}).
+        $products = Product::selectRaw('products.*, (SELECT purchase_price FROM products_purchases WHERE product_id = products.id LIMIT 1) as unit_price')
+            ->get();
 
         $customers = Customer::where('customer_type', 1)
                                 // ->where(function ($query) {
@@ -352,11 +353,20 @@ class PurchaseReturnController extends Controller
     public function getPurchaseReturnProduct($id)
     {
 
-        $products       =   ProductReturns::where('products_returns.purchase_return_invoice_id', $id)
+        $invoiceGodownId = ReturnInvoice::where('id', $id)->value('godown_id');
+        $shopGodownId = Godown::where('type', 'shop')->orderBy('id')->value('id');
+        $godownId = $invoiceGodownId ?: $shopGodownId;
+
+        $products = ProductReturns::where('products_returns.purchase_return_invoice_id', $id)
             ->selectRaw('products_returns.*,
                                     (SELECT product_name FROM products WHERE id=products_returns.product_id) as product_name,
                                     (SELECT IFNULL(new_purchase_price,old_purchase_price)  FROM products WHERE id=products_returns.product_id) as purchase_price,
-                                    (SELECT stock_balance FROM products WHERE id=products_returns.product_id) as stock_in_hand')->get();
+                                    (SELECT IFNULL(stock, 0) FROM godowns_stocks 
+                                        WHERE godown_id = ? 
+                                          AND company_id = products_returns.company_id
+                                          AND product_id = products_returns.product_id
+                                        LIMIT 1) as stock_in_hand', [$godownId])
+            ->get();
 
         return response()->json([
             'msg'       => 'Vendor Fetched',
