@@ -1,1 +1,804 @@
-(()=>{var t={6737:function(t){t.exports=function(t){function e(o){if(n[o])return n[o].exports;var r=n[o]={i:o,l:!1,exports:{}};return t[o].call(r.exports,r,r.exports,e),r.l=!0,r.exports}var n={};return e.m=t,e.c=n,e.d=function(t,n,o){e.o(t,n)||Object.defineProperty(t,n,{configurable:!1,enumerable:!0,get:o})},e.n=function(t){var n=t&&t.__esModule?function(){return t.default}:function(){return t};return e.d(n,"a",n),n},e.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},e.p="",e(e.s=8)}([function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o="swal-button";e.CLASS_NAMES={MODAL:"swal-modal",OVERLAY:"swal-overlay",SHOW_MODAL:"swal-overlay--show-modal",MODAL_TITLE:"swal-title",MODAL_TEXT:"swal-text",ICON:"swal-icon",ICON_CUSTOM:"swal-icon--custom",CONTENT:"swal-content",FOOTER:"swal-footer",BUTTON_CONTAINER:"swal-button-container",BUTTON:o,CONFIRM_BUTTON:o+"--confirm",CANCEL_BUTTON:o+"--cancel",DANGER_BUTTON:o+"--danger",BUTTON_LOADING:o+"--loading",BUTTON_LOADER:o+"__loader"},e.default=e.CLASS_NAMES},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.getNode=function(t){var e="."+t;return document.querySelector(e)},e.stringToNode=function(t){var e=document.createElement("div");return e.innerHTML=t.trim(),e.firstChild},e.insertAfter=function(t,e){var n=e.nextSibling;e.parentNode.insertBefore(t,n)},e.removeNode=function(t){t.parentElement.removeChild(t)},e.throwErr=function(t){throw"SweetAlert: "+(t=t.replace(/ +(?= )/g,"")).trim()},e.isPlainObject=function(t){if("[object Object]"!==Object.prototype.toString.call(t))return!1;var e=Object.getPrototypeOf(t);return null===e||e===Object.prototype},e.ordinalSuffixOf=function(t){var e=t%10,n=t%100;return 1===e&&11!==n?t+"st":2===e&&12!==n?t+"nd":3===e&&13!==n?t+"rd":t+"th"}},function(t,e,n){"use strict";function o(t){for(var n in t)e.hasOwnProperty(n)||(e[n]=t[n])}Object.defineProperty(e,"__esModule",{value:!0}),o(n(25));var r=n(26);e.overlayMarkup=r.default,o(n(27)),o(n(28)),o(n(29));var i=n(0),a=i.default.MODAL_TITLE,c=i.default.MODAL_TEXT,s=i.default.ICON,u=i.default.FOOTER;e.iconMarkup='\n  <div class="'+s+'"></div>',e.titleMarkup='\n  <div class="'+a+'"></div>\n',e.textMarkup='\n  <div class="'+c+'"></div>',e.footerMarkup='\n  <div class="'+u+'"></div>\n'},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1);e.CONFIRM_KEY="confirm",e.CANCEL_KEY="cancel";var r={visible:!0,text:null,value:null,className:"",closeModal:!0},i=Object.assign({},r,{visible:!1,text:"Cancel",value:null}),a=Object.assign({},r,{text:"OK",value:!0});e.defaultButtonList={cancel:i,confirm:a};var c=function(t){switch(t){case e.CONFIRM_KEY:return a;case e.CANCEL_KEY:return i;default:var n=t.charAt(0).toUpperCase()+t.slice(1);return Object.assign({},r,{text:n,value:t})}},s=function(t,e){var n=c(t);return!0===e?Object.assign({},n,{visible:!0}):"string"==typeof e?Object.assign({},n,{visible:!0,text:e}):o.isPlainObject(e)?Object.assign({visible:!0},n,e):Object.assign({},n,{visible:!1})},u=function(t){for(var e={},n=0,o=Object.keys(t);n<o.length;n++){var r=o[n],a=t[r],c=s(r,a);e[r]=c}return e.cancel||(e.cancel=i),e},l=function(t){var n={};switch(t.length){case 1:n[e.CANCEL_KEY]=Object.assign({},i,{visible:!1});break;case 2:n[e.CANCEL_KEY]=s(e.CANCEL_KEY,t[0]),n[e.CONFIRM_KEY]=s(e.CONFIRM_KEY,t[1]);break;default:o.throwErr("Invalid number of 'buttons' in array ("+t.length+").\n      If you want more than 2 buttons, you need to use an object!")}return n};e.getButtonListOpts=function(t){var n=e.defaultButtonList;return"string"==typeof t?n[e.CONFIRM_KEY]=s(e.CONFIRM_KEY,t):Array.isArray(t)?n=l(t):o.isPlainObject(t)?n=u(t):!0===t?n=l([!0,!0]):!1===t?n=l([!1,!1]):void 0===t&&(n=e.defaultButtonList),n}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(2),i=n(0),a=i.default.MODAL,c=i.default.OVERLAY,s=n(30),u=n(31),l=n(32),d=n(33);e.injectElIntoModal=function(t){var e=o.getNode(a),n=o.stringToNode(t);return e.appendChild(n),n};var f=function(t){t.className=a,t.textContent=""},p=function(t,e){f(t);var n=e.className;n&&t.classList.add(n)};e.initModalContent=function(t){var e=o.getNode(a);p(e,t),s.default(t.icon),u.initTitle(t.title),u.initText(t.text),d.default(t.content),l.default(t.buttons,t.dangerMode)};var v=function(){var t=o.getNode(c),e=o.stringToNode(r.modalMarkup);t.appendChild(e)};e.default=v},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(3),r={isOpen:!1,promise:null,actions:{},timer:null},i=Object.assign({},r);e.resetState=function(){i=Object.assign({},r)},e.setActionValue=function(t){if("string"==typeof t)return a(o.CONFIRM_KEY,t);for(var e in t)a(e,t[e])};var a=function(t,e){i.actions[t]||(i.actions[t]={}),Object.assign(i.actions[t],{value:e})};e.setActionOptionsFor=function(t,e){var n=(void 0===e?{}:e).closeModal,o=void 0===n||n;Object.assign(i.actions[t],{closeModal:o})},e.default=i},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(3),i=n(0),a=i.default.OVERLAY,c=i.default.SHOW_MODAL,s=i.default.BUTTON,u=i.default.BUTTON_LOADING,l=n(5);e.openModal=function(){o.getNode(a).classList.add(c),l.default.isOpen=!0};var d=function(){o.getNode(a).classList.remove(c),l.default.isOpen=!1};e.onAction=function(t){void 0===t&&(t=r.CANCEL_KEY);var e=l.default.actions[t],n=e.value;if(!1===e.closeModal){var i=s+"--"+t;o.getNode(i).classList.add(u)}else d();l.default.promise.resolve(n)},e.getState=function(){var t=Object.assign({},l.default);return delete t.promise,delete t.timer,t},e.stopLoading=function(){for(var t=document.querySelectorAll("."+s),e=0;e<t.length;e++)t[e].classList.remove(u)}},function(t,e){var n;n=function(){return this}();try{n=n||Function("return this")()||(0,eval)("this")}catch(t){"object"==typeof window&&(n=window)}t.exports=n},function(t,e,n){(function(e){t.exports=e.sweetAlert=n(9)}).call(e,n(7))},function(t,e,n){(function(e){t.exports=e.swal=n(10)}).call(e,n(7))},function(t,e,n){"undefined"!=typeof window&&n(11),n(16);var o=n(23).default;t.exports=o},function(t,e,n){var o=n(12);"string"==typeof o&&(o=[[t.i,o,""]]);var r={insertAt:"top",transform:void 0};n(14)(o,r),o.locals&&(t.exports=o.locals)},function(t,e,n){(t.exports=n(13)(void 0)).push([t.i,'.swal-icon--error{border-color:#f27474;-webkit-animation:animateErrorIcon .5s;animation:animateErrorIcon .5s}.swal-icon--error__x-mark{position:relative;display:block;-webkit-animation:animateXMark .5s;animation:animateXMark .5s}.swal-icon--error__line{position:absolute;height:5px;width:47px;background-color:#f27474;display:block;top:37px;border-radius:2px}.swal-icon--error__line--left{-webkit-transform:rotate(45deg);transform:rotate(45deg);left:17px}.swal-icon--error__line--right{-webkit-transform:rotate(-45deg);transform:rotate(-45deg);right:16px}@-webkit-keyframes animateErrorIcon{0%{-webkit-transform:rotateX(100deg);transform:rotateX(100deg);opacity:0}to{-webkit-transform:rotateX(0deg);transform:rotateX(0deg);opacity:1}}@keyframes animateErrorIcon{0%{-webkit-transform:rotateX(100deg);transform:rotateX(100deg);opacity:0}to{-webkit-transform:rotateX(0deg);transform:rotateX(0deg);opacity:1}}@-webkit-keyframes animateXMark{0%{-webkit-transform:scale(.4);transform:scale(.4);margin-top:26px;opacity:0}50%{-webkit-transform:scale(.4);transform:scale(.4);margin-top:26px;opacity:0}80%{-webkit-transform:scale(1.15);transform:scale(1.15);margin-top:-6px}to{-webkit-transform:scale(1);transform:scale(1);margin-top:0;opacity:1}}@keyframes animateXMark{0%{-webkit-transform:scale(.4);transform:scale(.4);margin-top:26px;opacity:0}50%{-webkit-transform:scale(.4);transform:scale(.4);margin-top:26px;opacity:0}80%{-webkit-transform:scale(1.15);transform:scale(1.15);margin-top:-6px}to{-webkit-transform:scale(1);transform:scale(1);margin-top:0;opacity:1}}.swal-icon--warning{border-color:#f8bb86;-webkit-animation:pulseWarning .75s infinite alternate;animation:pulseWarning .75s infinite alternate}.swal-icon--warning__body{width:5px;height:47px;top:10px;border-radius:2px;margin-left:-2px}.swal-icon--warning__body,.swal-icon--warning__dot{position:absolute;left:50%;background-color:#f8bb86}.swal-icon--warning__dot{width:7px;height:7px;border-radius:50%;margin-left:-4px;bottom:-11px}@-webkit-keyframes pulseWarning{0%{border-color:#f8d486}to{border-color:#f8bb86}}@keyframes pulseWarning{0%{border-color:#f8d486}to{border-color:#f8bb86}}.swal-icon--success{border-color:#a5dc86}.swal-icon--success:after,.swal-icon--success:before{content:"";border-radius:50%;position:absolute;width:60px;height:120px;background:#fff;-webkit-transform:rotate(45deg);transform:rotate(45deg)}.swal-icon--success:before{border-radius:120px 0 0 120px;top:-7px;left:-33px;-webkit-transform:rotate(-45deg);transform:rotate(-45deg);-webkit-transform-origin:60px 60px;transform-origin:60px 60px}.swal-icon--success:after{border-radius:0 120px 120px 0;top:-11px;left:30px;-webkit-transform:rotate(-45deg);transform:rotate(-45deg);-webkit-transform-origin:0 60px;transform-origin:0 60px;-webkit-animation:rotatePlaceholder 4.25s ease-in;animation:rotatePlaceholder 4.25s ease-in}.swal-icon--success__ring{width:80px;height:80px;border:4px solid hsla(98,55%,69%,.2);border-radius:50%;box-sizing:content-box;position:absolute;left:-4px;top:-4px;z-index:2}.swal-icon--success__hide-corners{width:5px;height:90px;background-color:#fff;padding:1px;position:absolute;left:28px;top:8px;z-index:1;-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}.swal-icon--success__line{height:5px;background-color:#a5dc86;display:block;border-radius:2px;position:absolute;z-index:2}.swal-icon--success__line--tip{width:25px;left:14px;top:46px;-webkit-transform:rotate(45deg);transform:rotate(45deg);-webkit-animation:animateSuccessTip .75s;animation:animateSuccessTip .75s}.swal-icon--success__line--long{width:47px;right:8px;top:38px;-webkit-transform:rotate(-45deg);transform:rotate(-45deg);-webkit-animation:animateSuccessLong .75s;animation:animateSuccessLong .75s}@-webkit-keyframes rotatePlaceholder{0%{-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}5%{-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}12%{-webkit-transform:rotate(-405deg);transform:rotate(-405deg)}to{-webkit-transform:rotate(-405deg);transform:rotate(-405deg)}}@keyframes rotatePlaceholder{0%{-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}5%{-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}12%{-webkit-transform:rotate(-405deg);transform:rotate(-405deg)}to{-webkit-transform:rotate(-405deg);transform:rotate(-405deg)}}@-webkit-keyframes animateSuccessTip{0%{width:0;left:1px;top:19px}54%{width:0;left:1px;top:19px}70%{width:50px;left:-8px;top:37px}84%{width:17px;left:21px;top:48px}to{width:25px;left:14px;top:45px}}@keyframes animateSuccessTip{0%{width:0;left:1px;top:19px}54%{width:0;left:1px;top:19px}70%{width:50px;left:-8px;top:37px}84%{width:17px;left:21px;top:48px}to{width:25px;left:14px;top:45px}}@-webkit-keyframes animateSuccessLong{0%{width:0;right:46px;top:54px}65%{width:0;right:46px;top:54px}84%{width:55px;right:0;top:35px}to{width:47px;right:8px;top:38px}}@keyframes animateSuccessLong{0%{width:0;right:46px;top:54px}65%{width:0;right:46px;top:54px}84%{width:55px;right:0;top:35px}to{width:47px;right:8px;top:38px}}.swal-icon--info{border-color:#c9dae1}.swal-icon--info:before{width:5px;height:29px;bottom:17px;border-radius:2px;margin-left:-2px}.swal-icon--info:after,.swal-icon--info:before{content:"";position:absolute;left:50%;background-color:#c9dae1}.swal-icon--info:after{width:7px;height:7px;border-radius:50%;margin-left:-3px;top:19px}.swal-icon{width:80px;height:80px;border-width:4px;border-style:solid;border-radius:50%;padding:0;position:relative;box-sizing:content-box;margin:20px auto}.swal-icon:first-child{margin-top:32px}.swal-icon--custom{width:auto;height:auto;max-width:100%;border:none;border-radius:0}.swal-icon img{max-width:100%;max-height:100%}.swal-title{color:rgba(0,0,0,.65);font-weight:600;text-transform:none;position:relative;display:block;padding:13px 16px;font-size:27px;line-height:normal;text-align:center;margin-bottom:0}.swal-title:first-child{margin-top:26px}.swal-title:not(:first-child){padding-bottom:0}.swal-title:not(:last-child){margin-bottom:13px}.swal-text{font-size:16px;position:relative;float:none;line-height:normal;vertical-align:top;text-align:left;display:inline-block;margin:0;padding:0 10px;font-weight:400;color:rgba(0,0,0,.64);max-width:calc(100% - 20px);overflow-wrap:break-word;box-sizing:border-box}.swal-text:first-child{margin-top:45px}.swal-text:last-child{margin-bottom:45px}.swal-footer{text-align:right;padding-top:13px;margin-top:13px;padding:13px 16px;border-radius:inherit;border-top-left-radius:0;border-top-right-radius:0}.swal-button-container{margin:5px;display:inline-block;position:relative}.swal-button{background-color:#7cd1f9;color:#fff;border:none;box-shadow:none;border-radius:5px;font-weight:600;font-size:14px;padding:10px 24px;margin:0;cursor:pointer}.swal-button:not([disabled]):hover{background-color:#78cbf2}.swal-button:active{background-color:#70bce0}.swal-button:focus{outline:none;box-shadow:0 0 0 1px #fff,0 0 0 3px rgba(43,114,165,.29)}.swal-button[disabled]{opacity:.5;cursor:default}.swal-button::-moz-focus-inner{border:0}.swal-button--cancel{color:#555;background-color:#efefef}.swal-button--cancel:not([disabled]):hover{background-color:#e8e8e8}.swal-button--cancel:active{background-color:#d7d7d7}.swal-button--cancel:focus{box-shadow:0 0 0 1px #fff,0 0 0 3px rgba(116,136,150,.29)}.swal-button--danger{background-color:#e64942}.swal-button--danger:not([disabled]):hover{background-color:#df4740}.swal-button--danger:active{background-color:#cf423b}.swal-button--danger:focus{box-shadow:0 0 0 1px #fff,0 0 0 3px rgba(165,43,43,.29)}.swal-content{padding:0 20px;margin-top:20px;font-size:medium}.swal-content:last-child{margin-bottom:20px}.swal-content__input,.swal-content__textarea{-webkit-appearance:none;background-color:#fff;border:none;font-size:14px;display:block;box-sizing:border-box;width:100%;border:1px solid rgba(0,0,0,.14);padding:10px 13px;border-radius:2px;transition:border-color .2s}.swal-content__input:focus,.swal-content__textarea:focus{outline:none;border-color:#6db8ff}.swal-content__textarea{resize:vertical}.swal-button--loading{color:transparent}.swal-button--loading~.swal-button__loader{opacity:1}.swal-button__loader{position:absolute;height:auto;width:43px;z-index:2;left:50%;top:50%;-webkit-transform:translateX(-50%) translateY(-50%);transform:translateX(-50%) translateY(-50%);text-align:center;pointer-events:none;opacity:0}.swal-button__loader div{display:inline-block;float:none;vertical-align:baseline;width:9px;height:9px;padding:0;border:none;margin:2px;opacity:.4;border-radius:7px;background-color:hsla(0,0%,100%,.9);transition:background .2s;-webkit-animation:swal-loading-anim 1s infinite;animation:swal-loading-anim 1s infinite}.swal-button__loader div:nth-child(3n+2){-webkit-animation-delay:.15s;animation-delay:.15s}.swal-button__loader div:nth-child(3n+3){-webkit-animation-delay:.3s;animation-delay:.3s}@-webkit-keyframes swal-loading-anim{0%{opacity:.4}20%{opacity:.4}50%{opacity:1}to{opacity:.4}}@keyframes swal-loading-anim{0%{opacity:.4}20%{opacity:.4}50%{opacity:1}to{opacity:.4}}.swal-overlay{position:fixed;top:0;bottom:0;left:0;right:0;text-align:center;font-size:0;overflow-y:auto;background-color:rgba(0,0,0,.4);z-index:10000;pointer-events:none;opacity:0;transition:opacity .3s}.swal-overlay:before{content:" ";display:inline-block;vertical-align:middle;height:100%}.swal-overlay--show-modal{opacity:1;pointer-events:auto}.swal-overlay--show-modal .swal-modal{opacity:1;pointer-events:auto;box-sizing:border-box;-webkit-animation:showSweetAlert .3s;animation:showSweetAlert .3s;will-change:transform}.swal-modal{width:478px;opacity:0;pointer-events:none;background-color:#fff;text-align:center;border-radius:5px;position:static;margin:20px auto;display:inline-block;vertical-align:middle;-webkit-transform:scale(1);transform:scale(1);-webkit-transform-origin:50% 50%;transform-origin:50% 50%;z-index:10001;transition:opacity .2s,-webkit-transform .3s;transition:transform .3s,opacity .2s;transition:transform .3s,opacity .2s,-webkit-transform .3s}@media (max-width:500px){.swal-modal{width:calc(100% - 20px)}}@-webkit-keyframes showSweetAlert{0%{-webkit-transform:scale(1);transform:scale(1)}1%{-webkit-transform:scale(.5);transform:scale(.5)}45%{-webkit-transform:scale(1.05);transform:scale(1.05)}80%{-webkit-transform:scale(.95);transform:scale(.95)}to{-webkit-transform:scale(1);transform:scale(1)}}@keyframes showSweetAlert{0%{-webkit-transform:scale(1);transform:scale(1)}1%{-webkit-transform:scale(.5);transform:scale(.5)}45%{-webkit-transform:scale(1.05);transform:scale(1.05)}80%{-webkit-transform:scale(.95);transform:scale(.95)}to{-webkit-transform:scale(1);transform:scale(1)}}',""])},function(t,e){function n(t,e){var n=t[1]||"",r=t[3];if(!r)return n;if(e&&"function"==typeof btoa){var i=o(r);return[n].concat(r.sources.map((function(t){return"/*# sourceURL="+r.sourceRoot+t+" */"}))).concat([i]).join("\n")}return[n].join("\n")}function o(t){return"/*# sourceMappingURL=data:application/json;charset=utf-8;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(t))))+" */"}t.exports=function(t){var e=[];return e.toString=function(){return this.map((function(e){var o=n(e,t);return e[2]?"@media "+e[2]+"{"+o+"}":o})).join("")},e.i=function(t,n){"string"==typeof t&&(t=[[null,t,""]]);for(var o={},r=0;r<this.length;r++){var i=this[r][0];"number"==typeof i&&(o[i]=!0)}for(r=0;r<t.length;r++){var a=t[r];"number"==typeof a[0]&&o[a[0]]||(n&&!a[2]?a[2]=n:n&&(a[2]="("+a[2]+") and ("+n+")"),e.push(a))}},e}},function(t,e,n){function o(t,e){for(var n=0;n<t.length;n++){var o=t[n],r=v[o.id];if(r){r.refs++;for(var i=0;i<r.parts.length;i++)r.parts[i](o.parts[i]);for(;i<o.parts.length;i++)r.parts.push(l(o.parts[i],e))}else{var a=[];for(i=0;i<o.parts.length;i++)a.push(l(o.parts[i],e));v[o.id]={id:o.id,refs:1,parts:a}}}}function r(t,e){for(var n=[],o={},r=0;r<t.length;r++){var i=t[r],a=e.base?i[0]+e.base:i[0],c={css:i[1],media:i[2],sourceMap:i[3]};o[a]?o[a].parts.push(c):n.push(o[a]={id:a,parts:[c]})}return n}function i(t,e){var n=h(t.insertInto);if(!n)throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");var o=_[_.length-1];if("top"===t.insertAt)o?o.nextSibling?n.insertBefore(e,o.nextSibling):n.appendChild(e):n.insertBefore(e,n.firstChild),_.push(e);else{if("bottom"!==t.insertAt)throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");n.appendChild(e)}}function a(t){if(null===t.parentNode)return!1;t.parentNode.removeChild(t);var e=_.indexOf(t);e>=0&&_.splice(e,1)}function c(t){var e=document.createElement("style");return t.attrs.type="text/css",u(e,t.attrs),i(t,e),e}function s(t){var e=document.createElement("link");return t.attrs.type="text/css",t.attrs.rel="stylesheet",u(e,t.attrs),i(t,e),e}function u(t,e){Object.keys(e).forEach((function(n){t.setAttribute(n,e[n])}))}function l(t,e){var n,o,r,i;if(e.transform&&t.css){if(!(i=e.transform(t.css)))return function(){};t.css=i}if(e.singleton){var u=g++;n=b||(b=c(e)),o=d.bind(null,n,u,!1),r=d.bind(null,n,u,!0)}else t.sourceMap&&"function"==typeof URL&&"function"==typeof URL.createObjectURL&&"function"==typeof URL.revokeObjectURL&&"function"==typeof Blob&&"function"==typeof btoa?(n=s(e),o=p.bind(null,n,e),r=function(){a(n),n.href&&URL.revokeObjectURL(n.href)}):(n=c(e),o=f.bind(null,n),r=function(){a(n)});return o(t),function(e){if(e){if(e.css===t.css&&e.media===t.media&&e.sourceMap===t.sourceMap)return;o(t=e)}else r()}}function d(t,e,n,o){var r=n?"":o.css;if(t.styleSheet)t.styleSheet.cssText=y(e,r);else{var i=document.createTextNode(r),a=t.childNodes;a[e]&&t.removeChild(a[e]),a.length?t.insertBefore(i,a[e]):t.appendChild(i)}}function f(t,e){var n=e.css,o=e.media;if(o&&t.setAttribute("media",o),t.styleSheet)t.styleSheet.cssText=n;else{for(;t.firstChild;)t.removeChild(t.firstChild);t.appendChild(document.createTextNode(n))}}function p(t,e,n){var o=n.css,r=n.sourceMap,i=void 0===e.convertToAbsoluteUrls&&r;(e.convertToAbsoluteUrls||i)&&(o=w(o)),r&&(o+="\n/*# sourceMappingURL=data:application/json;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(r))))+" */");var a=new Blob([o],{type:"text/css"}),c=t.href;t.href=URL.createObjectURL(a),c&&URL.revokeObjectURL(c)}var v={},m=function(t){var e;return function(){return void 0===e&&(e=t.apply(this,arguments)),e}}((function(){return window&&document&&document.all&&!window.atob})),h=function(t){var e={};return function(n){return void 0===e[n]&&(e[n]=t.call(this,n)),e[n]}}((function(t){return document.querySelector(t)})),b=null,g=0,_=[],w=n(15);t.exports=function(t,e){if("undefined"!=typeof DEBUG&&DEBUG&&"object"!=typeof document)throw new Error("The style-loader cannot be used in a non-browser environment");(e=e||{}).attrs="object"==typeof e.attrs?e.attrs:{},e.singleton||(e.singleton=m()),e.insertInto||(e.insertInto="head"),e.insertAt||(e.insertAt="bottom");var n=r(t,e);return o(n,e),function(t){for(var i=[],a=0;a<n.length;a++){var c=n[a];(s=v[c.id]).refs--,i.push(s)}for(t&&o(r(t,e),e),a=0;a<i.length;a++){var s;if(0===(s=i[a]).refs){for(var u=0;u<s.parts.length;u++)s.parts[u]();delete v[s.id]}}}};var y=function(){var t=[];return function(e,n){return t[e]=n,t.filter(Boolean).join("\n")}}()},function(t,e){t.exports=function(t){var e="undefined"!=typeof window&&window.location;if(!e)throw new Error("fixUrls requires window.location");if(!t||"string"!=typeof t)return t;var n=e.protocol+"//"+e.host,o=n+e.pathname.replace(/\/[^\/]*$/,"/");return t.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi,(function(t,e){var r,i=e.trim().replace(/^"(.*)"$/,(function(t,e){return e})).replace(/^'(.*)'$/,(function(t,e){return e}));return/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/)/i.test(i)?t:(r=0===i.indexOf("//")?i:0===i.indexOf("/")?n+i:o+i.replace(/^\.\//,""),"url("+JSON.stringify(r)+")")}))}},function(t,e,n){var o=n(17);"undefined"==typeof window||window.Promise||(window.Promise=o),n(21),String.prototype.includes||(String.prototype.includes=function(t,e){"use strict";return"number"!=typeof e&&(e=0),!(e+t.length>this.length)&&-1!==this.indexOf(t,e)}),Array.prototype.includes||Object.defineProperty(Array.prototype,"includes",{value:function(t,e){if(null==this)throw new TypeError('"this" is null or not defined');var n=Object(this),o=n.length>>>0;if(0===o)return!1;for(var r=0|e,i=Math.max(r>=0?r:o-Math.abs(r),0);i<o;){if(function(t,e){return t===e||"number"==typeof t&&"number"==typeof e&&isNaN(t)&&isNaN(e)}(n[i],t))return!0;i++}return!1}}),"undefined"!=typeof window&&[Element.prototype,CharacterData.prototype,DocumentType.prototype].forEach((function(t){t.hasOwnProperty("remove")||Object.defineProperty(t,"remove",{configurable:!0,enumerable:!0,writable:!0,value:function(){this.parentNode.removeChild(this)}})}))},function(t,e,n){(function(e){!function(n){function o(){}function r(t,e){return function(){t.apply(e,arguments)}}function i(t){if("object"!=typeof this)throw new TypeError("Promises must be constructed via new");if("function"!=typeof t)throw new TypeError("not a function");this._state=0,this._handled=!1,this._value=void 0,this._deferreds=[],d(t,this)}function a(t,e){for(;3===t._state;)t=t._value;0!==t._state?(t._handled=!0,i._immediateFn((function(){var n=1===t._state?e.onFulfilled:e.onRejected;if(null!==n){var o;try{o=n(t._value)}catch(t){return void s(e.promise,t)}c(e.promise,o)}else(1===t._state?c:s)(e.promise,t._value)}))):t._deferreds.push(e)}function c(t,e){try{if(e===t)throw new TypeError("A promise cannot be resolved with itself.");if(e&&("object"==typeof e||"function"==typeof e)){var n=e.then;if(e instanceof i)return t._state=3,t._value=e,void u(t);if("function"==typeof n)return void d(r(n,e),t)}t._state=1,t._value=e,u(t)}catch(e){s(t,e)}}function s(t,e){t._state=2,t._value=e,u(t)}function u(t){2===t._state&&0===t._deferreds.length&&i._immediateFn((function(){t._handled||i._unhandledRejectionFn(t._value)}));for(var e=0,n=t._deferreds.length;e<n;e++)a(t,t._deferreds[e]);t._deferreds=null}function l(t,e,n){this.onFulfilled="function"==typeof t?t:null,this.onRejected="function"==typeof e?e:null,this.promise=n}function d(t,e){var n=!1;try{t((function(t){n||(n=!0,c(e,t))}),(function(t){n||(n=!0,s(e,t))}))}catch(t){if(n)return;n=!0,s(e,t)}}var f=setTimeout;i.prototype.catch=function(t){return this.then(null,t)},i.prototype.then=function(t,e){var n=new this.constructor(o);return a(this,new l(t,e,n)),n},i.all=function(t){var e=Array.prototype.slice.call(t);return new i((function(t,n){function o(i,a){try{if(a&&("object"==typeof a||"function"==typeof a)){var c=a.then;if("function"==typeof c)return void c.call(a,(function(t){o(i,t)}),n)}e[i]=a,0==--r&&t(e)}catch(t){n(t)}}if(0===e.length)return t([]);for(var r=e.length,i=0;i<e.length;i++)o(i,e[i])}))},i.resolve=function(t){return t&&"object"==typeof t&&t.constructor===i?t:new i((function(e){e(t)}))},i.reject=function(t){return new i((function(e,n){n(t)}))},i.race=function(t){return new i((function(e,n){for(var o=0,r=t.length;o<r;o++)t[o].then(e,n)}))},i._immediateFn="function"==typeof e&&function(t){e(t)}||function(t){f(t,0)},i._unhandledRejectionFn=function(t){"undefined"!=typeof console&&console&&console.warn("Possible Unhandled Promise Rejection:",t)},i._setImmediateFn=function(t){i._immediateFn=t},i._setUnhandledRejectionFn=function(t){i._unhandledRejectionFn=t},void 0!==t&&t.exports?t.exports=i:n.Promise||(n.Promise=i)}(this)}).call(e,n(18).setImmediate)},function(t,e,n){function o(t,e){this._id=t,this._clearFn=e}var r=Function.prototype.apply;e.setTimeout=function(){return new o(r.call(setTimeout,window,arguments),clearTimeout)},e.setInterval=function(){return new o(r.call(setInterval,window,arguments),clearInterval)},e.clearTimeout=e.clearInterval=function(t){t&&t.close()},o.prototype.unref=o.prototype.ref=function(){},o.prototype.close=function(){this._clearFn.call(window,this._id)},e.enroll=function(t,e){clearTimeout(t._idleTimeoutId),t._idleTimeout=e},e.unenroll=function(t){clearTimeout(t._idleTimeoutId),t._idleTimeout=-1},e._unrefActive=e.active=function(t){clearTimeout(t._idleTimeoutId);var e=t._idleTimeout;e>=0&&(t._idleTimeoutId=setTimeout((function(){t._onTimeout&&t._onTimeout()}),e))},n(19),e.setImmediate=setImmediate,e.clearImmediate=clearImmediate},function(t,e,n){(function(t,e){!function(t,n){"use strict";function o(t){"function"!=typeof t&&(t=new Function(""+t));for(var e=new Array(arguments.length-1),n=0;n<e.length;n++)e[n]=arguments[n+1];var o={callback:t,args:e};return u[s]=o,c(s),s++}function r(t){delete u[t]}function i(t){var e=t.callback,o=t.args;switch(o.length){case 0:e();break;case 1:e(o[0]);break;case 2:e(o[0],o[1]);break;case 3:e(o[0],o[1],o[2]);break;default:e.apply(n,o)}}function a(t){if(l)setTimeout(a,0,t);else{var e=u[t];if(e){l=!0;try{i(e)}finally{r(t),l=!1}}}}if(!t.setImmediate){var c,s=1,u={},l=!1,d=t.document,f=Object.getPrototypeOf&&Object.getPrototypeOf(t);f=f&&f.setTimeout?f:t,"[object process]"==={}.toString.call(t.process)?c=function(t){e.nextTick((function(){a(t)}))}:function(){if(t.postMessage&&!t.importScripts){var e=!0,n=t.onmessage;return t.onmessage=function(){e=!1},t.postMessage("","*"),t.onmessage=n,e}}()?function(){var e="setImmediate$"+Math.random()+"$",n=function(n){n.source===t&&"string"==typeof n.data&&0===n.data.indexOf(e)&&a(+n.data.slice(e.length))};t.addEventListener?t.addEventListener("message",n,!1):t.attachEvent("onmessage",n),c=function(n){t.postMessage(e+n,"*")}}():t.MessageChannel?function(){var t=new MessageChannel;t.port1.onmessage=function(t){a(t.data)},c=function(e){t.port2.postMessage(e)}}():d&&"onreadystatechange"in d.createElement("script")?function(){var t=d.documentElement;c=function(e){var n=d.createElement("script");n.onreadystatechange=function(){a(e),n.onreadystatechange=null,t.removeChild(n),n=null},t.appendChild(n)}}():c=function(t){setTimeout(a,0,t)},f.setImmediate=o,f.clearImmediate=r}}("undefined"==typeof self?void 0===t?this:t:self)}).call(e,n(7),n(20))},function(t,e){function n(){throw new Error("setTimeout has not been defined")}function o(){throw new Error("clearTimeout has not been defined")}function r(t){if(l===setTimeout)return setTimeout(t,0);if((l===n||!l)&&setTimeout)return l=setTimeout,setTimeout(t,0);try{return l(t,0)}catch(e){try{return l.call(null,t,0)}catch(e){return l.call(this,t,0)}}}function i(t){if(d===clearTimeout)return clearTimeout(t);if((d===o||!d)&&clearTimeout)return d=clearTimeout,clearTimeout(t);try{return d(t)}catch(e){try{return d.call(null,t)}catch(e){return d.call(this,t)}}}function a(){m&&p&&(m=!1,p.length?v=p.concat(v):h=-1,v.length&&c())}function c(){if(!m){var t=r(a);m=!0;for(var e=v.length;e;){for(p=v,v=[];++h<e;)p&&p[h].run();h=-1,e=v.length}p=null,m=!1,i(t)}}function s(t,e){this.fun=t,this.array=e}function u(){}var l,d,f=t.exports={};!function(){try{l="function"==typeof setTimeout?setTimeout:n}catch(t){l=n}try{d="function"==typeof clearTimeout?clearTimeout:o}catch(t){d=o}}();var p,v=[],m=!1,h=-1;f.nextTick=function(t){var e=new Array(arguments.length-1);if(arguments.length>1)for(var n=1;n<arguments.length;n++)e[n-1]=arguments[n];v.push(new s(t,e)),1!==v.length||m||r(c)},s.prototype.run=function(){this.fun.apply(null,this.array)},f.title="browser",f.browser=!0,f.env={},f.argv=[],f.version="",f.versions={},f.on=u,f.addListener=u,f.once=u,f.off=u,f.removeListener=u,f.removeAllListeners=u,f.emit=u,f.prependListener=u,f.prependOnceListener=u,f.listeners=function(t){return[]},f.binding=function(t){throw new Error("process.binding is not supported")},f.cwd=function(){return"/"},f.chdir=function(t){throw new Error("process.chdir is not supported")},f.umask=function(){return 0}},function(t,e,n){"use strict";n(22).polyfill()},function(t,e,n){"use strict";function o(t,e){if(null==t)throw new TypeError("Cannot convert first argument to object");for(var n=Object(t),o=1;o<arguments.length;o++){var r=arguments[o];if(null!=r)for(var i=Object.keys(Object(r)),a=0,c=i.length;a<c;a++){var s=i[a],u=Object.getOwnPropertyDescriptor(r,s);void 0!==u&&u.enumerable&&(n[s]=r[s])}}return n}function r(){Object.assign||Object.defineProperty(Object,"assign",{enumerable:!1,configurable:!0,writable:!0,value:o})}t.exports={assign:o,polyfill:r}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(24),r=n(6),i=n(5),a=n(36),c=function(){for(var t=[],e=0;e<arguments.length;e++)t[e]=arguments[e];if("undefined"!=typeof window){var n=a.getOpts.apply(void 0,t);return new Promise((function(t,e){i.default.promise={resolve:t,reject:e},o.default(n),setTimeout((function(){r.openModal()}))}))}};c.close=r.onAction,c.getState=r.getState,c.setActionValue=i.setActionValue,c.stopLoading=r.stopLoading,c.setDefaults=a.setDefaults,e.default=c},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(0).default.MODAL,i=n(4),a=n(34),c=n(35),s=n(1);e.init=function(t){o.getNode(r)||(document.body||s.throwErr("You can only use SweetAlert AFTER the DOM has loaded!"),a.default(),i.default()),i.initModalContent(t),c.default(t)},e.default=e.init},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(0).default.MODAL;e.modalMarkup='\n  <div class="'+o+'" role="dialog" aria-modal="true"></div>',e.default=e.modalMarkup},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o='<div \n    class="'+n(0).default.OVERLAY+'"\n    tabIndex="-1">\n  </div>';e.default=o},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(0).default.ICON;e.errorIconMarkup=function(){var t=o+"--error",e=t+"__line";return'\n    <div class="'+t+'__x-mark">\n      <span class="'+e+" "+e+'--left"></span>\n      <span class="'+e+" "+e+'--right"></span>\n    </div>\n  '},e.warningIconMarkup=function(){var t=o+"--warning";return'\n    <span class="'+t+'__body">\n      <span class="'+t+'__dot"></span>\n    </span>\n  '},e.successIconMarkup=function(){var t=o+"--success";return'\n    <span class="'+t+"__line "+t+'__line--long"></span>\n    <span class="'+t+"__line "+t+'__line--tip"></span>\n\n    <div class="'+t+'__ring"></div>\n    <div class="'+t+'__hide-corners"></div>\n  '}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(0).default.CONTENT;e.contentMarkup='\n  <div class="'+o+'">\n\n  </div>\n'},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(0),r=o.default.BUTTON_CONTAINER,i=o.default.BUTTON,a=o.default.BUTTON_LOADER;e.buttonMarkup='\n  <div class="'+r+'">\n\n    <button\n      class="'+i+'"\n    ></button>\n\n    <div class="'+a+'">\n      <div></div>\n      <div></div>\n      <div></div>\n    </div>\n\n  </div>\n'},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(4),r=n(2),i=n(0),a=i.default.ICON,c=i.default.ICON_CUSTOM,s=["error","warning","success","info"],u={error:r.errorIconMarkup(),warning:r.warningIconMarkup(),success:r.successIconMarkup()},l=function(t,e){var n=a+"--"+t;e.classList.add(n);var o=u[t];o&&(e.innerHTML=o)},d=function(t,e){e.classList.add(c);var n=document.createElement("img");n.src=t,e.appendChild(n)},f=function(t){if(t){var e=o.injectElIntoModal(r.iconMarkup);s.includes(t)?l(t,e):d(t,e)}};e.default=f},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(2),r=n(4),i=function(t){navigator.userAgent.includes("AppleWebKit")&&(t.style.display="none",t.offsetHeight,t.style.display="")};e.initTitle=function(t){if(t){var e=r.injectElIntoModal(o.titleMarkup);e.textContent=t,i(e)}},e.initText=function(t){if(t){var e=document.createDocumentFragment();t.split("\n").forEach((function(t,n,o){e.appendChild(document.createTextNode(t)),n<o.length-1&&e.appendChild(document.createElement("br"))}));var n=r.injectElIntoModal(o.textMarkup);n.appendChild(e),i(n)}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(4),i=n(0),a=i.default.BUTTON,c=i.default.DANGER_BUTTON,s=n(3),u=n(2),l=n(6),d=n(5),f=function(t,e,n){var r=e.text,i=e.value,f=e.className,p=e.closeModal,v=o.stringToNode(u.buttonMarkup),m=v.querySelector("."+a),h=a+"--"+t;m.classList.add(h),f&&(Array.isArray(f)?f:f.split(" ")).filter((function(t){return t.length>0})).forEach((function(t){m.classList.add(t)})),n&&t===s.CONFIRM_KEY&&m.classList.add(c),m.textContent=r;var b={};return b[t]=i,d.setActionValue(b),d.setActionOptionsFor(t,{closeModal:p}),m.addEventListener("click",(function(){return l.onAction(t)})),v},p=function(t,e){var n=r.injectElIntoModal(u.footerMarkup);for(var o in t){var i=t[o],a=f(o,i,e);i.visible&&n.appendChild(a)}0===n.children.length&&n.remove()};e.default=p},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(3),r=n(4),i=n(2),a=n(5),c=n(6),s=n(0).default.CONTENT,u=function(t){t.addEventListener("input",(function(t){var e=t.target.value;a.setActionValue(e)})),t.addEventListener("keyup",(function(t){if("Enter"===t.key)return c.onAction(o.CONFIRM_KEY)})),setTimeout((function(){t.focus(),a.setActionValue("")}),0)},l=function(t,e,n){var o=document.createElement(e),r=s+"__"+e;for(var i in o.classList.add(r),n){var a=n[i];o[i]=a}"input"===e&&u(o),t.appendChild(o)},d=function(t){if(t){var e=r.injectElIntoModal(i.contentMarkup),n=t.element,o=t.attributes;"string"==typeof n?l(e,n,o):e.appendChild(n)}};e.default=d},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(2),i=function(){var t=o.stringToNode(r.overlayMarkup);document.body.appendChild(t)};e.default=i},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(5),r=n(6),i=n(1),a=n(3),c=n(0),s=c.default.MODAL,u=c.default.BUTTON,l=c.default.OVERLAY,d=function(t){t.preventDefault(),h()},f=function(t){t.preventDefault(),b()},p=function(t){if(o.default.isOpen&&"Escape"===t.key)return r.onAction(a.CANCEL_KEY)},v=function(t){if(o.default.isOpen&&"Tab"===t.key)return d(t)},m=function(t){if(o.default.isOpen)return"Tab"===t.key&&t.shiftKey?f(t):void 0},h=function(){var t=i.getNode(u);t&&(t.tabIndex=0,t.focus())},b=function(){var t=i.getNode(s).querySelectorAll("."+u),e=t[t.length-1];e&&e.focus()},g=function(t){t[t.length-1].addEventListener("keydown",v)},_=function(t){t[0].addEventListener("keydown",m)},w=function(){var t=i.getNode(s).querySelectorAll("."+u);t.length&&(g(t),_(t))},y=function(t){if(i.getNode(l)===t.target)return r.onAction(a.CANCEL_KEY)},x=function(t){var e=i.getNode(l);e.removeEventListener("click",y),t&&e.addEventListener("click",y)},$=function(t){o.default.timer&&clearTimeout(o.default.timer),t&&(o.default.timer=window.setTimeout((function(){return r.onAction(a.CANCEL_KEY)}),t))},k=function(t){t.closeOnEsc?document.addEventListener("keyup",p):document.removeEventListener("keyup",p),t.dangerMode?h():b(),w(),x(t.closeOnClickOutside),$(t.timer)};e.default=k},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r=n(3),i=n(37),a=n(38),c={title:null,text:null,icon:null,buttons:r.defaultButtonList,content:null,className:null,closeOnClickOutside:!0,closeOnEsc:!0,dangerMode:!1,timer:null},s=Object.assign({},c);e.setDefaults=function(t){s=Object.assign({},c,t)};var u=function(t){var e=t&&t.button,n=t&&t.buttons;return void 0!==e&&void 0!==n&&o.throwErr("Cannot set both 'button' and 'buttons' options!"),void 0!==e?{confirm:e}:n},l=function(t){return o.ordinalSuffixOf(t+1)},d=function(t,e){o.throwErr(l(e)+" argument ('"+t+"') is invalid")},f=function(t,e){var n=t+1,r=e[n];o.isPlainObject(r)||void 0===r||o.throwErr("Expected "+l(n)+" argument ('"+r+"') to be a plain object")},p=function(t,e){var n=t+1,r=e[n];void 0!==r&&o.throwErr("Unexpected "+l(n)+" argument ("+r+")")},v=function(t,e,n,r){var i=e instanceof Element;if("string"==typeof e){if(0===n)return{text:e};if(1===n)return{text:e,title:r[0]};if(2===n)return f(n,r),{icon:e};d(e,n)}else{if(i&&0===n)return f(n,r),{content:e};if(o.isPlainObject(e))return p(n,r),e;d(e,n)}};e.getOpts=function(){for(var t=[],e=0;e<arguments.length;e++)t[e]=arguments[e];var n={};t.forEach((function(e,o){var r=v(0,e,o,t);Object.assign(n,r)}));var o=u(n);n.buttons=r.getButtonListOpts(o),delete n.button,n.content=i.getContentOpts(n.content);var l=Object.assign({},c,s,n);return Object.keys(l).forEach((function(t){a.DEPRECATED_OPTS[t]&&a.logDeprecation(t)})),l}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var o=n(1),r={element:"input",attributes:{placeholder:""}};e.getContentOpts=function(t){var e={};return o.isPlainObject(t)?Object.assign(e,t):t instanceof Element?{element:t}:"input"===t?r:null}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.logDeprecation=function(t){var n=e.DEPRECATED_OPTS[t],o=n.onlyRename,r=n.replacement,i=n.subOption,a=n.link,c='SweetAlert warning: "'+t+'" option has been '+(o?"renamed":"deprecated")+".";r&&(c+=" Please use"+(i?' "'+i+'" in ':" ")+'"'+r+'" instead.');var s="https://sweetalert.js.org";c+=a?" More details: "+s+a:" More details: "+s+"/guides/#upgrading-from-1x",console.warn(c)},e.DEPRECATED_OPTS={type:{replacement:"icon",link:"/docs/#icon"},imageUrl:{replacement:"icon",link:"/docs/#icon"},customClass:{replacement:"className",onlyRename:!0,link:"/docs/#classname"},imageSize:{},showCancelButton:{replacement:"buttons",link:"/docs/#buttons"},showConfirmButton:{replacement:"button",link:"/docs/#button"},confirmButtonText:{replacement:"button",link:"/docs/#button"},confirmButtonColor:{},cancelButtonText:{replacement:"buttons",link:"/docs/#buttons"},closeOnConfirm:{replacement:"button",subOption:"closeModal",link:"/docs/#button"},closeOnCancel:{replacement:"buttons",subOption:"closeModal",link:"/docs/#buttons"},showLoaderOnConfirm:{replacement:"buttons"},animation:{},inputType:{replacement:"content",link:"/docs/#content"},inputValue:{replacement:"content",link:"/docs/#content"},inputPlaceholder:{replacement:"content",link:"/docs/#content"},html:{replacement:"content",link:"/docs/#content"},allowEscapeKey:{replacement:"closeOnEsc",onlyRename:!0,link:"/docs/#closeonesc"},allowClickOutside:{replacement:"closeOnClickOutside",onlyRename:!0,link:"/docs/#closeonclickoutside"}}}])}},e={};function n(o){var r=e[o];if(void 0!==r)return r.exports;var i=e[o]={exports:{}};return t[o].call(i.exports,i,i.exports,n),i.exports}n.n=t=>{var e=t&&t.__esModule?()=>t.default:()=>t;return n.d(e,{a:e}),e},n.d=(t,e)=>{for(var o in e)n.o(e,o)&&!n.o(t,o)&&Object.defineProperty(t,o,{enumerable:!0,get:e[o]})},n.o=(t,e)=>Object.prototype.hasOwnProperty.call(t,e),(()=>{"use strict";var t=n(6737),e=n.n(t),o=location.href.split("/"),r=o[o.length-1],i=0,a=[],c=[],s=[],u="",l=0,d=0,f="",p="",v="",m="",h=0,b=0,g="",_=(u="",""),w="",y="",x="",k="",O="",T=[],E=0,M=0,C="",j=0;function A(t){var e=a.filter((function(e){return e.id==t}));$(".retail_price").text(e[0].sale_price),$("#retail_price").val(e[0].sale_price),$(".stock_balance").text(e[0].stock_balance),e[0].new_purchase_price>0?$(".pp").text(e[0].new_purchase_price):$(".pp").text(e[0].old_purchase_price)}function N(t,e){var n=!1;if($(".required").each((function(){$(this).val()&&0!=$(this).val()||(n=!0)})),0==$("#customer_id").val())return $("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Please select Customer first (*)"),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3);if(n)return $("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Please provide all the required information (*)"),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3);if(0==s.length)return $("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Please add at least one Product."),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3);var o=!1;if(s.forEach((function(t){var e=$(".td-input-qty".concat(t.product_id));if(""===e.val().trim()||"0"===e.val().trim())return e.css("border-color","red"),e.focus(),$("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Qty Should not be Empty or Zero"),setTimeout((function(){$("#notifDiv").fadeOut()}),3e3),o=!0,!1})),!o){if(""==$(".amount_pay_input").val())return $(".amount_pay_input").focus(),$(".amount_pay_input").css("border-color","red"),$("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Amount Pay is required."),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3);if(s.length<1)return $("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Please Add Minimum 01 Product"),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3);if("1"==$("#invoice_type").val()&&(""==$(".amount_received").val()||parseInt($(".amount_received").val())<parseInt($(".amount_pay_input").val())))return $(".amount_received").focus(),$("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Received amount can not less then total invoice amount"),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3);t.text("Processing..."),t.attr("disabled","disabled"),$(".btn-cancel").attr("disabled","disabled"),$("#save").attr("disabled","disabled"),$("#form").ajaxSubmit({url:"/add-purchase-return-invoice",type:"post",data:{cash_return:i,service_charges:$(".service_charges_input").val(),grand_total:j,sale_total_amount:b,status:1,returns_product_array:s,existing_product_ids:T},success:function(t){j=0,$("#notifDiv").fadeIn(),$("#notifDiv").css("background","green"),$("#notifDiv").text("Added successfully");var n=$(".amount_received").val().trim()>0?$(".amount_received").val().trim():0;if("print"==e){var o=window.open("/print-purchase-return-invoice/"+t.invoice_id+"/"+t.customer_id+"/"+n);o.onload=function(){o.print()}}setTimeout((function(){$("#notifDiv").fadeOut(),window.location="/add-return"}),1500)},error:function(e){$("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Failed to save at the moment"),setTimeout((function(){$("#notifDiv").fadeOut()}),3e3),t.removeAttr("disabled"),$(".btn-cancel").removeAttr("disabled"),$("#save").attr("disabled","disabled"),t.text("Save")}})}}function D(){$("#products").empty(),$("#products").append('<option value="0">Select Product</option>'),k.forEach((function(t){$("#products").append('<option value="'.concat(t.id,'" data-name="').concat(t.product_name,'" data-qty="').concat(t.qty,'">').concat(t.id,"-").concat(t.product_name,"</option>")),a.push(t)}))}function L(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:0,e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:0,n=0,o=0,r=0;s.forEach((function(t,e){r++,n+=parseFloat(t.amount),o+=parseFloat(t.qty)})),console.log(r),$(".product_net_total").val(n.toFixed(2)),$("#total_qtys").html(o.toFixed(2)),$("#total_items").html(r),$(".product_net_total").val(n),n-=parseFloat(t),n+=parseFloat(e||0),b=n-M,console.log(b," then"),setTimeout((function(){j=b,$(".grand-total").text(addCommas(b-$(".amount_received").val())),$(".amount_pay_input").val(b)}),500),parseFloat($(".amount_pay_input").val())<0?($(".th-hide").hide(),$(".cash-return").text("Cash Received")):($(".th-hide").show(),$(".cash-return").text("Cash Received"))}function I(t,e,n,o,r,i,a,c,s){var u=arguments.length>9&&void 0!==arguments[9]?arguments[9]:0,l=arguments.length>10&&void 0!==arguments[10]?arguments[10]:0;$("#designationsTable tbody").append("\n    <tr class='tr-".concat(t,"' data-prod_id =\"").concat(t,'">\n        <td>').concat(t,"</td>\n        <td>").concat(e,'</td>\n        <td style="width:80px;"><input type="date" value="').concat(n,'" class="inputSale expiry_input"  data-id="').concat(t,'" style="font-size: 13px;width:100%;" min="0" ></td>\n        <td style="width:80px;"><input type="number" value="').concat(c,'"  data-retail="').concat(o,'" data-purchase="').concat(r,'" data-stock="').concat(i,'"  class="inputSale qty-input add-stock-input td-input-qty').concat(t,'"   data-id="').concat(t,'" data-value="').concat(a,'" data-quantity="').concat(c,'"  style="font-size: 13px;width:100%" min="0"></td>\n        <td style="width:80px;"> <input type="number" value="').concat(o,'" data-retail="').concat(o,'" data-purchase="').concat(r,'" data-stock="').concat(i,'" class="inputSale price-input add-stock-input td-').concat(t,'"  data-id="').concat(t,'" data-value="').concat(a,'" data-quantity="').concat(c,'"  style="font-size: 13px;width:100%" min="0"></td>\n        <td style="width:70px;"><input type="number" value="').concat(s,'"  class="inputSale discount-input add-stock-input td-').concat(s,'"  data-id="').concat(t,'" data-value="').concat(a,'" data-quantity="').concat(c,'"    style="font-size: 13px;width:100%" min="0"></td>\n        <td class=\'purchase-product-amount').concat(t,' add- S-input\' style="width:80px;" >').concat(a-s,'</td>\n        <td style="width:80px;"><button type="button" id="').concat(t,'" class="btn smBTN red-bg remove_btn W-100"   data-quantity="').concat(c,'" data-invoice-id="').concat(u,'" data-product-invoice="').concat(l,'">Remove</button></td>\n        </tr>'))}$(document).ready((function(){if($(".parent-div").show(),$("#tblLoader").hide(),$("#bar-code").focus(),k=JSON.parse($("#stock_products").val()),O=JSON.parse($("#customer_ledger").val()),c=JSON.parse($("#vendors").val()),D(),$(".display").show(),"purchase-return-edit"==o[3]){h=$("#curren_customer_id").val();var t=$("#hidden_invoice_id").val();E=$("#service_charges").val(),M=$("#invoice_discount").val(),g=o[3],$.ajax({url:"/get-purchase-return-products/"+t,type:"get",success:function(t){t.products.forEach((function(t){console.log(t),T.push(t.product_id),f=t.product_name,s.push({product_id:"".concat(t.product_id),prod_discount:"".concat(t.product_discount),expiry_date:"".concat(t.expiry_date),qty:"".concat(t.qty),amount:"".concat(t.product_return_total_amount),retail_price:"".concat(t.sale_price),stock_in_hand:"".concat(t.stock_in_hand),purchased_price:"".concat(t.purchase_price),p_name:"".concat(t.product_name),return_invoice_id:"".concat(t.purchase_return_invoice_id),return_invoice_prod_id:"".concat(t.id)})})),$(".display").show(),$(".show_existing_div").show();s.forEach((function(t,e){I(t.product_id,t.p_name,t.expiry_date,t.retail_price,t.purchased_price,t.stock_in_hand,t.amount,t.qty,t.prod_discount,t.return_invoice_id,t.return_invoice_prod_id)}))}})}$("#customer_id").empty(),$("#customer_id").append('<option value="0">Select Vendor</option>'),c.forEach((function(t){$("#customer_id").append('<option value="'.concat(t.id,'" data-name="').concat(t.customer_name,'" ').concat(t.id==h?"seleced":"",">").concat(t.id,"-").concat(t.customer_name,"</option>")),$("#customer_id").val(h).trigger("change")})),$(".add-more-btn").attr("href","#"),$(".new_form_field").addClass("required_client")})),$(document).on("change","#godown_id",(function(){!function(t){if(!(t=parseInt(t||0)))return a=[],void D();$("#products").empty().append('<option value="0">Select Product</option>'),a=[],$.ajax({url:"/godown-products/".concat(t),type:"get",success:function(t){t.products&&t.products.length>0&&t.products.forEach((function(t){$("#products").append('<option value="'.concat(t.id,'" data-name="').concat(t.product_name,'" data-qty="').concat(t.stock,'">').concat(t.id,"-").concat(t.product_name,"</option>")),a.push({id:t.id,product_name:t.product_name,qty:t.stock})}))}})}($(this).val())})),$("#add-product").on("click",(function(){var t=s.filter((function(t){return t.product_id==C}));if(t.length>0){for(var e=1;e<=p;e++)t[0].qty++;$(".td-input-qty"+C).val(t[0].qty).trigger("input"),$(".tr-"+C).css("background","#152e4d").addClass("text-white");var n=C;setTimeout((function(){$(".tr-"+n).css("background","").removeClass("text-white")}),1500)}else{if(""==$("#qty").val())return $(this).focus(),$("#qty").css("border-color","red"),$("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Please Add Qty for Product"),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3);$("#qty").css("border-color","");var o=$("#discount").val();_=$("#expiry_date").val(),s.push({return_invoice_id:"",return_invoice_prod_id:"",prod_discount:o||0,product_id:"".concat(v),expiry_date:"".concat(_),qty:"".concat(p),amount:"".concat(d-o),retail_price:"".concat(w),stock_in_hand:x,purchased_price:m}),$(".amount_received").val($(".paid_amount").text()),setTimeout((function(){$(".amount_received").trigger("input")}),500);$("#designationsTable tbody tr").length;I(v,f,_,w,m,x,d,p,o),L(l,E),$(".show_existing_div").show(),f=""}$(".purchase_price").val(""),$("#qty").val(""),$("#amount").val(""),$("#bar-code").val(""),$(".products").val(0).trigger("change"),$("#new_purchase_price").val(""),$("#retail_price").val(""),$("#discount").val(""),$("#bar-code").focus(),C=""})),$(".close").on("click",(function(){$(".new_form_field").removeClass("required_client"),$(".add-more-btn").attr("href","#collapseExample"),$(".add-more-btn").addClass("add_more_client"),$("#collapseExample").removeClass("show"),$(".add-more-btn").removeClass("save_client"),$(".add-more-btn").text("Add More"),$(".new_form_field").val(""),$("#new_marital_status").val(0).trigger("change"),$("#new_employment_status").val(0).trigger("change"),$("#new_residence_status").val(0).trigger("change")})),$(document).on("click",".remove_btn",(function(){var t=this;alert(34),u=$(this);var n=$(this).attr("id"),r=$(this).attr("data-quantity"),i=$(this).attr("data-invoice-id"),c=$(this).attr("data-product-invoice");console.log(i),"purchase-return-edit"==o[3]&&null!=i?e()({title:"Are you sure?",icon:"warning",buttons:!0,dangerMode:!0}).then((function(e){if(e){$(t);u.attr("disabled","disabled"),u.text("Processing..."),$.ajax({type:"DELETE",url:"/delete-product-from-purchase-return",data:{_token:$('meta[name="csrf_token"]').attr("content"),product_id:n,return_invoice_id:i,product_invoice_id:c,qty:r},success:function(t){"success"==t.status?($("#notifDiv").fadeIn(),$("#notifDiv").css("background","green"),$("#notifDiv").text("Successfully removed."),setTimeout((function(){$("#notifDiv").fadeOut()}),3e3),$("#tr-"+n).remove(),s=s.filter((function(t){return t.product_id!=n})),L(l,E),a.filter((function(t){return t.id==n}))[0].stock_balance=t.updated_stock):(u.removeAttr("disabled"),u.text("Delete"),$("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Unable to delete at the moment"),setTimeout((function(){$("#notifDiv").fadeOut()}),3e3))}})}})):($(".tr-"+n).remove(),s=s.filter((function(t){return t.product_id!=n})),$(".amount_received").val($(".paid_amount").text()),setTimeout((function(){$(".amount_received").trigger("input")}),500),L(l,E))})),$(".products").change((function(){var t=$(this).val();if(C=$(this).val(),$(".purchase_price").val(""),$("#product-name").val(""),$("#qty").val(""),$(".bar-code").val(""),$("#amount").val(""),t>0){var e=a.filter((function(e){return e.id==t}));console.log(e);var n=0;n=e[0].new_purchase_price>0?e[0].new_purchase_price:e[0].old_purchase_price,$(".retail_price").text(e[0].sale_price),$(".pp").html(n),$(".purchase_price").val(n),$("#retail_price").val(n),$(".stock_balance").text(e[0].stock_balance),f=e[0].product_name,v=e[0].id,x=e[0].stock_balance,m=n,$(".expiry_date").val(e[0].expiry_date),$(".bar-code").val(e[0].barcode)}})),$(document).on("focusout",".bar-code",(function(){if(C=$(this).val(),$(".purchase_price").val(""),$("#product-name").val(""),$("#qty").val(""),$("#amount").val(""),""!=C){var t=a.filter((function(t){return t.barcode.split(",").includes(C)||t.id==C}));if(t.length>0){var e=0;e=t[0].new_purchase_price>0?t[0].new_purchase_price:t[0].old_purchase_price,$("#products").val(t[0].id).trigger("change"),$(".purchase_price").val(e),$(".pp").text(e),$(".stock_balance").text(t[0].stock_balance),f=t[0].product_name,v=t[0].id}else $("#products").val("0").trigger("change"),$("#retail_price").val(""),$(".expiry_date ").val(""),C&&($("#notifDiv").fadeIn().css("background","red").text("Product Not Found"),setTimeout((function(){$("#notifDiv").fadeOut()}),3e3))}return 0})),$("#qty").on("input",(function(){if((p=$(this).val())>x)return $(this).val(""),$("#qty").css("border-color","red"),$(this).focus(),$("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Qty should be less then "+x),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3);w=$("#retail_price").val(),d=p*w,$("#amount").val(d)})),$("#save").on("click",(function(){var t=$(this);N(t,"save"),t.text("Save")})),$("#print-invoice").on("click",(function(){var t=$(this);N(t,"print"),t.text("Print")})),$(document).on("input",".qty-input",(function(){var t=$(this).val(),e=$(this).attr("data-id"),n="",o=($(this).attr("data-value"),0);$(".amount_received").val($(".paid_amount").text()),setTimeout((function(){$(".amount_received").trigger("input")}),500);var r=0;if(t<0)return $(this).val(""),$(this).css("border-color","red"),$(this).focus(),$("#notifDiv").fadeIn(),$("#notifDiv").css("background","red"),$("#notifDiv").text("Qty should be greater then 0."),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3);$(".purchase-product-amount".concat(e)).empty(),s.filter((function(i){if(i.product_id==e){if(y=i.retail_price,i.qty=t,n=i.stock_in_hand,o=y,parseInt(t)>parseInt(n))return $(".td-input-qty".concat(e)).val(n).css("border-color","red").focus(),$("#notifDiv").fadeIn().css("background","red").text("Qty should be less then "+n),setTimeout((function(){$("#notifDiv").fadeOut()}),3e3),$(".grand-total").text("0"),void(j=0);$(".td-input-qty".concat(e)).css("border-color","#dddddd"),r=t*o,i.amount=r-i.prod_discount;$("#invoice_type").val();$(".purchase-product-amount".concat(e)).text(i.amount),A(i.product_id),L(l,E,M)}}))})),$(document).on("input",".price-input",(function(){$(".amount_received").val($(".paid_amount").text()),setTimeout((function(){$(".amount_received").trigger("input")}),500);var t=$(this).val(),e=$(this).attr("data-id"),n=$(".tr-".concat(e)).find(".qty-input").val(),o=0;$(".purchase-product-amount".concat(e)).empty(),s.filter((function(r){r.product_id==e&&(r.qty=n,o=n*t,r.amount=o-r.prod_discount,r.retail_price=t,A(r.product_id),$(".purchase-product-amount".concat(e)).text(r.amount),L(l,E))}))})),$(document).on("input",".discount-input",(function(){var t=$(this).val(),e=$(this).attr("data-id"),n=$(".tr-".concat(e)).find(".qty-input").val(),o=(n=$(".tr-".concat(e)).find(".qty-input").val(),0);$(".amount_received").val($(".paid_amount").text()),setTimeout((function(){$(".amount_received").trigger("input")}),500),$(".purchase-product-amount".concat(e)).empty(),s.filter((function(r){r.product_id==e&&(r.prod_discount=t,r.qty=n,o=n*r.retail_price-t,r.amount=o,$(".purchase-product-amount".concat(e)).text(r.amount),L(l,E))}))})),$("#customer_id").change((function(){var t=0;7==$(this).val()?(s.forEach((function(e,n){t+=parseFloat(e.amount)})),$("#invoice_type").val("1").trigger("change"),$(".cash_return_tr").show(),$(".previous_payable_tr").hide()):($("#invoice_type").val("2").trigger("change"),$(".previous_payable_tr").show(),$(".cash_return_tr").hide()),$(".amount_pay_input").val(t);var e=$(this).val();if(e>0){$.ajax({url:"/get-vendor-balance-for-purchase-return/"+e,type:"get",data:{segment:g,lastSegment:r},success:function(t){l=t.customer_balance,$("#previous_receivable").val(l);var e=l>=0?l.toLocaleString("en-US")+" CR":l<0?l+" DR":addCommas(l);$(".previous_payable_heading").empty(),$(".previous_payable_heading").text(l>=0?"Previous Payable":"Previous Receivable"),$(".previous_payable").text(e),$(".previous_payable").val(l),L(l,E,M),"purchase-edit"==o[3]&&$(".paid_amount").text(O.cr),$(".display").css("display","")}});c.filter((function(t){return t.id==e}))}})),$("body").on("click",".ProductTable tr",(function(){$(this).attr("data-prod_id")&&A($(this).attr("data-prod_id"))})),$(document).on("input",".amount_received",(function(){var t=0;$(this).val()&&(i=$(this).val()-$(".amount_pay_input").val(),$(".cash_return").text(i.toLocaleString("en-US")),t=$(this).val()),$(".grand-total").text(addCommas(b-t))})),$(".service_charges_input").on("input",(function(){E=$(this).val(),L(l,$(this).val())})),$("#invoice_discount").on("input",(function(){M=$(this).val(),$(".amount_received").val($(".paid_amount").text()),setTimeout((function(){$(".amount_received").trigger("input")}),500),L(l,E,$(this).val())}))})()})();
+
+var segments = location.href.split('/');
+var lastSegment = segments[segments.length - 1];
+
+var result = 0;
+var product_list = [];
+var vendors = [];
+var returns_product_array = [];
+var deleteRef = '';
+let previous_payable = 0;
+let amount = 0;
+let p_name = '';
+let qty = '';
+let product_id = '';
+let purchased_price = '';
+let customer_id = 0;
+let sale_total_amount = 0;
+let segment = '';
+var deleteRef = '';
+var expiry_date = '';
+let retail_price = '';
+var p_price = '';
+let stock_in_hand = '';
+let stock_products = '';
+let customer_ledger = '';
+let existing_product_ids = [];
+let service_charges = 0;
+let invoice_discount = 0;
+let data_variable = '';
+let grand_total = 0;
+let godown_stock_map = {};
+
+$(document).ready(function () {
+
+    $('.parent-div').show();
+    $('#tblLoader').hide();
+    $('#bar-code').focus();
+    stock_products = JSON.parse($('#stock_products').val());
+    customer_ledger = JSON.parse($('#customer_ledger').val());
+    vendors = JSON.parse($('#vendors').val());
+    getProducts();
+    $('.display').show();
+    if (segments[3] == 'purchase-return-edit') {
+        customer_id = $('#curren_customer_id').val();
+        var invoice_id = $('#hidden_invoice_id').val();
+        service_charges = $('#service_charges').val();
+        invoice_discount = $('#invoice_discount').val();
+        segment = segments[3];
+        $.ajax({
+            url: '/get-purchase-return-products/' + invoice_id,
+            type: 'get',
+            success: function (response) {
+                response.products.forEach(function (product) {
+                    console.log(product)
+                    existing_product_ids.push(product.product_id);
+                    p_name = product.product_name;
+                    returns_product_array.push({
+                        'product_id': `${product.product_id}`,
+                        'prod_discount': `${product.product_discount}`,
+                        'expiry_date': `${product.expiry_date}`,
+                        'qty': `${product.qty}`,
+                        'amount': `${product.product_return_total_amount}`,
+                        'retail_price': `${product.sale_price}`,
+                        'stock_in_hand': `${product.stock_in_hand}`,
+                        'purchased_price': `${product.purchase_price}`,
+                        'p_name': `${product.product_name}`,
+                        'return_invoice_id': `${product.purchase_return_invoice_id}`,
+                        'return_invoice_prod_id': `${product.id}`,
+                    });
+                })
+                $('.display').show();
+                $('.show_existing_div').show();
+                var x = 0
+                returns_product_array.forEach(function (product, key) {
+                    x++;
+                    tableHtml(product.product_id, product.p_name, product.expiry_date, product.retail_price, product.purchased_price, product.stock_in_hand, product.amount, product.qty, product.prod_discount, product.return_invoice_id, product.return_invoice_prod_id)
+                })
+            }
+        })
+    }
+    getvendors();
+    $('.add-more-btn').attr('href', '#');
+    $('.new_form_field').addClass('required_client');
+})
+
+// Filter product dropdown by selected godown (server source of truth: godowns_stocks)
+function loadGodownProducts(godownId) {
+    godownId = parseInt(godownId || 0);
+    if (!godownId) {
+        // purchase return must be godown-aware; keep dropdown empty until godown selected
+        $("#products").empty().append(`<option value="0">Select Product</option>`);
+        product_list = [];
+        godown_stock_map = {};
+        return;
+    }
+    $("#products").empty().append(`<option value="0">Select Product</option>`);
+    product_list = [];
+    godown_stock_map = {};
+    $.ajax({
+        url: `/godown-products/${godownId}`,
+        type: 'get',
+        success: function (res) {
+            if (res.products && res.products.length > 0) {
+                res.products.forEach(p => {
+                    godown_stock_map[p.id] = parseFloat(p.stock || 0);
+
+                    // Merge full product info (prices, barcode etc) from stock_products,
+                    // but override stock_balance to represent THIS godown's available stock.
+                    const full = (Array.isArray(stock_products) ? stock_products : []).find(x => String(x.id) === String(p.id));
+                    const merged = full ? { ...full } : { id: p.id, product_name: p.product_name };
+                    merged.stock_balance = parseFloat(p.stock || 0);
+                    product_list.push(merged);
+
+                    $("#products").append(
+                        `<option value="${p.id}" data-name="${p.product_name}" data-qty="${p.stock}">${p.id}-${p.product_name}</option>`
+                    );
+                });
+            }
+        }
+    });
+}
+
+$(document).on('change', '#godown_id', function () {
+    // reset UI fields when godown changes
+    $('.purchase_price').val('');
+    $('#qty').val('');
+    $('.bar-code').val('');
+    $('#amount').val('');
+    $('.products').val(0).trigger('change');
+    $('.stock_balance').text('0');
+    loadGodownProducts($(this).val());
+});
+$('#add-product').on('click', function () {
+    var is_in_array = returns_product_array.filter(x => x.product_id == data_variable);
+
+    if (is_in_array.length > 0) {
+        for (var x = 1; x <= qty; x++) {
+            is_in_array[0].qty++;
+        }
+        $('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
+        $('.tr-' + data_variable).css('background', '#152e4d').addClass('text-white');
+        var ss = data_variable
+        setTimeout(function () {
+            $('.tr-' + ss).css('background', '').removeClass('text-white');
+        }, 1500);
+    }
+
+    // if (is_in_array.length > 0) {
+    //     for (var x = 1; x <= qty; x++) {
+    //         is_in_array[0].qty++;
+    //     }
+    //     $('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
+    // }
+    else {
+        if ($('#qty').val() == '') {
+            $(this).focus();
+            $('#qty').css('border-color', 'red');
+            $('#notifDiv').fadeIn();
+            $('#notifDiv').css('background', 'red');
+            $('#notifDiv').text('Please Add Qty for Product');
+            setTimeout(() => {
+                $('#notifDiv').fadeOut();
+            }, 3000);
+            return;
+        } else {
+            $('#qty').css('border-color', ''); // Reset the border color
+        }
+        var prod_discount = $('#discount').val();
+        expiry_date = $('#expiry_date').val();
+        returns_product_array.push({
+            'return_invoice_id': '',
+            'return_invoice_prod_id': '',
+            'prod_discount': prod_discount ? prod_discount : 0,
+            'product_id': `${product_id}`,
+            'expiry_date': `${expiry_date}`,
+            'qty': `${qty}`,
+            'amount': `${amount-prod_discount}`,
+            'retail_price': `${retail_price}`,
+            'stock_in_hand': stock_in_hand,
+            'purchased_price': purchased_price,
+
+        });
+        $('.amount_received').val($('.paid_amount').text());
+        setTimeout(() => {
+            $('.amount_received').trigger('input');
+        }, 500);
+        let rowCount = $('#designationsTable tbody tr').length + 1;
+        tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount)
+        grandSum(previous_payable, service_charges);
+        $('.show_existing_div').show()
+        p_name = '';
+    }
+    $('.purchase_price').val('');
+    $('#qty').val('');
+    $('#amount').val('');
+    $('#bar-code').val('');
+    $('.products').val(0).trigger('change');
+    $('#new_purchase_price').val('');
+    $('#retail_price').val('');
+    $('#discount').val('');
+    $('#bar-code').focus();
+    data_variable = '';
+
+});
+
+$('.close').on('click', function () {
+
+    $('.new_form_field').removeClass('required_client');
+    $('.add-more-btn').attr('href', '#collapseExample');
+    $(".add-more-btn").addClass("add_more_client");
+    $('#collapseExample').removeClass('show');
+    $(".add-more-btn").removeClass("save_client");
+    $('.add-more-btn').text('Add More');
+    $('.new_form_field').val('');
+    $('#new_marital_status').val(0).trigger('change');
+    $('#new_employment_status').val(0).trigger('change');
+    $('#new_residence_status').val(0).trigger('change');
+})
+$(document).on('click', '.remove_btn', function () {
+    deleteRef = $(this);
+    var product_id = $(this).attr('id');
+    var q = $(this).attr('data-quantity');
+    var return_invoice_id = $(this).attr('data-invoice-id');
+    var product_invoice_id = $(this).attr('data-product-invoice');
+    console.log(return_invoice_id)
+    if (segments[3] == 'purchase-return-edit' && return_invoice_id != undefined) {
+        swal({
+                title: "Are you sure?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    var thisRef = $(this);
+                    deleteRef.attr('disabled', 'disabled');
+                    deleteRef.text('Processing...');
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/delete-product-from-purchase-return',
+                        data: {
+                            _token: $('meta[name="csrf_token"]').attr('content'),
+                            product_id: product_id,
+                            return_invoice_id: return_invoice_id,
+                            product_invoice_id: product_invoice_id,
+
+                            qty: q
+                        },
+                        success: function (response) {
+                            if (response.status == 'success') {
+                                $('#notifDiv').fadeIn();
+                                $('#notifDiv').css('background', 'green');
+                                $('#notifDiv').text('Successfully removed.');
+                                setTimeout(() => {
+                                    $('#notifDiv').fadeOut();
+                                }, 3000);
+                                $("#tr-" + product_id).remove();
+                                returns_product_array = returns_product_array.filter(x => x.product_id != product_id);
+                                grandSum(previous_payable, service_charges);
+                                // Reload godown products list to refresh per-godown stock in dropdown/validation
+                                loadGodownProducts($('#godown_id').val());
+                            } else {
+                                deleteRef.removeAttr('disabled');
+                                deleteRef.text('Delete');
+                                $('#notifDiv').fadeIn();
+                                $('#notifDiv').css('background', 'red');
+                                $('#notifDiv').text('Unable to delete at the moment');
+                                setTimeout(() => {
+                                    $('#notifDiv').fadeOut();
+                                }, 3000);
+                            }
+                        }
+                    });
+                }
+            });
+    } else {
+
+        $(".tr-" + product_id).remove();
+        returns_product_array = returns_product_array.filter(x => x.product_id != product_id);
+        // $('.products').children('option[value="' + product_id + '"]').attr('disabled', false);
+        // $(".products").val('0');
+
+        // $(".products").select2();
+        $('.amount_received').val($('.paid_amount').text());
+        setTimeout(() => {
+            $('.amount_received').trigger('input');
+        }, 500);
+        grandSum(previous_payable, service_charges);
+    }
+})
+
+function getStockRetail(p_id) {
+    var filter_product = product_list.filter(x => x.id == p_id)
+
+    $('.retail_price').text(filter_product[0].sale_price);
+
+    $('#retail_price').val(filter_product[0].sale_price);
+
+    $('.stock_balance').text(filter_product[0].stock_balance);
+    if (filter_product[0].new_purchase_price > 0) {
+        $('.pp').text(filter_product[0].new_purchase_price);
+    } else {
+        $('.pp').text(filter_product[0].old_purchase_price);
+    }
+
+}
+$('.products').change(function () {
+    var selected_product = $(this).val();
+    data_variable = $(this).val();
+    $('.purchase_price').val('');
+    $('#product-name').val('');
+    $('#qty').val('');
+    $('.bar-code').val('');
+    $('#amount').val('');
+    if (selected_product > 0) {
+        if (!$('#godown_id').val()) {
+            $(this).val(0).trigger('change');
+            $('#notifDiv').fadeIn().css('background', 'red').text('Please select Godown first');
+            setTimeout(() => {
+                $('#notifDiv').fadeOut();
+            }, 2500);
+            return;
+        }
+        var filter_product = product_list.filter(x => x.id == selected_product);
+        console.log(filter_product);
+        var p_price = 0;
+        if (filter_product[0].new_purchase_price > 0) {
+            p_price = filter_product[0].new_purchase_price;
+        } else {
+            p_price = filter_product[0].old_purchase_price;
+        }
+        $('.retail_price').text(filter_product[0].sale_price);
+        $('.pp').html(p_price);
+        $('.purchase_price').val(p_price);
+        $('#retail_price').val(p_price);
+        $('.stock_balance').text(filter_product[0].stock_balance);
+        p_name = filter_product[0].product_name;
+        product_id = filter_product[0].id;
+        stock_in_hand = filter_product[0].stock_balance;
+        purchased_price = p_price;
+        $('.expiry_date').val(filter_product[0].expiry_date)
+        $('.bar-code').val(filter_product[0].barcode);
+    }
+});
+$(document).on('focusout', '.bar-code', function () {
+    data_variable = $(this).val();
+    $('.purchase_price').val('');
+    $('#product-name').val('');
+    $('#qty').val('');
+    $('#amount').val('');
+    if (data_variable != '') {
+        var filter_product = product_list.filter(x => {
+            const barcodeArray = x.barcode.split(',');
+            return barcodeArray.includes(data_variable) || x.id == data_variable;
+        });
+        if (filter_product.length > 0) {
+            var p_price = 0;
+            if (filter_product[0].new_purchase_price > 0) {
+                p_price = filter_product[0].new_purchase_price;
+            } else {
+                p_price = filter_product[0].old_purchase_price;
+            }
+            $('#products').val(filter_product[0].id).trigger('change');
+            $('.purchase_price').val(p_price);
+            $('.pp').text(p_price);
+            $('.stock_balance').text(filter_product[0].stock_balance);
+            p_name = filter_product[0].product_name;
+            product_id = filter_product[0].id;
+        } else {
+            $('#products').val('0').trigger('change');
+            $('#retail_price').val('');
+            $('.expiry_date ').val('');
+            if (data_variable) {
+                $('#notifDiv').fadeIn().css('background', 'red').text('Product Not Found');
+                setTimeout(() => {
+                    $('#notifDiv').fadeOut();
+                }, 3000)
+            }
+        }
+    }
+    return 0;
+
+});
+$('#qty').on('input', function () {
+    qty = $(this).val();
+    if (qty > stock_in_hand) {
+        $(this).val('')
+        $('#qty').css('border-color', 'red');
+        $(this).focus();
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Qty should be less then ' + stock_in_hand);
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    }
+    productRetailAmount();
+
+});
+$("#save").on('click', function () {
+    var current_action = $(this);
+    saleSave(current_action, 'save');
+    current_action.text('Save')
+});
+$("#print-invoice").on('click', function () {
+    var current_action = $(this);
+    saleSave(current_action, 'print');
+    current_action.text('Print')
+})
+
+function saleSave(current_action, type) {
+    let dirty = false;
+    $('.required').each(function () {
+        if (!$(this).val() || $(this).val() == 0) {
+            dirty = true;
+        }
+    });
+    if ($('#customer_id').val() == 0) {
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Please select Customer first (*)');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    }
+    if (dirty) {
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Please provide all the required information (*)');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    }
+    if (returns_product_array.length == 0) {
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Please add at least one Product.');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000)
+        return;
+    }
+    let hasEmptyQty = false;
+
+    returns_product_array.forEach(data => {
+        const qtyInput = $(`.td-input-qty${data.product_id}`);
+        if (qtyInput.val().trim() === '' || qtyInput.val().trim() === '0') {
+            qtyInput.css('border-color', 'red');
+            qtyInput.focus();
+            $('#notifDiv').fadeIn();
+            $('#notifDiv').css('background', 'red');
+            $('#notifDiv').text('Qty Should not be Empty or Zero');
+            setTimeout(() => {
+                $('#notifDiv').fadeOut();
+            }, 3000)
+            hasEmptyQty = true;
+            return false;
+        }
+    });
+    if (hasEmptyQty) {
+        return;
+    }
+    if ($('.amount_pay_input').val() == '') {
+        $('.amount_pay_input').focus();
+        $('.amount_pay_input').css('border-color', 'red');
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Amount Pay is required.');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000)
+        return;
+    }
+
+    if (returns_product_array.length < 1) {
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Please Add Minimum 01 Product');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    }
+    if ($('#invoice_type').val() == '1' && ($('.amount_received').val() == '' || parseInt($('.amount_received').val()) < parseInt($('.amount_pay_input').val()))) {
+        $('.amount_received').focus();
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Received amount can not less then total invoice amount');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    }
+    current_action.text('Processing...')
+    current_action.attr('disabled', 'disabled');
+    $('.btn-cancel').attr('disabled', 'disabled');
+    // $('#print-invoice').attr('disabled', 'disabled');
+    $('#save').attr('disabled', 'disabled');
+
+    $('#form').ajaxSubmit({
+        url: '/add-purchase-return-invoice',
+        type: 'post',
+        data: {
+            'cash_return': result,
+            'service_charges': $('.service_charges_input').val(),
+            'grand_total': grand_total,
+            'sale_total_amount': sale_total_amount,
+            'status': 1, //status
+            'returns_product_array': returns_product_array,
+            'existing_product_ids': existing_product_ids
+        },
+        success: function (response) {
+            if ("success") {
+                grand_total = 0;
+                $('#notifDiv').fadeIn();
+                $('#notifDiv').css('background', 'green');
+                $('#notifDiv').text('Added successfully');
+                var received_amount = $('.amount_received').val().trim() > 0 ? $('.amount_received').val().trim() : 0;
+                if (type == 'print') {
+                    var printWindow = window.open("/print-purchase-return-invoice/" + response.invoice_id + '/' + response.customer_id + '/' + received_amount);
+                    printWindow.onload = function () {
+                        printWindow.print();
+                    };
+
+                }
+                setTimeout(() => {
+                    $('#notifDiv').fadeOut();
+                    window.location = "/add-return";
+                }, 1500);
+            } else {
+                current_action.removeAttr('disabled');
+                $('.btn-cancel').removeAttr('disabled');
+                $('#print-invoice').removeAttr('disabled');
+            }
+        },
+        error: function (e) {
+            $('#notifDiv').fadeIn();
+            $('#notifDiv').css('background', 'red');
+            $('#notifDiv').text('Failed to save at the moment');
+            setTimeout(() => {
+                $('#notifDiv').fadeOut();
+            }, 3000);
+
+            current_action.removeAttr('disabled');;
+            $('.btn-cancel').removeAttr('disabled');
+            $('#save').attr('disabled', 'disabled');
+            current_action.text('Save')
+        }
+    })
+}
+
+$(document).on('input', '.qty-input', function () {
+
+    var update_qty = $(this).val();
+    var current_product_id = $(this).attr('data-id');
+    var current_product_qty = '';
+    var product_amount = $(this).attr('data-value')
+    var current_product_price = 0;
+    $('.amount_received').val($('.paid_amount').text());
+    setTimeout(() => {
+        $('.amount_received').trigger('input');
+    }, 500);
+
+    var new_amount_of_purchase_product = 0;
+    if (update_qty < 0) {
+        $(this).val('')
+        $(this).css('border-color', 'red');
+        $(this).focus();
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'red');
+        $('#notifDiv').text('Qty should be greater then 0.');
+        setTimeout(() => {
+            $('#notifDiv').fadeOut();
+        }, 3000);
+        return;
+    }
+    $(`.purchase-product-amount${current_product_id}`).empty();
+    returns_product_array.filter(function (data) {
+        if (data.product_id == current_product_id) {
+            p_price = data.retail_price
+            data.qty = update_qty;
+            current_product_qty = data.stock_in_hand;
+            current_product_price = p_price;
+            if (parseInt(update_qty) > parseInt(current_product_qty)) {
+                // update_qty      = update_qty.replace(update_qty, current_product_qty)
+                $(`.td-input-qty${current_product_id}`).val(current_product_qty).css('border-color', 'red').focus();
+                $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then ' + current_product_qty);
+                setTimeout(() => {
+                    $('#notifDiv').fadeOut();
+                }, 3000);
+                $('.grand-total').text('0');
+                grand_total = 0;
+                return;
+            } else {
+                $(`.td-input-qty${current_product_id}`).css('border-color', '#dddddd');
+                new_amount_of_purchase_product = update_qty * current_product_price;
+                data.amount = new_amount_of_purchase_product - data.prod_discount;
+                var invoice_type = $('#invoice_type').val();
+                $(`.purchase-product-amount${current_product_id}`).text(data.amount)
+                getStockRetail(data.product_id)
+                grandSum(previous_payable, service_charges, invoice_discount);
+            }
+        }
+    })
+
+})
+$(document).on('input', '.price-input', function () {
+    $('.amount_received').val($('.paid_amount').text());
+    setTimeout(() => {
+        $('.amount_received').trigger('input');
+    }, 500);
+    var retail_price = $(this).val();
+    var current_product_id = $(this).attr('data-id');
+    var current_product_qty = $(`.tr-${current_product_id}`).find('.qty-input').val();
+    var new_amount_of_sale_product = 0;
+    $(`.purchase-product-amount${current_product_id}`).empty();
+    returns_product_array.filter(function (data) {
+        if (data.product_id == current_product_id) {
+            data.qty = current_product_qty
+            new_amount_of_sale_product = current_product_qty * retail_price;
+            data.amount = new_amount_of_sale_product - data.prod_discount;
+            data.retail_price = retail_price;
+            getStockRetail(data.product_id);
+            $(`.purchase-product-amount${current_product_id}`).text(data.amount)
+            grandSum(previous_payable, service_charges);
+        }
+    })
+
+})
+$(document).on('input', '.discount-input', function () {
+    var p_discount = $(this).val();
+    var current_product_id = $(this).attr('data-id');
+    var current_product_qty = $(`.tr-${current_product_id}`).find('.qty-input').val();
+    var current_product_qty = $(`.tr-${current_product_id}`).find('.qty-input').val();
+    var new_amount_of_sale_product = 0;
+    $('.amount_received').val($('.paid_amount').text());
+    setTimeout(() => {
+        $('.amount_received').trigger('input');
+    }, 500);
+    $(`.purchase-product-amount${current_product_id}`).empty();
+    returns_product_array.filter(function (data) {
+        if (data.product_id == current_product_id) {
+            data.prod_discount = p_discount;
+            data.qty = current_product_qty
+            new_amount_of_sale_product = (current_product_qty * data.retail_price) - p_discount;
+            data.amount = new_amount_of_sale_product;
+            $(`.purchase-product-amount${current_product_id}`).text(data.amount)
+            grandSum(previous_payable, service_charges);
+        }
+    })
+})
+
+function getProducts() {
+    $("#products").empty();
+    $("#products").append(`<option value="0">Select Product</option>`)
+    stock_products.forEach(data => {
+        $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name}</option>`)
+        product_list.push(data);
+    });
+}
+
+function getvendors() {
+
+    $("#customer_id").empty();
+    $("#customer_id").append("<option value=\"0\">Select Vendor</option>");
+    vendors.forEach(function (data) {
+        $("#customer_id").append(`<option value="${data.id}" data-name="${data.customer_name}" ${data.id == customer_id ? 'seleced' : ''}>${data.id}-${data.customer_name}</option>`)
+
+        $("#customer_id").val(customer_id).trigger('change');
+    })
+}
+$('#customer_id').change(function () {
+    var total_paid_for_net_sale = 0;
+    if ($(this).val() == 7) {
+        returns_product_array.forEach(function (data, key) {
+            total_paid_for_net_sale += parseFloat(data.amount)
+        });
+        $('#invoice_type').val('1').trigger('change');
+        $('.cash_return_tr').show();
+        $('.previous_payable_tr').hide();
+    } else {
+        $('#invoice_type').val('2').trigger('change');
+        $('.previous_payable_tr').show();
+        $('.cash_return_tr').hide();
+    }
+    $('.amount_pay_input').val(total_paid_for_net_sale);
+    // $('.current_balance').text('0').trigger('change');
+    var selected_index = $(this).val();
+    if (selected_index > 0) {
+        $.ajax({
+            url: '/get-vendor-balance-for-purchase-return/' + selected_index,
+            type: 'get',
+            data: {
+                segment: segment,
+                lastSegment: lastSegment
+            },
+            success: function (response) {
+                previous_payable = response.customer_balance;
+                $('#previous_receivable').val(previous_payable);
+                var previous_payable_text = previous_payable >= 0 ? previous_payable.toLocaleString('en-US') + " CR" : previous_payable < 0 ? previous_payable + " DR" : addCommas(previous_payable);
+                $('.previous_payable_heading').empty();
+                $('.previous_payable_heading').text(previous_payable >= 0 ? 'Previous Payable' : 'Previous Receivable');
+                $('.previous_payable').text(previous_payable_text);
+                $('.previous_payable').val(previous_payable);
+                grandSum(previous_payable, service_charges, invoice_discount)
+                if (segments[3] == "purchase-edit") {
+                    $('.paid_amount').text(customer_ledger['cr']);
+                }
+                $('.display').css('display', '');
+            }
+        })
+        var customer = vendors.filter(x => x.id == selected_index);
+
+    }
+})
+
+function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
+    var sum = 0;
+    var grandQty = 0;
+    var productTotal = 0;
+    returns_product_array.forEach(function (data, key) {
+        productTotal++;
+        sum += parseFloat(data.amount)
+        grandQty += parseFloat(data.qty);
+    });  
+     console.log(productTotal);
+     $('.product_net_total').val(sum.toFixed(2));
+     $('#total_qtys').html(grandQty.toFixed(2));
+     $('#total_items').html(productTotal);
+   
+
+
+
+    $('.product_net_total').val(sum);
+    sum -= parseFloat(previous_payable)
+    sum += parseFloat(service_charges ? service_charges : 0);
+    // sum += parseFloat($('.paid_amount').text().trim());
+    sale_total_amount = sum - invoice_discount;
+    console.log(sale_total_amount, ' then');
+    setTimeout(() => {
+        grand_total = sale_total_amount
+        $('.grand-total').text(addCommas(sale_total_amount - $('.amount_received').val()));
+
+        $('.amount_pay_input').val(sale_total_amount);
+    }, 500);
+    if (parseFloat($('.amount_pay_input').val()) < 0) {
+        $('.th-hide').hide();
+        $('.cash-return').text('Cash Received');
+    } else {
+        $('.th-hide').show();
+        $('.cash-return').text('Cash Received');
+    }
+}
+$('body').on('click', '.ProductTable tr', function () {
+    if ($(this).attr('data-prod_id')) {
+        getStockRetail($(this).attr('data-prod_id'))
+    }
+});
+
+function productRetailAmount() {
+    retail_price = $('#retail_price').val();
+    amount = qty * retail_price;
+    // console.log(retail_price,qty)
+    $('#amount').val(amount);
+}
+$(document).on('input', '.amount_received', function () {
+    var amount_to_recive = 0
+    if ($(this).val()) {
+        result = $(this).val() - $('.amount_pay_input').val();
+        $('.cash_return').text(result.toLocaleString('en-US'));
+        amount_to_recive = $(this).val();
+    }
+    $('.grand-total').text(addCommas(sale_total_amount - amount_to_recive));
+})
+$('.service_charges_input').on('input', function () {
+    service_charges = $(this).val();
+    grandSum(previous_payable, $(this).val());
+})
+$('#invoice_discount').on('input', function () {
+    var service = 0;
+    invoice_discount = $(this).val();
+    $('.amount_received').val($('.paid_amount').text());
+    setTimeout(() => {
+        $('.amount_received').trigger('input');
+    }, 500);
+    grandSum(previous_payable, service_charges, $(this).val());
+})
+
+function tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0, return_prod_id = 0) {
+    $('#designationsTable tbody').append(`
+    <tr class='tr-${product_id}' data-prod_id ="${product_id}">
+        <td>${product_id}</td>
+        <td>${p_name}</td>
+        <td style="width:80px;"><input type="date" value="${expiry_date}" class="inputSale expiry_input"  data-id="${product_id}" style="font-size: 13px;width:100%;" min="0" ></td>
+        <td style="width:80px;"><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}"  class="inputSale qty-input add-stock-input td-input-qty${product_id}"   data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px;width:100%" min="0"></td>
+        <td style="width:80px;"> <input type="number" value="${retail_price}" data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px;width:100%" min="0"></td>
+        <td style="width:70px;"><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${prod_discount}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"    style="font-size: 13px;width:100%" min="0"></td>
+        <td class='purchase-product-amount${product_id} add- S-input' style="width:80px;" >${amount - prod_discount}</td>
+        <td style="width:80px;"><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn W-100"   data-quantity="${qty}" data-invoice-id="${invoice_id}" data-product-invoice="${return_prod_id}">Remove</button></td>
+        </tr>`);
+}

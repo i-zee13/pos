@@ -132,7 +132,8 @@ function getStock(CurrentRef = null,is_click = 0){
                 </td>
             </tr>
         `);
-            $('.ttl_stock_in_hand').html(addCommas(last_balance.toFixed(2)));
+            // total stock in hand = computed grand total
+            $('.ttl_stock_in_hand').html(addCommas(Number(total_balance || 0).toFixed(2)));
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
             var title = '';
