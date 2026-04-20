@@ -160,6 +160,12 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="{{route('stock-add-quick')}}" class="nav-link">
+                   <i class="fa fa-bolt" aria-hidden="true"></i>
+                  Quick Purchase
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="{{route('purchases')}}" class="nav-link ">
                    <i class="fa fa-shopping-bag" aria-hidden="true"></i> 
                   List

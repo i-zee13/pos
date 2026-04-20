@@ -101,6 +101,7 @@ Route::group(['middleware' => ['auth']], function () {
     //End Shahid
     /** Stock Routes */
     Route::get('/stock-add',                            [StockController::class, 'create'])->name('stock-add');
+    Route::get('/stock-add-quick',                      [StockController::class, 'createQuick'])->name('stock-add-quick');
     Route::get('/get-vendors',                          [StockController::class, 'getVendors'])->name('get-vendors');
     // Route::post('/get-product'           ,[StockController::class, 'getProduct'])->name('get-product');
     Route::get('/get-vendor-balance/{id}',              [StockController::class, 'getVendorBalance'])->name('get-vendor-balance');

@@ -25,6 +25,15 @@ class StockController extends Controller
         $products     =   Product::get();
         return view('purchases.add', compact('current_date', 'products', 'invoice_no', 'invoice_first_part'));
     }
+
+    public function createQuick()
+    {
+        $invoice_no   =   getPurchaseInvoice();
+        $parts        = explode('-', $invoice_no);
+        $invoice_first_part   = $parts[0];
+        $current_date =   Carbon::today()->toDateString();
+        return view('purchases.add_quick', compact('current_date', 'invoice_no', 'invoice_first_part'));
+    }
     public function getProduct(Request $request)
     {
         if ($request->get_result_for == 1) {
