@@ -93,7 +93,13 @@
               <li class="nav-item">
                 <a href="{{ route('stock-transfers') }}" class="nav-link ">
                   <i class="fa fa-random" aria-hidden="true"></i>
-                  Transfer
+                  Transfers List
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('stock-transfers.create') }}" class="nav-link ">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                  Add Transfer
                 </a>
               </li>
             </ul>

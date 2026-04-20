@@ -106,7 +106,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/stock-add',                            [StockController::class, 'create'])->name('stock-add');
     // Stock Transfers
     Route::get('/stock-transfers',                      [StockTransferController::class, 'index'])->name('stock-transfers');
+    Route::get('/stock-transfers/create',               [StockTransferController::class, 'create'])->name('stock-transfers.create');
     Route::post('/stock-transfers',                     [StockTransferController::class, 'store'])->name('stock-transfers.store');
+    Route::get('/print-stock-transfer/{transfer_id}',   [StockTransferController::class, 'printInvoice'])->name('print-stock-transfer');
     Route::get('/godown-products/{godown}',             [StockTransferController::class, 'products'])->name('godown-products');
     Route::get('/get-vendors',                          [StockController::class, 'getVendors'])->name('get-vendors');
     // Route::post('/get-product'           ,[StockController::class, 'getProduct'])->name('get-product');

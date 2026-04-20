@@ -15,11 +15,24 @@ class StockTransferController extends Controller
 {
     public function index()
     {
+        $transfers = StockTransfer::query()
+            ->with('items')
+            ->leftJoin('godowns as from_g', 'from_g.id', '=', 'stock_transfers.from_godown_id')
+            ->leftJoin('godowns as to_g', 'to_g.id', '=', 'stock_transfers.to_godown_id')
+            ->select('stock_transfers.*', 'from_g.name as from_godown_name', 'to_g.name as to_godown_name')
+            ->orderBy('stock_transfers.transfer_date', 'desc')
+            ->orderBy('stock_transfers.id', 'desc')
+            ->get();
+
         if (request()->wantsJson()) {
-            $transfers = StockTransfer::with('items')->orderBy('transfer_date', 'desc')->get();
             return response()->json(['transfers' => $transfers]);
         }
 
+        return view('stock_transfers.list', compact('transfers'));
+    }
+
+    public function create()
+    {
         return view('stock_transfers.index');
     }
 
@@ -84,6 +97,25 @@ class StockTransferController extends Controller
             'status' => 'success',
             'transfer_id' => $transfer->id,
         ]);
+    }
+
+    public function printInvoice($transferId)
+    {
+        $transfer = StockTransfer::query()
+            ->leftJoin('godowns as from_g', 'from_g.id', '=', 'stock_transfers.from_godown_id')
+            ->leftJoin('godowns as to_g', 'to_g.id', '=', 'stock_transfers.to_godown_id')
+            ->select('stock_transfers.*', 'from_g.name as from_godown_name', 'to_g.name as to_godown_name')
+            ->where('stock_transfers.id', $transferId)
+            ->firstOrFail();
+
+        $items = StockTransferItem::query()
+            ->where('stock_transfer_id', $transferId)
+            ->join('products', 'products.id', '=', 'stock_transfer_items.product_id')
+            ->select('stock_transfer_items.*', 'products.product_name')
+            ->orderBy('stock_transfer_items.id')
+            ->get();
+
+        return view('stock_transfers.print', compact('transfer', 'items'));
     }
 
     /**
