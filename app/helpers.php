@@ -362,40 +362,95 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     $s->qty                     =   $stock_qty;
    
 
-    if (($transaction_type == 2 || $transaction_type == 3) && $balance < 0) {
-        $balance                =   abs($balance);
-        $s->qty                 =   $s->batch_wise_balance;
-        $s->ttl_cost_price      =   ($s->unit_cost_price * $s->batch_wise_balance) ;
-        $remaining_qty          =   abs($balance);
-        $s->batch_wise_balance  =   0;
-        $s->save();
-        return BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $remaining_qty, $In_out_status, $transaction_type, $existing_inv_id);
+    $query = BatchStockMgt::where('product_id', $purchase->product_id)
+        ->where('company_id', $purchase->company_id);
+
+    // FIFO (earliest expiry first) for stock leaving the business: sales, purchase returns, replacement OUT.
+    // Purchase invoice line decreases (edit) stay on this line's expiry bucket — not global FIFO.
+    $useFifoForOut = ($In_out_status == 2 && in_array((int) $transaction_type, [2, 3, 6], true));
+
+    if ($In_out_status == 2) {
+        if ($useFifoForOut) {
+            $query->where('batch_wise_balance', '>', 0)
+                ->orderBy('expiry_date', 'ASC')
+                ->orderBy('id', 'ASC');
+        } else {
+            $query->whereDate('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC');
+        }
     } else {
-        $s->batch_wise_balance  = $balance;
-    }  
-    // $s->ttl_cost_price          = ($s->unit_cost_price * ($s->batch_wise_balance ??  $stock_qty)) ;
-    $s->total_balance           = NULL;
-    $s->vs_id                   = $vendor_stock_id;
-    $s->trx_type                = $transaction_type;
-    $s->avg_cost_price_per_unit = $s->ttl_cost_price / $s->batch_wise_balance;  
-     
-    $s->save(); 
-    //Make avrage cost total
-    $prod   = DB::select("SELECT 
-                            IFNULL(SUM(batch_wise_balance), 0) AS ttl_balance,
-                            IFNULL(SUM(IF(batch_wise_balance > 0, ttl_cost_price, 0)), 0) AS ttl_cost
-                        FROM stock_batches_items 
-                        WHERE product_id = $purchase->product_id")[0];   
-    $stock = StockManagment::where('product_id', $purchase->product_id)
-                            ->where('company_id', $purchase->company_id)
-                            ->orderBy('id', 'DESC')->first();
-    // $stock->ttl_avg_cost    = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
-    // $stock->ttl_cost        = $prod->ttl_cost > 0 ? $prod->ttl_cost  : 0;
-    $stock->ttl_avg_cost    =  0;
-    $stock->ttl_cost        =  0;
-    $stock->purchase_price  = $purchase->purchase_price;
-    $stock->sale_price      = $purchase->sale_price;
-    $stock->save(); 
+        $query->whereDate('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC');
+    }
+
+    $s = $query->first();
+    if (!$s) {
+        $s = new BatchStockMgt();
+        $s->company_name = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
+        $s->product_name = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
+    }
+
+    if ($In_out_status == 1) {
+        $s->expiry_date = $purchase->expiry_date ?? null;
+    }
+
+    $existingBalance = (float) ($s->batch_wise_balance ?? 0);
+    $balance = $In_out_status == 2
+        ? $existingBalance - $stock_qty
+        : $existingBalance + $stock_qty;
+
+    $unitCost = (float) ($s->unit_cost_price ?? 0);
+    $s->ttl_cost_price = $unitCost * $balance;
+    if ($In_out_status == 1) {
+        $new_cost_price = 0;
+        if ((float) $s->unit_cost_price != (float) $purchase->purchase_price) {
+            $new_cost_price = $purchase->purchase_price * $stock_qty;
+        }
+        $s->unit_cost_price = $purchase->purchase_price;
+        $s->ttl_cost_price = $s->ttl_cost_price + $new_cost_price;
+    }
+
+    $s->company_id = $purchase->company_id;
+    $s->product_id = $purchase->product_id;
+    $s->invoice_id = $invoice_id;
+    $s->invoice_product_id = $purchase->id;
+    $s->actual_qty = $purchase->qty;
+    $s->actual_status = $In_out_status;
+    $s->qty = $stock_qty;
+
+    if ($In_out_status == 2 && $balance < 0 && $existingBalance > 0) {
+        $remaining_qty = abs($balance);
+        $drainQty = $existingBalance;
+        $s->qty = $drainQty;
+        $s->ttl_cost_price = $unitCost * $drainQty;
+        $s->batch_wise_balance = 0;
+        $s->avg_cost_price_per_unit = 0;
+        $s->save();
+
+        return BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $remaining_qty, $In_out_status, $transaction_type, $existing_inv_id);
+    }
+
+    $s->batch_wise_balance = $balance;
+    $s->total_balance = null;
+    $s->vs_id = $vendor_stock_id;
+    $s->trx_type = $transaction_type;
+    $s->avg_cost_price_per_unit = $s->batch_wise_balance > 0
+        ? ($s->ttl_cost_price / $s->batch_wise_balance)
+        : 0;
+
+    $s->save();
+
+    $companyId = (int) $purchase->company_id;
+    $productId = (int) $purchase->product_id;
+    $stock = StockManagment::where('product_id', $productId)
+        ->where('company_id', $companyId)
+        ->orderBy('id', 'DESC')
+        ->first();
+    if ($stock) {
+        $stock->ttl_avg_cost = 0;
+        $stock->ttl_cost = 0;
+        $stock->purchase_price = $purchase->purchase_price;
+        $stock->sale_price = $purchase->sale_price;
+        $stock->save();
+    }
 }
 
 

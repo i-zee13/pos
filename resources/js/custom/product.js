@@ -535,7 +535,10 @@ function fetchproducts() {
                         if(element.deleted_at == null){
                              delet_status = `<button type="button" id="${element['id'] }" class="btn btn-default red-bg  delete_product" name="Sub_cat" title="Delete" data-status ="delete">Delete</button>`
                         }else{
-                             delet_status = `<button type="button" id="${element['id'] }" class="btn btn-default btn-line  delete_product" name="Sub_cat" title="Restore" data-status ="restore">Restore</button>`
+                             delet_status = `
+                                <button type="button" id="${element['id'] }" class="btn btn-default btn-line delete_product" name="Sub_cat" title="Restore" data-status="restore">Restore</button>
+                                <button type="button" id="${element['id'] }" class="btn btn-default red-bg delete_product" name="Sub_cat" title="Delete Forever" data-status="purge">Delete Forever</button>
+                             `
                         }
                         $('.subCatsListTable tbody').append(`
                         <tr> 
