@@ -19,6 +19,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SalesReturnController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\DatabaseBackupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -84,6 +85,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/', [HomeController::class,   'index'])->name('home');
     Route::get('/home', [HomeController::class,   'index'])->name('home');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/backups', [DatabaseBackupController::class, 'index'])->name('backups.index');
+    Route::post('/backups', [DatabaseBackupController::class, 'store'])->name('backups.store');
+    Route::post('/backups/mail-settings', [DatabaseBackupController::class, 'storeMailSettings'])->name('backups.mail-settings.store');
+    Route::get('/backups/{backup}/download', [DatabaseBackupController::class, 'download'])->name('backups.download');
     Route::get('/get-companies', [CompanyController::class, 'getCompanies'])->name('get-companies');
     Route::post('/get-customers', [CustomerController::class, 'getCustomers'])->name('get-customers');
     /** Product Routes */

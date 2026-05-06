@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RunDatabaseBackupJob;
 use App\Models\AdminSaleClose;
+use App\Models\BackupLog;
+use App\Services\DatabaseBackupService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Auth,DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AdminSaleCloseController extends Controller
 {
@@ -34,6 +39,23 @@ class AdminSaleCloseController extends Controller
                 DB::statement("UPDATE purchase_invoices SET is_editable = 0 WHERE is_editable = 1;");
                 DB::statement("UPDATE purchase_return_invoices SET is_editable = 0 WHERE is_editable = 1;");
                 DB::statement("UPDATE product_replacment_invoices SET is_editable = 0 WHERE is_editable = 1;");
+
+                // Auto queue a DB backup on Admin Close without blocking close operation.
+                try {
+                    $databases = DatabaseBackupService::resolveDatabaseNamesFromConfig();
+                    if (!empty($databases)) {
+                        $log = BackupLog::create([
+                            'user_id' => Auth::user()->id,
+                            'databases' => $databases,
+                            'status' => 'pending',
+                            'triggered_by' => 'admin_close',
+                        ]);
+                        RunDatabaseBackupJob::dispatch($log->id);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('backup.admin_close_dispatch_failed', ['message' => $e->getMessage()]);
+                }
+
                 return response()->JSON([
                     'status'            =>  'success',
                     'msg'               =>  'sale close successfully'

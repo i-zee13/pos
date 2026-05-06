@@ -78,6 +78,11 @@
             <i class="fa fa-home" aria-hidden="true"></i> Dashboard
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('backups.index') }}">
+            <i class="fa fa-cloud-download" aria-hidden="true"></i> DB backups
+          </a>
+        </li>
       </ul>
       <!-- Divider -->
       <hr class="navbar-divider my-3">

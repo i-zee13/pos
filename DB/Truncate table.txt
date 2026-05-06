@@ -42,3 +42,33 @@ ALTER TABLE `vendor_stock_managment` ADD `ttl_avg_cost` DOUBLE NOT NULL DEFAULT 
 ALTER TABLE `vendor_stock_managment` ADD `ttl_cost` DOUBLE NOT NULL DEFAULT '0' AFTER `ttl_avg_cost`;
 ALTER TABLE `vendor_stock_managment` ADD `purchase_price` DOUBLE NULL AFTER `product_id`, ADD `sale_price` DOUBLE NULL AFTER `purchase_price`;
 
+CREATE TABLE `backup_logs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `zip_filename` varchar(255) DEFAULT NULL,
+  `local_relative_path` varchar(512) DEFAULT NULL,
+  `databases` json NOT NULL,
+  `status` varchar(32) NOT NULL DEFAULT 'pending',
+  `size_bytes` bigint unsigned DEFAULT NULL,
+  `gdrive_uploaded` tinyint(1) NOT NULL DEFAULT '0',
+  `gdrive_remote_path` varchar(512) DEFAULT NULL,
+  `error_message` text,
+  `triggered_by` varchar(32) NOT NULL DEFAULT 'manual',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `backup_logs_user_id_index` (`user_id`),
+  KEY `backup_logs_status_index` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `user_backup_mail_settings` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `gmail` varchar(255) NOT NULL,
+  `app_password_encrypted` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_backup_mail_settings_user_id_unique` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

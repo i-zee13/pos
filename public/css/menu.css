@@ -401,21 +401,7 @@ strong,
 	padding: 10px 15px;
 }
 
-.badge {
-	background-color: #fff;
-	color: #282828;
-	position: absolute;
-	border-radius: 50%;
-	right: 15px;
-	top: 9px;
-	width: 15px;
-	height: 15px;
-	text-align: center;
-	font-size: 10px;
-	letter-spacing: 0px;
-	line-height: 11px;
-	padding: 2px
-}
+
 
 ._user-nav a .badge {
 	right: -8px;

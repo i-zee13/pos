@@ -392,7 +392,7 @@
         $showSticky = $today->day >= 1 && $today->day <= 8;
         $currentMonth = $today->format('F');
     @endphp
-    @if($showSticky)
+    <!-- @if($showSticky)
     <div id="sticky-notification" style="position:fixed;top:0;left:0;width:100vw;z-index:99999;background:#e74c3c;color:#fff;text-align:center;padding:12px 0;font-size:18px;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:system-ui,sans-serif;">
         Your {{ $currentMonth }} payment is overDue. Please send your draft on <a href="https://wa.me/923336701313" style="color:#fff;text-decoration:underline;">+92333 6701313</a><span style="margin-left:8px;">Thank You.</span>
     </div>
@@ -405,7 +405,7 @@
             }
         });
     </script>
-    @endif
+    @endif -->
     @php $close_routes = closeRoute() @endphp
     @php $is_close = isClose();
     $is_container = 0;
@@ -563,6 +563,7 @@
             $(".customer_form_div").removeClass("active");
             $(".poc_form_div").removeClass("active");
             $("#product-cl-sec").removeClass("active");
+            $("#backup-gmail-sidebar").removeClass("active");
             $("#product-add").removeClass("active");
             $("#performaPreferences").removeClass("active");
             $(".overlay").removeClass("active");
