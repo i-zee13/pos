@@ -141,15 +141,20 @@ if (!function_exists('getVendorCpvNo')) {
 }
 
 if (!function_exists('isEditable')) {
-    function isEditable($customer_id)
+     function isEditable($customer_id)
     {
         CustomerLedger::where('customer_id', $customer_id)
+            
+            ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         VendorLedger::where('customer_id', $customer_id)
             
+            ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         //Sales
         SaleInvoice::where('customer_id', $customer_id)
+            
+            ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         SaleReturn::where('customer_id', $customer_id)
             

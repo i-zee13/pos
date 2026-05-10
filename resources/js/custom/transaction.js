@@ -418,6 +418,9 @@ $('.customer_id').on('change', function () {
     if (customer_val > 0) {
         n++
         $('.customer_balnce').val(cust_bal)
+         $('#print-invoice').attr('tabindex', customer_val * 2 + 3);
+        $('#saveTransaction').attr('tabindex', customer_val * 2 + 4);
+        $('#cancelSubCat').attr('tabindex', customer_val * 2 + 5);
         $('.add-more').append(`
         <div class="row  remove_div" >
             <div class="row _head03">

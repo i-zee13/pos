@@ -193,8 +193,8 @@ class StockController extends Controller
                                     'stock_balance' =>  $v_stock->balance,
                                 ]);
                             }
-                            BatchWiseStockManagment($vs_id, $invoice->id, $purchased, $change_qty_value, $In_out_status, 1, $request->hidden_invoice_id);
                         }
+                        BatchWiseStockManagment($vs_id,  $invoice->id, $purchased, $change_qty_value, $In_out_status, 1, $request->hidden_invoice_id);
                         //Update Product Price
                         $product              = Product::where('id', $purchased->product_id)->first();
                         $company_id           = $product->company_id;
@@ -280,8 +280,9 @@ class StockController extends Controller
                                                 purchase_invoices.is_editable ,
                                                 purchase_invoices.paid_amount ,
                                                 purchase_invoices.date ,
-                                                purchase_invoices.customer_id ,
-                                                purchase_invoices.created_at ,
+                                                purchase_invoices.customer_id,
+                                                purchase_invoices.created_at,
+                                                 purchase_invoices.description,
                                                 (SELECT dr FROM vendor_ledger WHERE purchase_invoice_id = purchase_invoices.id ORDER BY created_at DESC LIMIT 1) as paid_amount,
                                                 (SELECT customer_name FROM customers WHERE id=purchase_invoices.customer_id) as customer_name')
             ->whereRaw("Date(created_at) = '$current_date'")

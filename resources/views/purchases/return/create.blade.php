@@ -877,5 +877,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{ asset('js/custom/purchase_return.js') }}?v={{ time() }}"></script>
+<script src="{{ mix('js/custom/purchase_return.js') }}"></script>
 @endpush

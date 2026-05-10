@@ -41,7 +41,7 @@
 
     <!-- Brand -->
     <a class="navbar-brand" href="{{route('home')}}">
-      <img src="{{ asset('storage/'.$organization->logo_img) }}" class="navbar-brand-img mx-auto" alt="storeeo" style="height: 75px;">
+      <img src="/storage/{{$organization->logo_img}}" class="navbar-brand-img mx-auto" alt="storeeo" style="height: 75px;">
     </a>
 
     <!-- User (xs) -->

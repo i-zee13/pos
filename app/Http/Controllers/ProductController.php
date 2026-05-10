@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Auth;
 
 class ProductController extends Controller
 {
@@ -109,61 +108,22 @@ class ProductController extends Controller
     }
     public function deleteProduct(Request $request, $id)
     {
-        $status = $request->input('status');
-
-        // Soft delete (existing behavior)
-        if ($status === 'delete' && Product::where('id', $id)->delete()) {
+        if ($request->status == 'delete' && Product::where('id', $id)->delete()) {
             return response()->json([
                 'msg' => 'Product has Deleted Successfully',
                 'status' => 'success'
             ]);
-        }
-
-        // Restore (existing behavior)
-        if ($status === 'restore' && ($p = Product::withTrashed()->find($id)) && $p->restore()) {
+        } else if (Product::withTrashed()->find($id)->restore()) {
             return response()->json([
                 'msg' => 'Product has Restored Successfully',
                 'status' => 'success'
             ]);
-        }
-
-        // Hard delete + purge all stock/transaction rows for this product
-        if ($status === 'purge') {
-            $product = Product::withTrashed()->find($id);
-            if (!$product) {
-                return response()->json([
-                    'msg' => 'Product not found',
-                    'status' => 'failed'
-                ]);
-            }
-
-            DB::transaction(function () use ($id, $product) {
-                // Stock tables
-                DB::table('vendor_stocks')->where('product_id', $id)->delete();
-                DB::table('vendor_stock_managment')->where('product_id', $id)->delete();
-                DB::table('stock_batches_items')->where('product_id', $id)->delete();
-
-                // Transaction line tables (invoice product rows)
-                DB::table('products_purchases')->where('product_id', $id)->delete();
-                DB::table('products_sales')->where('product_id', $id)->delete();
-                DB::table('products_returns')->where('product_id', $id)->delete();
-                DB::table('sale_return_products')->where('product_id', $id)->delete();
-                DB::table('product_replacements')->where('product_id', $id)->delete();
-
-                // Finally remove product itself (including soft-deleted row)
-                $product->forceDelete();
-            });
-
+        } else {
             return response()->json([
-                'msg' => 'Product purged (deleted from stock + transactions).',
-                'status' => 'success'
+                'msg' => 'failed',
+                'status' => 'failed'
             ]);
         }
-
-        return response()->json([
-            'msg' => 'failed',
-            'status' => 'failed'
-        ]);
     }
 
     //Change price Controlls

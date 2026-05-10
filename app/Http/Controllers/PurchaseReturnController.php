@@ -163,8 +163,8 @@ class PurchaseReturnController extends Controller
                                     'stock_balance' =>  $v_stock->balance,
                                 ]);
                             }
-                            BatchWiseStockManagment($vs_id, $invoice->id, $purchased, $change_qty_value, $In_out_status, 3, $request->hidden_invoice_id);
                         }
+                        BatchWiseStockManagment($vs_id,  $invoice->id, $purchased, $purchased->qty, $In_out_status, 3, $request->hidden_invoice_id);
                         $check_stock    = VendorStock::where('product_id', $purchased->product_id)->orderBy('id', 'DESC')->first();
                         if ($check_stock) {
                             $balance    =   $check_stock->balance;
@@ -310,7 +310,7 @@ class PurchaseReturnController extends Controller
                                                 purchase_return_invoices.customer_id ,
                                                 purchase_return_invoices.created_at ,
                                                 purchase_return_invoices.paid_amount,
-                                                purchase_return_invoices.description,
+                                                
                                                 (SELECT customer_name FROM customers WHERE id=purchase_return_invoices.customer_id) as customer_name')
             ->whereRaw("Date(created_at) = '$current_date'")
             ->orderBy('id', 'DESC')

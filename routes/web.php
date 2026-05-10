@@ -5,7 +5,6 @@ use App\Http\Controllers\AdminSaleCloseController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseReturnController;
@@ -46,10 +45,10 @@ use Illuminate\Support\Facades\Route;
  
 
 Route::get('/clear', function () {
-    Artisan::call('config:cache');
     Artisan::call('cache:clear');
     Artisan::call('route:clear');
     Artisan::call('optimize:clear');
+    Artisan::call('config:cache');
     Artisan::call('storage:link');
 
     return "All cache clear successfully";
@@ -84,8 +83,6 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/', [HomeController::class,   'index'])->name('home');
     Route::get('/home', [HomeController::class,   'index'])->name('home');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
     Route::get('/backups', [DatabaseBackupController::class, 'index'])->name('backups.index');
     Route::post('/backups', [DatabaseBackupController::class, 'store'])->name('backups.store');
     Route::post('/backups/mail-settings', [DatabaseBackupController::class, 'storeMailSettings'])->name('backups.mail-settings.store');

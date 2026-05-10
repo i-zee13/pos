@@ -34,7 +34,8 @@ function SaleCloseRecord(close_date) {
         url: `/sale-close-record/${close_date}`,
          success: function (response) {
             console.log(response.records)
-            var records = response.records; 
+            var records = response.records;
+console.log(records['petrol_khata']);
             //TOTAL TURN OVER 
             // Define all item names (including amounts and quantities)
             var items = [
@@ -43,16 +44,18 @@ function SaleCloseRecord(close_date) {
                     // All Banam (dr) Customers
                     "fazul_qadir_banam", "shafiq_karyana_banam", "abdul_ghaffar_ghar_banam",
                     "ammar_abdullah_ghar_banam", "imdad_khata_banam", "imran_niazi_banam",
-                    "sir_murtaza_sahib_banam", "master_khalid_faroq_shah_banam","karaya_dokan_banam","karaya_dokan_receive",
+                    "sir_murtaza_sahib_banam", "master_khalid_faroq_shah_banam","karaya_dokan_banam","karaya_dokan_receive","meezan_bank_jama","ubl_aftab_jama",
                     // All Vendor Names
                     "petrol_khata", "abdul_shakoor_exchange", "habib_bank_abdul_shakoor",'hbl_m_waqas_jama','ubl_m_waqas_jama','gandum_khareed_khata_receive',
-                    "dawaj_khareed", "angro_fertilizer", "fouji_fertilizer","np_khareed",
+                    "dawaj_khareed", "angro_fertilizer", "fouji_fertilizer","np_khareed","angro_khata","dap_khata",
                     "fatima_flink_ventilators", "wilkan_center_cotton", "tcs_tcs_wadha",
                     "nmlf", "abl_ka", "ubl_waqas", "mcb_ka","mcb_ka_jama", "bank_al_habib_ka",
                     "bop_card_loss", "hbl_m_waqas", "abdul_shakoor_habib_bank",
                     "sarhad_punjab_cash", "alfalah_bank_card", "tameerat_khata",
-                    "tameerat_khata", "imported_pura_khata", "bop_bank",
-                    "sonehri_bank", "askari_bank", "amanat_bank", "baghban_chemical","salries_banam","gandum_khareed_khata",
+                    "tameerat_khata", "imported_pura_khata", "bop_bank","meezan_bank_banam","ubl_aftab_banam",
+                    "sonehri_bank", "askari_bank", "amanat_bank", "baghban_chemical","salries_banam","gandum_khareed_khata","land_company","prime_khata",
+                    //Vendor Jama
+                    "abdul_shakoor_exchange_jama",
 
                     // Additional Vendors (Last Image)
                     "wilkan_chemicals", "swat_agro_chemicals", "agro_lux",
@@ -62,11 +65,11 @@ function SaleCloseRecord(close_date) {
                     // All Receiving (cr) Customers
                     "fazul_qadir_receive", "shafiq_karyana_receive", "abdul_ghaffar_ghar_receive",
                     "ammar_abdullah_ghar_receive", "imdad_khata_receive", "imran_niazi_receive",
-                    "sir_murta  a_sahib_receive", "master_khalid_faroq_shah_receive",
+                    "sir_murtaza_sahib_receive", "master_khalid_faroq_shah_receive",
                     
                     "dawai", "dawai_qty", "beej", "beej_qty", "gandom", "gandom_qty",
                     "kapas", "kapas_qty", "dhaan", "dhaan_qty", "dap_25kg", "dap_25kg_qty",
-                    "dap", "dap_qty", "urea", "urea_qty", "can", "can_qty", "np", "np_qty",
+                    "dap", "dap_qty", "urea", "urea_qty", "can", "can_qty", "np", "np_qty","tsp","tsp_qty",
                     "ssp", "ssp_qty", "zarkhez", "zarkhez_qty", "sop", "sop_qty",
                     "jimsam", "jimsam_qty", "sm_urea", "sm_urea_qty", "mop", "mop_qty"
                 ];
@@ -144,10 +147,11 @@ function SaleCloseRecord(close_date) {
             var ttl_cash_recovery = records.ttl_cash_recovery + credit_sale_receivings + vendor_cash_recovery + (openning_balance);
             console.log(ttl_cash_recovery)
             var total_payments = vendor_payment + customer_payment + credit_return_payments + total_pr_paid_amount + total_pr_invc_amount + expense;
-            var ttl_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery) - total_net_sale_discount - total_payments) - total_net_sale_returns_invoice_amount; 
+            // console.log(total_net_sale_returns,'zeee');
+            var ttl_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery) - total_net_sale_discount - total_payments) - total_net_sale_returns; 
+            console.log(ttl_in_hand,'zee',ttl_cash_recovery)
 
-
-            var cash_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery)- total_net_sale_discount - total_payments) - total_net_sale_returns_invoice_amount;
+            var cash_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery)- total_net_sale_discount - total_payments) - total_net_sale_returns;
             if (ttl_in_hand > 0) {
                 $('.sale-close-btn-modal').removeAttr('disabled');
                 $('.sale-close-btn-modal').attr('ttl_in_hand', ttl_in_hand);

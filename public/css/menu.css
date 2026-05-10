@@ -282,7 +282,7 @@ strong,
 .main-links>ul li a:HOVER,
 .sidebar-BL>ul li a:HOVER,
 ._subNav>ul li a:HOVER {
-	color: #0038ba !important;
+	color: #a1c95c !important;
 	background-color: #0a0a0a;
 	text-decoration: none
 }
@@ -299,7 +299,7 @@ strong,
 	padding-left: 20px;
 	padding-right: 20px;
 	padding-bottom: 15px;
-	border-bottom: solid 1px #0038ba
+	border-bottom: solid 1px #a1c95c
 }
 
 ._user-nav a {
@@ -401,7 +401,21 @@ strong,
 	padding: 10px 15px;
 }
 
-
+.badge {
+	background-color: #fff;
+	color: #282828;
+	position: absolute;
+	border-radius: 50%;
+	right: 15px;
+	top: 9px;
+	width: 15px;
+	height: 15px;
+	text-align: center;
+	font-size: 10px;
+	letter-spacing: 0px;
+	line-height: 11px;
+	padding: 2px
+}
 
 ._user-nav a .badge {
 	right: -8px;
@@ -501,7 +515,7 @@ strong,
 
 ._QL-creat .dropdown-item:HOVER {
 	background-color: #f0f4fe;
-	color: #0038ba
+	color: #a1c95c
 }
 
 .container {
@@ -606,7 +620,7 @@ strong,
 	margin: auto;
 	margin-top: 15px;
 	padding: 2px;
-	border: solid 1px #0038ba
+	border: solid 1px #a1c95c
 }
 
 ._profile-card h2 {
@@ -686,7 +700,7 @@ strong,
 }
 
 ._BC-btn:HOVER {
-	background-color: #0038ba;
+	background-color: #a1c95c;
 	color: #fff
 }
 
@@ -717,7 +731,7 @@ button {
 
 .profile-left .dropdown-item:HOVER {
 	color: #fff;
-	background-color: #0038ba
+	background-color: #a1c95c
 }
 
 .profile-left .dropdown-menu::before,
@@ -844,7 +858,7 @@ button {
 	font-size: 16px;
 	padding: 0 20px;
 	margin: 0;
-	background: linear-gradient(90deg, #101010 0%, #0038ba 100%);
+	background: linear-gradient(90deg, #101010 0%, #a1c95c 100%);
 	width: inherit;
 }
 
@@ -946,7 +960,7 @@ button {
 }
 
 ._customerP-card h2:before {
-	background: #0038ba;
+	background: #a1c95c;
 	position: absolute;
 	width: 2px;
 	height: 32px;
@@ -1018,7 +1032,7 @@ button {
 	box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.2);
 	position: relative;
 	margin-bottom: 30px;
-	border-bottom: solid 1px #0038ba
+	border-bottom: solid 1px #a1c95c
 }
 
 .CL-Search {
@@ -1156,7 +1170,7 @@ button {
 .Up-DocList a:HOVER {
 	margin-right: 25px;
 	font-size: 13px;
-	color: #0038ba
+	color: #a1c95c
 }
 
 .Up-DocList a .fa {
@@ -1164,7 +1178,7 @@ button {
 }
 
 .dropzone:HOVER {
-	border-color: #0038ba
+	border-color: #a1c95c
 }
 
 ._invNDV {
@@ -1218,7 +1232,7 @@ button {
 	background: linear-gradient(90deg, #ffffff 0%, #ffffff 100%);
 	border: none;
 	box-shadow: none;
-	color: #0038ba !important;
+	color: #a1c95c !important;
 	padding: 0
 }
 
@@ -1279,7 +1293,7 @@ button {
 	position: absolute;
 	right: 22px;
 	top: 22px;
-	color: #0038ba
+	color: #a1c95c
 }
 
 .Activity-bottom {
@@ -1297,7 +1311,7 @@ button {
 	border-radius: 50%;
 	overflow: hidden;
 	padding: 2px;
-	border: solid 1px #0038ba;
+	border: solid 1px #a1c95c;
 }
 
 .text-gray {
@@ -1319,7 +1333,7 @@ button {
 	border-radius: 50%;
 	overflow: hidden;
 	padding: 1px;
-	border: solid 1px #0038ba;
+	border: solid 1px #a1c95c;
 	margin-right: 8px
 }
 
@@ -1432,7 +1446,7 @@ button {
 	box-shadow: 2px 2px 10px 0 rgba(79, 79, 79, .2) !important;
 	padding: 7px 35px 5px 20px !important;
 	border: solid 1px #003db6 !important;
-	background: linear-gradient(90deg, #101010 0%, #0038ba 100%) !important;
+	background: linear-gradient(90deg, #101010 0%, #a1c95c 100%) !important;
 	margin: 0;
 }
 
@@ -1554,7 +1568,7 @@ button {
 	50% {
 		width: 2em;
 		height: 2em;
-		background: linear-gradient(90deg, #101010 0%, #0038ba 100%);
+		background: linear-gradient(90deg, #101010 0%, #a1c95c 100%);
 		border: 0;
 		opacity: 0.6;
 	}
@@ -1562,7 +1576,7 @@ button {
 	100% {
 		width: 2em;
 		height: 2em;
-		background: linear-gradient(90deg, #101010 0%, #0038ba 100%);
+		background: linear-gradient(90deg, #101010 0%, #a1c95c 100%);
 		border: 0;
 		opacity: 1;
 	}
@@ -1599,8 +1613,8 @@ button {
 }
 
 ._profile-card .dropdown-item:HOVER {
-	background-color: #0038ba;
-	border-bottom: solid 1px #0038ba;
+	background-color: #a1c95c;
+	border-bottom: solid 1px #a1c95c;
 	color: #fff !important
 }
 
@@ -1678,7 +1692,7 @@ button {
 	position: absolute;
 	right: 15px;
 	top: 15px;
-	color: #0038ba;
+	color: #a1c95c;
 	width: 20px;
 	height: auto;
 	filter: invert(60%);
@@ -1807,7 +1821,7 @@ button {
 }
 
 .SearchList ul li a:HOVER {
-	color: #0038ba;
+	color: #a1c95c;
 	margin-left: 8px;
 	-webkit-transition: all 0.3s;
 	-moz-transition: all 0.3s;
@@ -1857,7 +1871,7 @@ button {
 
 .TaskText:focus {
 	background-image: none;
-	border: solid 1px #0038ba;
+	border: solid 1px #a1c95c;
 	margin-bottom: 10px
 }
 
@@ -1904,7 +1918,7 @@ button {
 	right: -10px;
 	top: -10px;
 	border: solid 1px #003db6;
-	background: linear-gradient(90deg, #101010 0%, #0038ba 100%);
+	background: linear-gradient(90deg, #101010 0%, #a1c95c 100%);
 	width: 30px;
 	height: 30px;
 	border-radius: 50%;
@@ -1971,8 +1985,8 @@ button {
 
 .Tdone {
 	color: #fff !important;
-	background: linear-gradient(90deg, #101010 0%, #0038ba 100%);
-	border-color: #0038ba;
+	background: linear-gradient(90deg, #101010 0%, #a1c95c 100%);
+	border-color: #a1c95c;
 	font-size: 11px;
 	line-height: 1;
 	display: inline-block;
@@ -2000,7 +2014,7 @@ button {
 	border-radius: 50%;
 	overflow: hidden;
 	padding: 1px;
-	border: solid 1px #0038ba;
+	border: solid 1px #a1c95c;
 	margin-right: 8px;
 }
 
@@ -2041,8 +2055,8 @@ button {
 }
 
 .box-sec:HOVER {
-	background: linear-gradient(90deg, #101010 0%, #0038ba 100%);
-	/*	border-top: 3px solid #0038ba;*/
+	background: linear-gradient(90deg, #101010 0%, #a1c95c 100%);
+	/*	border-top: 3px solid #a1c95c;*/
 	color: #fff;
 	text-decoration: none;
 	-webkit-transition: all 0.3s ease-in-out;
@@ -2084,7 +2098,7 @@ button {
 }
 
 ._dashTOP span {
-	color: #0038ba
+	color: #a1c95c
 }
 
 ._dashTOP p {
@@ -2100,7 +2114,7 @@ footer.sticky-footer {
 ._user_Pimage {
 	width: 38px;
 	height: 38px;
-	border: solid 1px #0038ba;
+	border: solid 1px #a1c95c;
 	background-color: #FFF;
 	padding: 1px;
 	border-radius: 50%;
@@ -2143,7 +2157,7 @@ footer.sticky-footer {
 
 ._user-CS ul li div {
 	font-weight: normal;
-	color: #0038ba;
+	color: #a1c95c;
 	font-family: 'Rationale', sans-serif;
 	font-size: 25px;
 	padding-bottom: 3px
@@ -2172,7 +2186,7 @@ footer.sticky-footer {
 }
 
 ._act-TL .header a:HOVER {
-	background-color: #0038ba;
+	background-color: #a1c95c;
 	color: #fff;
 	-webkit-transition: all 0.3s;
 	-moz-transition: all 0.3s;
@@ -2351,7 +2365,7 @@ footer.sticky-footer {
 .Order-Cust-detail {
 	padding: 8px 15px;
 	background-color: #f8f8f8;
-	border-top: solid 2px #0038ba;
+	border-top: solid 2px #a1c95c;
 	font-size: 13px;
 	line-height: 22px;
 	letter-spacing: normal
@@ -2391,7 +2405,7 @@ footer.sticky-footer {
 }
 
 .Order-PL .progress-bar {
-	background-color: #0038ba
+	background-color: #a1c95c
 }
 
 .progress {
@@ -2429,14 +2443,14 @@ footer.sticky-footer {
 
 .AssSupplier:HOVER {
 	text-decoration: none;
-	color: #0038ba;
+	color: #a1c95c;
 	background-color: #fff;
 	box-shadow: 2px 2px 45px 11px rgba(45, 62, 80, .12)
 }
 
 .AssSupplier .fa {
 	font-size: 14px;
-	color: #0038ba
+	color: #a1c95c
 }
 
 .OtherAction {
@@ -2560,7 +2574,7 @@ footer.sticky-footer {
 	border-radius: 50%;
 	overflow: hidden;
 	padding: 1px;
-	border: solid 1px #0038ba;
+	border: solid 1px #a1c95c;
 	opacity: 1
 }
 
@@ -2627,7 +2641,7 @@ footer.sticky-footer {
 
 .AddSupp {
 	font-size: 13px;
-	background-color: #0038ba;
+	background-color: #a1c95c;
 	padding: 6px 10px;
 	color: #fff !important;
 	margin: 10px 0
@@ -2636,7 +2650,7 @@ footer.sticky-footer {
 ._blueBTN {
 	padding: 4px 8px 2px 8px;
 	margin-right: 10px;
-	color: #0038ba;
+	color: #a1c95c;
 	font-size: 12px;
 	letter-spacing: 1px;
 	background: linear-gradient(90deg, #fff 0%, #fff 100%);
@@ -2644,7 +2658,7 @@ footer.sticky-footer {
 }
 
 ._blueBTN:HOVER {
-	background: linear-gradient(90deg, #101010 0%, #0038ba 100%)
+	background: linear-gradient(90deg, #101010 0%, #a1c95c 100%)
 }
 
 .ProductStatus {
@@ -2748,7 +2762,7 @@ footer.sticky-footer {
 }
 
 .blue-text {
-	color: #0038ba
+	color: #a1c95c
 }
 
 .activityTime {
@@ -2868,7 +2882,7 @@ footer.sticky-footer {
 
 .card-report .digit {
 	font-size: 30px;
-	color: #0038ba;
+	color: #a1c95c;
 	font-family: 'Rationale', sans-serif !important;
 	position: absolute;
 	bottom: 10px;
@@ -2893,7 +2907,7 @@ footer.sticky-footer {
 }
 
 .bottomBB {
-	border-bottom: solid 2px #0038ba
+	border-bottom: solid 2px #a1c95c
 }
 
 .bottomBGR {
@@ -3002,12 +3016,12 @@ body {
 	float: right;
 	padding: 0px 0px 0px 25px;
 	font-family: 'Rationale', sans-serif;
-	color: #0038ba;
+	color: #a1c95c;
 	line-height: normal
 }
 
 .TopProductList .progress-bar {
-	background-color: #0038ba
+	background-color: #a1c95c
 }
 
 .TopProductList .progress {
@@ -3070,7 +3084,7 @@ body {
 	margin: 0;
 	margin-top: 4px;
 	padding: 5px 0px 15px 0px;
-	border-top: solid 1px #0038ba;
+	border-top: solid 1px #a1c95c;
 }
 
 .CoInvTotal .form-control,
@@ -3126,7 +3140,7 @@ body {
 }
 
 .FEMP-lab {
-	background-color: #0038ba;
+	background-color: #a1c95c;
 	font-size: 11px;
 	top: -5px;
 	right: 5px;
@@ -3207,7 +3221,7 @@ body {
 	width: inherit;
 	margin-top: 0px;
 	padding-bottom: 0px;
-	border-bottom: solid 2px #0038ba;
+	border-bottom: solid 2px #a1c95c;
 	margin-bottom: 15px
 }
 
@@ -3304,7 +3318,7 @@ body {
 	padding: 10px;
 	display: block;
 	position: relative;
-	border-bottom: solid 2px #0038ba
+	border-bottom: solid 2px #a1c95c
 }
 
 .cp-stats-value {
@@ -3331,7 +3345,7 @@ body {
 }
 
 .notificationList li:HOVER {
-	background: linear-gradient(90deg, #101010 0%, #0038ba 100%);
+	background: linear-gradient(90deg, #101010 0%, #a1c95c 100%);
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 	color: #b3c4ea
 }
@@ -3460,7 +3474,7 @@ body {
 }
 
 ._amState .text-primary {
-	color: #0038ba !important
+	color: #a1c95c !important
 }
 
 ._RVperDay {
@@ -3493,7 +3507,7 @@ body {
 }
 
 .B_border {
-	border-bottom: solid 2px #0038ba
+	border-bottom: solid 2px #a1c95c
 }
 
 ._dash-table {
@@ -3526,7 +3540,7 @@ body {
 	text-align: right;
 	line-height: 20px;
 	font-size: 20px;
-	color: #0038ba;
+	color: #a1c95c;
 	font-family: 'Rationale', sans-serif
 }
 
@@ -3556,7 +3570,7 @@ body {
 	color: #fff;
 	text-align: center;
 	white-space: nowrap;
-	background-color: #0038ba;
+	background-color: #a1c95c;
 	-webkit-transition: width .6s ease;
 	transition: width .6s ease;
 }
@@ -3601,7 +3615,7 @@ body {
 }
 
 .progress-bar {
-	background: linear-gradient(90deg, #101010 0%, #0038ba 100%) !important
+	background: linear-gradient(90deg, #101010 0%, #a1c95c 100%) !important
 }
 
 .cus-ass-list {
@@ -3614,7 +3628,7 @@ body {
 	border-radius: 0;
 	box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.4);
 	color: #fff;
-	background: linear-gradient(90deg, #101010 0%, #0038ba 100%)
+	background: linear-gradient(90deg, #101010 0%, #a1c95c 100%)
 }
 
 .cus-ass-list:HOVER .close,
@@ -3862,7 +3876,7 @@ body {
 	padding-top: 0;
 	margin-bottom: 5px;
 	font-size: 15px;
-	color: #0038ba
+	color: #a1c95c
 }
 
 .TaskCommentSec .FU-history .Act-timeline .LS-Comments {
@@ -3971,7 +3985,7 @@ a.report-Card {
 
 a.report-Card:HOVER {
 	text-decoration: none;
-	border: solid 1PX #0038ba;
+	border: solid 1PX #a1c95c;
 	-webkit-box-shadow: 2px 2px 10px 0 rgba(79, 79, 79, .4);
 	-moz-box-shadow: 2px 2px 10px 0 rgba(79, 79, 79, .4);
 	box-shadow: 2px 2px 10px 0 rgba(79, 79, 79, .4);
@@ -4019,7 +4033,7 @@ a.report-Card:HOVER {
 
 .fav-icon:HOVER,
 .addFav {
-	color: #0038ba
+	color: #a1c95c
 }
 
 .reportCard .addFav {
@@ -4049,7 +4063,7 @@ a.report-Card:HOVER {
 
 .SupplierCard {
 	border: solid 1px #dbdbdb;
-	border-bottom: solid 1px #0038ba;
+	border-bottom: solid 1px #a1c95c;
 	padding: 10px;
 	margin: 10px;
 	font-size: 13px;
@@ -4067,8 +4081,8 @@ a.report-Card:HOVER {
 	box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.4);
 	text-decoration: none;
 	color: #fff;
-	background-color: #0038ba;
-	border: solid 1px #0038ba;
+	background-color: #a1c95c;
+	border: solid 1px #a1c95c;
 	-webkit-transition: all 0.3s;
 	-moz-transition: all 0.3s;
 	transition: all 0.3s;
@@ -4239,9 +4253,9 @@ a.report-Card:HOVER {
 }
 
 .header-tabs .nav-pills .nav-link.active {
-	color: #0038ba;
+	color: #a1c95c;
 	border: none;
-	border-bottom: solid 2px #0038ba;
+	border-bottom: solid 2px #a1c95c;
 	background: none
 }
 
@@ -4267,7 +4281,7 @@ a.report-Card:HOVER {
 .header-tabs .nav-pills .nav-link.active ._cus-val,
 .header-tabs .nav-tabs .nav-link.active ._cus-val {
 	color: #fff;
-	background-color: #0038ba
+	background-color: #a1c95c
 }
 
 .header-tabs {
@@ -4639,7 +4653,7 @@ a.report-Card:HOVER {
 		height: 100vh;
 		overflow-y: auto;
 		flex-direction: column;
-		background: linear-gradient(90deg, #101010 0%, #0038ba 100%);
+		background: linear-gradient(90deg, #101010 0%, #a1c95c 100%);
 		display: none
 	}
 
@@ -4659,8 +4673,8 @@ a.report-Card:HOVER {
 
 	._user-nav {
 		width: 100%;
-		border-bottom: solid 1px #0038ba;
-		border-top: solid 1px #0038ba;
+		border-bottom: solid 1px #a1c95c;
+		border-top: solid 1px #a1c95c;
 		display: inline-block
 	}
 
@@ -4674,7 +4688,7 @@ a.report-Card:HOVER {
 		padding-left: 20px;
 		padding-right: 20px;
 		padding-bottom: 10px;
-		border-bottom: solid 1px #0038ba;
+		border-bottom: solid 1px #a1c95c;
 		padding-top: 15px;
 	}
 
@@ -4746,7 +4760,7 @@ a.report-Card:HOVER {
 	}
 
 	.mobile__toggler span {
-		background: #0038ba;
+		background: #a1c95c;
 		display: block;
 		position: absolute;
 		top: 12px;
@@ -4772,7 +4786,7 @@ a.report-Card:HOVER {
 		-webkit-transition: all 0.4s ease;
 		top: 8px;
 		transition: all 0.4s ease;
-		background-color: #0038ba
+		background-color: #a1c95c
 	}
 
 	.mobile__toggler span::before {
@@ -4896,7 +4910,7 @@ a.report-Card:HOVER {
 
 .heading-line:before {
 	content: "";
-	background-color: #0038ba;
+	background-color: #a1c95c;
 	width: 18px;
 	height: 6px;
 	border-radius: 2px;
@@ -4920,8 +4934,8 @@ a.report-Card:HOVER {
 
 .btn-logout:hover,
 .btn-logout:focus {
-	background: #0038ba !important;
-	border-color: #0038ba !important
+	background: #a1c95c !important;
+	border-color: #a1c95c !important
 }
 
 .topbar {
@@ -4940,12 +4954,12 @@ a.report-Card:HOVER {
 	vertical-align: middle;
 	border-radius: 50%;
 	margin-right: 5px;
-	border: solid 1px #0038ba;
+	border: solid 1px #a1c95c;
 }
 
 .topbar .nav-link {
 	padding: 0 !important;
-	color: #0038ba;
+	color: #a1c95c;
 	line-height: 30px;
 	font-size: 15px;
 }
@@ -4957,7 +4971,7 @@ a.report-Card:HOVER {
 }
 
 .topbar .dropdown-item:hover .fa {
-	color: #0038ba;
+	color: #a1c95c;
 }
 
 .topbar .dropdown-item {

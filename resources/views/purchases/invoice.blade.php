@@ -187,7 +187,7 @@
     <div id="invoice-POS">
         <center id="top">
             <div class="info">
-                <!-- <img src="{{ asset('storage/'.$organization->logo_img) }}" class="navbar-brand-img mx-auto" alt="..." style="height: 35px;"> -->
+                <!-- <img src="/storage/{{$organization->logo_img}}" class="navbar-brand-img mx-auto" alt="..." style="height: 35px;"> -->
                 <p>{{$organization->name}} {{$organization->address}}</p>
                 <p>Phone # {{$organization->phone_number}}</p>
             </div><!--End Info-->
