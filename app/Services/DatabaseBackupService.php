@@ -106,11 +106,12 @@ class DatabaseBackupService
             $gdrivePath = null;
 
             $uploader = app(GoogleDriveApiBackupUploader::class);
-            $useDriveApi = $uploader->isConfigured();
+            $driveUserId = $backupLog->user_id ? (int) $backupLog->user_id : null;
+            $useDriveApi = $uploader->isConfigured($driveUserId);
 
             if ($useDriveApi) {
                 try {
-                    $gdrivePath = $uploader->uploadZip($zipAbs, $zipFilename);
+                    $gdrivePath = $uploader->uploadZip($zipAbs, $zipFilename, $driveUserId);
                     $gdriveOk = true;
                 } catch (\Throwable $e) {
                     Log::warning('backup.google_drive_api_failed', ['message' => $e->getMessage(), 'log_id' => $backupLog->id]);
@@ -210,7 +211,9 @@ class DatabaseBackupService
             $database,
         ];
 
-        $process = new Process($cmd, base_path(), ['MYSQL_PWD' => $password]);
+        $env = $password !== '' ? ['MYSQL_PWD' => $password] : null;
+
+        $process = new Process($cmd, base_path(), $env);
         $process->setTimeout(3600);
         $process->run();
 

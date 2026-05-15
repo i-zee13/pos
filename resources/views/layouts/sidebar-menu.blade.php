@@ -79,9 +79,23 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('backups.index') }}">
-            <i class="fa fa-cloud-download" aria-hidden="true"></i> DB backups
+          <a class="nav-link collapsed" href="#sidebarSystemBackups" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSystemBackups">
+            <i class="fa fa-cloud" aria-hidden="true"></i> System Backups
           </a>
+          <div class="collapse" id="sidebarSystemBackups">
+            <ul class="nav nav-sm flex-column">
+              <li class="nav-item">
+                <a href="{{ route('backups.index') }}" class="nav-link">
+                  <i class="fa fa-database" aria-hidden="true"></i> DB Backups
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('backups.logs') }}" class="nav-link">
+                  <i class="fa fa-list-alt" aria-hidden="true"></i> Backup Logs
+                </a>
+              </li>
+            </ul>
+          </div>
         </li>
       </ul>
       <!-- Divider -->

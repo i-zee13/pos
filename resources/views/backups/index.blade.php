@@ -3,7 +3,7 @@
 @section('data-sidebar')
 <div id="product-cl-sec">
     <a href="#" id="pl-close"  class="close-btn-pl"></a>
-    <div class="pro-header-text">Google <span>account</span></div>
+    <div class="pro-header-text">Google <span>Drive</span></div>
     <div class="pc-cartlist">
         <div class="overflow-plist">
             <div class="plist-content">
@@ -11,12 +11,35 @@
                     <div class="container">
                         <div class="row">
                             <div class="col-12">
+                                <div class="card p-20 top_border mb-3" style="width: 100%">
+                                    <h2 class="_head03">Drive <span>connection</span></h2>
+                                    <p class="font12 text-muted mb-3" style="line-height: 1.5;">
+                                        Connect the Google account where manual database backups should be uploaded. Google will generate the OAuth token; this app stores the refresh token encrypted.
+                                    </p>
+                                    @if($mailSetting && $mailSetting->hasConnectedGoogleDrive())
+                                        <div class="alert alert-success mb-3">
+                                            Connected as <strong>{{ $mailSetting->gmail }}</strong>
+                                            @if($mailSetting->google_drive_connected_at)
+                                                <br><small>Connected {{ $mailSetting->google_drive_connected_at->format('d M Y h:i A') }}</small>
+                                            @endif
+                                        </div>
+                                        <form method="post" action="{{ route('backups.google.disconnect') }}" class="mb-0">
+                                            @csrf
+                                            <button type="submit" class="btn btn-default btn-line">Disconnect Google Drive</button>
+                                        </form>
+                                    @else
+                                        <a href="{{ route('backups.google.connect') }}" class="btn btn-primary">
+                                            <i class="fa fa-google"></i> Connect Google Drive
+                                        </a>
+                                    @endif
+                                </div>
+
                                 <form id="backupGmailForm" method="post" action="{{ route('backups.mail-settings.store') }}">
                                     @csrf
                                     <div id="floating-label" class="card p-20 top_border mb-3" style="width: 100%">
-                                        <h2 class="_head03">Gmail <span>credentials</span></h2>
+                                        <h2 class="_head03">Optional Gmail <span>credentials</span></h2>
                                         <p class="font12 text-muted mb-3" style="line-height: 1.5;">
-                                            Use the Google account you want tied to backups. Create an <strong>App password</strong> under Google Account → Security → 2-Step Verification → App passwords (not your normal Gmail password). Values are stored <strong>encrypted</strong> on this server.
+                                            This is only for email/app-password settings. Drive upload uses the OAuth connection above, not your Gmail password.
                                         </p>
                                         <div class="form-wrap p-0">
                                             <div class="row">
@@ -110,7 +133,7 @@
                 </div>
                 <div class="d-flex flex-wrap align-items-center" style="gap: 8px;">
                     <button type="button" class="btn btn-default btn-line" onclick="openSidebar('#product-cl-sec'); return false;">
-                        <i class="fa fa-google"></i> Gmail / app password
+                        <i class="fa fa-google"></i> Google Drive
                     </button>
                     <form action="{{ route('backups.store') }}" method="post" class="m-0">
                         @csrf
@@ -137,8 +160,8 @@
                             <th>ID</th>
                             <th>When</th>
                             <th>Source</th>
-                            <th>DBs</th>
-                            <th>Zip</th>
+                           
+                           
                             <th>Status</th>
                             <th>Size</th>
                             <th>Drive</th>
@@ -150,10 +173,10 @@
                         @forelse($logs as $log)
                             <tr>
                                 <td>{{ $log->id }}</td>
-                                <td>{{ $log->created_at->format('Y-m-d H:i') }}</td>
+                                <td>{{ $log->created_at->isoFormat('ddd, Do MMM') }}</td>
                                 <td>{{ $log->triggered_by }}@if($log->user_id) (user #{{ $log->user_id }}) @endif</td>
-                                <td><small>{{ implode(', ', $log->databases ?? []) }}</small></td>
-                                <td>{{ $log->zip_filename ?? '—' }}</td>
+                              
+                                
                                 <td>
                                     @if($log->status === 'completed')
                                         <span class="badge badge-success">completed</span>
@@ -195,7 +218,7 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $logs->links() }}
+                
             </div>
         </div>
     </div>

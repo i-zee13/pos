@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\UserBackupMailSetting;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -16,9 +18,16 @@ class GoogleDriveApiBackupUploader
     protected $integrationSettings = null;
     /** @var object|null */
     protected $integrationRow = null;
+    /** @var array<int,UserBackupMailSetting|null> */
+    protected $userDriveSettings = [];
 
-    public function isConfigured(): bool
+    public function isConfigured(?int $userId = null): bool
     {
+        if ($this->userDriveRefreshToken($userId) !== null) {
+            return $this->nonEmpty($this->credential('client_id', (string) config('backup.google_drive_api.client_id')))
+                && $this->nonEmpty($this->credential('client_secret', (string) config('backup.google_drive_api.client_secret')));
+        }
+
         $settings = $this->getIntegrationSettings();
         $enabled = (bool) config('backup.google_drive_api.enabled') || !empty($settings);
 
@@ -33,21 +42,18 @@ class GoogleDriveApiBackupUploader
      *
      * @throws \RuntimeException
      */
-    public function uploadZip(string $absoluteZipPath, string $zipFilename): string
+    public function uploadZip(string $absoluteZipPath, string $zipFilename, ?int $userId = null): string
     {
         if (! is_readable($absoluteZipPath)) {
             throw new \RuntimeException('Zip file is not readable: '.$absoluteZipPath);
         }
 
-        $accessToken = $this->fetchAccessToken();
+        $accessToken = $this->fetchAccessToken($userId);
 
         $metadata = ['name' => $zipFilename];
-        $folderId = trim((string) config('backup.google_drive_api.folder_id', ''));
+        $folderId = $this->folderId($userId);
         if ($folderId === '') {
-            $folderId = trim((string) $this->credential('folder_id', ''));
-        }
-        if ($folderId === '') {
-            $folderId = $this->resolveOrCreateFolderId($accessToken);
+            $folderId = $this->resolveOrCreateFolderId($accessToken, $userId);
         }
         if ($folderId !== '') {
             $metadata['parents'] = [$folderId];
@@ -95,12 +101,13 @@ class GoogleDriveApiBackupUploader
         throw new \RuntimeException('Drive API returned no file id.');
     }
 
-    protected function fetchAccessToken(): string
+    protected function fetchAccessToken(?int $userId = null): string
     {
+        $userRefreshToken = $this->userDriveRefreshToken($userId);
         $tokenPayload = [
             'client_id' => $this->credential('client_id', (string) config('backup.google_drive_api.client_id')),
             'client_secret' => $this->credential('client_secret', (string) config('backup.google_drive_api.client_secret')),
-            'refresh_token' => $this->credential('refresh_token', (string) config('backup.google_drive_api.refresh_token')),
+            'refresh_token' => $userRefreshToken ?: $this->credential('refresh_token', (string) config('backup.google_drive_api.refresh_token')),
             'grant_type' => 'refresh_token',
         ];
 
@@ -111,6 +118,15 @@ class GoogleDriveApiBackupUploader
         if ($response->failed()) {
             $body = $response->json();
             Log::warning('backup.google_drive_token', ['body' => $response->body()]);
+
+            if ($userRefreshToken !== null) {
+                $error = is_array($body) ? (string) ($body['error'] ?? '') : '';
+                if ($error === 'invalid_grant') {
+                    $this->clearUserDriveToken($userId);
+                }
+
+                throw new \RuntimeException('Connected Google Drive token expired or was revoked. Reconnect Google Drive from DB Backups.');
+            }
 
             // If refresh token is invalid/expired, try external rotation endpoint once.
             $error = is_array($body) ? (string) ($body['error'] ?? '') : '';
@@ -181,9 +197,9 @@ class GoogleDriveApiBackupUploader
         }
     }
 
-    protected function resolveOrCreateFolderId(string $accessToken): string
+    protected function resolveOrCreateFolderId(string $accessToken, ?int $userId = null): string
     {
-        $folderName = trim((string) $this->credential('folder_name', (string) config('backup.google_drive_api.folder_name', 'POS DBs Backups')));
+        $folderName = $this->folderName($userId);
         if ($folderName === '') {
             return '';
         }
@@ -222,7 +238,95 @@ class GoogleDriveApiBackupUploader
         }
 
         $newId = $create->json('id');
-        return is_string($newId) ? $newId : '';
+        if (is_string($newId) && $newId !== '') {
+            $this->saveUserFolderId($userId, $newId);
+
+            return $newId;
+        }
+
+        return '';
+    }
+
+    protected function folderId(?int $userId = null): string
+    {
+        $setting = $this->getUserDriveSetting($userId);
+        if ($setting && $setting->hasConnectedGoogleDrive()) {
+            return trim((string) $setting->google_drive_folder_id);
+        }
+
+        $folderId = trim((string) config('backup.google_drive_api.folder_id', ''));
+        if ($folderId !== '') {
+            return $folderId;
+        }
+
+        return trim((string) $this->credential('folder_id', ''));
+    }
+
+    protected function folderName(?int $userId = null): string
+    {
+        $setting = $this->getUserDriveSetting($userId);
+        if ($setting && $setting->hasConnectedGoogleDrive() && trim((string) $setting->google_drive_folder_name) !== '') {
+            return trim((string) $setting->google_drive_folder_name);
+        }
+
+        return trim((string) $this->credential('folder_name', (string) config('backup.google_drive_api.folder_name', 'POS DBs Backups')));
+    }
+
+    protected function userDriveRefreshToken(?int $userId = null): ?string
+    {
+        $setting = $this->getUserDriveSetting($userId);
+        if (! $setting || ! $setting->hasConnectedGoogleDrive()) {
+            return null;
+        }
+
+        try {
+            $token = Crypt::decryptString($setting->google_drive_refresh_token_encrypted);
+
+            return trim($token) !== '' ? trim($token) : null;
+        } catch (\Throwable $e) {
+            Log::warning('backup.google_drive_user_token_decrypt_failed', ['user_id' => $userId, 'message' => $e->getMessage()]);
+
+            return null;
+        }
+    }
+
+    protected function getUserDriveSetting(?int $userId = null): ?UserBackupMailSetting
+    {
+        if (! $userId) {
+            return null;
+        }
+
+        if (! array_key_exists($userId, $this->userDriveSettings)) {
+            $this->userDriveSettings[$userId] = UserBackupMailSetting::where('user_id', $userId)->first();
+        }
+
+        return $this->userDriveSettings[$userId];
+    }
+
+    protected function saveUserFolderId(?int $userId, string $folderId): void
+    {
+        $setting = $this->getUserDriveSetting($userId);
+        if (! $setting) {
+            return;
+        }
+
+        $setting->google_drive_folder_id = $folderId;
+        $setting->save();
+        $this->userDriveSettings[$userId] = $setting;
+    }
+
+    protected function clearUserDriveToken(?int $userId = null): void
+    {
+        $setting = $this->getUserDriveSetting($userId);
+        if (! $setting) {
+            return;
+        }
+
+        $setting->google_drive_refresh_token_encrypted = null;
+        $setting->google_drive_folder_id = null;
+        $setting->google_drive_connected_at = null;
+        $setting->save();
+        $this->userDriveSettings[$userId] = $setting;
     }
 
     protected function nonEmpty($value): bool
