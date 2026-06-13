@@ -45,6 +45,7 @@ use Illuminate\Support\Facades\Route;
  
 
 Route::get('/clear', function () {
+    fix_invoice_helper_case();
     Artisan::call('cache:clear');
     Artisan::call('route:clear');
     Artisan::call('optimize:clear');
@@ -52,6 +53,16 @@ Route::get('/clear', function () {
     Artisan::call('storage:link');
 
     return "All cache clear successfully";
+});
+
+/**
+ * Linux (case-sensitive) servers par lowercase `app/invoice_helper.php` shim bana
+ * deta hai jo asli `app/Invoice_helper.php` ko load karti hai. Isse composer
+ * autoload aur purane lowercase require dono chal jate hain. Composer/CMD ki
+ * zaroorat nahi - bas yeh route browser mein khol lein.
+ */
+Route::get('/fix-helper', function () {
+    return fix_invoice_helper_case();
 });
   Route::get('/clear-config', function () {
     Artisan::call('config:clear');

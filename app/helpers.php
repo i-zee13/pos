@@ -70,6 +70,32 @@ if (!function_exists('tenant_where')) {
         return " {$prefix}{$column} = ".(int) $tenantId.' ';
     }
 }
+if (!function_exists('fix_invoice_helper_case')) {
+    /**
+     * Linux (case-sensitive) par lowercase `app/invoice_helper.php` shim banata
+     * hai jo asli `app/Invoice_helper.php` ko load karti hai. Composer/CMD ke
+     * baghair case-mismatch error theek karne ke liye. Windows (case-insensitive)
+     * par koi change nahi hota (capital file hi match ho jati hai).
+     */
+    function fix_invoice_helper_case()
+    {
+        $upper = app_path('Invoice_helper.php');
+        $lower = app_path('invoice_helper.php');
+
+        if (!file_exists($upper)) {
+            return 'Source app/Invoice_helper.php not found; nothing to fix.';
+        }
+        if (file_exists($lower)) {
+            return 'invoice_helper.php already available (no change needed).';
+        }
+
+        $ok = @file_put_contents($lower, "<?php\n\nrequire_once __DIR__ . '/Invoice_helper.php';\n");
+
+        return $ok !== false
+            ? 'OK: created lowercase shim app/invoice_helper.php'
+            : 'FAILED: could not write app/invoice_helper.php (check app/ folder permissions).';
+    }
+}
 if (!function_exists('timeZoneList')) {
     function timeZoneList()
     {
