@@ -14,7 +14,7 @@ use DB;
 use DateTime;
 use stdClass;
 
-require app_path('invoice_helper.php');
+require_once app_path('Invoice_helper.php');
 class ReportsController extends Controller
 {
 

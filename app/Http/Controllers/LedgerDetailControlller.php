@@ -9,7 +9,7 @@ use App\Models\Product;
 use App\Models\VendorLedger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-require app_path('invoice_helper.php');
+require app_path('Invoice_helper.php');
 
 class LedgerDetailControlller extends Controller
 {
