@@ -591,7 +591,7 @@ class ReportsController extends Controller
 
       $records->total_net_sale_invoice_amount           =  collect($saleRecords['sales'])->WHERE('invoice_type', 1)->SUM('sale_total_amount');
       $records->total_credit_sale_invoice_amount        =  collect($saleRecords['sales'])->WHERE('invoice_type', 2)->unique('invoice_no')->SUM('sale_total_amount');
-      $records->total_net_sale_returns_invoice_amount   =  collect($saleRecords['sale_returns'])->WHERE('invoice_type', 1)->unique('invoice_no')->SUM('total_invoice_amount');
+      $records->total_net_sale_returns_invoice_amount   =  collect($saleRecords['sale_returns'])->WHERE('invoice_type', 1)->SUM('total_invoice_amount');
 
 
       $records->total_credit_sales_amount_received     =  collect($saleRecords['sales'])->WHERE('invoice_type', 2)->unique('invoice_no')->SUM('paid_amount');

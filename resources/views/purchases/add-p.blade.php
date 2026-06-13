@@ -722,7 +722,7 @@
                               }
                           </style>
                           <div class="row">
-                              <div class="col-12 table-responsive" id="table-container">
+                              <div class="col-12" id="table-container">
                                   <table class="ProductTable table  " id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
                                       <thead>
                                           <tr>

@@ -100,10 +100,11 @@ function getStock() {
         var percentageValue = (element.sale_price - element.p_price) / element.p_price * 100;
         var date = new Date(element.expire_date);
         var formattedDate = date.toDateString();
-        $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td hidden>".concat(element['id'], "</td>\n                        <td>").concat(key + 1, "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat(element['product_name'], "</td>\n                        <td>").concat(element['expiry_date'] ? element['expiry_date'] : 'NA', "</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(element['balance'], "</td> \n                    </tr>"));
+        $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td hidden>".concat(element['id'], " </td>\n                        <td>").concat(key + 1, "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat('<strong>' + element['product_id'] + ' - </strong> ' + element['product_name'], "</td>\n                        <td>").concat(element['expiry_date'] ? element['expiry_date'] : 'NA', "</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(element['balance'], "</td> \n                    </tr>"));
       });
-      $('.TeacherAttendanceListTable tbody').append("\n            <tr style=\"background: #152e4d;border: solid 1px #dbdbdb;color: white\">\n                <td class=\"font18\" align=\"right\" colspan=\"3\"></td>\n                <td class=\"font18\" align=\"center\">Grand Total :</td>\n                <td class=\"totalNo\">\n                    <span class=\"grand-total\" style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">".concat(total_balance, "</span>\n                </td>\n            </tr>\n        "));
-      $('.ttl_stock_in_hand').html(addCommas(last_balance.toFixed(2)));
+      
+    //   $('.TeacherAttendanceListTable tbody').append("\n            <tr style=\"background: #152e4d;border: solid 1px #dbdbdb;color: white\">\n                <td class=\"font18\" align=\"right\" colspan=\"3\"></td>\n                <td class=\"font18\" align=\"center\">Grand Total :</td>\n                <td class=\"totalNo\">\n                    <span class=\"grand-total\" style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">".concat(total_balance, "</span>\n                </td>\n            </tr>\n        "));
+      $('.ttl_stock_in_hand').html(addCommas(total_balance.toFixed(2)));
       $('.TeacherAttendanceListTable').fadeIn();
       $('.loader').hide();
       var title = '';
@@ -112,11 +113,13 @@ function getStock() {
       } else {
         title = 'Vendor Report';
       }
-      if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
-        $('.TeacherAttendanceListTable').DataTable().clear().destroy();
-      }
+    //   if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
+    //     $('.TeacherAttendanceListTable').DataTable().clear().destroy();
+    //   }
       var table = $('.TeacherAttendanceListTable').DataTable({
         dom: 'Bfrtip',
+          pageLength: 50, // 👈 Set to show 50 rows per page
+
         buttons: [{
           title: 'Stock Report',
           extend: 'excelHtml5',

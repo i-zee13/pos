@@ -391,7 +391,9 @@
 
 <div class="col-12 h_dash">
   <div class="col-lg-12 col-md-12 col-sm-12">
-    <h2 class="_head01 HomeHead">Shortcuts <span></span></h2>
+    <h2 class="_head01 HomeHead">Shortcuts <span> {{ \Carbon\Carbon::now('Asia/Karachi')->format('h:i A') }}
+
+</span></h2>
   </div>
   <div class="row">
     <!-- <div class="col-4"> <a href="/admin/register" class="follow_action d-flex align-content-center flex-wrap"><span class="img-svg"><img src="/images/employee-dash-icon.svg" alt="">Add New Employee</span></a> </div> -->

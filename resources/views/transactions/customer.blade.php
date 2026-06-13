@@ -132,7 +132,7 @@
                                                 <div class="row status-sh">
                                                     <div class="col-12">
                                                         <div class="custom-control custom-radio">
-                                                            <input class="custom-control-input" type="checkbox" id="print-invoice" value="1" data-id="print-invoice" name="print_invoice">
+                                                            <input class="custom-control-input" type="checkbox" id="print-invoice" value="1" data-id="print-invoice" name="print_invoice" tabindex="7">
                                                             <label class="custom-control-label font13 he ad-sta" for="print-invoice">Print</label>
                                                         </div>
                                                     </div>
@@ -166,8 +166,8 @@
     </div>
     <div class="_cl-bottom">
         <!-- <button type="button" id="print-invoice" class="btn btn-primary mr-2" tabindex="4">Print</button> -->
-        <button type="submit" class="btn btn-primary mr-2" id="saveTransaction" tabindex="5">Save</button>
-        <button type="button" class="btn btn-cancel mr-2" id="cancelSubCat">Cancel</button>
+        <button type="submit" class="btn btn-primary mr-2" id="saveTransaction" tabindex="8">Save</button>
+        <button type="button" class="btn btn-cancel mr-2" id="cancelSubCat" tabindex="9">Cancel</button>
     </div>
 </div>
 @endsection

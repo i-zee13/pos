@@ -78,6 +78,25 @@
             <i class="fa fa-home" aria-hidden="true"></i> Dashboard
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#sidebarSystemBackups" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSystemBackups">
+            <i class="fa fa-cloud" aria-hidden="true"></i> System Backups
+          </a>
+          <div class="collapse" id="sidebarSystemBackups">
+            <ul class="nav nav-sm flex-column">
+              <li class="nav-item">
+                <a href="{{ route('backups.index') }}" class="nav-link">
+                  <i class="fa fa-database" aria-hidden="true"></i> DB Backups
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('backups.logs') }}" class="nav-link">
+                  <i class="fa fa-list-alt" aria-hidden="true"></i> Backup Logs
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
       </ul>
       <!-- Divider -->
       <hr class="navbar-divider my-3">

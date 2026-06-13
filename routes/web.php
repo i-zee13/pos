@@ -5,7 +5,6 @@ use App\Http\Controllers\AdminSaleCloseController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseReturnController;
@@ -19,6 +18,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SalesReturnController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\DatabaseBackupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,10 +45,10 @@ use Illuminate\Support\Facades\Route;
  
 
 Route::get('/clear', function () {
-    Artisan::call('config:cache');
     Artisan::call('cache:clear');
     Artisan::call('route:clear');
     Artisan::call('optimize:clear');
+    Artisan::call('config:cache');
     Artisan::call('storage:link');
 
     return "All cache clear successfully";
@@ -83,7 +83,14 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/', [HomeController::class,   'index'])->name('home');
     Route::get('/home', [HomeController::class,   'index'])->name('home');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/backups', [DatabaseBackupController::class, 'index'])->name('backups.index');
+    Route::get('/backups/logs', [DatabaseBackupController::class, 'logs'])->name('backups.logs');
+    Route::get('/backups/google/connect', [DatabaseBackupController::class, 'connectGoogleDrive'])->name('backups.google.connect');
+    Route::get('/backups/google/callback', [DatabaseBackupController::class, 'googleDriveCallback'])->name('backups.google.callback');
+    Route::post('/backups/google/disconnect', [DatabaseBackupController::class, 'disconnectGoogleDrive'])->name('backups.google.disconnect');
+    Route::post('/backups', [DatabaseBackupController::class, 'store'])->name('backups.store');
+    Route::post('/backups/mail-settings', [DatabaseBackupController::class, 'storeMailSettings'])->name('backups.mail-settings.store');
+    Route::get('/backups/{backup}/download', [DatabaseBackupController::class, 'download'])->name('backups.download');
     Route::get('/get-companies', [CompanyController::class, 'getCompanies'])->name('get-companies');
     Route::post('/get-customers', [CustomerController::class, 'getCustomers'])->name('get-customers');
     /** Product Routes */

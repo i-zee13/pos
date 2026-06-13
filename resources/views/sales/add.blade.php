@@ -678,8 +678,10 @@
                                 <div class="col-md-7 pr-0"><strong class="previous_payable_heading">Previous Receivable :</strong> </div>
 
                                 <div class="col-md-5"><span class="dashboard_avg_rev_perCust {{ request()->query('invoice') == 'detail' ? '' : 'previous_payable' }}">{{ request()->query('invoice') == 'detail' ? $invoice->previous_receivable : '' }}</span></div>
-                                <!-- <div class="col-md-7 pr-0"><strong>Country:</strong></div>
-                        <div class="col-md-5"><span id="country"></span></div> -->
+                                <div class="col-md-7 pr-0"><strong  class="show_purchase">P.P:</strong></div>
+                                     <div class="col-md-5"><span class="pp" style="display:none"></span></div>  
+ 
+                               
                             </div>
                             <!-- <h2 class="title m-0 pb-0">Shipping <span>Details</span></h2> -->
                         </div>
@@ -794,7 +796,7 @@
                     <div class="right_Info">
                         <div class="row inputfileds-top">
                             <div class="row CompanyInfo">
-                                <div class="col-md-3"><strong class="show_purchase">P.P:</strong> <span class="pp" style="display:none"></span></div>
+                                <!--<div class="col-md-3"><strong class="">P.P:</strong> <span class="pp" style="display:none"></span></div>-->
                                 <div class="col-md-5"><strong>Retail Price:</strong> <span class="retail_price ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
 
                                 <div class="col-md-4 pr-0"><strong>Stock Balance:</strong><span class="stock_balance ml-10" style="font-family: 'Rationale', sans-serif !important;font-size: 27px;color:red">0</span></div>
@@ -893,7 +895,7 @@
                                             </td>
                                             <td><input type="text" id="qty" class="inputSale only_numerics qty" placeholder="" name="qty" tabindex="3" min="0"></td>
                                             <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px;" tabindex="4"></td>
-                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;" min="0"></td>
+                                            <td><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;"  min="0"></td>
                                             <td class='add- S-input' style="width: 130px;"><input type="text" id="amount" class="inputSale" placeholder="" name="amount" style="font-size: 13px; width:100%"></td>
                                             <td style="width: 100px;">
                                                 <button type="button" id="add-product" class="btn btn-primary smBTN mr-2" tabindex="5" style="padding: 5px 15px 5px 15px; background:green;width:100%">Add</button>
