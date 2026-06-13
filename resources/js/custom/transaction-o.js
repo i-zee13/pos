@@ -68,7 +68,7 @@ $(document).ready(function () {
 
                 });
                 $('#transactionTable tbody').append(`
-                <tr style="background: #152e4d;color: white;">  
+                <tr style="background: #040725;color: white;">  
                     <td style="font-family:bold" >Total:</td>
                     <td colspan="2">${action == operation + '-ledger-jama' ? cr_sum : dr_sum}</td>
                 </tr>
@@ -406,7 +406,7 @@ $('#saveTransaction').on('focus', function () {
     $(this).css('background', 'green');
 });
 $('#saveTransaction').on('blur', function () {
-    $(this).css('background', 'linear-gradient(90deg, #152e4d 0%, #152e4d 100%)');
+    $(this).css('background', 'linear-gradient(90deg, #040725 0%, #040725 100%)');
 });
 $(document).on('click', '.btn-cancel', function () {
     if (n > 0) {

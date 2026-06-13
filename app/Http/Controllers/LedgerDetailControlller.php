@@ -9,7 +9,7 @@ use App\Models\Product;
 use App\Models\VendorLedger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-require app_path('invoice_helper.php');
+require_once app_path('Invoice_helper.php');
 
 class LedgerDetailControlller extends Controller
 {
@@ -35,7 +35,7 @@ class LedgerDetailControlller extends Controller
    public function productList(Request $request)
    {
       $current_date     =  date('Y-m-d');
-      $records          =  ProductReportList($request, $current_date);
+      $records          =  \ProductReportList($request, $current_date);
 
       return response()->json([
          'msg'     => 'Product report list fetched',
@@ -116,15 +116,15 @@ class LedgerDetailControlller extends Controller
 
       $label = str_replace([' ', '%20'], '_', strtolower($lastParameter));
       if ($label === 'sale_inv') {
-         $invoice     = getSaleInv($id);
+         $invoice     = \getSaleInv($id);
       } elseif ($label == 'sale_return_inv') {
-         $invoice     = getSaleReturnInv($id);
+         $invoice     = \getSaleReturnInv($id);
       } else if ($label == 'purchase_inv') {
-         $invoice     = getPurchaseInv($id);
+         $invoice     = \getPurchaseInv($id);
       } elseif ($label == 'return_inv') {
-         $invoice     = getPurchaseReturnInv($id);
+         $invoice     = \getPurchaseReturnInv($id);
       } elseif ($label == 'product_replacement_inv') {
-         $invoice     = getProductReplacementInv($id);
+         $invoice     = \getProductReplacementInv($id);
          return view('reports.replacement-detail', compact('invoice'));
       }
       return view('reports.detail', compact('invoice'));

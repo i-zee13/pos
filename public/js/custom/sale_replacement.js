@@ -195,7 +195,7 @@ $('.add-product').on('click', function () {
       is_in_array[0].qty++;
     }
     nearestParent.find('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
-    nearestParent.find('.tr-' + data_variable).css('background', '#152e4d').addClass('text-white');
+    nearestParent.find('.tr-' + data_variable).css('background', '#040725').addClass('text-white');
     var ss = data_variable;
     setTimeout(function () {
       nearestParent.find('.tr-' + ss).css('background', '').removeClass('text-white');
@@ -761,10 +761,10 @@ function grandSum() {
     prod_type = data.prod_type;
     if (data.prod_type == 2) {
       new_sum += parseFloat(data.amount);
-      $('.product_net_total').val(new_sum.toFixed(2));
+      $('.product_net_total').val(new_sum);
     } else {
       return_sum += parseFloat(data.amount);
-      $('.return_total').val(return_sum.toFixed(2));
+      $('.return_total').val(return_sum);
     }
   });
   grandtotal(new_sum - return_sum);
@@ -777,9 +777,9 @@ function grandtotal(sum) {
   sale_total_amount = sum - invoice_discount;
   setTimeout(function () {
     $('.grand-total').text(addCommas(sale_total_amount - $('.amount_received').val()));
-    $('.amount_pay_input').val(sale_total_amount.toFixed(2));
+    $('.amount_pay_input').val(sale_total_amount);
   }, 500);
-  $('.amount_pay_input').val(sale_total_amount.toFixed(2));
+  $('.amount_pay_input').val(sale_total_amount);
   if (parseFloat($('.amount_pay_input').val()) < 0) {
     $('.th-hide').hide();
     $('.cash-return').text('Cash Paid');
@@ -826,7 +826,7 @@ $('#invoice_discount').on('input', function () {
   grandSum(previous_payable, service_charges, $(this).val());
 });
 $('#add-product').on('focus', function () {
-  $(this).css('background', '#152e4d ');
+  $(this).css('background', '#040725 ');
 });
 $('#add-product').on('blur', function () {
   $(this).css('background', 'green');

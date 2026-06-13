@@ -161,21 +161,8 @@
                             </div>
                         </div>
                         <div class="col-auto pl-0" style="float:right;">
-                        <style>
-                            .reset-btn {
-                                box-shadow: none;
-                            }
-
-                            .reset-btn:hover {
-                                color: white !important;
-                            }
-
-                            .Product-Filter .btn-primary {
-                                float: none;
-                            }
-                        </style>
-                            <button type="button" class="btn btn-primary m-0 reset-btn"> Reset</button>
-                            <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
+                            <button type="button" class="btn btn-line m-0 reset-btn">Reset</button>
+                            <button type="button" class="btn btn-primary m-0 search-btn">Search</button>
                         </div>
                     </div>
 
@@ -192,7 +179,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="card">
+        <div class="card report-list-card">
             <div class="header m-0">
                 <h2>{{$ledger_for}} <span>Area</span></h2>
                  <span class="prod-bal-div">0.0</span>
@@ -212,5 +199,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/reports.js') }}"></script>
+<script src="{{asset('js/custom/reports.js?v=1.6') }}"></script>
 @endpush

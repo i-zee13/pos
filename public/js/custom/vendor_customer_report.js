@@ -36,6 +36,7 @@ $('.search-btn').on('click', function () {
   }
   CurrentRef = $(this);
   CurrentRef.attr('disabled', 'disabled');
+  if (typeof reportPageLoader === 'function') reportPageLoader(true);
   url = '/report-list';
   $("#search-form").ajaxSubmit({
     type: 'POST',
@@ -46,7 +47,6 @@ $('.search-btn').on('click', function () {
     },
     success: function success(response) {
       CurrentRef.attr('disabled', false);
-      $('.loader').show();
       $('.teacher_attendance_list').empty();
       $('.teacher_attendance_list').append("\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th>Date</th>\n                            <th>Transaction Type</th>\n                            <th>CR</th>\n                            <th>DR</th>\n                            <th>Balance</th>\n                        </tr>\n                    </thead><tbody>\n                </tbody>\n                </table>");
       $('.TeacherAttendanceListTable tbody').empty();
@@ -64,7 +64,6 @@ $('.search-btn').on('click', function () {
         $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td>".concat(formattedDate, "</td>\n                        <td>").concat(element['trx_type'] == 1 ? 'Purchase Invoice' : element['trx_type'] == 2 ? 'Return Invoice' : 'Payment', "</td>\n                        <td>").concat(element['cr'] ? element['cr'] : '0', "</td>\n                        <td>").concat(element['dr'] ? element['dr'] : '0', "</td>\n                        <td>").concat(element['balance'] ? element['balance'] : '0', "</td>\n                         \n                    </tr>"));
       });
       $('.TeacherAttendanceListTable').fadeIn();
-      $('.loader').hide();
       var title = '';
       if (segments[3] == 'customer-reports') {
         title = 'Customer Report';
@@ -75,12 +74,7 @@ $('.search-btn').on('click', function () {
         $('.TeacherAttendanceListTable').DataTable().clear().destroy();
       }
       var table = $('.TeacherAttendanceListTable').DataTable({
-         "bSort": false,
-         "bPaginate": false,
-         scrollX: false,
-         scrollY: '400px',
-         scrollCollapse: true,
-         dom: 'Bfrtip',
+        dom: 'Bfrtip',
         buttons: [{
           extend: 'excelHtml5',
           text: 'Excel',
@@ -115,6 +109,14 @@ $('.search-btn').on('click', function () {
           }
         }]
       });
+    },
+    error: function error() {
+      if (CurrentRef) {
+        CurrentRef.attr('disabled', false);
+      }
+    },
+    complete: function complete() {
+      if (typeof reportPageLoader === 'function') reportPageLoader(false);
     }
   });
 });

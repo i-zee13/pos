@@ -520,7 +520,7 @@
                   <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
                   <input type="hidden" id="" value="1" name="form_status">
                   <div class="col-md-4 left-sidebox ">
-                      <div class="sidebox-content text-white" style="background-color: #152e4d">
+                      <div class="sidebox-content text-white" style="background-color: #040725">
                           <div class="CT_sec">
                               <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
                               <div class="col-md-12 PB-10">
@@ -603,7 +603,7 @@
                           </div>
                           <style>
                               .ProductTable tbody tr:hover td {
-                                  background: #152e4d !important;
+                                  background: #040725 !important;
                                   color: white !important;
                               }
                           </style>

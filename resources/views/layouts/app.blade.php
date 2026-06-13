@@ -36,9 +36,12 @@
   <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('/css/jquery.steps.css')}}" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('/css/selectize.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('/css/style.css?v=7.1')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('/css/style.css?v=8.3')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('/css/menu.css?v=6.4')}}" />
-    <link rel="stylesheet" type="text/css" href="{{asset('/css/product.css?v=8.1')}}" />
+    {{-- Preview only: DataTables new UI — disable this line after approval --}}
+    <link rel="stylesheet" type="text/css" href="{{asset('/css/datatables-theme.css?v=3.5')}}" />
+    <link rel="stylesheet" type="text/css" href="{{asset('/css/brand-theme.css?v=1.3')}}" />
+    <link rel="stylesheet" type="text/css" href="{{asset('/css/product.css?v=8.2')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('/css/jquery.mCustomScrollbar.css')}}" />
     <link rel="stylesheet" href="{{asset('/css/animate.css')}}">
     <script src="{{asset('/js/moment.js')}}"></script>
@@ -46,7 +49,7 @@
   
      .prod-bal-div{
         float: right;   
-        color: #152e4d;
+        color: #040725;
         font-weight: bolder;
         font-family:'Rationale', sans-serif !important;
         font-size: 18px;
@@ -72,7 +75,7 @@
             font-size: 13px; 
             font-family: monospace;
             padding: 4px 10px;
-            background: #152e4d;
+            background: #040725;
             border-radius: 5px;
         }
         #notifDiv {
@@ -410,6 +413,145 @@
                 $('#tblLoader').hide();
                 $('.parent-div').show();
             }, 1500);
+            window.reportPageLoader = function (show) {
+                var $loader = $('#contentContainerDiv .card.report-list-card > .loader, #contentContainerDiv .card:has(.teacher_attendance_list) > .loader');
+                show ? $loader.show() : $loader.hide();
+            };
+
+            window.initListDataTable = function (selector, options) {
+                var $table = $(selector);
+                if (!$table.length) return null;
+                if ($.fn.DataTable.isDataTable($table)) {
+                    $table.DataTable().clear().destroy();
+                }
+                $table.removeClass('dtr-inline collapsed');
+                return $table.DataTable($.extend(true, {
+                    responsive: false,
+                    autoWidth: false,
+                    scrollX: false,
+                    bSort: false,
+                    stripeClasses: []
+                }, options || {}));
+            };
+
+            window.initReportDateRange = function (formSelector, defaultDays) {
+                defaultDays = defaultDays || 30;
+                var $form = $(formSelector);
+                if (!$form.length) return;
+                var $start = $form.find('input.start_date, input[name="start_date"]').first();
+                var $end = $form.find('input.end_date, input[name="end_date"]').first();
+                if (!$start.length || !$end.length) return;
+                if (!$end.val()) $end.val(moment().format('YYYY-MM-DD'));
+                if (!$start.val()) $start.val(moment().subtract(defaultDays, 'days').format('YYYY-MM-DD'));
+            };
+
+            window.initReportDateRangePicker = function (root, defaultDays) {
+                defaultDays = defaultDays || 30;
+                var $root = root ? $(root) : $(document);
+                $root.find('.report-date-range').each(function () {
+                    var $wrap = $(this);
+                    if ($wrap.data('range-picker-inited')) return;
+                    var $display = $wrap.find('.report-range-display');
+                    if (!$display.length) return;
+                    $wrap.data('range-picker-inited', true);
+
+                    var $start = $wrap.find('input.start_date, input[name="start_date"]').first();
+                    var $end = $wrap.find('input.end_date, input[name="end_date"]').first();
+                    var pickingEnd = false;
+
+                    function formatDisplay(d) {
+                        return moment(d, 'YYYY-MM-DD').format('DD/MM/YYYY');
+                    }
+
+                    function syncDisplay() {
+                        var s = $start.val();
+                        var e = $end.val();
+                        if (s && e) {
+                            $display.val(formatDisplay(s) + ' – ' + formatDisplay(e));
+                        } else if (s) {
+                            $display.val(formatDisplay(s) + ' – …');
+                        } else {
+                            $display.val('');
+                        }
+                    }
+
+                    function setDefaults() {
+                        if (!$end.val()) $end.val(moment().format('YYYY-MM-DD'));
+                        if (!$start.val()) $start.val(moment().subtract(defaultDays, 'days').format('YYYY-MM-DD'));
+                        pickingEnd = false;
+                        syncDisplay();
+                    }
+
+                    $display.datepicker({
+                        autoclose: false,
+                        todayHighlight: true,
+                        format: 'yyyy-mm-dd',
+                        maxViewMode: 2,
+                        forceParse: false
+                    }).on('changeDate', function (e) {
+                        var d = moment(e.date).format('YYYY-MM-DD');
+                        if (!pickingEnd || !$start.val() || ($start.val() && $end.val())) {
+                            $start.val(d);
+                            $end.val('');
+                            pickingEnd = true;
+                        } else {
+                            var s = moment($start.val(), 'YYYY-MM-DD');
+                            var end = moment(d, 'YYYY-MM-DD');
+                            if (end.isBefore(s)) {
+                                $end.val($start.val());
+                                $start.val(d);
+                            } else {
+                                $end.val(d);
+                            }
+                            pickingEnd = false;
+                            $display.datepicker('hide');
+                        }
+                        syncDisplay();
+                    });
+
+                    function openRangePicker() {
+                        if ($display.data('datepicker')) {
+                            $display.datepicker('show');
+                        }
+                    }
+
+                    $display.on('click focus', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openRangePicker();
+                    });
+
+                    $wrap.on('click', function (e) {
+                        if ($(e.target).closest('.datepicker').length) return;
+                        openRangePicker();
+                    });
+
+                    $wrap.data('resetRange', setDefaults);
+                    setDefaults();
+                });
+            };
+
+            window.resetReportDateRangePicker = function (formSelector, defaultDays) {
+                var $form = $(formSelector);
+                if (!$form.length) return;
+                if ($form.find('.report-date-range .report-range-display').length) {
+                    $form.find('.report-date-range').each(function () {
+                        var fn = $(this).data('resetRange');
+                        if (typeof fn === 'function') fn();
+                    });
+                } else if (typeof initReportDateRange === 'function') {
+                    initReportDateRange(formSelector, defaultDays || 30);
+                }
+            };
+
+            $('form#search-form, .Product-Filter form, form.Product-Filter, form.all-sales-filter-form').each(function () {
+                if ($(this).find('.report-date-range .report-range-display').length) {
+                    initReportDateRangePicker(this, 30);
+                } else if ($(this).find('input.start_date, input[name="start_date"]').length) {
+                    initReportDateRange(this, 30);
+                }
+            });
+
             function addCommas(nStr) {
                 nStr += "";
                 x = nStr.split(".");
@@ -424,9 +566,9 @@
             $("#contentContainerDiv").removeClass("blur-div");
             $('.dropify').dropify();
             $(".formselect").select2();
-            $('#example').DataTable({
-                "bSort": false
-            });
+            if ($('#example').length && !$.fn.DataTable.isDataTable('#example')) {
+                initListDataTable('#example');
+            }
 
             $(".form-control").on("focus blur", function(e) {
                 $(this)

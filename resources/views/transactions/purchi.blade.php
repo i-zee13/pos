@@ -2,8 +2,34 @@
 @section('content')
 <style>
     tbody tr:hover td {
-        background: red !important;
+        background: #e8ebf0 !important;
         color: #282828 !important;
+    }
+
+    #contentContainerDiv .TeacherAttendanceListTable thead th {
+        background: linear-gradient(0deg, #f5f6f8 0%, #ffffff 100%) !important;
+        color: #5c646c !important;
+        border-bottom: 1px solid #e8eaed !important;
+        font-weight: 600 !important;
+    }
+
+    #contentContainerDiv .TeacherAttendanceListTable tbody td {
+        border-bottom: 1px solid #eceef2 !important;
+    }
+
+    #contentContainerDiv .TeacherAttendanceListTable tfoot tr {
+        background: #040725 !important;
+        color: #fff !important;
+    }
+
+    #contentContainerDiv .TeacherAttendanceListTable tfoot td {
+        color: #fff !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    #contentContainerDiv #btns_div {
+        background-color: #f6f6f6 !important;
+        border-top: 1px solid #eceef2;
     }
 
     .dt-buttons .dt-button,
@@ -139,7 +165,7 @@
 
                     </div>
                     <div class="col-auto pl-0">
-                        <button type="button" class="btn btn-primary m-0 reset-btn"> Reset</button>
+                        <button type="button" class="btn btn-line m-0 reset-btn">Reset</button>
                     </div>
                 </div>
             </form>
@@ -176,7 +202,7 @@
                     <tbody>
                     </tbody>
                     <tfoot> 
-                <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+                <tr style="background: #040725;border: solid 1px #dbdbdb;color: white">
                     <td class="font18" align="right" colspan="2"></td>
                     <td class="font18" align="center">Grand Total :</td>
                     <td class="totalNo" >

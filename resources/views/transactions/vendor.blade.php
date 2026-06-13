@@ -1,11 +1,6 @@
 @extends('layouts.app')
 @section('data-sidebar')
 {{-- Confirmation Modal --}}
-<style>
- .dataTable td{
-          font-family: 'system-ui' !important;
-        }
-</style>
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content top-borderRed">
@@ -127,7 +122,7 @@
                                                     
                                                 </div> -->
                                                 <table class="table">
-                                                    <tr style="background: #152e4d;color: white;">
+                                                    <tr style="background: #040725;color: white;">
                                                         <td style="font-family:bold">Total:</td>
                                                         <td colspan="2" class="total_ledger_sum"></td>
                                                     </tr>
@@ -205,10 +200,10 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div class="header mb-0 d-flex">
+            <div class="header mb-0 d-flex ledger-list-header">
                 <h2>Vendor Cash {{request()->segment(1) == 'vendor-ledger-jama' ? '( جمع )'  :' ( بنام )'}}</h2>
                 <a class="btn add_button openDataSidebarForAddCustomerLedger vendor-ledger-jama-banam"><i class="fa fa-plus"></i> Add New</a>
-                <div class="CL-Product inputmonth" style="margin-left: 14px;top: -5px;"><i class="fa fa-calendar-alt"></i>
+                <div class="CL-Product inputmonth ledger-date-filter"><i class="fa fa-calendar-alt"></i>
                     <input type="date" autocomplete="off" class="form-control date_wise" placeholder="Start Date" name="date_wise">
                 </div>
             </div>
@@ -222,5 +217,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/vendor_transaction.js')}}"> </script>
+<script src="{{asset('js/custom/vendor_transaction.js?v=1.1')}}"> </script>
 @endpush

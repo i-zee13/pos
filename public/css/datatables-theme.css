@@ -1,0 +1,1371 @@
+/**
+ * DataTables list-page theme — scoped to standard list tables only.
+ * Targets: subCatsListTable, mainCatsListTable, #example, backupLogsTable
+ * Does NOT affect report/dashboard tables (e.g. admin-sale-close).
+ */
+
+/* Tables this theme applies to */
+#contentContainerDiv table.subCatsListTable,
+#contentContainerDiv table.mainCatsListTable,
+#contentContainerDiv table.backupLogsTable,
+#contentContainerDiv table#example {
+	--dt-list-primary: #040725;
+}
+
+/* =============================================================================
+   Page shell — list cards only
+   ============================================================================= */
+
+#contentContainerDiv > .header:has(+ .row .card table.subCatsListTable),
+#contentContainerDiv > .header:has(+ .row .card table.mainCatsListTable),
+#contentContainerDiv > .header:has(+ .row .card table#example),
+#contentContainerDiv > .header:has(+ .row .card .add_button) {
+	display: none !important;
+}
+
+/* Top breathing room on all list/table pages */
+#contentContainerDiv > .row:has(.card table.subCatsListTable),
+#contentContainerDiv > .row:has(.card table.mainCatsListTable),
+#contentContainerDiv > .row:has(.card table#example),
+#contentContainerDiv > .row:has(.card table.backupLogsTable),
+#contentContainerDiv > .row:has(.card .add_button) {
+	margin-top: 1.75rem !important;
+}
+
+#contentContainerDiv .row > .col-md-12 > .card:has(table.subCatsListTable),
+#contentContainerDiv .row > .col-md-12 > .card:has(table.mainCatsListTable),
+#contentContainerDiv .row > .col-md-12 > .card:has(table#example),
+#contentContainerDiv .row > .col-md-12 > .card:has(table.backupLogsTable),
+#contentContainerDiv .row > .col-md-12 > .card:has(.add_button) {
+	box-shadow: none !important;
+	border: none !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	padding: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) .header,
+#contentContainerDiv .card:has(table.mainCatsListTable) .header,
+#contentContainerDiv .card:has(table#example) .header,
+#contentContainerDiv .card:has(table.backupLogsTable) .header,
+#contentContainerDiv .card:has(.add_button) .header {
+	display: block !important;
+	position: relative !important;
+	padding: 6px 0 20px 0 !important;
+	margin: 0 0 4px 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	border: none !important;
+	overflow: visible !important;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) .header::after,
+#contentContainerDiv .card:has(table.mainCatsListTable) .header::after,
+#contentContainerDiv .card:has(table#example) .header::after,
+#contentContainerDiv .card:has(.add_button) .header::after {
+	content: '';
+	display: table;
+	clear: both;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) .header h2,
+#contentContainerDiv .card:has(table.mainCatsListTable) .header h2,
+#contentContainerDiv .card:has(table#example) .header h2,
+#contentContainerDiv .card:has(.add_button) .header h2 {
+	display: inline-block !important;
+	margin: 0 !important;
+	padding: 0 0 0 14px !important;
+	font-size: 17px !important;
+	font-weight: 600 !important;
+	color: #282828 !important;
+	line-height: 1.35;
+	vertical-align: middle;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) .header h2:before,
+#contentContainerDiv .card:has(table.mainCatsListTable) .header h2:before,
+#contentContainerDiv .card:has(table#example) .header h2:before,
+#contentContainerDiv .card:has(.add_button) .header h2:before {
+	background: #ebb30a !important;
+	width: 3px !important;
+	height: 18px !important;
+	left: 0 !important;
+	top: 2px !important;
+}
+
+/* Add button — vendors (.add_button) + sales/purchases (.btn-primary) */
+#contentContainerDiv .card:has(table.subCatsListTable) .header .add_button,
+#contentContainerDiv .card:has(table.subCatsListTable) .header a.add_button,
+#contentContainerDiv .card:has(table.subCatsListTable) .header button.add_button,
+#contentContainerDiv .card:has(table.subCatsListTable) .header .btn-primary,
+#contentContainerDiv .card:has(table.mainCatsListTable) .header .add_button,
+#contentContainerDiv .card:has(table.mainCatsListTable) .header a.add_button,
+#contentContainerDiv .card:has(table#example) .header .btn-primary,
+#contentContainerDiv .card:has(table#example) .header a.btn-primary,
+#contentContainerDiv .card:has(.add_button) .header .add_button,
+#contentContainerDiv .card:has(.add_button) .header a.add_button {
+	font-size: 11px !important;
+	border-radius: 5px !important;
+	height: 25px !important;
+	font-weight: normal !important;
+	box-shadow: none !important;
+	padding: 5px 7px 3px !important;
+	border: 1px solid var(--dt-list-primary, #040725) !important;
+	background-color: #fff !important;
+	background: #fff !important;
+	color: var(--dt-list-primary, #040725) !important;
+	position: relative !important;
+	float: right !important;
+	top: 0 !important;
+	right: 0 !important;
+	line-height: 1 !important;
+	margin: 0 !important;
+	letter-spacing: 0 !important;
+	text-transform: none !important;
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+
+#contentContainerDiv .card .header .add_button i.fa,
+#contentContainerDiv .card .header .add_button .fa-plus {
+	margin-right: 2px !important;
+	font-size: 10px !important;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) .header .add_button:hover,
+#contentContainerDiv .card:has(table.subCatsListTable) .header .btn-primary:hover,
+#contentContainerDiv .card:has(table.mainCatsListTable) .header .add_button:hover,
+#contentContainerDiv .card:has(table#example) .header .btn-primary:hover,
+#contentContainerDiv .card:has(.add_button) .header .add_button:hover {
+	background: var(--dt-list-primary, #040725) !important;
+	color: #fff !important;
+	border-color: var(--dt-list-primary, #040725) !important;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) .body,
+#contentContainerDiv .card:has(table.mainCatsListTable) .body,
+#contentContainerDiv .card:has(table#example) .body,
+#contentContainerDiv .card:has(table.backupLogsTable) .body,
+#contentContainerDiv .card:has(.add_button) .body {
+	padding: 14px 16px 12px !important;
+	background: #fff !important;
+	border-radius: 10px !important;
+	box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1), 0 2px 12px 0 rgba(0, 0, 0, 0.06) !important;
+	margin-bottom: 0 !important;
+}
+
+/* Report / change-price inner body — no second card shadow */
+#contentContainerDiv .card.report-list-card .body.teacher_attendance_list,
+#contentContainerDiv .card.purchase-report-list-card .body.teacher_attendance_list,
+#contentContainerDiv .card:has(> .body.teacher_attendance_list) .body.teacher_attendance_list {
+	padding: 12px 16px 16px !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	margin-bottom: 0 !important;
+	border-radius: 0 !important;
+}
+
+/* Same soft shadow on the DataTables wrapper (controls + table + pagination) */
+#contentContainerDiv .card:has(table.subCatsListTable) .dataTables_wrapper,
+#contentContainerDiv .card:has(table.mainCatsListTable) .dataTables_wrapper,
+#contentContainerDiv .card:has(table#example) .dataTables_wrapper,
+#contentContainerDiv .card:has(table.backupLogsTable) .dataTables_wrapper,
+#contentContainerDiv .teacher_attendance_list .dataTables_wrapper {
+	border-radius: 8px;
+}
+
+/* =============================================================================
+   DataTables controls (scoped wrapper)
+   ============================================================================= */
+
+#contentContainerDiv .card:has(table.subCatsListTable) div.dataTables_wrapper div.dataTables_filter label,
+#contentContainerDiv .card:has(table.mainCatsListTable) div.dataTables_wrapper div.dataTables_filter label,
+#contentContainerDiv .card:has(table#example) div.dataTables_wrapper div.dataTables_filter label {
+	font-weight: normal !important;
+	letter-spacing: 0;
+	font-size: 12px;
+	font-family: 'Source Sans Pro', sans-serif;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) div.dataTables_wrapper div.dataTables_length label,
+#contentContainerDiv .card:has(table.subCatsListTable) div.dataTables_wrapper div.dataTables_info,
+#contentContainerDiv .card:has(table.mainCatsListTable) div.dataTables_wrapper div.dataTables_length label,
+#contentContainerDiv .card:has(table.mainCatsListTable) div.dataTables_wrapper div.dataTables_info,
+#contentContainerDiv .card:has(table#example) div.dataTables_wrapper div.dataTables_length label,
+#contentContainerDiv .card:has(table#example) div.dataTables_wrapper div.dataTables_info {
+	color: #a5a1a1 !important;
+	font-size: 12px;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) div.dataTables_wrapper div.dataTables_filter input,
+#contentContainerDiv .card:has(table.mainCatsListTable) div.dataTables_wrapper div.dataTables_filter input,
+#contentContainerDiv .card:has(table#example) div.dataTables_wrapper div.dataTables_filter input {
+	border: solid 1px #e1e3e8 !important;
+	border-radius: 5px !important;
+	box-shadow: none !important;
+	height: 30px !important;
+	font-size: 12px !important;
+}
+
+/* =============================================================================
+   Table head, body, rows (list tables only)
+   ============================================================================= */
+
+#contentContainerDiv table.subCatsListTable thead,
+#contentContainerDiv table.subCatsListTable tfoot,
+#contentContainerDiv table.mainCatsListTable thead,
+#contentContainerDiv table.mainCatsListTable tfoot,
+#contentContainerDiv table#example thead,
+#contentContainerDiv table#example tfoot,
+#contentContainerDiv table.backupLogsTable thead,
+#contentContainerDiv table.TeacherAttendanceListTable thead {
+	background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+}
+
+#contentContainerDiv table.subCatsListTable thead th,
+#contentContainerDiv table.mainCatsListTable thead th,
+#contentContainerDiv table#example thead th,
+#contentContainerDiv table.backupLogsTable thead th,
+#contentContainerDiv table.TeacherAttendanceListTable thead th,
+#contentContainerDiv table.subCatsListTable thead th,
+#contentContainerDiv table.mainCatsListTable thead th,
+#contentContainerDiv .dataTables_wrapper table.dataTable thead th {
+	background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+	color: #fff !important;
+	border: none !important;
+	border-bottom: none !important;
+	font-weight: 600 !important;
+	font-size: 12px !important;
+	padding: 10px 12px !important;
+	text-transform: capitalize;
+	vertical-align: middle !important;
+	white-space: nowrap;
+}
+
+/* DataTables sort arrows on navy header */
+#contentContainerDiv table.dataTable thead > tr > th.sorting:before,
+#contentContainerDiv table.dataTable thead > tr > th.sorting:after,
+#contentContainerDiv table.dataTable thead > tr > th.sorting_asc:before,
+#contentContainerDiv table.dataTable thead > tr > th.sorting_asc:after,
+#contentContainerDiv table.dataTable thead > tr > th.sorting_desc:before,
+#contentContainerDiv table.dataTable thead > tr > th.sorting_desc:after {
+	opacity: 0.55 !important;
+	color: #fff !important;
+	border-top-color: #fff !important;
+	border-bottom-color: #fff !important;
+}
+
+#contentContainerDiv table.dataTable thead > tr > th.sorting_asc:before,
+#contentContainerDiv table.dataTable thead > tr > th.sorting_desc:after {
+	opacity: 1 !important;
+}
+
+#contentContainerDiv table.subCatsListTable thead th,
+#contentContainerDiv table.mainCatsListTable thead th,
+#contentContainerDiv table#example thead th,
+#contentContainerDiv table.backupLogsTable thead th {
+	font-size: 12px !important;
+	text-transform: none;
+	padding: 10px 12px !important;
+	line-height: 1.35;
+	vertical-align: middle !important;
+	border-top: 0 !important;
+}
+
+/* List tables — standard font for text; Rationale only on .dt-amount digit columns */
+#contentContainerDiv table.subCatsListTable tbody td,
+#contentContainerDiv table.mainCatsListTable tbody td,
+#contentContainerDiv table#example tbody td,
+#contentContainerDiv table.backupLogsTable tbody td,
+#contentContainerDiv .card .dataTables_wrapper table.subCatsListTable tbody td,
+#contentContainerDiv .card .dataTables_wrapper table.mainCatsListTable tbody td,
+#contentContainerDiv .card .dataTables_wrapper table#example tbody td {
+	font-family: 'Source Sans Pro', sans-serif !important;
+	font-size: 13px !important;
+	font-weight: 400 !important;
+	text-transform: none;
+	padding: 10px 12px !important;
+	line-height: 1.35;
+	vertical-align: middle !important;
+	border-top: 0 !important;
+	letter-spacing: normal;
+}
+
+#contentContainerDiv table.subCatsListTable tbody td b,
+#contentContainerDiv table.subCatsListTable tbody td strong,
+#contentContainerDiv table#example tbody td b,
+#contentContainerDiv table#example tbody td strong,
+#contentContainerDiv .card .dataTables_wrapper table.subCatsListTable tbody td b,
+#contentContainerDiv .card .dataTables_wrapper table#example tbody td b {
+	font-weight: 400 !important;
+}
+
+/* Description — cap width; full text in title tooltip */
+#contentContainerDiv table.subCatsListTable tbody td.list-desc-cell,
+#contentContainerDiv table#example tbody td.list-desc-cell,
+#contentContainerDiv .card .dataTables_wrapper table.subCatsListTable tbody td.list-desc-cell,
+#contentContainerDiv .card .dataTables_wrapper table#example tbody td.list-desc-cell {
+	max-width: 240px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-weight: 400 !important;
+}
+
+/* List tables — large digits ONLY on amount columns (beats 12px rule above) */
+#contentContainerDiv .card .dataTables_wrapper table.dataTable.subCatsListTable tbody td.dt-amount,
+#contentContainerDiv .card .dataTables_wrapper table.dataTable#example tbody td.dt-amount,
+#contentContainerDiv .card .dataTables_wrapper table.dataTable.mainCatsListTable tbody td.dt-amount,
+#contentContainerDiv .card .dataTables_wrapper table.subCatsListTable tbody td.dt-amount,
+#contentContainerDiv .card .dataTables_wrapper table#example tbody td.dt-amount,
+#contentContainerDiv .card .dataTables_wrapper table.mainCatsListTable tbody td.dt-amount,
+#contentContainerDiv table.subCatsListTable tbody td.dt-amount,
+#contentContainerDiv table#example tbody td.dt-amount,
+#contentContainerDiv table.mainCatsListTable tbody td.dt-amount {
+	font-family: 'Rationale', sans-serif !important;
+	font-size: 20px !important;
+	font-weight: 700 !important;
+	letter-spacing: 0.02em;
+	text-align: right;
+}
+
+/* List tables — remove blue/grey line under navy header (product.css .table border-top) */
+#contentContainerDiv .card .dataTables_wrapper table.table.subCatsListTable td,
+#contentContainerDiv .card .dataTables_wrapper table.table.subCatsListTable th,
+#contentContainerDiv .card .dataTables_wrapper table.table#example td,
+#contentContainerDiv .card .dataTables_wrapper table.table#example th,
+#contentContainerDiv .card .dataTables_wrapper table.table.mainCatsListTable td,
+#contentContainerDiv .card .dataTables_wrapper table.table.mainCatsListTable th,
+#contentContainerDiv table.table.subCatsListTable td,
+#contentContainerDiv table.table.subCatsListTable th,
+#contentContainerDiv table.table#example td,
+#contentContainerDiv table.table#example th {
+	border-top: none !important;
+}
+
+#contentContainerDiv table.subCatsListTable thead th,
+#contentContainerDiv table#example thead th,
+#contentContainerDiv table.mainCatsListTable thead th,
+#contentContainerDiv .card .dataTables_wrapper table.dataTable.subCatsListTable thead th,
+#contentContainerDiv .card .dataTables_wrapper table.dataTable#example thead th,
+#contentContainerDiv .card .dataTables_wrapper table.dataTable.mainCatsListTable thead th {
+	border-bottom: none !important;
+	box-shadow: none !important;
+}
+
+#contentContainerDiv table.subCatsListTable > tbody > tr:first-child > td,
+#contentContainerDiv table#example > tbody > tr:first-child > td,
+#contentContainerDiv table.mainCatsListTable > tbody > tr:first-child > td,
+#contentContainerDiv .card .dataTables_wrapper table.dataTable.subCatsListTable > tbody > tr:first-child > td,
+#contentContainerDiv .card .dataTables_wrapper table.dataTable#example > tbody > tr:first-child > td {
+	border-top: none !important;
+}
+
+/* Vendors / Customers list — column alignment */
+#contentContainerDiv table.mainCatsListTable {
+	table-layout: fixed;
+	width: 100% !important;
+}
+
+#contentContainerDiv table.mainCatsListTable thead th:nth-child(1),
+#contentContainerDiv table.mainCatsListTable tbody td:nth-child(1) {
+	width: 48px;
+	text-align: center;
+}
+
+#contentContainerDiv table.mainCatsListTable thead th:nth-child(2),
+#contentContainerDiv table.mainCatsListTable tbody td:nth-child(2) {
+	width: 18%;
+	min-width: 120px;
+}
+
+#contentContainerDiv table.mainCatsListTable thead th:nth-child(3),
+#contentContainerDiv table.mainCatsListTable tbody td:nth-child(3),
+#contentContainerDiv table.mainCatsListTable thead th:nth-child(4),
+#contentContainerDiv table.mainCatsListTable tbody td:nth-child(4),
+#contentContainerDiv table.mainCatsListTable thead th:nth-child(5),
+#contentContainerDiv table.mainCatsListTable tbody td:nth-child(5) {
+	width: 11%;
+	text-align: center;
+}
+
+#contentContainerDiv table.mainCatsListTable thead th:nth-child(6),
+#contentContainerDiv table.mainCatsListTable tbody td:nth-child(6) {
+	max-width: 160px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#contentContainerDiv table.mainCatsListTable thead th:last-child,
+#contentContainerDiv table.mainCatsListTable tbody td:last-child {
+	width: 130px;
+	text-align: center;
+	white-space: nowrap;
+}
+
+#contentContainerDiv table.mainCatsListTable tbody td:last-child .btn-default {
+	display: inline-block;
+	margin: 0 3px 0 0 !important;
+	float: none;
+}
+
+#contentContainerDiv .card .dataTables_wrapper {
+	width: 100%;
+}
+
+#contentContainerDiv .card .dataTables_wrapper table.dataTable {
+	width: 100% !important;
+	margin-top: 0.5rem !important;
+}
+
+#contentContainerDiv table.subCatsListTable tbody td,
+#contentContainerDiv table.mainCatsListTable tbody td,
+#contentContainerDiv table#example tbody td {
+	border-bottom: 1px solid #eceef2 !important;
+	color: #282828 !important;
+	background: #fff !important;
+}
+
+/* Single solid row color — no zebra striping */
+#contentContainerDiv table.subCatsListTable tbody tr:nth-child(even) td,
+#contentContainerDiv table.mainCatsListTable tbody tr:nth-child(even) td,
+#contentContainerDiv table#example tbody tr:nth-child(even) td,
+#contentContainerDiv table.subCatsListTable tbody tr:nth-child(odd) td,
+#contentContainerDiv table.mainCatsListTable tbody tr:nth-child(odd) td,
+#contentContainerDiv table#example tbody tr:nth-child(odd) td,
+#contentContainerDiv table.dataTable.stripe tbody tr.odd,
+#contentContainerDiv table.dataTable.stripe tbody tr.even,
+#contentContainerDiv table.dataTable.display tbody tr.odd > .sorting_1,
+#contentContainerDiv table.dataTable.display tbody tr.even > .sorting_1,
+#contentContainerDiv table.dataTable.hover tbody tr:hover td,
+#contentContainerDiv table.subCatsListTable tbody tr:hover td,
+#contentContainerDiv table.mainCatsListTable tbody tr:hover td,
+#contentContainerDiv table#example tbody tr:hover td {
+	background-color: #fff !important;
+}
+
+#contentContainerDiv table.subCatsListTable,
+#contentContainerDiv table.mainCatsListTable,
+#contentContainerDiv table#example {
+	margin-bottom: 0.75rem !important;
+	margin-top: 0.5rem !important;
+	border-collapse: separate !important;
+	width: 100% !important;
+}
+
+/* Action buttons inside list tables */
+#contentContainerDiv table.subCatsListTable .btn-default,
+#contentContainerDiv table.subCatsListTable .smBTN,
+#contentContainerDiv table.mainCatsListTable .btn-default,
+#contentContainerDiv table#example .btn-default {
+	padding: 3px 10px 4px !important;
+	font-size: 11px !important;
+	border-radius: 5px !important;
+	text-transform: capitalize;
+	background: #04072512 !important;
+	color: #040725 !important;
+	border: none !important;
+	text-align: center;
+	margin: 0 5px 5px 0 !important;
+	font-weight: normal !important;
+	line-height: 1;
+	min-width: 22px;
+	box-shadow: none !important;
+}
+
+#contentContainerDiv table.subCatsListTable .btn-line,
+#contentContainerDiv table.mainCatsListTable .btn-line,
+#contentContainerDiv table#example .btn-line {
+	background: #fff !important;
+	color: #040725 !important;
+	border: 1px solid #d5d5d5 !important;
+	border-radius: 5px !important;
+}
+
+#contentContainerDiv table.subCatsListTable .btn-default:hover,
+#contentContainerDiv table.subCatsListTable .btn-line:hover,
+#contentContainerDiv table.mainCatsListTable .btn-default:hover,
+#contentContainerDiv table.mainCatsListTable .btn-line:hover,
+#contentContainerDiv table#example .btn-default:hover,
+#contentContainerDiv table#example .btn-line:hover {
+	color: #fff !important;
+	background: #040725 !important;
+	border-color: #040725 !important;
+}
+
+#contentContainerDiv table.subCatsListTable .red-bg,
+#contentContainerDiv table.mainCatsListTable .red-bg,
+#contentContainerDiv table#example .red-bg {
+	background: #e2000014 !important;
+	color: #e20000 !important;
+	border: none !important;
+	border-radius: 5px !important;
+}
+
+#contentContainerDiv table.subCatsListTable .red-bg:hover,
+#contentContainerDiv table.mainCatsListTable .red-bg:hover,
+#contentContainerDiv table#example .red-bg:hover {
+	background: #e20000 !important;
+	color: #fff !important;
+}
+
+#contentContainerDiv table.subCatsListTable tbody td .fa,
+#contentContainerDiv table.mainCatsListTable tbody td .fa,
+#contentContainerDiv table#example tbody td .fa {
+	font-size: 1rem;
+	margin-top: 0.3125rem;
+	margin-right: 0.4375rem;
+	color: #5f5f5f;
+}
+
+#contentContainerDiv table.subCatsListTable tbody td .btn-default .fa,
+#contentContainerDiv table#example tbody td .btn-default .fa {
+	color: #fff;
+	font-size: 0.6875rem;
+	margin: 0;
+	padding: 0;
+}
+
+/* Pagination (inside list card wrappers) */
+#contentContainerDiv .card:has(table.subCatsListTable) .dataTables_wrapper .dataTables_paginate ul.pagination,
+#contentContainerDiv .card:has(table.mainCatsListTable) .dataTables_wrapper .dataTables_paginate ul.pagination,
+#contentContainerDiv .card:has(table#example) .dataTables_wrapper .dataTables_paginate ul.pagination {
+	justify-content: flex-end !important;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) .page-item .page-link,
+#contentContainerDiv .card:has(table.mainCatsListTable) .page-item .page-link,
+#contentContainerDiv .card:has(table#example) .page-item .page-link {
+	font-size: 11px !important;
+	font-weight: 600;
+	color: #5c646c !important;
+	border: 1px solid #cfd0d6 !important;
+	border-radius: 5px !important;
+	background: #fff !important;
+	padding: 6px 12px !important;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) .page-item.active .page-link,
+#contentContainerDiv .card:has(table.mainCatsListTable) .page-item.active .page-link,
+#contentContainerDiv .card:has(table#example) .page-item.active .page-link,
+#contentContainerDiv .dataTables_wrapper .page-item.active .page-link {
+	background: #040725 !important;
+	border-color: #040725 !important;
+	color: #fff !important;
+}
+
+#contentContainerDiv .card:has(table.subCatsListTable) .page-link:hover,
+#contentContainerDiv .card:has(table.mainCatsListTable) .page-link:hover,
+#contentContainerDiv .card:has(table#example) .page-link:hover,
+#contentContainerDiv .dataTables_wrapper .page-item:not(.active) .page-link:hover {
+	background: #0a0e36 !important;
+	border-color: #040725 !important;
+	color: #fff !important;
+}
+
+#contentContainerDiv .dataTables_wrapper .page-item.disabled .page-link {
+	opacity: 0.45;
+}
+
+/* Responsive child rows */
+#contentContainerDiv table.subCatsListTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child:before,
+#contentContainerDiv table.mainCatsListTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child:before,
+#contentContainerDiv table#example.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child:before {
+	top: 8px;
+	left: 8px;
+	height: 20px;
+	width: 20px;
+	border: 1px solid #040725;
+	border-radius: 20px;
+	box-shadow: none;
+	line-height: 21px;
+	content: '\f107';
+	font-family: 'Font Awesome 5 Free';
+	background: #040725;
+	color: #fff;
+	font-weight: 600;
+}
+
+#contentContainerDiv table.subCatsListTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child,
+#contentContainerDiv table#example.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child {
+	padding-left: 45px;
+}
+
+@media (max-width: 767px) {
+	#contentContainerDiv .card:has(table.subCatsListTable) .dataTables_wrapper .dataTables_paginate ul.pagination,
+	#contentContainerDiv .card:has(table#example) .dataTables_wrapper .dataTables_paginate ul.pagination {
+		justify-content: center !important;
+	}
+
+	#contentContainerDiv .card:has(table.subCatsListTable) .dataTables_wrapper .dataTables_filter input,
+	#contentContainerDiv .card:has(table#example) .dataTables_wrapper .dataTables_filter input {
+		width: 80% !important;
+	}
+}
+
+/* =============================================================================
+   Ledger jama/banam — calendar filter in card header
+   ============================================================================= */
+
+#contentContainerDiv .card .header.ledger-list-header,
+#contentContainerDiv .card .header.d-flex:has(.CL-Product.inputmonth) {
+	display: flex !important;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px 14px;
+}
+
+#contentContainerDiv .card .header.ledger-list-header h2,
+#contentContainerDiv .card .header.d-flex:has(.CL-Product.inputmonth) h2 {
+	flex: 1 1 220px;
+	margin: 0 !important;
+	min-width: 0;
+}
+
+#contentContainerDiv .card .header.ledger-list-header .add_button,
+#contentContainerDiv .card .header.d-flex:has(.CL-Product.inputmonth) .add_button {
+	float: none !important;
+	position: relative !important;
+	top: auto !important;
+	right: auto !important;
+	flex-shrink: 0;
+}
+
+#contentContainerDiv .card .header .CL-Product.ledger-date-filter,
+#contentContainerDiv .card .header .CL-Product.inputmonth {
+	float: none !important;
+	position: relative !important;
+	top: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	width: auto !important;
+	min-width: 165px;
+	flex-shrink: 0;
+}
+
+#contentContainerDiv .card .header .CL-Product.inputmonth input[type="date"],
+#contentContainerDiv .card .header .CL-Product.inputmonth input.date_wise {
+	width: 165px;
+	max-width: 100%;
+	height: 32px;
+	border: 1px solid #dedede !important;
+	border-radius: 5px !important;
+	box-shadow: none !important;
+	padding: 4px 8px 4px 32px !important;
+	font-size: 13px !important;
+	background: #fff !important;
+}
+
+#contentContainerDiv .card .header .CL-Product.inputmonth .fa-calendar-alt {
+	position: absolute;
+	left: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #040725;
+	pointer-events: none;
+	z-index: 1;
+	font-size: 14px;
+}
+
+/* =============================================================================
+   Remove unnecessary scrollbars on AJAX list pages (products, vendors, etc.)
+   ============================================================================= */
+
+#contentContainerDiv > .row:has(.card .add_button) {
+	margin-bottom: 0 !important;
+}
+
+#contentContainerDiv .card:has(.add_button) {
+	position: relative;
+	margin-bottom: 0 !important;
+}
+
+#contentContainerDiv .card:has(.add_button) #tblLoader {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 48px;
+	min-height: 0 !important;
+	height: auto !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	pointer-events: none;
+	z-index: 2;
+}
+
+#wrapper #content-wrapper:has(#contentContainerDiv .card .add_button) {
+	padding-bottom: 58px !important;
+}
+
+#contentContainerDiv .card:has(.add_button) .body,
+#contentContainerDiv .card:has(table.subCatsListTable) .body,
+#contentContainerDiv .card:has(table.mainCatsListTable) .body {
+	overflow: visible !important;
+}
+
+#contentContainerDiv .card:has(.add_button) .dataTables_wrapper,
+#contentContainerDiv .card:has(table.subCatsListTable) .dataTables_wrapper,
+#contentContainerDiv .card:has(table.mainCatsListTable) .dataTables_wrapper {
+	overflow: visible !important;
+	width: 100% !important;
+}
+
+#contentContainerDiv .card .dataTables_scroll,
+#contentContainerDiv .card .dataTables_scrollBody,
+#contentContainerDiv .card .dataTables_scrollHead {
+	overflow: visible !important;
+	max-height: none !important;
+}
+
+/* Products list — compact barcode / ID column */
+#contentContainerDiv table.subCatsListTable td.barcode-cell {
+	max-width: 200px;
+	min-width: 100px;
+	vertical-align: middle !important;
+	word-break: normal !important;
+	white-space: normal !important;
+}
+
+#contentContainerDiv table.subCatsListTable td.barcode-cell .barcode-cell-wrap {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+	max-width: 200px;
+}
+
+#contentContainerDiv table.subCatsListTable .barcode-chip {
+	display: inline-block;
+	font-size: 11px;
+	line-height: 1.3;
+	padding: 2px 6px;
+	background: #f0f2f5;
+	border-radius: 4px;
+	color: #282828;
+	font-family: 'Source Sans Pro', sans-serif;
+	max-width: 92px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+#contentContainerDiv table.subCatsListTable .barcode-more-btn {
+	font-size: 11px;
+	font-weight: 600;
+	color: #040725 !important;
+	background: transparent !important;
+	border: none !important;
+	padding: 0 2px !important;
+	margin: 0 !important;
+	cursor: pointer;
+	text-decoration: underline;
+	line-height: 1.2;
+	box-shadow: none !important;
+}
+
+#contentContainerDiv table.subCatsListTable .barcode-more-btn:hover {
+	color: #ebb30a !important;
+}
+
+#contentContainerDiv table.subCatsListTable th:first-child,
+#contentContainerDiv table.subCatsListTable td:first-child {
+	width: 12% !important;
+	max-width: 200px;
+}
+
+#contentContainerDiv .card:has(.add_button) .table-responsive,
+#contentContainerDiv .card:has(table.subCatsListTable) .table-responsive {
+	overflow-x: visible !important;
+	overflow-y: visible !important;
+}
+
+#contentContainerDiv .card:has(.add_button) .dataTables_scrollHead,
+#contentContainerDiv .card:has(table.mainCatsListTable) .dataTables_scrollHead,
+#contentContainerDiv .card:has(table.subCatsListTable) .dataTables_scrollHead,
+#contentContainerDiv .card:has(table#example) .dataTables_scrollHead {
+	border: none !important;
+}
+
+#contentContainerDiv .card:has(.add_button) .dataTables_scrollHead table.dataTable thead th,
+#contentContainerDiv .card:has(table.mainCatsListTable) .dataTables_scrollHead table.dataTable thead th,
+#contentContainerDiv .card:has(table.subCatsListTable) .dataTables_scrollHead table.dataTable thead th,
+#contentContainerDiv .card:has(table#example) .dataTables_scrollHead table.dataTable thead th {
+	border: none !important;
+	border-bottom: none !important;
+}
+
+#contentContainerDiv .card:has(.add_button) .dataTables_scrollBody table.dataTable tbody tr:first-child td,
+#contentContainerDiv .card:has(table.mainCatsListTable) .dataTables_scrollBody table.dataTable tbody tr:first-child td,
+#contentContainerDiv .card:has(table.subCatsListTable) .dataTables_scrollBody table.dataTable tbody tr:first-child td,
+#contentContainerDiv .card:has(table#example) .dataTables_scrollBody table.dataTable tbody tr:first-child td {
+	border-top: none !important;
+}
+
+/* Customer / Vendor ledger reports (TeacherAttendanceListTable) */
+#contentContainerDiv table.TeacherAttendanceListTable {
+	width: 100% !important;
+	table-layout: auto;
+	border-collapse: collapse !important;
+}
+
+/* Remove blue/default line under ledger table header (DataTables scrollX clone) */
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollHead,
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollHeadInner,
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollHead table.dataTable,
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollBody table.dataTable {
+	border: none !important;
+}
+
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollHead table.dataTable thead th,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable thead th {
+	border: none !important;
+	border-bottom: none !important;
+	box-shadow: none !important;
+}
+
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollBody table.dataTable tbody tr:first-child td {
+	border-top: none !important;
+}
+
+#contentContainerDiv table.TeacherAttendanceListTable thead th {
+	text-transform: capitalize !important;
+}
+
+#contentContainerDiv table.TeacherAttendanceListTable tbody td {
+	text-transform: none !important;
+	vertical-align: middle !important;
+	padding: 8px 10px !important;
+	line-height: 1.35 !important;
+	white-space: nowrap;
+}
+
+#contentContainerDiv table.TeacherAttendanceListTable td.ledger-date-cell {
+	min-width: 155px;
+	font-size: 12px !important;
+	font-family: 'Source Sans Pro', sans-serif !important;
+}
+
+#contentContainerDiv table.TeacherAttendanceListTable td.ledger-inv-cell {
+	max-width: 140px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 12px !important;
+}
+
+#contentContainerDiv table.TeacherAttendanceListTable td.ledger-comment-cell {
+	max-width: 120px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#contentContainerDiv table.TeacherAttendanceListTable td.ledger-comment-cell .comment,
+#contentContainerDiv table.TeacherAttendanceListTable .ledger-comment-text {
+	display: inline-block;
+	max-width: 110px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: middle;
+	font-size: 11px !important;
+}
+
+#contentContainerDiv table.TeacherAttendanceListTable td.ledger-amount-cell {
+	font-size: 20px !important;
+	font-weight: 700 !important;
+	font-family: 'Rationale', sans-serif !important;
+	text-align: right;
+	min-width: 70px;
+}
+
+#contentContainerDiv table.TeacherAttendanceListTable thead th:nth-child(5),
+#contentContainerDiv table.TeacherAttendanceListTable thead th:nth-child(6) {
+	text-align: right;
+}
+
+/* Customer/Vendor reports: inner "slip" scroll + sticky grand total */
+#contentContainerDiv .teacher_attendance_list .report-slip-shell {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll {
+	max-height: 520px;
+	overflow-y: auto;
+	overflow-x: auto;
+	padding-right: 4px;
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll::-webkit-scrollbar-thumb {
+	background: rgba(4, 7, 37, 0.35);
+	border-radius: 6px;
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll::-webkit-scrollbar-thumb:hover {
+	background: rgba(4, 7, 37, 0.55);
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-footer {
+	position: sticky;
+	bottom: 0;
+	z-index: 6;
+}
+
+#contentContainerDiv .teacher_attendance_list .ledger-grand-total-bar {
+	display: grid;
+	grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
+	gap: 0;
+	align-items: center;
+	padding: 10px 14px;
+	background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+	color: #fff !important;
+	border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+	border-radius: 0 0 10px 10px;
+}
+
+#contentContainerDiv .teacher_attendance_list .ledger-grand-total-bar .label {
+	font-weight: 600;
+	text-align: left;
+}
+
+#contentContainerDiv .teacher_attendance_list .ledger-grand-total-bar .val {
+	font-family: 'Rationale', sans-serif !important;
+	font-size: 22px !important;
+	font-weight: 700 !important;
+	white-space: nowrap;
+	text-align: center;
+}
+
+#contentContainerDiv .teacher_attendance_list .ledger-grand-total-bar .val.grand {
+	font-size: 24px !important;
+	color: #12ff12 !important;
+}
+
+#contentContainerDiv .teacher_attendance_list .dataTables_wrapper {
+	overflow: visible !important;
+	width: 100%;
+}
+
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollBody {
+	overflow: visible !important;
+	max-height: none !important;
+}
+
+#contentContainerDiv .teacher_attendance_list .btn-detail {
+	font-size: 11px !important;
+	padding: 3px 10px !important;
+	white-space: nowrap;
+}
+
+/* =============================================================================
+   Report filter bars — Reset (outline) + Search (filled navy)
+   ============================================================================= */
+
+#contentContainerDiv .Product-Filter .reset-btn,
+#contentContainerDiv .purchase-filter-bar .reset-btn,
+#contentContainerDiv .card .Product-Filter .reset-btn {
+	background: #fff !important;
+	background-image: none !important;
+	border: 1px solid #040725 !important;
+	color: #040725 !important;
+	box-shadow: none !important;
+	border-radius: 6px !important;
+	font-size: 14px !important;
+	font-weight: 600 !important;
+	padding: 6px 18px !important;
+	height: 32px;
+	line-height: 1.2;
+	min-width: 72px;
+}
+
+#contentContainerDiv .Product-Filter .reset-btn:hover,
+#contentContainerDiv .Product-Filter .reset-btn:focus,
+#contentContainerDiv .purchase-filter-bar .reset-btn:hover,
+#contentContainerDiv .purchase-filter-bar .reset-btn:focus,
+#contentContainerDiv .card .Product-Filter .reset-btn:hover,
+#contentContainerDiv .card .Product-Filter .reset-btn:focus {
+	background: #040725 !important;
+	background-image: none !important;
+	color: #fff !important;
+	border-color: #ebb30a !important;
+}
+
+#contentContainerDiv .Product-Filter .search-btn,
+#contentContainerDiv .purchase-filter-bar .search-btn,
+#contentContainerDiv .card .Product-Filter .search-btn {
+	background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+	border: 1px solid #040725 !important;
+	color: #fff !important;
+	box-shadow: none !important;
+	border-radius: 6px !important;
+	font-size: 14px !important;
+	font-weight: 600 !important;
+	padding: 6px 18px !important;
+	height: 32px;
+	line-height: 1.2;
+	min-width: 72px;
+}
+
+#contentContainerDiv .Product-Filter .search-btn:hover,
+#contentContainerDiv .Product-Filter .search-btn:focus,
+#contentContainerDiv .purchase-filter-bar .search-btn:hover,
+#contentContainerDiv .purchase-filter-bar .search-btn:focus,
+#contentContainerDiv .card .Product-Filter .search-btn:hover,
+#contentContainerDiv .card .Product-Filter .search-btn:focus {
+	color: #fff !important;
+	border-color: #ebb30a !important;
+}
+
+#contentContainerDiv .Product-Filter .col-auto,
+#contentContainerDiv .purchase-filter-bar .col-auto {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* Compact date range — single calendar, one visible field */
+#contentContainerDiv .report-date-range {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 0 10px;
+	height: 32px;
+	min-width: 220px;
+	max-width: 280px;
+	border: 1px solid #dedede;
+	border-radius: 6px;
+	background: #fff;
+	vertical-align: middle;
+	flex: 0 1 auto;
+	cursor: pointer;
+}
+
+#contentContainerDiv .report-date-range .fa-calendar-alt {
+	color: #040725;
+	font-size: 13px;
+	flex-shrink: 0;
+	cursor: pointer;
+}
+
+#contentContainerDiv .report-date-range input.report-range-display {
+	border: none !important;
+	box-shadow: none !important;
+	height: 28px !important;
+	padding: 0 !important;
+	font-size: 13px !important;
+	width: 100%;
+	min-width: 0;
+	background: transparent !important;
+	cursor: pointer;
+	color: #282828;
+}
+
+#contentContainerDiv .report-date-range input[type="date"] {
+	display: none !important;
+}
+
+#contentContainerDiv .Product-Filter.purchase-filter-bar .row,
+#contentContainerDiv .Product-Filter.report-filter-inline > .row,
+#contentContainerDiv .Product-Filter .row.report-filter-actions,
+#contentContainerDiv .Product-Filter .row.report-filter-inline {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin: 0 !important;
+}
+
+#contentContainerDiv .Product-Filter .row.report-filter-actions {
+	margin-top: 10px !important;
+	padding-top: 0;
+}
+
+#contentContainerDiv .Product-Filter .row.report-filter-actions > .reset-btn,
+#contentContainerDiv .Product-Filter .row.report-filter-actions > .search-btn,
+#contentContainerDiv .Product-Filter.report-filter-inline > .row > .reset-btn,
+#contentContainerDiv .Product-Filter.report-filter-inline > .row > .search-btn,
+#contentContainerDiv .Product-Filter.purchase-filter-bar .reset-btn,
+#contentContainerDiv .Product-Filter.purchase-filter-bar .search-btn {
+	width: auto !important;
+	max-width: none !important;
+	flex: 0 0 auto !important;
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+}
+
+#contentContainerDiv .Product-Filter.report-filter-inline ._cust_filter,
+#contentContainerDiv .Product-Filter.purchase-filter-bar ._cust_filter {
+	width: auto !important;
+	min-width: 150px;
+	max-width: 200px;
+	padding: 0 !important;
+	margin: 0 !important;
+	float: none !important;
+}
+
+#contentContainerDiv .all-sales-filter-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 16px;
+	background: #fff;
+	border-radius: 10px;
+	box-shadow: 0 4px 20px rgba(4, 7, 37, 0.08);
+	margin-bottom: 12px;
+}
+
+#contentContainerDiv .all-sales-filter-bar ._cust_filter {
+	min-width: 140px;
+	flex: 0 1 auto;
+}
+
+#contentContainerDiv .all-sales-filter-bar .form-control,
+#contentContainerDiv .all-sales-filter-bar .formselect {
+	height: 32px !important;
+	font-size: 13px !important;
+}
+
+/* Amount / figure cells ONLY — paid, received, total, qty, balance, etc. */
+#contentContainerDiv table.dataTable td.dt-amount,
+#contentContainerDiv table.dataTable th.dt-amount,
+#contentContainerDiv td.dt-amount,
+#contentContainerDiv th.dt-amount,
+#contentContainerDiv table.TeacherAttendanceListTable td.ledger-amount-cell,
+#contentContainerDiv table.TeacherAttendanceListTable th.ledger-amount-cell {
+	font-family: 'Rationale', sans-serif !important;
+	font-size: 20px !important;
+	font-weight: 700 !important;
+	letter-spacing: 0.02em;
+	text-align: right;
+}
+
+#contentContainerDiv table.all-sales-compact {
+	font-size: 12px;
+}
+
+#contentContainerDiv table.all-sales-compact td.dt-amount {
+	font-size: 20px !important;
+}
+
+/* Red / delete buttons — white text always */
+#contentContainerDiv .red-bg,
+#contentContainerDiv .btn.red-bg,
+#contentContainerDiv .btn-default.red-bg,
+#contentContainerDiv .btn-invoice-delete {
+	color: #fff !important;
+}
+
+#contentContainerDiv .red-bg:hover,
+#contentContainerDiv .red-bg:focus,
+#contentContainerDiv .btn.red-bg:hover,
+#contentContainerDiv .btn-default.red-bg:hover,
+#contentContainerDiv .btn-invoice-delete:hover,
+#contentContainerDiv .delete_product:hover,
+#contentContainerDiv .delete_cat:hover {
+	color: #fff !important;
+	background: #c40000 !important;
+	border-color: #a80000 !important;
+}
+
+#product-cl-sec ._cl-bottom .btn-cancel,
+#product-cl-sec .btn-cancel {
+	color: #fff !important;
+}
+
+/* =============================================================================
+   Report list cards (product, stock, sale, profit, expense, ledger)
+   ============================================================================= */
+
+#contentContainerDiv .card.report-list-card,
+#contentContainerDiv .card:has(> .body.teacher_attendance_list) {
+	box-shadow: 0 4px 24px rgba(4, 7, 37, 0.08) !important;
+	border: 1px solid rgba(4, 7, 37, 0.06) !important;
+	border-radius: 10px !important;
+	background: #fff !important;
+	overflow: hidden;
+}
+
+#contentContainerDiv .card.report-list-card .header h2,
+#contentContainerDiv .card:has(> .body.teacher_attendance_list) .header h2 {
+	font-size: 17px !important;
+	font-weight: 600 !important;
+	color: #282828 !important;
+}
+
+#contentContainerDiv .card.report-list-card .body.teacher_attendance_list,
+#contentContainerDiv .card:has(> .body.teacher_attendance_list) .body.teacher_attendance_list {
+	padding: 12px 16px 16px !important;
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll--report {
+	max-height: calc(100vh - 320px);
+	min-height: 200px;
+	overflow-y: auto;
+	overflow-x: auto;
+	padding-right: 4px;
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll--report::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll--report::-webkit-scrollbar-thumb {
+	background: rgba(4, 7, 37, 0.35);
+	border-radius: 6px;
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll table tbody tr.report-grand-total-row,
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll table tfoot tr,
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll table tfoot tr.ledger-grand-total {
+	position: sticky;
+	bottom: 0;
+	z-index: 4;
+	background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+	color: #fff !important;
+}
+
+/* =============================================================================
+   All report pages — summary digits + table body numbers
+   ============================================================================= */
+
+#contentContainerDiv .card.total-sale .total-amount,
+#contentContainerDiv .card.total-bs .total-amount {
+	font-family: 'Rationale', sans-serif !important;
+	font-size: 48px !important;
+	font-weight: 700 !important;
+	line-height: 1.1;
+}
+
+#contentContainerDiv .card.total-sale .unit-v span,
+#contentContainerDiv .card.total-sale .total-val span,
+#contentContainerDiv .card.total-bs .total-val span,
+#contentContainerDiv .card.total-sale .ttl_quantity,
+#contentContainerDiv .card.total-sale .ttl_payment,
+#contentContainerDiv .card.total-sale .ttl_invoice_discount,
+#contentContainerDiv .card.total-sale .ttl_product_discount,
+#contentContainerDiv .card.total-sale .ttl_discount,
+#contentContainerDiv .card.total-sale .ttl_sales,
+#contentContainerDiv .card.total-sale .ttl_sales span,
+#contentContainerDiv .card.total-bs .ttl_expenses {
+	font-family: 'Rationale', sans-serif !important;
+	font-size: 32px !important;
+	font-weight: 700 !important;
+	line-height: 1.15;
+}
+
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody td.dt-report-num,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody td.dt-report-num strong,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody th.dt-report-num,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody th.totalNo,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tfoot th.totalNo,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tfoot td.totalNo,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable .grand-total,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody tr.report-grand-total-row .grand-total,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody tr.report-grand-total-row td.totalNo,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody tr.report-grand-total-row td.dt-report-num {
+	font-family: 'Rationale', sans-serif !important;
+	font-size: 22px !important;
+	font-weight: 700 !important;
+	letter-spacing: 0.02em;
+}
+
+/* Report table text columns — names, dates, comments stay normal */
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody td:not(.dt-report-num):not(.totalNo):not(.ledger-amount-cell):not(.ledger-date-cell):not(.ledger-inv-cell):not(.ledger-comment-cell),
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody th.font18 {
+	font-family: 'Source Sans Pro', sans-serif !important;
+	font-size: 12px !important;
+	font-weight: 400 !important;
+}
+
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody td.dt-report-pct {
+	font-size: 16px !important;
+	font-weight: 600 !important;
+}
+
+/* Report table header — remove blue/grey line under navy head (Bootstrap + DataTables) */
+#contentContainerDiv .teacher_attendance_list table.table.TeacherAttendanceListTable thead th,
+#contentContainerDiv .teacher_attendance_list table.dataTable.TeacherAttendanceListTable thead th,
+#contentContainerDiv .teacher_attendance_list table.dataTable.TeacherAttendanceListTable thead td,
+#contentContainerDiv .teacher_attendance_list .dataTables_wrapper table.dataTable thead th,
+#contentContainerDiv .teacher_attendance_list .dataTables_wrapper table.dataTable thead td,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable thead tr {
+	border: none !important;
+	border-bottom: none !important;
+	border-top: none !important;
+	box-shadow: none !important;
+}
+
+/* product.css .table td/th { border-top } loads after this file — override for all report tables */
+#contentContainerDiv .teacher_attendance_list table.table.TeacherAttendanceListTable td,
+#contentContainerDiv .teacher_attendance_list table.table.TeacherAttendanceListTable th,
+#contentContainerDiv .teacher_attendance_list table.dataTable.TeacherAttendanceListTable td,
+#contentContainerDiv .teacher_attendance_list table.dataTable.TeacherAttendanceListTable th,
+#contentContainerDiv .teacher_attendance_list .dataTables_wrapper table.dataTable.TeacherAttendanceListTable td,
+#contentContainerDiv .teacher_attendance_list .dataTables_wrapper table.dataTable.TeacherAttendanceListTable th {
+	border-top: none !important;
+}
+
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable > tbody > tr:first-child > td,
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable > tbody > tr:first-child > th,
+#contentContainerDiv .teacher_attendance_list table.dataTable.TeacherAttendanceListTable > tbody > tr:first-child > td,
+#contentContainerDiv .teacher_attendance_list .dataTables_wrapper table.dataTable > tbody > tr:first-child > td {
+	border-top: none !important;
+}
+
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody tr:not(.report-grand-total-row) td {
+	border-bottom: 1px solid #eceef2 !important;
+}
+
+#contentContainerDiv .teacher_attendance_list table.TeacherAttendanceListTable tbody tr.report-grand-total-row td {
+	border-bottom: none !important;
+}
+
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollHead,
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollHeadInner,
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollHead table,
+#contentContainerDiv .teacher_attendance_list .dataTables_scrollBody table {
+	border: none !important;
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll table tbody tr.report-grand-total-row td,
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll table tfoot tr td,
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll table tfoot tr th {
+	background: inherit !important;
+	color: #fff !important;
+	border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll .dataTables_wrapper,
+#contentContainerDiv .teacher_attendance_list .report-slip-scroll .dataTables_scrollBody {
+	overflow: visible !important;
+	max-height: none !important;
+}
+
+/* Hide report preloader once table data is rendered */
+#contentContainerDiv .card.report-list-card:has(.teacher_attendance_list .TeacherAttendanceListTable tbody tr) > .loader,
+#contentContainerDiv .card:has(.teacher_attendance_list .TeacherAttendanceListTable tbody tr) > .loader {
+	display: none !important;
+	min-height: 0 !important;
+	height: 0 !important;
+	overflow: hidden !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	visibility: hidden !important;
+}

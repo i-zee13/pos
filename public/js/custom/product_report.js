@@ -37,6 +37,7 @@ $('.search-btn').on('click', function () {
     }
     CurrentRef = $(this);
     CurrentRef.attr('disabled', 'disabled');
+    if (typeof reportPageLoader === 'function') reportPageLoader(true);
     url = '/product-list';
     $(`#search-form`).ajaxSubmit({
         type: 'POST',
@@ -49,9 +50,9 @@ $('.search-btn').on('click', function () {
             CurrentRef.attr('disabled', false);
             var stock = $('.product_id option:selected').attr('data-stock');
             $('.prod-bal-div').html(`Stk In Hand : ${stock}`); 
-            $('.loader').show();
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
+                <div class="report-slip-scroll report-slip-scroll--report">
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
                     <thead>
                         <tr>
@@ -59,14 +60,15 @@ $('.search-btn').on('click', function () {
                             <th >Invoice #</th>
                             <th>Date</th>
                             <th>Invoice #</th> 
-                            <th>Name</>
+                            <th>Name</th>
                             <th>IN</th> 
                             <th>OUT</th> 
                             <th>Balance</th>
                         </tr>
                     </thead><tbody>
                 </tbody>
-                </table>`);
+                </table>
+                </div>`);
             $('.TeacherAttendanceListTable tbody').empty();
             if (response.reports.length == 0) {
                 $('#notifDiv').fadeIn();
@@ -132,7 +134,6 @@ $('.search-btn').on('click', function () {
 
             }
             $('.TeacherAttendanceListTable').fadeIn();
-            $('.loader').hide();
             var title = 'Product Report';
 
             if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
@@ -190,16 +191,24 @@ $('.search-btn').on('click', function () {
             })
 
             $('.TeacherAttendanceListTable tbody').append(`
-                <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+                <tr style="background: #040725;border: solid 1px #dbdbdb;color: white">
                     <td class="font18" align="right" colspan="3"></td>
                     <td class="font18" align="center">Grand Total :</td>
-                    <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${totalDR.toLocaleString('en-US')}</td>
-                    <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${totalCR.toLocaleString('en-US')} </td>
+                    <td class="totalNo dt-report-num">${totalDR.toLocaleString('en-US')}</td>
+                    <td class="totalNo dt-report-num">  ${totalCR.toLocaleString('en-US')} </td>
                     <td class="totalNo" >
-                        <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${stock_in_hand}</span>
+                        <span class="grand-total dt-report-num">${stock_in_hand}</span>
                     </td>
                 </tr>
             `);
+        },
+        error: function () {
+            if (CurrentRef) {
+                CurrentRef.attr('disabled', false);
+            }
+        },
+        complete: function () {
+            if (typeof reportPageLoader === 'function') reportPageLoader(false);
         }
     });
 });
@@ -241,9 +250,9 @@ function tableHtml(element, inv_id, formattedDate, label) {
    <td>${element.customer_name}</td> 
     
    ${element.p_status} 
-   <td style="color:${element.p_status ==  1 ? 'green'  : 'red' };font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.p_status == 1 ? element.p_qty : '-'} </td>
-   <td style="color:${element.p_status ==  1 ? 'green'  : 'red' };font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.p_status == 2 ? element.p_qty : '-'} </td>
-   <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.p_balance} <i  class=" ${element.p_status == 1 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger'}"></i></td>
+   <td class="dt-report-num" style="color:${element.p_status ==  1 ? 'green'  : 'red' };">${element.p_status == 1 ? element.p_qty : '-'} </td>
+   <td class="dt-report-num" style="color:${element.p_status ==  2 ? 'green'  : 'red' };">${element.p_status == 2 ? element.p_qty : '-'} </td>
+   <td class="dt-report-num">${element.p_balance} <i  class=" ${element.p_status == 1 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger'}"></i></td>
     
 </tr>`;
     $('.TeacherAttendanceListTable tbody').append(RowHTML);

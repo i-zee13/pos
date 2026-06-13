@@ -23,16 +23,64 @@
   <link rel="stylesheet" href="{{asset('/assets/css/theme.bundle.css')}}" id="stylesheetLight">
   <link rel="stylesheet" href="{{asset('/assets/css/theme-dark.bundle.css')}}" id="stylesheetDark" disabled="">
 
+  <link href="{{ asset('/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+
   <style>
     body {
       display: none;
+    }
+
+    .btn-login-brand {
+      background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+      border: 2px solid #ebb30a !important;
+      color: #fff !important;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      box-shadow: 0 0 0 0 rgba(235, 179, 10, 0);
+      transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+    }
+
+    .btn-login-brand:hover,
+    .btn-login-brand:focus {
+      background: linear-gradient(90deg, #ebb30a 0%, #d4a008 100%) !important;
+      border-color: #ebb30a !important;
+      color: #040725 !important;
+      box-shadow: 0 4px 18px rgba(235, 179, 10, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-login-brand:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(235, 179, 10, 0.35) !important;
+    }
+
+    .btn-login-brand:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(235, 179, 10, 0.35), 0 4px 18px rgba(235, 179, 10, 0.45);
+    }
+
+    #togglePassword {
+      cursor: pointer;
+      background: #fff;
+      border-color: #e2e6ea;
+      color: #040725;
+      min-width: 46px;
+      justify-content: center;
+    }
+
+    #togglePassword:hover {
+      color: #ebb30a;
     }
   </style>
 
   <!-- Title -->
   <title>POS</title>
 
-<body class="d-flex align-items-center bg-auth border-top border-top-2 border-primary" style="display: block; background:#152e4d !important; border-top:none !important">
+<body class="d-flex align-items-center bg-auth border-top border-top-2 border-primary" style="display: block; background:#040725 !important; border-top:none !important">
 
   <!-- CONTENT
     ================================================== -->
@@ -100,18 +148,15 @@
                 <strong>{{ $message }}</strong>
               </span>
               @enderror
-              <!-- Icon -->
-              <span class="input-group-text">
-
-
-                <i class="fe fe-eye"></i>
-              </span>
+              <button type="button" class="input-group-text" id="togglePassword" aria-label="Show password" title="Show password">
+                <i class="fas fa-eye" id="togglePasswordIcon"></i>
+              </button>
 
             </div>
           </div>
 
           <!-- Submit -->
-          <button type="submit" class="btn btn-lg w-100 btn-dark mb-3" fdprocessedid="nxu92" tabindex="3" style="background:#2c7be5">
+          <button type="submit" class="btn btn-lg w-100 btn-login-brand mb-3" tabindex="3">
             {{ __('Sign In') }}
           </button>
 
@@ -146,7 +191,24 @@
   <!-- Theme JS -->
   <script src="{{asset('/assets/js/theme.bundle.js')}}"></script>
 
-
+  <script>
+    (function () {
+      var toggle = document.getElementById('togglePassword');
+      var password = document.getElementById('password');
+      var icon = document.getElementById('togglePasswordIcon');
+      if (!toggle || !password || !icon) {
+        return;
+      }
+      toggle.addEventListener('click', function () {
+        var show = password.type === 'password';
+        password.type = show ? 'text' : 'password';
+        icon.classList.toggle('fa-eye', !show);
+        icon.classList.toggle('fa-eye-slash', show);
+        toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        toggle.setAttribute('title', show ? 'Hide password' : 'Show password');
+      });
+    })();
+  </script>
 
 
   <div id="draggable-live-region" aria-relevant="additions" aria-atomic="true" aria-live="assertive" role="log" style="position: fixed; width: 1px; height: 1px; top: -1px; overflow: hidden;"></div>

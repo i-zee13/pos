@@ -33,6 +33,7 @@ let segments = location.href.split('/');
     }
     CurrentRef = $(this);
     CurrentRef.attr('disabled', 'disabled');
+    if (typeof reportPageLoader === 'function') reportPageLoader(true);
      url = '/report-list';
      $(`#search-form`).ajaxSubmit({
          type: 'POST',
@@ -43,7 +44,6 @@ let segments = location.href.split('/');
          },
          success: function(response){
             CurrentRef.attr('disabled', false);
-            $('.loader').show();
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
@@ -82,7 +82,6 @@ let segments = location.href.split('/');
                     </tr>`);
             });
             $('.TeacherAttendanceListTable').fadeIn();
-            $('.loader').hide();
            var title = '';
            if(segments[3] == 'customer-reports'){
             title = 'Customer Report'
@@ -142,6 +141,14 @@ let segments = location.href.split('/');
        
     })
      
+        },
+        error: function () {
+            if (CurrentRef) {
+                CurrentRef.attr('disabled', false);
+            }
+        },
+        complete: function () {
+            if (typeof reportPageLoader === 'function') reportPageLoader(false);
         }
      });
  });

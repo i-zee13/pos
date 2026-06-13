@@ -806,7 +806,7 @@ $('#invoice_discount').on('input', function () {
 })
 
 $('#add-product').on('focus', function () {
-    $(this).css('background', '#152e4d ');
+    $(this).css('background', '#040725 ');
 });
 $('#add-product').on('blur', function () {
     $(this).css('background', 'green');

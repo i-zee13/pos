@@ -120,6 +120,10 @@ class DatabaseBackupController extends Controller
             return redirect()->route('backups.index')->with('error', 'Google did not return a refresh token. Reconnect and approve offline access when prompted.');
         }
 
+        if (str_starts_with(trim($refreshToken), 'ya29.')) {
+            return redirect()->route('backups.index')->with('error', 'Google returned an access token instead of a refresh token. Try Connect again and approve all permissions.');
+        }
+
         $email = null;
         if (is_string($accessToken) && $accessToken !== '') {
             $profile = Http::withToken($accessToken)

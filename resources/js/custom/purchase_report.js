@@ -32,6 +32,7 @@ $('.search-btn').on('click', function () {
     CurrentRef = $(this);
     CurrentRef.text('Fetching...')
     CurrentRef.attr('disabled', 'disabled');
+    if (typeof reportPageLoader === 'function') reportPageLoader(true);
     url = '/purchase-list';
     $(`#search-form`).ajaxSubmit({
         type: 'POST',
@@ -43,24 +44,26 @@ $('.search-btn').on('click', function () {
         success: function (response) {
             CurrentRef.text('Search')
             CurrentRef.attr('disabled', false);
-            $('.loader').show();
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
 
-                <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Date</th>
-                            <th>Vendor</th>
-                            <th>Product Name</th>
-                            <th>P.Price</th>
-                            <th>Qty</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead><tbody>
-                </tbody>
-                </table>`);
+                <div class="report-slip-scroll report-slip-scroll--purchase">
+                    <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Date</th>
+                                <th>Vendor</th>
+                                <th>Product Name</th>
+                                <th>P.Price</th>
+                                <th>Qty</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        <tfoot></tfoot>
+                    </table>
+                </div>`);
 
 
 
@@ -85,14 +88,11 @@ $('.search-btn').on('click', function () {
 
             if (response.reports.purchases && response.reports.purchases.length > 0) {
                 response.reports.purchases.forEach((element, key) => {
-                    total_sales += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
-                    ttl_quantity += element['qty'] ? element['qty'] : 0;
-                    ttl_product_discount += element['product_discount'] ? element['product_discount'] : 0;
-                    ttl_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
-                    var date = new Date(element.expire_date);
-                    var formattedDate = date.toDateString();
-                    var invoice_no = "";
-                    invoice_no = element.invoice_no.split('-');
+                    total_sales += Number(element['sale_total_amount'] || 0);
+                    ttl_quantity += Number(element['qty'] || 0);
+                    ttl_product_discount += Number(element['product_discount'] || 0);
+                    ttl_invoice_discount += Number(element['invoice_discount'] || 0);
+                    var invoice_no = element.invoice_no ? element.invoice_no.split('-') : [''];
                     reportTable(invoice_no[0], element)
                 });
                 $('.TeacherAttendanceListTable').fadeIn();
@@ -102,25 +102,24 @@ $('.search-btn').on('click', function () {
             if (response.reports.purchase_returns && response.reports.purchase_returns.length > 0) {
                 //Sale Returns
                 response.reports.purchase_returns.forEach((element, key) => {
-                    total_returns += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
-                    ttl_return_quantity += element['qty'] ? element['qty'] : 0;
-                    ttl_return_product_discount += element['product_discount'] ? element['product_discount'] : 0;
-                    ttl_return_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
-                    var invoice_no = "";
-                    invoice_no = element.invoice_no.split('-');
+                    total_returns += Number(element['sale_total_amount'] || 0);
+                    ttl_return_quantity += Number(element['qty'] || 0);
+                    ttl_return_product_discount += Number(element['product_discount'] || 0);
+                    ttl_return_invoice_discount += Number(element['invoice_discount'] || 0);
+                    var invoice_no = element.invoice_no ? element.invoice_no.split('-') : [''];
                     reportTable(invoice_no[0], element);
                 });
                 sale_return_total(ttl_return_quantity, ttl_return_product_discount, total_returns, 'Return');
             }
             //Grand Total
-            $('.TeacherAttendanceListTable tbody').append(`
-            <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
-                 <td colspan="3"></td> 
+            $('.TeacherAttendanceListTable tfoot').empty().append(`
+            <tr class="ledger-grand-total">
+                <td colspan="3"></td> 
                 <td class="font18">Grand Total :</td>
-                <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> - </td>
-                <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${addCommas(parseInt(ttl_product_discount - ttl_return_product_discount))} </td>
+                <td class="totalNo dt-report-num"> - </td>
+                <td class="totalNo dt-report-num">${addCommas(ttl_product_discount - ttl_return_product_discount)}</td>
                 <td class="totalNo" colspan="2">
-                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(parseInt(total_sales - total_returns))}</span>
+                    <span class="grand-total dt-report-num">${addCommas(total_sales - total_returns)}</span>
                 </td>
             </tr>
         `);
@@ -134,7 +133,6 @@ $('.search-btn').on('click', function () {
             $('.ttl_discount').html(ttl_invoice_discount ? addCommas(ttl_invoice_discount) : 0);
             $('.ttl_invoice_discount').html(total_returns ? addCommas(total_returns) : 0);
 
-            $('.loader').hide();
             var title = '';
             if (segments[3] == 'customer-reports') {
                 title = 'Customer Report'
@@ -148,9 +146,10 @@ $('.search-btn').on('click', function () {
             var table = $('.TeacherAttendanceListTable').DataTable({
                 "bSort": false,
                 "bPaginate": false,
-                scrollX: false,
-                scrollY: '400px',
-                scrollCollapse: true,
+                scrollX: true,
+                scrollY: false,
+                scrollCollapse: false,
+                autoWidth: false,
                 dom: 'Bfrtip',
                 buttons: [{
                         extend: 'pdfHtml5',
@@ -280,6 +279,15 @@ $('.search-btn').on('click', function () {
                 ],
 
             })
+        },
+        error: function () {
+            if (CurrentRef) {
+                CurrentRef.text('Search');
+                CurrentRef.attr('disabled', false);
+            }
+        },
+        complete: function () {
+            if (typeof reportPageLoader === 'function') reportPageLoader(false);
         }
     });
 });
@@ -291,20 +299,20 @@ function reportTable(invoice_no, element) {
                         <td>${element['created']}</td>
                         <td>${element['customer_name']}</td>
                         <td>${element['product_name']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['purchase_price'] ? element['purchase_price'] : 0}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['sale_total_amount'])}</td>
+                        <td class="dt-report-num">${addCommas(element['purchase_price'] || 0)}</td>
+                        <td class="dt-report-num">${addCommas(element['qty'] || 0)}</td>
+                        <td class="dt-report-num">${addCommas(element['sale_total_amount'] || 0)}</td>
                     </tr>`);
 }
 
 function sale_return_total(ttl_quantity, ttl_product_discount, total, flag) {
     $('.TeacherAttendanceListTable tbody').append(`
-    <tr style="background:#eaf1fa ; color:#152e4d" >
+    <tr style="background:#eaf1fa ; color:#040725" >
         <th colspan="3"></th>
         <th class="font18" align="center">${flag} Total</th>
-        <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> - </th>
-        <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${ttl_quantity ? addCommas(ttl_quantity) : 0}</th>
-        <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${total ? addCommas(total) : 0}</th>
+        <th class="totalNo dt-report-num"> - </th>
+        <th class="totalNo dt-report-num">${ttl_quantity ? addCommas(ttl_quantity) : 0}</th>
+        <th class="totalNo dt-report-num">${total ? addCommas(total) : 0}</th>
     </tr>
 `);
 }
@@ -327,6 +335,10 @@ $('.reset-btn').on('click', function () {
     $('.product_id').val('').trigger('change');
     $('.customer_id').val('').trigger('change');
     $('input[name="bill_no"]').val('');
+    $('#current-date').prop('checked', false);
+    if (typeof resetReportDateRangePicker === 'function') {
+        resetReportDateRangePicker('#search-form', 30);
+    }
     $('.ttl_sales').html('<span>Rs.</span> 0');
     $('.ttl_payment').html(0);
     $('.ttl_quantity').html(0);
@@ -343,16 +355,27 @@ $('.reset-btn').on('click', function () {
         `);
 })
 
-function addCommas(nStr) {
-    nStr += "";
-    x = nStr.split(".");
-    x1 = x[0];
-    x2 = x.length > 1 ? "." + x[1] : "";
+function roundAmount(value, decimals = 2) {
+    var num = parseFloat(value);
+    if (isNaN(num) || !isFinite(num)) {
+        return 0;
+    }
+    var factor = Math.pow(10, decimals);
+    return Math.round((num + Number.EPSILON) * factor) / factor;
+}
+
+function addCommas(value, decimals = 2) {
+    var num = roundAmount(value, decimals);
+    var negative = num < 0;
+    num = Math.abs(num);
+    var parts = num.toFixed(decimals).split('.');
+    var x1 = parts[0];
+    var x2 = parts.length > 1 ? '.' + parts[1] : '';
     var rgx = /(\d+)(\d{3})/;
     while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, "$1" + "," + "$2");
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
     }
-    return x1 + x2;
+    return (negative ? '-' : '') + x1 + x2;
 }
 $('.report_type').on('change', function () {
     var report_type = $(this).val();

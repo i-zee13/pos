@@ -480,7 +480,7 @@ function fetchcompanies() {
         success :     function(response) {
             companies =  response.companies;
                     $('.body').empty();
-                    $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>ID</th><th>Icon</th><th>Name</th><th>Action</th></tr></thead><tbody></tbody></table>');
+                    $('.body').append('<table class="table table-hover mainCatsListTable" style="width:100%;"><thead><tr><th>ID</th><th>Icon</th><th>Name</th><th>Action</th></tr></thead><tbody></tbody></table>');
                     $('.mainCatsListTable tbody').empty();
                     // var response = JSON.parse(response);
                     var sNo = 1;
@@ -498,10 +498,69 @@ function fetchcompanies() {
                     });
                     $('#tblLoader').hide();
                     $('.body').fadeIn();
-                    $('.mainCatsListTable').DataTable();
+                    if (typeof initListDataTable === 'function') {
+                        initListDataTable('.mainCatsListTable');
+                    } else {
+                        $('.mainCatsListTable').DataTable({ responsive: false, autoWidth: false, bSort: false });
+                    }
                 }
     });
 }
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function formatBarcodeCellHtml(barcodeOrId) {
+    var raw = String(barcodeOrId || '').trim();
+    if (!raw) {
+        return '<span class="text-muted">—</span>';
+    }
+
+    var codes = raw.split(',').map(function (c) { return c.trim(); }).filter(Boolean);
+    if (codes.length === 0) {
+        codes = [raw];
+    }
+
+    if (codes.length === 1) {
+        var one = codes[0];
+        var short = one.length > 14 ? one.substring(0, 14) + '…' : one;
+        return '<span class="barcode-chip" title="' + escapeHtml(one) + '">' + escapeHtml(short) + '</span>';
+    }
+
+    var visible = codes.slice(0, 2);
+    var hidden = codes.slice(2);
+    var html = '<div class="barcode-cell-wrap">';
+
+    visible.forEach(function (code) {
+        var shortCode = code.length > 12 ? code.substring(0, 12) + '…' : code;
+        html += '<span class="barcode-chip" title="' + escapeHtml(code) + '">' + escapeHtml(shortCode) + '</span>';
+    });
+
+    hidden.forEach(function (code) {
+        var shortCode = code.length > 12 ? code.substring(0, 12) + '…' : code;
+        html += '<span class="barcode-chip barcode-chip-hidden d-none" title="' + escapeHtml(code) + '">' + escapeHtml(shortCode) + '</span>';
+    });
+
+    if (hidden.length > 0) {
+        html += '<button type="button" class="barcode-more-btn">+' + hidden.length + ' more</button>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+$(document).on('click', '.barcode-more-btn', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var $wrap = $(this).closest('.barcode-cell-wrap');
+    $wrap.find('.barcode-chip-hidden').removeClass('d-none');
+    $(this).remove();
+});
+
 function fetchproducts() {
     $.ajax({
         type    : 'GET',
@@ -539,7 +598,7 @@ function fetchproducts() {
                         }
                         $('.subCatsListTable tbody').append(`
                         <tr> 
-                            <td>${element['barcode'] ? element['barcode'] : element['id']} </td>
+                            <td class="barcode-cell">${formatBarcodeCellHtml(element['barcode'] ? element['barcode'] : element['id'])}</td>
                             <td> ${element['company_name']}</td>
                             <td> <img src="${element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png'}"  style="height:25px; width:25px;"> ${element['product_name']}</td>
                             <td>${element['size']} </td>
@@ -552,7 +611,11 @@ function fetchproducts() {
                     });
                     $('#tblLoader').hide();
                     $('.body').fadeIn();
-                    $('.subCatsListTable').DataTable();
+                    if (typeof initListDataTable === 'function') {
+                        initListDataTable('.subCatsListTable');
+                    } else {
+                        $('.subCatsListTable').DataTable({ responsive: false, autoWidth: false, bSort: false });
+                    }
                 }
     });
 }  

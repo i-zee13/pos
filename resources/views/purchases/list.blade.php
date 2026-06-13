@@ -70,9 +70,9 @@
                         <tr>
                             <td>{{$invoice_first_part}} ({{ $purchase->created_at->format('h:i A') }})</td>
                             <td><b>{{ $purchase->customer_name }}</b></td>
-                            <td>{{$purchase->description}}</td>
-                            <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->paid_amount ? $purchase->paid_amount : 0.00}} </td>
-                            <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$purchase->product_net_total}} </td>
+                            <td class="list-desc-cell" title="{{ $purchase->description }}">{{ \Illuminate\Support\Str::words(preg_replace('/\s+/', ' ', trim($purchase->description ?? '')), 20, '...') }}</td>
+                            <td class="dt-amount">{{$purchase->paid_amount ? $purchase->paid_amount : 0.00}}</td>
+                            <td class="dt-amount">{{$purchase->product_net_total}}</td>
                             <td>
                                 <a id="{{$purchase->id}}" class="btn btn-default {{$purchase->is_editable== 1 ? 'btn-line'  : '' }}" href="{{$purchase->is_editable== 1 ? route('purchase-edit' ,['id'=>$purchase->id]) : route('purchase-edit' ,['id'=>$purchase->id ,'invoice' => 'detail'])}}">{{$purchase->is_editable== 1  ? 'Edit'  : "Detail" }}</a>
                                 @if($purchase->is_editable== 1)

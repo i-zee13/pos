@@ -32,6 +32,7 @@ $('.search-btn').on('click', function () {
     CurrentRef = $(this);
     CurrentRef.text('Fetching...')
     CurrentRef.attr('disabled', 'disabled');
+    if (typeof reportPageLoader === 'function') reportPageLoader(true);
     url = '/sales-list';
     $(`#search-form`).ajaxSubmit({
         type: 'POST',
@@ -43,9 +44,9 @@ $('.search-btn').on('click', function () {
         success: function (response) {
             CurrentRef.text('Search')
             CurrentRef.attr('disabled', false);
-            $('.loader').show();
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
+                <div class="report-slip-scroll report-slip-scroll--report">
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
                     <thead>
                         <tr>
@@ -61,7 +62,8 @@ $('.search-btn').on('click', function () {
                     </thead><tbody>
                     </tbody>
                     <tfoot></tfoot>
-                </table>`);
+                </table>
+                </div>`);
 
 
 
@@ -113,13 +115,13 @@ $('.search-btn').on('click', function () {
             var grand_qty = parseInt(ttl_quantity - ttl_return_quantity);
             //Grand Total
             $('.TeacherAttendanceListTable tfoot').append(`
-            <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+            <tr class="report-grand-total-row" style="background: #040725;border: solid 1px #dbdbdb;color: white">
                 <td colspan="3"></td> 
                 <td class="font18">Grand Total :</td>
-                <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${addCommas(parseInt(ttl_quantity - ttl_return_quantity))} </td>
-                <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${addCommas(parseInt(ttl_product_discount - ttl_return_product_discount))} </td>
+                <td class="totalNo dt-report-num"> ${addCommas(parseInt(ttl_quantity - ttl_return_quantity))} </td>
+                <td class="totalNo dt-report-num">  ${addCommas(parseInt(ttl_product_discount - ttl_return_product_discount))} </td>
                 <td class="totalNo" colspan="2">
-                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(parseInt(total_sales - total_returns))}</span>
+                    <span class="grand-total dt-report-num">${addCommas(parseInt(total_sales - total_returns))}</span>
                 </td>
             </tr>
         `);
@@ -133,7 +135,6 @@ $('.search-btn').on('click', function () {
             $('.ttl_invoice_discount').html(grand_total_discount ? addCommas(grand_total_discount) : 0);
             $('.ttl_discount').html(total_returns ? addCommas(total_returns) : 0);
 
-            $('.loader').hide();
             var title = '';
             if (segments[3] == 'customer-reports') {
                 title = 'Customer Report'
@@ -148,8 +149,8 @@ $('.search-btn').on('click', function () {
                 "bSort": false,
                 "bPaginate": false,
                 scrollX: false,
-                scrollY: '400px',
-                scrollCollapse: true,
+                scrollY: false,
+                scrollCollapse: false,
                 dom: 'Bfrtip',
                 buttons: [{
                         extend: 'pdfHtml5',
@@ -279,6 +280,15 @@ $('.search-btn').on('click', function () {
                 ],
 
             })
+        },
+        error: function () {
+            if (CurrentRef) {
+                CurrentRef.text('Search');
+                CurrentRef.attr('disabled', false);
+            }
+        },
+        complete: function () {
+            if (typeof reportPageLoader === 'function') reportPageLoader(false);
         }
     });
 });
@@ -290,20 +300,20 @@ function reportTable(invoice_no, element) {
                         <td>${element['created']}</td>
                         <td>${element['company_name']}</td>
                         <td>${element['product_name']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['product_discount'] ? element['product_discount'] : 0}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element['sale_total_amount'] ?? element['return_total_amount'])}</td>
+                        <td class="dt-report-num">${element['qty']}</td>
+                        <td class="dt-report-num">${element['product_discount'] ? element['product_discount'] : 0}</td>
+                        <td class="dt-report-num">${addCommas(element['sale_total_amount'] ?? element['return_total_amount'])}</td>
                     </tr>`);
 }
 
 function sale_return_total(ttl_quantity, ttl_product_discount, total, flag) {
     $('.TeacherAttendanceListTable tfoot').append(`
-    <tr style="background:#eaf1fa ; color:#152e4d" >
+    <tr style="background:#eaf1fa ; color:#040725" >
         <th colspan="3"></th>
         <th class="font18" align="center">${flag} Total</th>
-        <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${ttl_quantity ? addCommas(ttl_quantity) : 0}</th>
-        <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${ttl_product_discount ? addCommas(ttl_product_discount) : 0}</th>
-        <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${total ? addCommas(total) : 0}</th>
+        <th class="totalNo dt-report-num">${ttl_quantity ? addCommas(ttl_quantity) : 0}</th>
+        <th class="totalNo dt-report-num">${ttl_product_discount ? addCommas(ttl_product_discount) : 0}</th>
+        <th class="totalNo dt-report-num">${total ? addCommas(total) : 0}</th>
     </tr>
 `);
 }
@@ -326,6 +336,9 @@ $('.reset-btn').on('click', function () {
     $('.product_id').val('').trigger('change');
     $('.customer_id').val('').trigger('change');
     $('input[name="bill_no"]').val('');
+    if (typeof resetReportDateRangePicker === 'function') {
+        resetReportDateRangePicker('#search-form', 30);
+    }
     $('.ttl_sales').html('<span>Rs.</span> 0');
     $('.ttl_payment').html(0);
     $('.ttl_quantity').html(0);

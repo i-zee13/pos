@@ -341,7 +341,7 @@
     }
 
     .product-card:before {
-        background: #152e4d;
+        background: #040725;
         position: absolute;
         width: 2px;
         height: 32px;
@@ -364,7 +364,7 @@
 
     .pr-st {
         background-color: #fbfbfb;
-        border-top: solid 1px #152e4d;
+        border-top: solid 1px #040725;
         text-align: center;
         line-height: 1;
         margin-top: 5px;

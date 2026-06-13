@@ -1,0 +1,287 @@
+/**
+ * Brand theme preview — navy gradient sidebar + accent #EBB30A
+ * Load after theme.bundle.css / menu.css / style.css
+ */
+
+:root {
+	--brand-navy-deep: #040725;
+	--brand-navy-mid: #0a0e36;
+	--brand-accent: #ebb30a;
+	--brand-accent-rgb: 235, 179, 10;
+	--brand-sidebar-muted: rgba(255, 255, 255, 0.55);
+	--bs-primary: #040725;
+	--bs-primary-rgb: 4, 7, 37;
+	--bs-link-color: #040725;
+	--bs-link-hover-color: #0a0e36;
+}
+
+/* =============================================================================
+   Sidebar (#sidebar)
+   ============================================================================= */
+
+#sidebar.navbar-vertical.navbar-light,
+.navbar-vertical.navbar-light#sidebar {
+	background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+	border-color: transparent !important;
+}
+
+.sidebar-height::-webkit-scrollbar-thumb {
+	background: linear-gradient(180deg, #0a0e36 0%, #040725 100%) !important;
+}
+
+.sidebar-height::-webkit-scrollbar-thumb:hover {
+	background: linear-gradient(180deg, #ebb30a 0%, #c99708 100%) !important;
+}
+
+.sidebar-height::-webkit-scrollbar-track {
+	background: rgba(0, 0, 0, 0.15) !important;
+}
+
+#sidebar .navbar-light .navbar-heading {
+	color: rgba(255, 255, 255, 0.38) !important;
+}
+
+#sidebar .navbar-light .navbar-divider {
+	background-color: rgba(255, 255, 255, 0.12) !important;
+	border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+#sidebar .navbar-light .navbar-nav .nav-link {
+	color: var(--brand-sidebar-muted) !important;
+	border-radius: 4px;
+	margin: 1px 0;
+	transition: color 0.15s ease, background 0.15s ease;
+}
+
+#sidebar .navbar-light .navbar-nav .nav-link i,
+#sidebar .navbar-light .navbar-nav .nav-link .fa {
+	color: inherit !important;
+	opacity: 0.9;
+}
+
+#sidebar .navbar-light .navbar-nav .nav-link:hover,
+#sidebar .navbar-light .navbar-nav .nav-link:focus {
+	color: #fff !important;
+	background: rgba(255, 255, 255, 0.07) !important;
+}
+
+#sidebar .navbar-light .navbar-nav .nav-link.active,
+#sidebar .navbar-light .navbar-nav .show > .nav-link,
+#sidebar .navbar-vertical .navbar-nav .nav-link.active {
+	color: var(--brand-accent) !important;
+	background: rgba(var(--brand-accent-rgb), 0.12) !important;
+	font-weight: 600;
+}
+
+#sidebar .navbar-nav .nav-link.active:before,
+#sidebar .navbar-vertical.navbar-expand-xs .navbar-nav .nav-link.active:before {
+	border-left-color: var(--brand-accent) !important;
+	border-left-width: 3px !important;
+}
+
+#sidebar .navbar-light .navbar-user {
+	border-top-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+#sidebar .navbar-light .navbar-user-link,
+#sidebar .navbar-light .navbar-user-link:hover,
+#sidebar .navbar-light .navbar-user-link:focus {
+	color: rgba(255, 255, 255, 0.75) !important;
+}
+
+#sidebar .navbar-light .navbar-toggler {
+	color: rgba(255, 255, 255, 0.7) !important;
+}
+
+#sidebar .navbar-light .navbar-collapse:before {
+	border-top-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+#sidebar .nav-sm .nav-link {
+	color: rgba(255, 255, 255, 0.5) !important;
+}
+
+#sidebar .nav-sm .nav-link:hover {
+	color: #ebb30a !important;
+	background: rgba(255, 255, 255, 0.05) !important;
+}
+
+#sidebar .nav-sm .nav-link.active {
+	color: var(--brand-accent) !important;
+	background: rgba(var(--brand-accent-rgb), 0.1) !important;
+}
+
+/* =============================================================================
+   App-wide accents (primary actions, links, highlights)
+   ============================================================================= */
+
+.btn-primary,
+.btn-primary:focus {
+	background-color: var(--brand-navy-deep) !important;
+	border-color: var(--brand-navy-deep) !important;
+	color: #fff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:active {
+	background-color: #0a0e36 !important;
+	border-color: var(--brand-accent) !important;
+	color: #fff !important;
+}
+
+.btn-default.btn-primary,
+a.btn-primary {
+	background: var(--brand-navy-deep) !important;
+}
+
+.page-item.active .page-link {
+	background: var(--brand-navy-deep) !important;
+	border-color: var(--brand-navy-deep) !important;
+	color: #fff !important;
+}
+
+.page-link:hover,
+.page-link:focus {
+	color: var(--brand-navy-deep) !important;
+}
+
+.card .header h2:before {
+	background: var(--brand-accent) !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+	background-color: var(--brand-navy-deep) !important;
+	color: #fff !important;
+}
+
+.prod-bal-div {
+	color: var(--brand-navy-deep) !important;
+}
+
+/* Datatables theme alignment */
+/* List-table pagination handled in datatables-theme.css */
+
+.card .header .add_button {
+	border-color: var(--brand-navy-deep) !important;
+	color: var(--brand-navy-deep) !important;
+}
+
+.card .header .add_button:hover {
+	background: var(--brand-navy-deep) !important;
+	border-color: var(--brand-accent) !important;
+}
+
+/* style.css legacy primary (#152e4d) — map to new palette */
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:focus,
+.lgray-btn,
+.edit_button {
+	border-color: var(--brand-navy-deep) !important;
+	background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+	color: #fff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+	border-color: var(--brand-accent) !important;
+}
+
+/* Cancel buttons — red fill, white text (stock add, sales, modals, sidebars) */
+.btn-cancel,
+a.btn-cancel,
+button.btn-cancel {
+	background: linear-gradient(90deg, #f12300 0%, #e20000 100%) !important;
+	color: #fff !important;
+	border: 1px solid #e20000 !important;
+	box-shadow: none !important;
+}
+
+.btn-cancel:hover,
+.btn-cancel:focus,
+a.btn-cancel:hover,
+a.btn-cancel:focus,
+button.btn-cancel:hover,
+button.btn-cancel:focus {
+	background: linear-gradient(90deg, #c40000 0%, #a80000 100%) !important;
+	color: #fff !important;
+	border-color: #a80000 !important;
+}
+
+/* Red delete / remove buttons — white text project-wide */
+.red-bg,
+.btn.red-bg,
+.btn-default.red-bg,
+.btn.smBTN.red-bg,
+.remove_btn,
+.btn-invoice-delete,
+.delete_product,
+.delete_cat {
+	color: #fff !important;
+}
+
+.red-bg:hover,
+.red-bg:focus,
+.btn.red-bg:hover,
+.btn-default.red-bg:hover,
+.btn.smBTN.red-bg:hover,
+.remove_btn:hover,
+.btn-invoice-delete:hover,
+.delete_product:hover,
+.delete_cat:hover {
+	color: #fff !important;
+	background: #c40000 !important;
+	border-color: #a80000 !important;
+}
+
+.btn-outline {
+	color: var(--brand-navy-deep) !important;
+	border-color: var(--brand-navy-deep) !important;
+	background: transparent !important;
+}
+
+.btn-outline:hover,
+.btn-outline:focus {
+	border-color: var(--brand-accent) !important;
+	color: var(--brand-navy-deep) !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+	background-color: var(--brand-navy-deep) !important;
+	border-color: var(--brand-navy-deep) !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+	border-bottom-color: var(--brand-accent) !important;
+}
+
+a {
+	color: #0a0e36;
+}
+
+a:hover {
+	color: var(--brand-accent);
+}
+
+.text-primary {
+	color: var(--brand-navy-deep) !important;
+}
+
+.bg-primary {
+	background-color: var(--brand-navy-deep) !important;
+}
+
+/* Add / purchase / sale pages — navy panel headers */
+.sidebox-content.text-white,
+.sidebox-content[style*="background-color"] {
+	background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+}
+
+.pro-header-text {
+	background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+}
+
+#product-cl-sec .pro-header-text {
+	background: linear-gradient(90deg, #0a0e36 0%, #040725 100%) !important;
+}

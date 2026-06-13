@@ -49,6 +49,8 @@ return [
         // Used only when Google token endpoint returns invalid/expired refresh token.
         'refresh_token_rotate_url' => env('GOOGLE_DRIVE_REFRESH_ROTATE_URL', ''),
         'refresh_token_rotate_secret' => env('GOOGLE_DRIVE_REFRESH_ROTATE_SECRET', ''),
+        // Scheduled/cron backups have no logged-in user — use this user's Drive token first.
+        'fallback_user_id' => (int) env('BACKUP_GOOGLE_DRIVE_FALLBACK_USER_ID', 0),
     ],
 
 ];

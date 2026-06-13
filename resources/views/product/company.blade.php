@@ -108,5 +108,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/product.js')}}"> </script>
+<script src="{{asset('js/custom/product.js?v=1.2')}}"> </script>
 @endpush

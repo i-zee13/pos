@@ -227,7 +227,7 @@
         }
 
         .sidebox-content {
-            background-color: #152e4d;
+            background-color: #040725;
             color: white;
             box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.2);
             overflow-y: auto;
@@ -703,7 +703,7 @@
                         </div>
                         <style>
                             .ProductTable tbody tr:hover td {
-                                background: #152e4d !important;
+                                background: #040725 !important;
 
                                 color: white !important;
                             }

@@ -49,7 +49,7 @@
     </div>
   </div> -->
             <div class="body" >
-            <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;" id="example">
+            <table class="table table-hover subCatsListTable" style="width:100%;" id="example">
                 <thead>
                     <tr>
                         <th>Invoice #</th>
@@ -68,8 +68,8 @@
                 <tr>
                     <td>{{$invoice_first_part}} ({{ $sale->created_at->format('h:i A') }})</td>
                     <td>{{$sale->customer_name}}</td>
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->paid_amount}} </td>
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total +$sale->service_charges - $sale->invoice_discount}} </td>
+                    <td class="dt-amount">{{$sale->paid_amount}}</td>
+                    <td class="dt-amount">{{$sale->product_net_total + $sale->service_charges - $sale->invoice_discount}}</td>
                     <!-- <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td> -->
                     <td>
                         

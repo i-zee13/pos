@@ -18034,17 +18034,17 @@ function grandSum() {
   var previous_payable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
   var service_charges = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   var discount = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-  var grandQty = 0;
   var sum = 0;
-    var productTotal = 0;
-    sales_product_array.forEach(function (data, key) {
-        productTotal++;
-        sum += parseFloat(data.amount);
-        grandQty += parseFloat(data.qty);
-    });
-    $('.product_net_total').val(sum.toFixed(2));
-    $('#total_qtys').html(grandQty.toFixed(2));
-    $('#total_items').html(productTotal);
+  var grandQty = 0;
+  var productTotal = 0;
+  sales_product_array.forEach(function (data, key) {
+    productTotal++;
+    sum += parseFloat(data.amount);
+    grandQty += parseFloat(data.qty);
+  });
+  $('.product_net_total').val(sum.toFixed(2));
+  $('#total_qtys').html(grandQty.toFixed(2));
+  $('#total_items').html(productTotal);
   $('.product_net_total').val(sum);
   // sum -= parseFloat(previous_payable)  // sum -= parseFloat(previous_payable ? previous_payable : 0);
   // previous_payable >= 0 ? sum -= parseFloat(previous_payable ? previous_payable : 0) : sum += parseFloat(previous_payable);
@@ -18095,7 +18095,7 @@ $('#invoice_discount').on('input', function () {
   grandSum(previous_payable, service_charges, $(this).val());
 });
 $('#add-product').on('focus', function () {
-  $(this).css('background', '#152e4d ');
+  $(this).css('background', '#040725 ');
 });
 $('#add-product').on('blur', function () {
   $(this).css('background', 'green');

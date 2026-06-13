@@ -15,18 +15,17 @@
   }
 
   .sidebar-height::-webkit-scrollbar-thumb {
-    background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
-    opacity: 0.75;
+    background: linear-gradient(180deg, #0a0e36 0%, #040725 100%);
+    opacity: 0.85;
     border-radius: 4px;
   }
 
   .sidebar-height::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
-    /* Color when hovered */
+    background: linear-gradient(180deg, #ebb30a 0%, #c99708 100%);
   }
 
   .sidebar-height::-webkit-scrollbar-track {
-    background: white;
+    background: rgba(0, 0, 0, 0.12);
     /* Background color of the scrollbar track */
   }
 </style>

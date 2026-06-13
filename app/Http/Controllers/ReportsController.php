@@ -14,7 +14,7 @@ use DB;
 use DateTime;
 use stdClass;
 
-require app_path('invoice_helper.php');
+require_once app_path('Invoice_helper.php');
 class ReportsController extends Controller
 {
 
@@ -287,7 +287,7 @@ class ReportsController extends Controller
    public function expenseReportList(Request $request)
    {
       $current_date     =  date('Y-m-d');
-      $records          = ExpenseReportRecords($request, $current_date);
+      $records          = \ExpenseReportRecords($request, $current_date);
       return response()->json([
          'msg'     => 'Expense reports fetched',
          'status'  => 'success',
@@ -314,9 +314,9 @@ class ReportsController extends Controller
    { 
       $current_date     =  date('Y-m-d');
       if($request->report_type == 1){
-         $records       = ProfitReportRecords($request, $current_date);
+         $records       = \ProfitReportRecords($request, $current_date);
       }else{
-         $records       = StockProfitReport($request, $current_date);
+         $records       = \StockProfitReport($request, $current_date);
       }
       return response()->json([
          'msg'     => 'Stock reports list fetched',
@@ -540,7 +540,7 @@ class ReportsController extends Controller
    public function purchaseReportList(Request $request)
    {
       $current_date     =  date('Y-m-d');
-      $records          =  PurchaseReportList($request, $current_date);
+      $records          =  \PurchaseReportList($request, $current_date);
 
       return response()->json([
          'msg'     => 'Purchase reports list fetched',

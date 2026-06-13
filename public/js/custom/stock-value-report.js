@@ -31,6 +31,7 @@ $('.search-btn').on('click', function () {
     }
     CurrentRef = $(this);
     CurrentRef.attr('disabled', 'disabled');
+    if (typeof reportPageLoader === 'function') reportPageLoader(true);
     url = '/fetch-stock-value-report';
     $("#search-form").ajaxSubmit({
         type: 'POST',
@@ -44,9 +45,9 @@ $('.search-btn').on('click', function () {
             
             CurrentRef.attr('disabled', false);
             var filter_selected = $('.filter_by_value').val();
-            $('.loader').show();
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
+          <div class="report-slip-scroll report-slip-scroll--report">
           <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
               <thead>
                   <tr>
@@ -60,7 +61,8 @@ $('.search-btn').on('click', function () {
                   </tr>
               </thead><tbody>
           </tbody>
-          </table>`);
+          </table>
+          </div>`);
             $('.TeacherAttendanceListTable tbody').empty();
             if (response.records.length == 0) {
                 $('#notifDiv').fadeIn();
@@ -74,10 +76,8 @@ $('.search-btn').on('click', function () {
             var last_balance = 0;
             var ttl_qty_purchase = 0; 
             response.records.forEach((element, key) => {
-                console.log(element)
                 var cost = 0;
                 var amount = 0;
-                console.warn(filter_selected);
                 if (filter_selected == 1) {
                     amount = element.ttl_avg_cost * parseInt(element.balance);
                     // last_balance += parseInt(element.balance) * parseInt(element.avg_product_value);
@@ -99,9 +99,9 @@ $('.search-btn').on('click', function () {
                   <td>${key+1}</td>
                   <td>${element['company_name'] }</td>
                   <td>${element['product_name'] }</td>
-                  <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${cost ? addCommas(cost.toFixed(2)) : 0}</td>
-                   <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element.balance.toFixed(2))}</td>
-                  <td style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(amount.toFixed(2))}</td> 
+                  <td class="dt-report-num">${cost ? addCommas(cost.toFixed(2)) : 0}</td>
+                   <td class="dt-report-num">${addCommas(element.balance.toFixed(2))}</td>
+                  <td class="dt-report-num">${addCommas(amount.toFixed(2))}</td> 
               </tr>`);
             });
             // if (filter_selected == 1) {
@@ -109,20 +109,19 @@ $('.search-btn').on('click', function () {
             //     last_balance = parseFloat(last_balance / ttl_qty_purchase).toFixed(3);
             // }
             $('.TeacherAttendanceListTable tbody').append(`
-              <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+              <tr class="report-grand-total-row" style="background: #040725;border: solid 1px #dbdbdb;color: white">
                   <td class="font18" align="right" ></td>
                   <td class="font18" align="center" colspan="3">Grand Total :</td>
                   <td class="totalNo">
-                      <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(total_balance.toFixed(2))}</span>
+                      <span class="grand-total dt-report-num">${addCommas(total_balance.toFixed(2))}</span>
                   </td>
                   <td class="totalNo">
-                      <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(last_balance.toFixed(2))}</span>
+                      <span class="grand-total dt-report-num">${addCommas(last_balance.toFixed(2))}</span>
                   </td>
               </tr>
           `);
             $('.ttl_stock_in_hand').html(addCommas(last_balance.toFixed(2)));
             $('.TeacherAttendanceListTable').fadeIn();
-            $('.loader').hide();
 
             $('.ttl_stock_in_hand').html(last_balance ? '<span>Rs. </span>' + addCommas(last_balance.toFixed(2)) : '<span>Rs. </span>' + 0);
             $('.ttl_products').html(response.records.length ? addCommas(response.records.length) : 0);
@@ -139,15 +138,15 @@ $('.search-btn').on('click', function () {
             } else {
                 title = 'Vendor Report';
             }
-            if ($.fn.DataTable.isDataTable(".StockListTable")) {
-                $('.StockListTable').DataTable().clear().destroy();
+            if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
+                $('.TeacherAttendanceListTable').DataTable().clear().destroy();
             }
-            var table = $('.StockListTable').DataTable({
+            var table = $('.TeacherAttendanceListTable').DataTable({
                 "bSort": false,
                 "bPaginate": false,
                 scrollX: false,
-                scrollY: '400px',
-                scrollCollapse: true,
+                scrollY: false,
+                scrollCollapse: false,
                 dom: 'Bfrtip',
                 buttons: [{
                         extend: 'pdfHtml5',
@@ -273,6 +272,14 @@ $('.search-btn').on('click', function () {
                     }
                 ]
             });
+        },
+        error: function () {
+            if (CurrentRef) {
+                CurrentRef.attr('disabled', false);
+            }
+        },
+        complete: function () {
+            if (typeof reportPageLoader === 'function') reportPageLoader(false);
         }
     });
 });
@@ -293,7 +300,9 @@ $('.company_id').on('change', function () {
 });
 $('.reset-btn').on('click', function () {
     $('.company_id,.expiry-select,.product_id').val('').trigger('change');
-    $('#search-form')[0].reset();
+    if (typeof resetReportDateRangePicker === 'function') {
+        resetReportDateRangePicker('#search-form', 30);
+    }
     $('.teacher_attendance_list').empty();
     $('.teacher_attendance_list').append("\n            <div class=\"col-12 pb-10\">\n            <div class=\"no-info\"> <div class=\"m-auto\"><strong>Please Filter Your Stock Record !</strong></div>\n            </div>\n        </div>\n        ");
 });

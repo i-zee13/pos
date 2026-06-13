@@ -81,7 +81,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/get-countries',                    [OrganizationController::class, 'getCountries'])->name('admin.getCountries');
 
 
-    Route::get('/', [HomeController::class,   'index'])->name('home');
+    Route::get('/', [HomeController::class,   'index'])->name('/');
     Route::get('/home', [HomeController::class,   'index'])->name('home');
     Route::get('/backups', [DatabaseBackupController::class, 'index'])->name('backups.index');
     Route::get('/backups/logs', [DatabaseBackupController::class, 'logs'])->name('backups.logs');

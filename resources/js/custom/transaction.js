@@ -67,7 +67,7 @@ $(document).ready(function () {
                     }
                 });
                 $('#transactionTable tbody').append(`
-                <tr style="background: #152e4d;color: white;">
+                <tr style="background: #040725;color: white;">
                     <td style="font-family:bold" >Total:</td>
                     <td colspan="2">${action == operation+'-ledger-jama' ? cr_sum : dr_sum}</td>
                 </tr>
@@ -380,7 +380,7 @@ function fetchLedgers(select_date = null) {
                          <td> ${voucher}</td> 
                             <td> ${element['customer_name']}</td>
                             <!-- <td class='total_balance'>${ledger_balance}</td> --!>
-                            <td>${total_cr_dr}</td>
+                            <td class="dt-amount">${total_cr_dr}</td>
                             <td> ${element['comment'] ?? 'NA'}</td>
                             <td> ${moment(element['date']).format('D MMM YYYY')}</td>
                             <td>
@@ -484,7 +484,7 @@ $('#saveTransaction').on('focus', function () {
     $(this).css('background', 'green');
 });
 $('#saveTransaction').on('blur', function () {
-    $(this).css('background', 'linear-gradient(90deg, #152e4d 0%, #152e4d 100%)');
+    $(this).css('background', 'linear-gradient(90deg, #040725 0%, #040725 100%)');
 });
 $(document).on('click', '.btn-cancel', function () {
     if (n > 0) {

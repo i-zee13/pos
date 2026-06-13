@@ -16,6 +16,9 @@
                                     <p class="font12 text-muted mb-3" style="line-height: 1.5;">
                                         Connect the Google account where manual database backups should be uploaded. Google will generate the OAuth token; this app stores the refresh token encrypted.
                                     </p>
+                                    <p class="font12 text-muted mb-3" style="line-height: 1.5;">
+                                        <strong>Important:</strong> In Google Cloud Console, set your OAuth app to <strong>Production</strong> (not Testing). Testing-mode tokens expire after about 7 days and backups stop until you reconnect.
+                                    </p>
                                     @if($mailSetting && $mailSetting->hasConnectedGoogleDrive())
                                         <div class="alert alert-success mb-3">
                                             Connected as <strong>{{ $mailSetting->gmail }}</strong>

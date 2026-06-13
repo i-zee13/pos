@@ -238,7 +238,7 @@ function fetchcustomers() {
     });
     function table(data){
         $('.body').empty();
-        $('.body').append('<table class="table table-hover dt-responsive nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Cnic</th><th>Phone #</th><th>Whatsapp #</th><th>Address</th><th>Action</th></tr></thead><tbody></tbody></table>');
+        $('.body').append('<table class="table table-hover nowrap mainCatsListTable" style="width:100%;"><thead><tr><th>S.No</th><th>Name</th><th>Cnic</th><th>Phone #</th><th>Whatsapp #</th><th>Address</th><th>Action</th></tr></thead><tbody></tbody></table>');
         $('.mainCatsListTable tbody').empty();
         // var response = JSON.parse(response);
         var sNo = 1;
@@ -247,10 +247,10 @@ function fetchcustomers() {
             <tr>
                 <td>${key + 1}</td>
                 <td>${element['customer_name']}</td>
-                <td>${element['cnic_no'] ? element['cnic_no'] : 'NA'}</td>
-                <td>${element['phone_no'] ? element['phone_no'] : 'NA'}</td>
-                <td>${element['whatsapp_no'] ? element['whatsapp_no'] : 'NA'}</td>
-                <td>${element['address'] ? element['address'].substring(0, 40) + '...' : 'NA'}</td> 
+                <td>${element['cnic_no'] ? element['cnic_no'] : '-'}</td>
+                <td>${element['phone_no'] ? element['phone_no'] : '-'}</td>
+                <td>${element['whatsapp_no'] ? element['whatsapp_no'] : '-'}</td>
+                <td>${element['address'] ? element['address'].substring(0, 40) + '...' : '-'}</td> 
                 <td>
                     <button id="${element['id']}" class="btn btn-default btn-line openDataSidebarForUpdatecustomer">Edit</button>
                     <button type="button" id="${element['id']}" class="btn btn-default red-bg deleteMaincustomer delete_cat" name="main_cat" title="Delete">Delete</button>
@@ -260,7 +260,11 @@ function fetchcustomers() {
         });
         $('#tblLoader').hide();
         $('.body').fadeIn();
-        $('.mainCatsListTable').DataTable();
+        if (typeof initListDataTable === 'function') {
+            initListDataTable('.mainCatsListTable');
+        } else {
+            $('.mainCatsListTable').DataTable({ responsive: false, scrollX: false, bSort: false });
+        }
     }
 }
 var select = $('.customer_name').selectize({ 

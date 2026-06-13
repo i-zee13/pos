@@ -72,6 +72,7 @@ $('.expiry-select').on('change',function(){
 
 function getStock(CurrentRef = null,is_click = 0){
     url = '/stocks';
+    if (typeof reportPageLoader === 'function') reportPageLoader(true);
     $(`#search-form`).ajaxSubmit({
         type: 'POST',
         url: url,
@@ -82,9 +83,9 @@ function getStock(CurrentRef = null,is_click = 0){
         },
         success: function (response) { 
             CurrentRef ?  CurrentRef.attr('disabled', false) : null;
-            $('.loader').show();
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
+                <div class="report-slip-scroll report-slip-scroll--report">
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
                     <thead>
                         <tr>
@@ -97,7 +98,8 @@ function getStock(CurrentRef = null,is_click = 0){
                         </tr>
                     </thead><tbody>
                 </tbody>
-                </table>`);
+                </table>
+                </div>`);
             $('.TeacherAttendanceListTable tbody').empty();
             if (response.records.length == 0) {
                 $('#notifDiv').fadeIn();
@@ -120,21 +122,20 @@ function getStock(CurrentRef = null,is_click = 0){
                         <td>${element['company_name'] }</td>
                         <td>${element['product_name'] }</td>
                         <td>${element['expiry_date'] ? element['expiry_date'] : 'NA' }</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${element['balance']}</td> 
+                        <td class="dt-report-num">${element['balance']}</td> 
                     </tr>`);
             });
             $('.TeacherAttendanceListTable tbody').append(`
-            <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+            <tr class="report-grand-total-row" style="background: #040725;border: solid 1px #dbdbdb;color: white">
                 <td class="font18" align="right" colspan="3"></td>
                 <td class="font18" align="center">Grand Total :</td>
                 <td class="totalNo">
-                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${total_balance}</span>
+                    <span class="grand-total dt-report-num">${total_balance}</span>
                 </td>
             </tr>
         `);
-            $('.ttl_stock_in_hand').html(addCommas(last_balance.toFixed(2)));
+            $('.ttl_stock_in_hand').html(addCommas(total_balance.toFixed(2)));
             $('.TeacherAttendanceListTable').fadeIn();
-            $('.loader').hide();
             var title = '';
             if (segments[3] == 'customer-reports') {
                 title = 'Customer Report'
@@ -182,6 +183,14 @@ function getStock(CurrentRef = null,is_click = 0){
 
             })
 
+        },
+        error: function () {
+            if (CurrentRef) {
+                CurrentRef.attr('disabled', false);
+            }
+        },
+        complete: function () {
+            if (typeof reportPageLoader === 'function') reportPageLoader(false);
         }
     });
 }

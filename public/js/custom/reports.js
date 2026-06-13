@@ -5,6 +5,39 @@ let CurrentRef = '';
 let report_segments = location.href.split('/');
 let current_url = report_segments[3].replace(/[#?]+$/, '');
 let trx_inv = false;
+
+function ledgerNum(value) {
+    var n = parseFloat(value);
+    return isNaN(n) ? 0 : n;
+}
+
+function formatLedgerAmount(value) {
+    return ledgerNum(value).toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+}
+
+function formatLedgerDate(value) {
+    if (!value) {
+        return '—';
+    }
+    if (typeof moment !== 'undefined') {
+        return moment(value).format('DD MMM YYYY, h:mm A');
+    }
+    var date = new Date(value);
+    if (isNaN(date.getTime())) {
+        return String(value);
+    }
+    return date.toLocaleString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+}
 $(document).ready(function () {
 
 });
@@ -37,6 +70,7 @@ $('.search-btn').on('click', function () {
     }
     CurrentRef = $(this);
     CurrentRef.attr('disabled', 'disabled');
+    if (typeof reportPageLoader === 'function') reportPageLoader(true);
     url = '/report-list';   
     $(`#search-form`).ajaxSubmit({
         type: 'POST',
@@ -47,40 +81,41 @@ $('.search-btn').on('click', function () {
         },
         success: function (response) {
             CurrentRef.attr('disabled', false);
-            $('.loader').show();
              
+            var stock = ledgerNum($('.vendor_id option:selected').attr('data-balance'));
             var balanceType;
             if (current_url == 'customer-reports') {
-                balanceType = Number(stock) > 0 
-                    ? `<span style="color: green;"> DR</span>` 
+                balanceType = stock > 0
+                    ? `<span style="color: green;"> DR</span>`
                     : `<span style="color: red;"> CR</span>`;
             } else {
-                balanceType = Number(stock) > 0 
-                    ? `<span style="color: red;"> CR</span>` 
+                balanceType = stock > 0
+                    ? `<span style="color: red;"> CR</span>`
                     : `<span style="color: green;"> DR</span>`;
-            } 
-            
-            
-               var stock = $('.vendor_id option:selected').attr('data-balance');
-            $('.prod-bal-div').html(`Previous Balance : ${addCommas(stock)} ${balanceType}`); 
-            console.log(current_url);
+            }
+            $('.prod-bal-div').html(`Previous Balance : ${formatLedgerAmount(Math.abs(stock))} ${balanceType}`); 
             $('.teacher_attendance_list').empty();
             $('.teacher_attendance_list').append(`
-                <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th hidden>Invoice #</th>
-                            <th>Invoice #</th>
-                            <th>Date</th>
-                            <th>Comment</th>
-                            <th style="color:red">Outgoing</th>
-                            <th style="color:rgb(11, 246, 11)">Incoming</th>
-                            <th>Balance</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead><tbody>
-                </tbody>
-                </table>`);
+                <div class="report-slip-shell">
+                  <div class="report-slip-scroll">
+                    <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th hidden>Invoice #</th>
+                                <th>Invoice #</th>
+                                <th>Date</th>
+                                <th>Comment</th>
+                                <th style="color:red">Outgoing</th>
+                                <th style="color:rgb(11, 246, 11)">Incoming</th>
+                                <th>Balance</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                  </div>
+                  <div class="report-slip-footer"></div>
+                </div>`);
             $('.TeacherAttendanceListTable tbody').empty();
             if (response.vendor.length == 0) {
                 $('#notifDiv').fadeIn();
@@ -99,8 +134,8 @@ $('.search-btn').on('click', function () {
                 var inv_no = '';
                 var flag = false;
                 trx_inv = false;
-                totalCR += element['cr'] || 0;
-                totalDR += element['dr'] || 0;
+                totalCR += ledgerNum(element['cr']);
+                totalDR += ledgerNum(element['dr']);
                 if (element['sale_invoice_id'] != null && element['sale_invoice_id'] != 0) {
                     inv_no = element['invoice_no'];
                     label = 'Sale Inv';
@@ -134,31 +169,16 @@ $('.search-btn').on('click', function () {
                     label = 'Cash Payment Voucher ( ' + element['comment'] + ' )';
                     inv_id = element['id'];
                 }
-                var date = new Date(element.created_at);
-
-                function formatAMPM(date) {
-                    var hours = date.getHours();
-                    var minutes = date.getMinutes();
-                    var ampm = hours >= 12 ? 'PM' : 'AM';
-                    hours = hours % 12;
-                    hours = hours ? hours : 12; // Handle midnight (0 hours)
-                    minutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero for single digit minutes
-                    var timeStr = ' (' + hours + ':' + minutes + ' ' + ampm + ')';
-                    return timeStr;
-                }
-                var formattedDate = `${date.toDateString()} ${formatAMPM(date)}`;
+                var formattedDate = formatLedgerDate(element.created_at);
+                var balNum = ledgerNum(element['balance']);
                 if (current_url == 'vendor-reports') {
-                    if (flag) {
-                        var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
-                    } else {
-                        var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
-                    }
+                    var ledger_bal = balNum < 0
+                        ? formatLedgerAmount(Math.abs(balNum)) + ' DR'
+                        : formatLedgerAmount(balNum) + ' CR';
                 } else {
-                    if (flag) {
-                        var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' DR' : element['balance'].toLocaleString('en-US') + ' CR') : '0';
-                    } else {
-                        var ledger_bal = element['balance'] ? (element['balance'] < 0 ? element['balance'].toLocaleString('en-US') + ' CR' : element['balance'].toLocaleString('en-US') + ' DR') : '0';
-                    }
+                    var ledger_bal = balNum < 0
+                        ? formatLedgerAmount(Math.abs(balNum)) + ' CR'
+                        : formatLedgerAmount(balNum) + ' DR';
                 }
                 final_balance = ledger_bal
                 ledger_bal = ledger_bal.replace('-', '');
@@ -169,7 +189,6 @@ $('.search-btn').on('click', function () {
                 }
             });
             $('.TeacherAttendanceListTable').fadeIn();
-            $('.loader').hide();
             var title = '';
             if (report_segments[3] == 'customer-reports') {
                 title = 'Customer Report'
@@ -182,9 +201,10 @@ $('.search-btn').on('click', function () {
             var table = $('.TeacherAttendanceListTable').DataTable({
                   "bSort": false,
                  "bPaginate": false,
-                 scrollX: false,
-                 scrollY: '400px',
-                 scrollCollapse: true,
+                 scrollX: true,
+                 scrollY: false,
+                 scrollCollapse: false,
+                 autoWidth: false,
                  dom: 'Bfrtip',
                 buttons: [{
                         extend: 'excelHtml5',
@@ -230,18 +250,22 @@ $('.search-btn').on('click', function () {
 
             })
 
-            $('.TeacherAttendanceListTable tbody').append(`
-                <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
-                    <td class="font18" align="right"></td>
-                    <td class="font18" align="right"></td>
-                    <td class="font18" align="center">Grand Total :</td>
-                    <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${totalDR.toLocaleString('en-US')}</td>
-                    <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">  ${totalCR.toLocaleString('en-US')} </td>
-                    <td class="totalNo" colspan="2">
-                        <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${final_balance}</span>
-                    </td>
-                </tr>
+            $('.report-slip-footer').html(`
+              <div class="ledger-grand-total-bar">
+                <div class="label">Grand Total :</div>
+                <div class="val">${formatLedgerAmount(totalDR)}</div>
+                <div class="val">${formatLedgerAmount(totalCR)}</div>
+                <div class="val grand">${final_balance}</div>
+              </div>
             `);
+        },
+        error: function () {
+            if (CurrentRef) {
+                CurrentRef.attr('disabled', false);
+            }
+        },
+        complete: function () {
+            if (typeof reportPageLoader === 'function') reportPageLoader(false);
         }
     });
 });
@@ -278,27 +302,28 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
         comment  = `<span class="comment"> ${element.comment}</span>`; 
     }
     console.log(comment)
-    if (element.cr && element.dr) {
+    var crN = ledgerNum(element.cr);
+    var drN = ledgerNum(element.dr);
+    var balN = ledgerNum(element.balance);
+    if (crN && drN) {
         // Both CR and DR present
         // First iteration: CR present, DR skipped 
-        if (element.balance > 0) {
-            var firstBalance = (element.balance + parseFloat(element.cr));
-            var secondBalance = element.balance;
-            console.log(firstBalance, secondBalance);
+        if (balN > 0) {
+            var firstBalance = balN + crN;
+            var secondBalance = balN;
         } else {
-            var firstBalance = (element.balance - parseFloat(element.dr) + parseFloat(element.cr)) + parseFloat(element.dr);
-            console.log((element.balance - parseFloat(element.dr) + parseFloat(element.cr)));
-            var secondBalance = element.balance;
+            var firstBalance = (balN - drN + crN) + drN;
+            var secondBalance = balN;
         }
         var firstRowHTML = `
             <tr>
                 <td hidden>${element.id}</td>
-                <td>${inv_no ?? 'NA'}</td>
-                <td>${formattedDate}</td> 
-                <td>${comment}</td> 
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.dr.toLocaleString('en-US')}</td>
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${firstBalance.toLocaleString('en-US')}</td>
+                <td class="ledger-inv-cell">${inv_no ?? 'NA'}</td>
+                <td class="ledger-date-cell">${formattedDate}</td> 
+                <td class="ledger-comment-cell">${comment}</td> 
+                <td class="ledger-amount-cell">${formatLedgerAmount(drN)}</td>
+                <td class="ledger-amount-cell">0</td>
+                <td class="ledger-amount-cell">${formatLedgerAmount(firstBalance)}</td>
                 <td><a class="btn btn-default btn-detail  btn-line"
                         data-inv-id="${inv_id}"
                         data-inv_no="${inv_no}"
@@ -317,12 +342,12 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
         var secondRowHTML = `
             <tr>
                 <td hidden>${element.id}</td>
-                <td>${inv_no  ?? 'NA'}</td>
-                <td>${formattedDate}</td> 
-                <td>${comment}</td>  
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.cr.toLocaleString('en-US')}</td>
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${secondBalance.toLocaleString('en-US')}</td>
+                <td class="ledger-inv-cell">${inv_no  ?? 'NA'}</td>
+                <td class="ledger-date-cell">${formattedDate}</td> 
+                <td class="ledger-comment-cell">${comment}</td>  
+                <td class="ledger-amount-cell">0</td>
+                <td class="ledger-amount-cell">${formatLedgerAmount(crN)}</td>
+                <td class="ledger-amount-cell">${formatLedgerAmount(secondBalance)}</td>
                 <td><a class="btn btn-default btn-detail  btn-line"
                         data-inv-id="${inv_id}"
                         data-inv_no="${inv_no}"
@@ -337,26 +362,26 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
     } else {
 
         // Only one of CR or DR present or neither
-        var crValue = element.cr ? element.cr.toLocaleString('en-US') : '0';
-        var drValue = element.dr ? element.dr.toLocaleString('en-US') : '0';
+        var crValue = crN ? formatLedgerAmount(crN) : '0';
+        var drValue = drN ? formatLedgerAmount(drN) : '0';
          
         var balance_text = '';
-        if (element.balance >= 0) {
-            balance_text = (element.balance).toLocaleString('en-US') + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>";
-        } else if (element.balance < 0) {
-            balance_text = (-element.balance).toLocaleString('en-US') + "<span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>";
+        if (balN >= 0) {
+            balance_text = formatLedgerAmount(balN) + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>";
+        } else if (balN < 0) {
+            balance_text = formatLedgerAmount(Math.abs(balN)) + "<span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>";
         } else {
-            balance_text = element.balance.toLocaleString('en-US');
+            balance_text = '0';
         }
         var rowHTML = `
             <tr>
                 <td hidden>${element.id}</td>
-                <td>${inv_no  ?? 'NA'}</td>
-                <td>${formattedDate}</td> 
-                 <td>${comment}</td>  
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${drValue}</td>
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${crValue}</td>
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${balance_text}</td>
+                <td class="ledger-inv-cell">${inv_no  ?? 'NA'}</td>
+                <td class="ledger-date-cell">${formattedDate}</td> 
+                 <td class="ledger-comment-cell">${comment}</td>  
+                <td class="ledger-amount-cell">${drValue}</td>
+                <td class="ledger-amount-cell">${crValue}</td>
+                <td class="ledger-amount-cell">${balance_text}</td>
                 <td><a class="btn btn-default btn-detail  btn-line"
                         data-inv-id="${inv_id}"
                         data-inv_no="${inv_no}"
@@ -371,16 +396,19 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
     }
 }
 function vendor_Data(element, inv_no, inv_id, label, formattedDate) {
-    if (element.cr && element.dr) {
+    var crN = ledgerNum(element.cr);
+    var drN = ledgerNum(element.dr);
+    var balN = ledgerNum(element.balance);
+    if (crN && drN) {
         // Both CR and DR present
         // First iteration: CR present, DR skipped 
 
-        if (element.balance > 0) {
-            var firstBalance = (parseFloat(element.balance) + parseFloat(element.dr));
-            var secondBalance = element.balance;
+        if (balN > 0) {
+            var firstBalance = balN + drN;
+            var secondBalance = balN;
         } else {
-            var firstBalance = (element.balance - parseFloat(element.dr) + parseFloat(element.cr)) + parseFloat(element.dr);
-            var secondBalance = element.balance;
+            var firstBalance = (balN - drN + crN) + drN;
+            var secondBalance = balN;
         }
         tableHtml(element, inv_id, inv_no, formattedDate, label, element.cr, firstBalance, "cr")
         tableHtml(element, inv_id, inv_no, formattedDate, label, element.dr, secondBalance, "dr")
@@ -389,27 +417,26 @@ function vendor_Data(element, inv_no, inv_id, label, formattedDate) {
     } else {
         if (element.trx_type == 3) {
             // Only one of CR or DR present or neither
-            var crValue = element.cr ? element.cr.toLocaleString('en-US') : '0';
-            var drValue = element.dr ? element.dr.toLocaleString('en-US') : '0';
-            // var balance_text = element.balance >= 0 ? element.balance.toLocaleString('en-US') + "<span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>" : element.balance < 0 ? element.balance.toLocaleString('en-US') + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>" : element.balance.toLocaleString('en-US');
+            var crValue = crN ? formatLedgerAmount(crN) : '0';
+            var drValue = drN ? formatLedgerAmount(drN) : '0';
             var balance_text = '';
-            if (element.balance >= 0) {
-                balance_text = element.balance.toLocaleString('en-US') + "<span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>";
-            } else if (element.balance < 0) {
-                balance_text = (-element.balance).toLocaleString('en-US') + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>";
+            if (balN >= 0) {
+                balance_text = formatLedgerAmount(balN) + "<span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>";
+            } else if (balN < 0) {
+                balance_text = formatLedgerAmount(Math.abs(balN)) + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>";
             } else {
-                balance_text = element.balance.toLocaleString('en-US');
+                balance_text = '0';
             }
 
             var rowHTML = `
             <tr>
                 <td hidden>${element.id}</td>
-                <td>${inv_no}</td>
-                <td>${formattedDate}</td> 
-                 <td><span style='color:red;font-size: 16px;font-weight: bold;'> ${element.comment ?? ''}</span></td>  
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${drValue}</td>
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${crValue}</td>
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${balance_text}</td>
+                <td class="ledger-inv-cell">${inv_no}</td>
+                <td class="ledger-date-cell">${formattedDate}</td> 
+                 <td class="ledger-comment-cell"><span class="ledger-comment-text">${element.comment ?? ''}</span></td>  
+                <td class="ledger-amount-cell">${drValue}</td>
+                <td class="ledger-amount-cell">${crValue}</td>
+                <td class="ledger-amount-cell">${balance_text}</td>
                 <td><a class="btn btn-default btn-detail btn-line"
                         data-inv-id="${inv_id}"
                         data-inv_no="${inv_no}"
@@ -423,24 +450,25 @@ function vendor_Data(element, inv_no, inv_id, label, formattedDate) {
             $('.TeacherAttendanceListTable tbody').append(rowHTML);
         } else {
             // Only one of CR or DR present or neither
-            var crValue = element.cr ? element.cr.toLocaleString('en-US') : '0';
+            var crValue = crN ? formatLedgerAmount(crN) : '0';
             var drValue = 0;
+            var paidReturn = ledgerNum(element.paid_p_return_amount);
 
-            if (element.dr > 0) {
-                drValue = element.paid_p_return_amount > 0 ? (element.dr - element.paid_p_return_amount).toLocaleString('en-US') : element.dr.toLocaleString('en-US');
+            if (drN > 0) {
+                drValue = paidReturn > 0 ? formatLedgerAmount(drN - paidReturn) : formatLedgerAmount(drN);
             }
-            if (element.balance > 0) {
-                var firstBalance = element.balance + element.paid_p_return_amount;
-                var secondBalance = element.balance;
+            if (balN > 0) {
+                var firstBalance = balN + paidReturn;
+                var secondBalance = balN;
             } else {
-                var firstBalance = (parseFloat(element.balance) + parseFloat(element.paid_p_return_amount));
-                var secondBalance = element.balance;
+                var firstBalance = balN + paidReturn;
+                var secondBalance = balN;
             }
-            if (element.cr) {
+            if (crN) {
                 tableHtml(element, inv_id, inv_no, formattedDate, label, crValue, firstBalance, "cr")
-            } else if (element.paid_p_return_amount > 0 && element.dr > 0) {
+            } else if (paidReturn > 0 && drN > 0) {
                 tableHtml(element, inv_id, inv_no, formattedDate, label, drValue, firstBalance, "dr")
-                tableHtml(element, inv_id, inv_no, formattedDate, label, element.paid_p_return_amount, secondBalance, "dr_with_payment")
+                tableHtml(element, inv_id, inv_no, formattedDate, label, paidReturn, secondBalance, "dr_with_payment")
             } else {
                 tableHtml(element, inv_id, inv_no, formattedDate, label, drValue, secondBalance, "dr")
             }
@@ -452,29 +480,28 @@ function vendor_Data(element, inv_no, inv_id, label, formattedDate) {
 function tableHtml(element, inv_id, inv_no, formattedDate, label, dr_cr, balance, payment_flag = null) {
     var dr_val = 0;
     var cr_val = 0;
-    var balance_text = balance >= 0 ? balance.toLocaleString('en-US') + " <span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>" : balance < 0 ? balance.toLocaleString('en-US') + " <span style='color:red;font-size: 16px;font-weight: bold;'> DR </span>" : balance.toLocaleString('en-US');
+    var balN = ledgerNum(balance);
     var balance_text = '';
-    if (balance >= 0) {
-        balance_text = balance.toLocaleString('en-US') + "<span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>";
-    } else if (balance < 0) {
-        balance_text = (-balance).toLocaleString('en-US') + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>";
+    if (balN >= 0) {
+        balance_text = formatLedgerAmount(balN) + "<span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>";
+    } else if (balN < 0) {
+        balance_text = formatLedgerAmount(Math.abs(balN)) + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>";
     } else {
-        balance_text = balance.toLocaleString('en-US');
+        balance_text = '0';
     }
     if (payment_flag == 'dr' || payment_flag == 'dr_with_payment') {
-        console.log(payment_flag)
-        dr_val = dr_cr.toLocaleString('en-US');
+        dr_val = typeof dr_cr === 'number' ? formatLedgerAmount(dr_cr) : dr_cr;
     } else if (payment_flag == 'cr') {
-        cr_val = dr_cr.toLocaleString('en-US');
+        cr_val = typeof dr_cr === 'number' ? formatLedgerAmount(dr_cr) : dr_cr;
     }
     var RowHTML = ` <tr>
    <td hidden>${element.id}</td>
-   <td>${inv_no}</td>
-   <td>${formattedDate}</td>
-    <td><span style='color:red;font-size: 16px;font-weight: bold;'> ${element.comment ?? ''}</span></td>  
-   <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${dr_val}</td>
-   <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${cr_val}</td>
-   <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${balance_text}</td>
+   <td class="ledger-inv-cell">${inv_no}</td>
+   <td class="ledger-date-cell">${formattedDate}</td>
+    <td class="ledger-comment-cell"><span class="ledger-comment-text">${element.comment ?? ''}</span></td>  
+   <td class="ledger-amount-cell">${dr_val}</td>
+   <td class="ledger-amount-cell">${cr_val}</td>
+   <td class="ledger-amount-cell">${balance_text}</td>
    <td><a class="btn btn-default btn-detail  btn-line"
            data-inv-id="${inv_id}"
            data-inv_no="${inv_no}"

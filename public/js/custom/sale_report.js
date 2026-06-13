@@ -37,6 +37,7 @@ $('.search-btn').on('click', function () {
   CurrentRef = $(this);
   CurrentRef.text('Fetching...');
   CurrentRef.attr('disabled', 'disabled');
+  if (typeof reportPageLoader === 'function') reportPageLoader(true);
   url = '/sales-list';
   $("#search-form").ajaxSubmit({
     type: 'POST',
@@ -48,9 +49,8 @@ $('.search-btn').on('click', function () {
     success: function success(response) {
       CurrentRef.text('Search');
       CurrentRef.attr('disabled', false);
-      $('.loader').show();
       $('.teacher_attendance_list').empty();
-      $('.teacher_attendance_list').append("\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th>Bill #</th>\n                            <th>Date</th>\n                            <th>Company Name</th>\n                            <th>Product Name</th>\n                            <th>Qty</th>\n                            <th>Discount</th>\n                            <th>Amount</th>\n\n                        </tr>\n                    </thead><tbody>\n                    </tbody>\n                    <tfoot></tfoot>\n                </table>");
+      $('.teacher_attendance_list').append("\n                <div class=\"report-slip-scroll report-slip-scroll--report\">\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th>Bill #</th>\n                            <th>Date</th>\n                            <th>Company Name</th>\n                            <th>Product Name</th>\n                            <th>Qty</th>\n                            <th>Discount</th>\n                            <th>Amount</th>\n\n                        </tr>\n                    </thead><tbody>\n                    </tbody>\n                    <tfoot></tfoot>\n                </table>\n                </div>");
       $('.TeacherAttendanceListTable tbody').empty();
       if (response.stocks.length == 0) {
         $('#notifDiv').fadeIn();
@@ -97,7 +97,7 @@ $('.search-btn').on('click', function () {
       var grand_total_discount = parseInt(ttl_invoice_discount + ttl_return_invoice_discount);
       var grand_qty = parseInt(ttl_quantity - ttl_return_quantity);
       //Grand Total
-      $('.TeacherAttendanceListTable tfoot').append("\n            <tr style=\"background: #152e4d;border: solid 1px #dbdbdb;color: white\">\n                <td colspan=\"3\"></td> \n                <td class=\"font18\">Grand Total :</td>\n                <td class=\"totalNo\"   style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\"> ".concat(addCommas(parseInt(ttl_quantity - ttl_return_quantity)), " </td>\n                <td class=\"totalNo\"  style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">  ").concat(addCommas(parseInt(ttl_product_discount - ttl_return_product_discount)), " </td>\n                <td class=\"totalNo\" colspan=\"2\">\n                    <span class=\"grand-total\" style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(addCommas(parseInt(total_sales - total_returns)), "</span>\n                </td>\n            </tr>\n        "));
+      $('.TeacherAttendanceListTable tfoot').append("\n            <tr class=\"report-grand-total-row\" style=\"background: #040725;border: solid 1px #dbdbdb;color: white\">\n                <td colspan=\"3\"></td> \n                <td class=\"font18\">Grand Total :</td>\n                <td class=\"totalNo dt-report-num\"> ".concat(addCommas(parseInt(ttl_quantity - ttl_return_quantity)), " </td>\n                <td class=\"totalNo dt-report-num\">  ").concat(addCommas(parseInt(ttl_product_discount - ttl_return_product_discount)), " </td>\n                <td class=\"totalNo\" colspan=\"2\">\n                    <span class=\"grand-total dt-report-num\">").concat(addCommas(parseInt(total_sales - total_returns)), "</span>\n                </td>\n            </tr>\n        "));
       $('.ttl_sales').html('<span>Rs.</span>' + addCommas(total_sales - total_returns - grand_total_discount));
       // $('.ttl_payment').html(total_sales ? addCommas(addCommas(parseInt(total_sales + ttl_invoice_discount + ttl_product_discount))) : 0);
       $('.ttl_payment').html(total_sales ? addCommas(total_sales) : 0);
@@ -105,7 +105,6 @@ $('.search-btn').on('click', function () {
       $('.ttl_product_discount').html(ttl_product_discount ? addCommas(ttl_product_discount) : 0);
       $('.ttl_invoice_discount').html(grand_total_discount ? addCommas(grand_total_discount) : 0);
       $('.ttl_discount').html(total_returns ? addCommas(total_returns) : 0);
-      $('.loader').hide();
       var title = '';
       if (segments[3] == 'customer-reports') {
         title = 'Customer Report';
@@ -119,8 +118,8 @@ $('.search-btn').on('click', function () {
         "bSort": false,
         "bPaginate": false,
         scrollX: false,
-        scrollY: '400px',
-        scrollCollapse: true,
+        scrollY: false,
+        scrollCollapse: false,
         dom: 'Bfrtip',
         buttons: [{
           extend: 'pdfHtml5',
@@ -245,15 +244,24 @@ $('.search-btn').on('click', function () {
           }
         }]
       });
+    },
+    error: function error() {
+      if (CurrentRef) {
+        CurrentRef.text('Search');
+        CurrentRef.attr('disabled', false);
+      }
+    },
+    complete: function complete() {
+      if (typeof reportPageLoader === 'function') reportPageLoader(false);
     }
   });
 });
 function reportTable(invoice_no, element) {
   var _element$sale_total_a;
-  $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td>".concat(element['invoice_no'], "</td>\n                        <td>").concat(element['created'], "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat(element['product_name'], "</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 16px;\">").concat(element['qty'], "</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 16px;\">").concat(element['product_discount'] ? element['product_discount'] : 0, "</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 16px;\">").concat(addCommas((_element$sale_total_a = element['sale_total_amount']) !== null && _element$sale_total_a !== void 0 ? _element$sale_total_a : element['return_total_amount']), "</td>\n                    </tr>"));
+  $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td>".concat(element['invoice_no'], "</td>\n                        <td>").concat(element['created'], "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat(element['product_name'], "</td>\n                        <td class=\"dt-report-num\">").concat(element['qty'], "</td>\n                        <td class=\"dt-report-num\">").concat(element['product_discount'] ? element['product_discount'] : 0, "</td>\n                        <td class=\"dt-report-num\">").concat(addCommas((_element$sale_total_a = element['sale_total_amount']) !== null && _element$sale_total_a !== void 0 ? _element$sale_total_a : element['return_total_amount']), "</td>\n                    </tr>"));
 }
 function sale_return_total(ttl_quantity, ttl_product_discount, total, flag) {
-  $('.TeacherAttendanceListTable tfoot').append("\n    <tr style=\"background:#eaf1fa ; color:#152e4d\" >\n        <th colspan=\"3\"></th>\n        <th class=\"font18\" align=\"center\">".concat(flag, " Total</th>\n        <th class=\"totalNo\"   style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(ttl_quantity ? addCommas(ttl_quantity) : 0, "</th>\n        <th class=\"totalNo\"   style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(ttl_product_discount ? addCommas(ttl_product_discount) : 0, "</th>\n        <th class=\"totalNo\"   style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(total ? addCommas(total) : 0, "</th>\n    </tr>\n"));
+  $('.TeacherAttendanceListTable tfoot').append("\n    <tr style=\"background:#eaf1fa ; color:#040725\" >\n        <th colspan=\"3\"></th>\n        <th class=\"font18\" align=\"center\">".concat(flag, " Total</th>\n        <th class=\"totalNo dt-report-num\">").concat(ttl_quantity ? addCommas(ttl_quantity) : 0, "</th>\n        <th class=\"totalNo dt-report-num\">").concat(ttl_product_discount ? addCommas(ttl_product_discount) : 0, "</th>\n        <th class=\"totalNo dt-report-num\">").concat(total ? addCommas(total) : 0, "</th>\n    </tr>\n"));
 }
 $('.company_id').on('change', function () {
   var company_id = $(this).val();
@@ -275,6 +283,9 @@ $('.reset-btn').on('click', function () {
   $('.product_id').val('').trigger('change');
   $('.customer_id').val('').trigger('change');
   $('input[name="bill_no"]').val('');
+  if (typeof resetReportDateRangePicker === 'function') {
+    resetReportDateRangePicker('#search-form', 30);
+  }
   $('.ttl_sales').html('<span>Rs.</span> 0');
   $('.ttl_payment').html(0);
   $('.ttl_quantity').html(0);
@@ -285,13 +296,13 @@ $('.reset-btn').on('click', function () {
   $('.teacher_attendance_list').append("\n            <div class=\"col-12 pb-10\">\n            <div class=\"no-info\">\n                <div class=\"m-auto\"><strong>Please Filter Your Sale Record !</strong></div>\n            </div>\n        </div>\n        ");
 });
 function addCommas(nStr) {
-  nStr = parseFloat(nStr).toFixed(2);
-  var x = nStr.split('.');
-  var x1 = x[0];
-  var x2 = x.length > 1 ? '.' + x[1] : '';
+  nStr += "";
+  x = nStr.split(".");
+  x1 = x[0];
+  x2 = x.length > 1 ? "." + x[1] : "";
   var rgx = /(\d+)(\d{3})/;
   while (rgx.test(x1)) {
-    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    x1 = x1.replace(rgx, "$1" + "," + "$2");
   }
   return x1 + x2;
 }

@@ -36,7 +36,7 @@
             </div>
           
             <div class="body" >
-            <table class="table table-hover dt-responsive nowrap subCatsListTable" style="width:100%;" id="example">
+            <table class="table table-hover subCatsListTable" style="width:100%;" id="example">
                 <thead>
                     <tr>
                         <th>Invoice#</th>
@@ -59,8 +59,9 @@
                         @else
                             {{ $sale->customer_name }}
                         @endif</td>
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->paid_amount}} </td> <td>{{$sale->description}}</td>
-                    <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->product_net_total +$sale->service_charges - $sale->invoice_discount}} </td>
+                    <td class="dt-amount">{{$sale->paid_amount}}</td>
+                    <td class="list-desc-cell" title="{{ $sale->description }}">{{ \Illuminate\Support\Str::words(preg_replace('/\s+/', ' ', trim($sale->description ?? '')), 20, '...') }}</td>
+                    <td class="dt-amount">{{$sale->product_net_total + $sale->service_charges - $sale->invoice_discount}}</td>
                     <!-- <td style="font-family: 'Rationale', sans-serif !important;font-size: 20px;">{{$sale->total_invoice_amount}} </td> -->
                     <td>
                         

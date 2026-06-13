@@ -23,18 +23,43 @@ class GoogleDriveApiBackupUploader
 
     public function isConfigured(?int $userId = null): bool
     {
-        if ($this->userDriveRefreshToken($userId) !== null) {
+        $effectiveUserId = $this->resolveEffectiveUserId($userId);
+        if ($effectiveUserId !== null && $this->userDriveRefreshToken($effectiveUserId) !== null) {
             return $this->nonEmpty($this->credential('client_id', (string) config('backup.google_drive_api.client_id')))
                 && $this->nonEmpty($this->credential('client_secret', (string) config('backup.google_drive_api.client_secret')));
         }
 
         $settings = $this->getIntegrationSettings();
-        $enabled = (bool) config('backup.google_drive_api.enabled') || !empty($settings);
+        $enabled = (bool) config('backup.google_drive_api.enabled') || ! empty($settings);
+        $refreshToken = $this->credential('refresh_token', (string) config('backup.google_drive_api.refresh_token'));
 
         return $enabled
             && $this->nonEmpty($this->credential('client_id', (string) config('backup.google_drive_api.client_id')))
             && $this->nonEmpty($this->credential('client_secret', (string) config('backup.google_drive_api.client_secret')))
-            && $this->nonEmpty($this->credential('refresh_token', (string) config('backup.google_drive_api.refresh_token')));
+            && $this->isValidRefreshTokenFormat($refreshToken);
+    }
+
+    /**
+     * Manual backup uses the logged-in user; scheduled backup uses fallback / any connected user.
+     */
+    public function resolveEffectiveUserId(?int $userId = null): ?int
+    {
+        if ($userId && $this->userDriveRefreshToken($userId) !== null) {
+            return $userId;
+        }
+
+        $configuredFallback = (int) config('backup.google_drive_api.fallback_user_id', 0);
+        if ($configuredFallback > 0 && $this->userDriveRefreshToken($configuredFallback) !== null) {
+            return $configuredFallback;
+        }
+
+        $anyConnected = UserBackupMailSetting::query()
+            ->whereNotNull('google_drive_refresh_token_encrypted')
+            ->where('google_drive_refresh_token_encrypted', '!=', '')
+            ->orderByDesc('google_drive_connected_at')
+            ->first();
+
+        return $anyConnected ? (int) $anyConnected->user_id : null;
     }
 
     /**
@@ -48,12 +73,13 @@ class GoogleDriveApiBackupUploader
             throw new \RuntimeException('Zip file is not readable: '.$absoluteZipPath);
         }
 
-        $accessToken = $this->fetchAccessToken($userId);
+        $effectiveUserId = $this->resolveEffectiveUserId($userId);
+        $accessToken = $this->fetchAccessToken($effectiveUserId);
 
         $metadata = ['name' => $zipFilename];
-        $folderId = $this->folderId($userId);
+        $folderId = $this->folderId($effectiveUserId);
         if ($folderId === '') {
-            $folderId = $this->resolveOrCreateFolderId($accessToken, $userId);
+            $folderId = $this->resolveOrCreateFolderId($accessToken, $effectiveUserId);
         }
         if ($folderId !== '') {
             $metadata['parents'] = [$folderId];
@@ -103,11 +129,22 @@ class GoogleDriveApiBackupUploader
 
     protected function fetchAccessToken(?int $userId = null): string
     {
-        $userRefreshToken = $this->userDriveRefreshToken($userId);
+        $effectiveUserId = $this->resolveEffectiveUserId($userId);
+        $userRefreshToken = $effectiveUserId ? $this->userDriveRefreshToken($effectiveUserId) : null;
+        $refreshTokenValue = $userRefreshToken ?: $this->credential('refresh_token', (string) config('backup.google_drive_api.refresh_token'));
+
+        if (! $this->isValidRefreshTokenFormat($refreshTokenValue)) {
+            if ($this->isLikelyAccessToken($refreshTokenValue)) {
+                throw new \RuntimeException('Google Drive is misconfigured: an access token was stored instead of a refresh token. Reconnect Google Drive from DB Backups.');
+            }
+
+            throw new \RuntimeException('Google Drive refresh token is missing or invalid. Reconnect Google Drive from DB Backups.');
+        }
+
         $tokenPayload = [
             'client_id' => $this->credential('client_id', (string) config('backup.google_drive_api.client_id')),
             'client_secret' => $this->credential('client_secret', (string) config('backup.google_drive_api.client_secret')),
-            'refresh_token' => $userRefreshToken ?: $this->credential('refresh_token', (string) config('backup.google_drive_api.refresh_token')),
+            'refresh_token' => $refreshTokenValue,
             'grant_type' => 'refresh_token',
         ];
 
@@ -117,12 +154,12 @@ class GoogleDriveApiBackupUploader
 
         if ($response->failed()) {
             $body = $response->json();
-            Log::warning('backup.google_drive_token', ['body' => $response->body()]);
+            Log::warning('backup.google_drive_token', ['body' => $response->body(), 'user_id' => $effectiveUserId]);
 
             if ($userRefreshToken !== null) {
                 $error = is_array($body) ? (string) ($body['error'] ?? '') : '';
                 if ($error === 'invalid_grant') {
-                    $this->clearUserDriveToken($userId);
+                    $this->clearUserDriveToken($effectiveUserId);
                 }
 
                 throw new \RuntimeException('Connected Google Drive token expired or was revoked. Reconnect Google Drive from DB Backups.');
@@ -150,6 +187,15 @@ class GoogleDriveApiBackupUploader
         $token = $response->json('access_token');
         if (! is_string($token) || $token === '') {
             throw new \RuntimeException('Google OAuth response missing access_token.');
+        }
+
+        $rotatedRefresh = $response->json('refresh_token');
+        if (is_string($rotatedRefresh) && $this->isValidRefreshTokenFormat($rotatedRefresh)) {
+            if ($userRefreshToken !== null && $effectiveUserId) {
+                $this->persistUserRefreshToken($effectiveUserId, $rotatedRefresh);
+            } else {
+                $this->saveIntegrationSetting('refresh_token', $rotatedRefresh);
+            }
         }
 
         return $token;
@@ -327,6 +373,27 @@ class GoogleDriveApiBackupUploader
         $setting->google_drive_connected_at = null;
         $setting->save();
         $this->userDriveSettings[$userId] = $setting;
+    }
+
+    protected function persistUserRefreshToken(int $userId, string $refreshToken): void
+    {
+        $setting = $this->getUserDriveSetting($userId) ?: UserBackupMailSetting::firstOrNew(['user_id' => $userId]);
+        $setting->google_drive_refresh_token_encrypted = Crypt::encryptString($refreshToken);
+        $setting->google_drive_connected_at = now();
+        $setting->save();
+        $this->userDriveSettings[$userId] = $setting;
+    }
+
+    protected function isLikelyAccessToken(string $token): bool
+    {
+        return str_starts_with(trim($token), 'ya29.');
+    }
+
+    protected function isValidRefreshTokenFormat(string $token): bool
+    {
+        $token = trim($token);
+
+        return $token !== '' && ! $this->isLikelyAccessToken($token);
     }
 
     protected function nonEmpty($value): bool

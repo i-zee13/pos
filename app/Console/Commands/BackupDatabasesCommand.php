@@ -24,8 +24,10 @@ class BackupDatabasesCommand extends Command
 
         $triggeredBy = $this->option('scheduled') ? 'schedule' : 'artisan';
 
+        $driveUserId = app(\App\Services\GoogleDriveApiBackupUploader::class)->resolveEffectiveUserId(null);
+
         $log = BackupLog::create([
-            'user_id' => null,
+            'user_id' => $driveUserId,
             'databases' => $databases,
             'status' => 'pending',
             'triggered_by' => $triggeredBy,

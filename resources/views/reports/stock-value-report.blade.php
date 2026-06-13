@@ -16,11 +16,11 @@
         width: 34px;
         height: 34px;
         margin: 6px;
-        border: 6px solid #152e4d;
+        border: 6px solid #040725;
         border-radius: 50%;
         animation: lds-ring 1.5s cubic-bezier(.7, .1, .3, .9) infinite;
         border-color: transparent;
-        border-top-color: #152e4d;
+        border-top-color: #040725;
     }
 
     .lds-ring :nth-child(1) {
@@ -188,7 +188,7 @@
     }
 
     .card-heading:before {
-        background: #152e4d !important;
+        background: #040725 !important;
         position: absolute !important;
         width: 2px !important;
         height: 18px !important;
@@ -204,7 +204,7 @@
 
     .total-sale .total-amount {
         font-size: 42px;
-        color: #152e4d;
+        color: #040725;
         padding: 8px 0 8px 0;
     }
 
@@ -238,7 +238,7 @@
     }
 
     .total-val span {
-        color: #152e4d;
+        color: #040725;
         margin-bottom: 5px;
     }
 
@@ -262,7 +262,7 @@
         background-color: #ffffff;
         box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
         text-decoration: none;
-        border-bottom: solid 1px #152e4d;
+        border-bottom: solid 1px #040725;
         -webkit-transition: all 0.3s;
         -moz-transition: all 0.3s;
         transition: all 0.3s;
@@ -297,7 +297,7 @@
     }
 
     .view-all:hover {
-        color: #152e4d;
+        color: #040725;
         text-decoration: none
     }
 
@@ -316,19 +316,19 @@
     .strength .Strength-val {
         display: block;
         font-size: 35px;
-        color: #152e4d;
+        color: #040725;
     }
 
     .strength .Strength-lab {
         display: block;
-        background-color: #152e4d;
+        background-color: #040725;
         color: #fff;
         padding: 4px
     }
 
     .emp-val-box {
         border: solid 1px #e5e5e5;
-        border-top-color: #152e4d;
+        border-top-color: #040725;
         padding: 15px 5px 5px 8px;
         font-size: 11px;
     }
@@ -336,7 +336,7 @@
     .emp-val-box span {
         display: block;
         font-size: 32px;
-        color: #152e4d;
+        color: #040725;
         padding: 15px 0px 27px 0px;
         line-height: 1
     }
@@ -374,7 +374,7 @@
     }
 
     .avg-booking .avg-val {
-        color: #152e4d;
+        color: #040725;
         font-size: 30px;
         margin-bottom: 0;
         letter-spacing: 0;
@@ -419,7 +419,7 @@
         width: 75px;
         height: 75px;
         border-radius: 50%;
-        border: solid 2px #152e4d
+        border: solid 2px #040725
     }
 
     .emp-pic .badge-icon {
@@ -449,7 +449,7 @@
 
     .state-01 {
         font-size: 14px;
-        border-top: solid 1px #152e4d;
+        border-top: solid 1px #040725;
         position: relative
     }
 
@@ -498,7 +498,7 @@
         font-size: 20px;
         margin-top: -2px;
         float: right;
-        color: #152e4d;
+        color: #040725;
         line-height: 1;
     }
 
@@ -553,7 +553,7 @@
     }
 
     .product-card:before {
-        background: #152e4d;
+        background: #040725;
         position: absolute;
         width: 2px;
         height: 32px;
@@ -576,7 +576,7 @@
 
     .pr-st {
         background-color: #fbfbfb;
-        border-top: solid 1px #152e4d;
+        border-top: solid 1px #040725;
         text-align: center;
         line-height: 1;
         margin-top: 5px;
@@ -616,7 +616,7 @@
     .avg-booking-day h2 span {
         font-size: 30px;
         display: block;
-        color: #152e4d;
+        color: #040725;
         padding-top: 2px;
     }
 
@@ -628,7 +628,7 @@
 
     .segmentType-value span {
         font-size: 32px;
-        color: #152e4d;
+        color: #040725;
         display: block
     }
 
@@ -647,7 +647,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap');
 
     .employeecard {
-        border-top: solid 2px #152e4d;
+        border-top: solid 2px #040725;
         box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -webkit-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -moz-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
@@ -707,7 +707,7 @@
     .employeecard .emp-pic .pic {
         width: 50px;
         height: 50px;
-        border: solid 1px #152e4d;
+        border: solid 1px #040725;
     }
 
     .employeecard .emp-pic .badge-icon {
@@ -740,7 +740,7 @@
     }
 
     .empsale span {
-        color: #152e4d;
+        color: #040725;
     }
 
     .sale-pu {
@@ -841,13 +841,13 @@
         font-size: 13px;
         color: #fff;
         margin-top: -2px;
-        background-color: #152e4d;
+        background-color: #040725;
         line-height: 1;
         padding: 5px 11px
     }
 
     .back-btn:hover {
-        background-color: #152e4d;
+        background-color: #040725;
         color: #fff;
         text-decoration: none
     }
@@ -879,7 +879,7 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        border: solid 2px #152e4d
+        border: solid 2px #040725
     }
 
     .emp-info .emp-pic .badge-icon {
@@ -934,7 +934,7 @@
 
     .total-bs .total-amount {
         font-size: 28px;
-        color: #152e4d;
+        color: #040725;
         padding: 4px 0 10px 0;
         border-bottom: solid 1px #e1e1e1;
         line-height: 1;
@@ -1003,7 +1003,7 @@
 
     .total-stime .total-time {
         font-size: 24px;
-        color: #152e4d;
+        color: #040725;
         margin-bottom: 6px;
         line-height: 1
     }
@@ -1014,7 +1014,7 @@
 
     .total-stime .time-s {
         border: solid 1px #ececec;
-        border-top: solid 1px #152e4d;
+        border-top: solid 1px #040725;
         font-size: 13px;
         line-height: 1;
         text-align: center;
@@ -1064,7 +1064,7 @@
         float: right;
         font-size: 20px;
         margin-top: 0;
-        color: #152e4d;
+        color: #040725;
         line-height: 1;
     }
 
@@ -1169,7 +1169,7 @@
         font-size: 32px;
         font-weight: normal;
         letter-spacing: normal;
-        color: #152e4d;
+        color: #040725;
         line-height: 1;
         text-align: center
     }
@@ -1186,7 +1186,7 @@
     }
 
     .total-progress .progress-barColor {
-        border-color: #152e4d
+        border-color: #040725
     }
 
     .map-section {
@@ -1226,13 +1226,13 @@
     }
 
     .act-loc {
-        color: #152e4d;
+        color: #040725;
         font-size: 16px;
         padding-left: 10px;
     }
 
     .act-loc .fa {
-        color: #152e4d;
+        color: #040725;
         padding-right: 5px;
     }
 
@@ -1275,7 +1275,7 @@
     .map-b-act a.active {
         text-decoration: none;
         color: #fff;
-        background-color: #152e4d
+        background-color: #040725
     }
 
     .map-b-act a:hover img,
@@ -1293,7 +1293,7 @@
 
     .shift-overview .FU-history .Act-timeline {
         margin-left: 115px;
-        border-left: 1px solid #152e4d;
+        border-left: 1px solid #040725;
     }
 
     .shift-overview .FU-history .Act-timeline li {
@@ -1337,7 +1337,7 @@
 
 
     .productcard {
-        border-top: solid 2px #152e4d;
+        border-top: solid 2px #040725;
         box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -webkit-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -moz-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
@@ -1517,7 +1517,7 @@
         -moz-border-radius: 0;
         border-radius: 0;
         -khtml-border-radius: 0;
-        background: linear-gradient(90deg, #1e54d3 0%, #152e4d 100%);
+        background: linear-gradient(90deg, #1e54d3 0%, #040725 100%);
         color: #fff;
         text-align: center;
         margin: 0;
@@ -1547,7 +1547,7 @@
 
     .total-vals {
         border: solid 1px #e4e4e4;
-        border-top: solid 1px #152e4d;
+        border-top: solid 1px #040725;
         text-align: center;
         margin: 0;
         font-size: 14px;
@@ -1562,7 +1562,7 @@
     .total-vals span {
         display: block;
         font-size: 30px;
-        color: #152e4d;
+        color: #040725;
         line-height: 1;
         padding-bottom: 10px;
     }
@@ -1579,7 +1579,7 @@
 
     .keytrend-lr span {
         float: right;
-        color: #152e4d;
+        color: #040725;
         font-size: 22px;
         line-height: 1;
         margin-top: -1px;
@@ -1672,7 +1672,7 @@
     }
 
     .card-heading:before {
-        background: #152e4d !important;
+        background: #040725 !important;
         position: absolute !important;
         width: 2px !important;
         height: 18px !important;
@@ -1688,7 +1688,7 @@
 
     .total-sale .total-amount {
         font-size: 42px;
-        color: #152e4d;
+        color: #040725;
         padding: 8px 0 8px 0;
     }
 
@@ -1722,7 +1722,7 @@
     }
 
     .total-val span {
-        color: #152e4d;
+        color: #040725;
         margin-bottom: 5px;
     }
 
@@ -1746,7 +1746,7 @@
         background-color: #ffffff;
         box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
         text-decoration: none;
-        border-bottom: solid 1px #152e4d;
+        border-bottom: solid 1px #040725;
         -webkit-transition: all 0.3s;
         -moz-transition: all 0.3s;
         transition: all 0.3s;
@@ -1781,7 +1781,7 @@
     }
 
     .view-all:hover {
-        color: #152e4d;
+        color: #040725;
         text-decoration: none
     }
 
@@ -1798,7 +1798,7 @@
     }
 
     .avg-booking .avg-val {
-        color: #152e4d;
+        color: #040725;
         font-size: 30px;
         margin-bottom: 0;
         letter-spacing: 0;
@@ -1845,7 +1845,7 @@
         width: 75px;
         height: 75px;
         border-radius: 50%;
-        border: solid 2px #152e4d
+        border: solid 2px #040725
     }
 
     .emp-pic .badge-icon {
@@ -1875,7 +1875,7 @@
 
     .state-01 {
         font-size: 14px;
-        border-top: solid 1px #152e4d;
+        border-top: solid 1px #040725;
         position: relative
     }
 
@@ -1924,7 +1924,7 @@
         font-size: 20px;
         margin-top: -2px;
         float: right;
-        color: #152e4d;
+        color: #040725;
         line-height: 1;
     }
 
@@ -1979,7 +1979,7 @@
     }
 
     .product-card:before {
-        background: #152e4d;
+        background: #040725;
         position: absolute;
         width: 2px;
         height: 32px;
@@ -2002,7 +2002,7 @@
 
     .pr-st {
         background-color: #fbfbfb;
-        border-top: solid 1px #152e4d;
+        border-top: solid 1px #040725;
         text-align: center;
         line-height: 1;
         margin-top: 5px;
@@ -2042,7 +2042,7 @@
     .avg-booking-day h2 span {
         font-size: 30px;
         display: block;
-        color: #152e4d;
+        color: #040725;
         padding-top: 2px;
     }
 
@@ -2054,7 +2054,7 @@
 
     .segmentType-value span {
         font-size: 32px;
-        color: #152e4d;
+        color: #040725;
         display: block
     }
 
@@ -2095,7 +2095,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap');
 
     .employeecard {
-        border-top: solid 2px #152e4d;
+        border-top: solid 2px #040725;
         box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -webkit-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -moz-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
@@ -2155,7 +2155,7 @@
     .employeecard .emp-pic .pic {
         width: 50px;
         height: 50px;
-        border: solid 1px #152e4d;
+        border: solid 1px #040725;
     }
 
     .employeecard .emp-pic .badge-icon {
@@ -2188,7 +2188,7 @@
     }
 
     .empsale span {
-        color: #152e4d;
+        color: #040725;
     }
 
     .sale-pu {
@@ -2294,7 +2294,7 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        border: solid 2px #152e4d
+        border: solid 2px #040725
     }
 
     .emp-info .emp-pic .badge-icon {
@@ -2349,7 +2349,7 @@
 
     .total-bs .total-amount {
         font-size: 28px;
-        color: #152e4d;
+        color: #040725;
         padding: 4px 0 10px 0;
         border-bottom: solid 1px #e1e1e1;
         line-height: 1;
@@ -2418,7 +2418,7 @@
 
     .total-stime .total-time {
         font-size: 24px;
-        color: #152e4d;
+        color: #040725;
         margin-bottom: 6px;
         line-height: 1
     }
@@ -2429,7 +2429,7 @@
 
     .total-stime .time-s {
         border: solid 1px #ececec;
-        border-top: solid 1px #152e4d;
+        border-top: solid 1px #040725;
         font-size: 13px;
         line-height: 1;
         text-align: center;
@@ -2479,7 +2479,7 @@
         float: right;
         font-size: 20px;
         margin-top: 0;
-        color: #152e4d;
+        color: #040725;
         line-height: 1;
     }
 
@@ -2584,7 +2584,7 @@
         font-size: 32px;
         font-weight: normal;
         letter-spacing: normal;
-        color: #152e4d;
+        color: #040725;
         line-height: 1;
         text-align: center
     }
@@ -2601,7 +2601,7 @@
     }
 
     .total-progress .progress-barColor {
-        border-color: #152e4d
+        border-color: #040725
     }
 
     .map-section {
@@ -2641,13 +2641,13 @@
     }
 
     .act-loc {
-        color: #152e4d;
+        color: #040725;
         font-size: 16px;
         padding-left: 10px;
     }
 
     .act-loc .fa {
-        color: #152e4d;
+        color: #040725;
         padding-right: 5px;
     }
 
@@ -2691,7 +2691,7 @@
     .map-b-act a.active {
         text-decoration: none;
         color: #fff !important;
-        background-color: #152e4d
+        background-color: #040725
     }
 
     .map-b-act a:hover img,
@@ -2709,7 +2709,7 @@
 
     .shift-overview .FU-history .Act-timeline {
         margin-left: 115px;
-        border-left: 1px solid #152e4d;
+        border-left: 1px solid #040725;
     }
 
     .shift-overview .FU-history .Act-timeline li {
@@ -2753,7 +2753,7 @@
 
 
     .productcard {
-        border-top: solid 2px #152e4d;
+        border-top: solid 2px #040725;
         box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -webkit-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -moz-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
@@ -2933,7 +2933,7 @@
         -moz-border-radius: 0;
         border-radius: 0;
         -khtml-border-radius: 0;
-        background: linear-gradient(90deg, #1e54d3 0%, #152e4d 100%);
+        background: linear-gradient(90deg, #1e54d3 0%, #040725 100%);
         color: #fff;
         text-align: center;
         margin: 0;
@@ -2963,7 +2963,7 @@
 
     .total-vals {
         border: solid 1px #e4e4e4;
-        border-top: solid 1px #152e4d;
+        border-top: solid 1px #040725;
         text-align: center;
         margin: 0;
         font-size: 14px;
@@ -2978,7 +2978,7 @@
     .total-vals span {
         display: block;
         font-size: 30px;
-        color: #152e4d;
+        color: #040725;
         line-height: 1;
         padding-bottom: 10px;
     }
@@ -2995,7 +2995,7 @@
 
     .keytrend-lr span {
         float: right;
-        color: #152e4d;
+        color: #040725;
         font-size: 22px;
         line-height: 1;
         margin-top: -1px;
@@ -3021,7 +3021,7 @@
     .head-blue {
         line-height: 1;
         font-size: 18px;
-        color: #152e4d;
+        color: #040725;
     }
 
     .ex-avg-booking {
@@ -3046,7 +3046,7 @@
 
     .divisional-reports .font-digit {
         letter-spacing: normal;
-        color: #152e4d
+        color: #040725
     }
 
     .divisional-reports .font-digit b {
@@ -3086,7 +3086,7 @@
         height: 13px;
         background-color: #fff;
         border-radius: 50%;
-        border: solid 3px #152e4d;
+        border: solid 3px #040725;
         display: inline-block;
     }
 
@@ -3101,7 +3101,7 @@
     }
 
     .dis-vs-value span {
-        color: #152e4d;
+        color: #040725;
         font-size: 15px;
     }
 
@@ -3117,7 +3117,7 @@
     .shopclose {
         font-size: 13px;
         cursor: pointer;
-        color: #152e4d !important;
+        color: #040725 !important;
     }
 
     .shopclose .fa {
@@ -3156,7 +3156,7 @@
 
     .dash-order-list .dash-ord-price {
         font-size: 20px;
-        color: #152e4d
+        color: #040725
     }
 
     .dash-order-list .btn-primary {
@@ -3198,7 +3198,7 @@
     }
 
     .tab-inner-link:hover {
-        color: #152e4d
+        color: #040725
     }
 
     .min-h-auto {
@@ -3532,13 +3532,6 @@
         height: 31px !important;
     }
 
-    .reset-btn {
-        box-shadow: none;
-    }
-
-    .reset-btn:hover {
-        color: white !important;
-    }
 </style>
 <!-- Body -->
 <div class="header-body">
@@ -3565,53 +3558,47 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <div class="Product-Filter">
+        <div class="Product-Filter purchase-filter-bar report-filter-inline">
             <form id="search-form">
                 <div class="row">
-                    <div class="col-auto">
-                        <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
-                            <input type="date" autocomplete="off" class="form-control " placeholder="Start Date" name="start_date" value="{{date('Y-m-d')}}">
-                        </div>
-                        <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
-                            <input type="date" autocomplete="off" class="form-control" placeholder="End Date" name="end_date" value="{{date('Y-m-d')}}">
-                        </div>
-                        <div class="_cust_filter ">
-                            <div class="form-s2">
-                                <select class="form-control formselect company_id" name="company_id">
-                                    <option value="">Select Company</option>
-                                    @foreach($companies as $company)
-                                    <option value="{{$company->id}}">{{$company->id}}-{{$company->company_name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="_cust_filter ">
-                            <div class="form-s2">
-                                <select class="form-control formselect product_id" name="product_id">
-                                    <option value="">Select Product</option>
-                                    @foreach($products as $company)
-                                    <option value="{{$company->id}}">{{$company->id}}-{{$company->product_name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="_cust_filter ">
-                            <div class="form-s2">
-                                <select class="form-control formselect product_id filter_by_value" name="filter_by_value">
-                                    <option value="">Select Value</option>
-                                    <option value="1">By Average</option>
-                                    <option value="2">By Last Price</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-auto" style="float:right;">
-                            <button type="button" class="btn btn-primary m-0 search-btn" style=" margin-right:10px !important"> Search</button>
-                            <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#152e4d !important"> Reset</button>
+                    <div class="report-date-range">
+                        <i class="fa fa-calendar-alt" title="Pick start date, then end date"></i>
+                        <input type="text" autocomplete="off" class="form-control report-range-display" readonly placeholder="Start date – End date">
+                        <input type="hidden" class="start_date" name="start_date">
+                        <input type="hidden" class="end_date" name="end_date">
+                    </div>
+                    <div class="_cust_filter">
+                        <div class="form-s2">
+                            <select class="form-control formselect company_id" name="company_id">
+                                <option value="">Select Company</option>
+                                @foreach($companies as $company)
+                                <option value="{{$company->id}}">{{$company->id}}-{{$company->company_name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-
+                    <div class="_cust_filter">
+                        <div class="form-s2">
+                            <select class="form-control formselect product_id" name="product_id">
+                                <option value="">Select Product</option>
+                                @foreach($products as $company)
+                                <option value="{{$company->id}}">{{$company->id}}-{{$company->product_name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="_cust_filter">
+                        <div class="form-s2">
+                            <select class="form-control formselect filter_by_value" name="filter_by_value">
+                                <option value="">Select Value</option>
+                                <option value="1">By Average</option>
+                                <option value="2">By Last Price</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-line m-0 reset-btn">Reset</button>
+                    <button type="button" class="btn btn-primary m-0 search-btn">Search</button>
                 </div>
-
             </form>
             <div class="clearfix"></div>
         </div>
@@ -3658,7 +3645,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="card" style="padding: 0px">
+        <div class="card report-list-card" style="padding: 0px">
             <div class="header m-0">
                 <h2 style="width: 100%">Stock <span>List</span>
                     <p style="text-align: right;margin:-20px 0px 0px 0px;font-size: 15px;" class="filter_name"></p>
@@ -3679,5 +3666,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/stock-value-report.js') }}"></script>
+<script src="{{asset('js/custom/stock-value-report.js?v=1.3') }}"></script>
 @endpush

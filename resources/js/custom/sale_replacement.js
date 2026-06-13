@@ -104,7 +104,7 @@ $('.add-product').on('click', function () {
             is_in_array[0].qty++;
         }
         nearestParent.find('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
-        nearestParent.find('.tr-' + data_variable).css('background', '#152e4d').addClass('text-white');
+        nearestParent.find('.tr-' + data_variable).css('background', '#040725').addClass('text-white');
         var ss = data_variable
         setTimeout(function () {
             nearestParent.find('.tr-' + ss).css('background', '').removeClass('text-white');
@@ -747,7 +747,7 @@ $('#invoice_discount').on('input', function () {
     grandSum(previous_payable, service_charges, $(this).val());
 })
 $('#add-product').on('focus', function () {
-    $(this).css('background', '#152e4d ');
+    $(this).css('background', '#040725 ');
 });
 $('#add-product').on('blur', function () {
     $(this).css('background', 'green');

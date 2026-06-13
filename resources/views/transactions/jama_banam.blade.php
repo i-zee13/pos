@@ -88,7 +88,7 @@
                         
                     </div>
                     <div class="col-auto pl-0">
-                        <button type="button" class="btn btn-primary m-0 reset-btn"> Reset</button>
+                        <button type="button" class="btn btn-line m-0 reset-btn">Reset</button>
                     </div>
                     <div class="col-auto pl-0">
                         <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
@@ -121,5 +121,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/reports.js') }}"></script>
+<script src="{{asset('js/custom/reports.js?v=1.3') }}"></script>
 @endpush

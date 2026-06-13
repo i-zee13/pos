@@ -220,7 +220,7 @@ $('#add-product').on('click', function () {
             is_in_array[0].qty++;
         }
         $('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
-        $('#tr-' + data_variable).css('background', '#152e4d').addClass('text-white');
+        $('#tr-' + data_variable).css('background', '#040725').addClass('text-white');
         var ss = data_variable
         setTimeout(function () {
             $('#tr-' + ss).css('background', '').removeClass('text-white');
