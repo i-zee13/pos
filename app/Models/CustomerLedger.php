@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CustomerLedger extends Model
 {
+    use \App\Models\Concerns\BelongsToTenant;
     use HasFactory;
     protected $table    =   'customer_ledger';
     protected $guarded  =    [];

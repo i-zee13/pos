@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AdminSaleClose extends Model
 {
+    use \App\Models\Concerns\BelongsToTenant;
     use HasFactory;
     protected $table = "admin_sale_close";
 }

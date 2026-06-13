@@ -139,6 +139,7 @@ class LedgerDetailControlller extends Controller
                   SUM(IFNULL(cr, 0)) as cr, 
                   SUM(IFNULL(dr, 0)) as dr
               ")
+         ->when(current_tenant_id(), function ($q, $t) { return $q->where('tenant_id', $t); })
          ->whereRaw("DATE(created_at) = ? AND is_deleted = 0 AND customer_id NOT IN (5,8,49,97,105,107,113,126,145,157,170,48,242,356)", [$req->date])
          ->groupBy("customer_id")
          ->get();
@@ -150,6 +151,7 @@ class LedgerDetailControlller extends Controller
           SUM(IFNULL(cr, 0)) as cr, 
           SUM(IFNULL(dr, 0)) as dr
       ")
+         ->when(current_tenant_id(), function ($q, $t) { return $q->where('tenant_id', $t); })
          ->whereNull('purchase_return_invoice_id')
          ->whereRaw("DATE(created_at) = ? AND is_deleted = 0 AND customer_id != 167", [$req->date])
          ->groupBy("customer_id")
@@ -211,6 +213,7 @@ class LedgerDetailControlller extends Controller
 
       $customerLgr = DB::table("customer_ledger as cl")
          ->join("customers as c", "c.id", "=", "cl.customer_id")
+         ->when(current_tenant_id(), function ($q, $t) { return $q->where('cl.tenant_id', $t); })
          ->selectRaw("
                               cl.customer_id,
                             

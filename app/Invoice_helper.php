@@ -118,6 +118,7 @@ if (!function_exists('PurchaseReportRecords')) {
       } else {
          $query         =  $where;
       }
+      $query .= tenant_and('pp');
       $records          =  DB::select("
                                 SELECT 
                                    DATE_FORMAT(pp.created_at,'%d-%m-%Y %h:%i %p') as created,
@@ -157,7 +158,7 @@ if (!function_exists('StockProfitReport')) {
       if (isset($request->product_id)) {
          $query .= " AND ps.product_id = $request->product_id";
       }
-      
+      $query .= tenant_and('ps');
     
       $sales          =  DB::select("
                               SELECT
@@ -197,6 +198,7 @@ if (!function_exists('ProfitReportRecords')) {
          $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
       }
      
+      $query .= tenant_and('ps');
       // IFNULL(si.invoice_discount/sum(ps.qty),0) AS divide_invoice_discount,
       $sales          =  DB::select("
                               SELECT
@@ -268,6 +270,7 @@ if (!function_exists('PurchaseReportList')) {
          $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
       }
 
+      $query .= tenant_and('ps');
       $purchases          =  DB::select("
                               SELECT
                                  DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
@@ -361,6 +364,7 @@ if (!function_exists('ProductReportList')) {
            $query .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
        }
    
+       $query .= tenant_and('ps');
        // Main query
        $reports = DB::select("
                               SELECT
@@ -405,6 +409,7 @@ if (!function_exists('ProductReportList')) {
                                      vendor_stocks as ps
                                   JOIN products pr ON pr.id = ps.product_id
                                   JOIN companies co ON co.id = ps.company_id
+                                  WHERE ".tenant_where('ps')."
                                   ORDER BY ps.created_at DESC
                                   LIMIT 5
                                 ");

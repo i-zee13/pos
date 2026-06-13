@@ -45,6 +45,7 @@ class ReportsController extends Controller
       if (isset($request->product_id)) {
          $query      .= " AND vs.product_id = $request->product_id ";
       }
+      $query .= tenant_and('vs');
       if (isset($request->expiry) && $request->expiry > 0  || $request->is_click == 0) { //is_click = 0 mean on page load get 3 months expires
          $query                .=  "AND batch_wise_balance > 0 ";
          $expiry_month         =   $request->is_click == 0 ? 3 :  $request->expiry;
@@ -119,6 +120,7 @@ class ReportsController extends Controller
       if (isset($request->product_id)) {
          $query      .= " AND vs.product_id = $request->product_id";
       }
+      $query .= tenant_and('vs');
       $inner_join_where = $query;
       $query      .= " AND $where";
       $max_id = '';
@@ -211,6 +213,7 @@ class ReportsController extends Controller
       if (isset($request->product_id)) {
          $query      .= " AND vs.product_id = $request->product_id";
       }
+      $query .= tenant_and('vs');
 // ;      if ($request->filter_by_value == '2') {
          // $where            =  " DATE(vs.created_at) BETWEEN '$request->start_date' AND '$request->end_date' AND vs.transaction_type != 4 ";
          // $where            =  " DATE(vs.created_at) <= $request->end_date";
@@ -349,6 +352,7 @@ class ReportsController extends Controller
       $purchase_return_paid_amount = 0;
       $purchase_inv_paid_amount    = 0;
       $query .= " AND ps.deleted_at IS NULL";
+      $query .= tenant_and('ps');
 
       if (isset($request->company_id)) {
          $query .= " AND ps.company_id = $request->company_id";
@@ -569,6 +573,7 @@ class ReportsController extends Controller
                                              IFNULL(dr,0) as dr,
                                              trx_type
                                           ")
+                                          ->when(current_tenant_id(), function ($q, $t) { return $q->where('tenant_id', $t); })
                                           ->whereRaw("DATE(created_at) = '$closing_date' AND  is_deleted = 0
                                           ")->get();
       $vendor_payment                  =  DB::table("vendor_ledger")->selectRaw("
@@ -576,7 +581,8 @@ class ReportsController extends Controller
                                              IFNULL(cr,0) as cr,
                                              IFNULL(dr,0) as dr,
                                              trx_type
-                                          ")->whereNull('purchase_return_invoice_id')
+                                          ")                                          ->whereNull('purchase_return_invoice_id')
+                                          ->when(current_tenant_id(), function ($q, $t) { return $q->where('tenant_id', $t); })
                                           ->whereRaw("DATE(created_at) = '$closing_date' AND  is_deleted = 0")->get(); 
                                        //  dd($saleRecords);
       $records                         =  new stdClass();

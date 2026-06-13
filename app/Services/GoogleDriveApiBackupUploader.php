@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\UserBackupMailSetting;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -48,7 +49,7 @@ class GoogleDriveApiBackupUploader
             throw new \RuntimeException('Zip file is not readable: '.$absoluteZipPath);
         }
 
-        $accessToken = $this->fetchAccessToken($userId);
+        $accessToken = $this->getValidAccessToken($userId);
 
         $metadata = ['name' => $zipFilename];
         $folderId = $this->folderId($userId);
@@ -101,6 +102,33 @@ class GoogleDriveApiBackupUploader
         throw new \RuntimeException('Drive API returned no file id.');
     }
 
+    /**
+     * Returns a valid access token, reusing a cached one until it is close to
+     * expiry. Only refreshes against Google when needed, so a single warm token
+     * keeps working and the connection auto-renews silently.
+     */
+    public function getValidAccessToken(?int $userId = null): string
+    {
+        $cached = $this->cachedAccessToken($userId);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        return $this->fetchAccessToken($userId);
+    }
+
+    /**
+     * Force a token refresh against Google (ignoring cache). Used by the
+     * scheduled keep-alive command so refresh tokens are exercised/rotated
+     * regularly and never silently expire.
+     */
+    public function keepAlive(?int $userId = null): bool
+    {
+        $this->fetchAccessToken($userId);
+
+        return true;
+    }
+
     protected function fetchAccessToken(?int $userId = null): string
     {
         $userRefreshToken = $this->userDriveRefreshToken($userId);
@@ -119,28 +147,36 @@ class GoogleDriveApiBackupUploader
             $body = $response->json();
             Log::warning('backup.google_drive_token', ['body' => $response->body()]);
 
+            $error = is_array($body) ? (string) ($body['error'] ?? '') : '';
+
             if ($userRefreshToken !== null) {
-                $error = is_array($body) ? (string) ($body['error'] ?? '') : '';
-                if ($error === 'invalid_grant') {
+                // Try external rotation endpoint first so an expired/rotated token
+                // can be replaced automatically instead of forcing a manual reconnect.
+                if (in_array($error, ['invalid_grant', 'deleted_client'], true)) {
+                    $rotated = $this->rotateRefreshTokenFromEndpoint();
+                    if ($rotated) {
+                        $token = $this->retryWithRefreshToken($tokenPayload, $rotated, $userId);
+                        if ($token !== null) {
+                            $this->saveUserRefreshToken($userId, $rotated);
+
+                            return $token;
+                        }
+                    }
                     $this->clearUserDriveToken($userId);
                 }
 
                 throw new \RuntimeException('Connected Google Drive token expired or was revoked. Reconnect Google Drive from DB Backups.');
             }
 
-            // If refresh token is invalid/expired, try external rotation endpoint once.
-            $error = is_array($body) ? (string) ($body['error'] ?? '') : '';
+            // .env / integration based admin token: try external rotation endpoint once.
             if (in_array($error, ['invalid_grant', 'deleted_client'], true)) {
                 $rotated = $this->rotateRefreshTokenFromEndpoint();
                 if ($rotated) {
-                    $tokenPayload['refresh_token'] = $rotated;
-                    $retry = Http::asForm()
-                        ->timeout(60)
-                        ->post('https://oauth2.googleapis.com/token', $tokenPayload);
-                    if ($retry->ok() && is_string($retry->json('access_token')) && $retry->json('access_token') !== '') {
-                        return (string) $retry->json('access_token');
+                    $token = $this->retryWithRefreshToken($tokenPayload, $rotated, $userId);
+                    if ($token !== null) {
+                        return $token;
                     }
-                    Log::warning('backup.google_drive_token_retry_failed', ['body' => $retry->body()]);
+                    Log::warning('backup.google_drive_token_retry_failed', ['refresh' => 'rotated']);
                 }
             }
 
@@ -152,7 +188,122 @@ class GoogleDriveApiBackupUploader
             throw new \RuntimeException('Google OAuth response missing access_token.');
         }
 
+        $this->persistTokenResponse($response->json(), $userId);
+
         return $token;
+    }
+
+    /**
+     * Retries the token request with a freshly rotated refresh token and persists
+     * the resulting access token on success.
+     *
+     * @param  array<string,mixed>  $tokenPayload
+     */
+    protected function retryWithRefreshToken(array $tokenPayload, string $refreshToken, ?int $userId): ?string
+    {
+        $tokenPayload['refresh_token'] = $refreshToken;
+        $retry = Http::asForm()
+            ->timeout(60)
+            ->post('https://oauth2.googleapis.com/token', $tokenPayload);
+
+        if ($retry->ok() && is_string($retry->json('access_token')) && $retry->json('access_token') !== '') {
+            $this->persistTokenResponse($retry->json(), $userId);
+
+            return (string) $retry->json('access_token');
+        }
+
+        Log::warning('backup.google_drive_token_retry_failed', ['body' => $retry->body()]);
+
+        return null;
+    }
+
+    /**
+     * Persists access token (with expiry) and a rotated refresh token if Google
+     * returned one. This keeps the connection alive without manual reconnects.
+     *
+     * @param  array<string,mixed>|null  $json
+     */
+    protected function persistTokenResponse(?array $json, ?int $userId): void
+    {
+        if (! is_array($json)) {
+            return;
+        }
+
+        $accessToken = isset($json['access_token']) ? (string) $json['access_token'] : '';
+        $expiresIn = isset($json['expires_in']) ? (int) $json['expires_in'] : 3500;
+        // Refresh a bit early to avoid using a token that expires mid-upload.
+        $expiresAt = now()->addSeconds(max(60, $expiresIn - 120));
+
+        if ($accessToken !== '') {
+            $this->storeAccessToken($userId, $accessToken, $expiresAt);
+        }
+
+        // Google rotates refresh tokens for some clients; persist the new one.
+        $newRefresh = isset($json['refresh_token']) ? trim((string) $json['refresh_token']) : '';
+        if ($newRefresh !== '') {
+            if ($userId && $this->userDriveRefreshToken($userId) !== null) {
+                $this->saveUserRefreshToken($userId, $newRefresh);
+            } else {
+                $this->saveIntegrationSetting('refresh_token', $newRefresh);
+                $this->integrationSettings['refresh_token'] = $newRefresh;
+            }
+        }
+    }
+
+    protected function cachedAccessToken(?int $userId): ?string
+    {
+        if ($userId) {
+            $setting = $this->getUserDriveSetting($userId);
+            if (! $setting || empty($setting->google_drive_access_token_encrypted) || empty($setting->google_drive_token_expires_at)) {
+                return null;
+            }
+            try {
+                if (now()->lt($setting->google_drive_token_expires_at)) {
+                    return Crypt::decryptString($setting->google_drive_access_token_encrypted) ?: null;
+                }
+            } catch (\Throwable $e) {
+                return null;
+            }
+
+            return null;
+        }
+
+        $payload = Cache::get('backup.gdrive.admin_access_token');
+        if (is_array($payload) && ! empty($payload['token'])) {
+            return (string) $payload['token'];
+        }
+
+        return null;
+    }
+
+    protected function storeAccessToken(?int $userId, string $accessToken, \DateTimeInterface $expiresAt): void
+    {
+        if ($userId) {
+            $setting = $this->getUserDriveSetting($userId);
+            if (! $setting) {
+                return;
+            }
+            $setting->google_drive_access_token_encrypted = Crypt::encryptString($accessToken);
+            $setting->google_drive_token_expires_at = $expiresAt;
+            $setting->save();
+            $this->userDriveSettings[$userId] = $setting;
+
+            return;
+        }
+
+        $ttl = max(60, $expiresAt->getTimestamp() - time());
+        Cache::put('backup.gdrive.admin_access_token', ['token' => $accessToken], $ttl);
+    }
+
+    protected function saveUserRefreshToken(?int $userId, string $refreshToken): void
+    {
+        $setting = $this->getUserDriveSetting($userId);
+        if (! $setting) {
+            return;
+        }
+        $setting->google_drive_refresh_token_encrypted = Crypt::encryptString($refreshToken);
+        $setting->save();
+        $this->userDriveSettings[$userId] = $setting;
     }
 
     /**
@@ -323,6 +474,8 @@ class GoogleDriveApiBackupUploader
         }
 
         $setting->google_drive_refresh_token_encrypted = null;
+        $setting->google_drive_access_token_encrypted = null;
+        $setting->google_drive_token_expires_at = null;
         $setting->google_drive_folder_id = null;
         $setting->google_drive_connected_at = null;
         $setting->save();

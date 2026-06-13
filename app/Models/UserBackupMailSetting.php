@@ -6,13 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserBackupMailSetting extends Model
 {
+    use \App\Models\Concerns\BelongsToTenant;
+
     protected $table = 'user_backup_mail_settings';
 
     protected $fillable = [
+        'tenant_id',
         'user_id',
         'gmail',
         'app_password_encrypted',
         'google_drive_refresh_token_encrypted',
+        'google_drive_access_token_encrypted',
+        'google_drive_token_expires_at',
         'google_drive_folder_id',
         'google_drive_folder_name',
         'google_drive_connected_at',
@@ -21,10 +26,12 @@ class UserBackupMailSetting extends Model
     protected $hidden = [
         'app_password_encrypted',
         'google_drive_refresh_token_encrypted',
+        'google_drive_access_token_encrypted',
     ];
 
     protected $casts = [
         'google_drive_connected_at' => 'datetime',
+        'google_drive_token_expires_at' => 'datetime',
     ];
 
     public function user()

@@ -32,13 +32,14 @@ class AdminSaleCloseController extends Controller
             $new_close->created_by      =   Auth::user()->id;
             $new_close->created_at      =   Carbon::now();
             if($new_close->save()){
-                DB::statement("UPDATE customer_ledger SET is_editable = 0 WHERE is_editable = 1;");
-                DB::statement("UPDATE vendor_ledger SET is_editable = 0 WHERE is_editable = 1;");
-                DB::statement("UPDATE sale_invoices SET is_editable = 0 WHERE is_editable = 1;");
-                DB::statement("UPDATE sale_return_invoices SET is_editable = 0 WHERE is_editable = 1;");
-                DB::statement("UPDATE purchase_invoices SET is_editable = 0 WHERE is_editable = 1;");
-                DB::statement("UPDATE purchase_return_invoices SET is_editable = 0 WHERE is_editable = 1;");
-                DB::statement("UPDATE product_replacment_invoices SET is_editable = 0 WHERE is_editable = 1;");
+                $tenantClause = current_tenant_id() ? ' AND tenant_id = '.(int) current_tenant_id() : '';
+                DB::statement("UPDATE customer_ledger SET is_editable = 0 WHERE is_editable = 1{$tenantClause};");
+                DB::statement("UPDATE vendor_ledger SET is_editable = 0 WHERE is_editable = 1{$tenantClause};");
+                DB::statement("UPDATE sale_invoices SET is_editable = 0 WHERE is_editable = 1{$tenantClause};");
+                DB::statement("UPDATE sale_return_invoices SET is_editable = 0 WHERE is_editable = 1{$tenantClause};");
+                DB::statement("UPDATE purchase_invoices SET is_editable = 0 WHERE is_editable = 1{$tenantClause};");
+                DB::statement("UPDATE purchase_return_invoices SET is_editable = 0 WHERE is_editable = 1{$tenantClause};");
+                DB::statement("UPDATE product_replacment_invoices SET is_editable = 0 WHERE is_editable = 1{$tenantClause};");
 
                 // Auto queue a DB backup on Admin Close without blocking close operation.
                 try {

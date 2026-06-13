@@ -21,6 +21,55 @@ use Illuminate\Support\Facades\Log;
 use Stevebauman\Location\Facades\Location;
 
 
+if (!function_exists('current_tenant_id')) {
+    /**
+     * Resolve the tenant_id of the currently logged-in user.
+     * Returns null when nobody is authenticated (console, jobs, login screen).
+     */
+    function current_tenant_id()
+    {
+        if (Auth::check()) {
+            $tenantId = Auth::user()->tenant_id ?? null;
+
+            return $tenantId !== null ? (int) $tenantId : null;
+        }
+
+        return null;
+    }
+}
+if (!function_exists('tenant_and')) {
+    /**
+     * Build a raw SQL fragment ` AND <alias.>tenant_id = X ` for splicing into
+     * hand-written WHERE clauses. Returns an empty string when no tenant is
+     * resolvable so legacy/console queries keep working unchanged.
+     */
+    function tenant_and($alias = null, $column = 'tenant_id')
+    {
+        $tenantId = current_tenant_id();
+        if ($tenantId === null) {
+            return '';
+        }
+        $prefix = $alias ? $alias.'.' : '';
+
+        return " AND {$prefix}{$column} = ".(int) $tenantId.' ';
+    }
+}
+if (!function_exists('tenant_where')) {
+    /**
+     * Build a raw SQL condition `<alias.>tenant_id = X` for use right after WHERE.
+     * Returns `1=1` when no tenant is resolvable.
+     */
+    function tenant_where($alias = null, $column = 'tenant_id')
+    {
+        $tenantId = current_tenant_id();
+        if ($tenantId === null) {
+            return ' 1=1 ';
+        }
+        $prefix = $alias ? $alias.'.' : '';
+
+        return " {$prefix}{$column} = ".(int) $tenantId.' ';
+    }
+}
 if (!function_exists('timeZoneList')) {
     function timeZoneList()
     {
@@ -578,6 +627,7 @@ function SaleReportRecords($request = null, $current_date, $is_admin_close = nul
       $purchase_return_paid_amount = 0;
       $purchase_inv_paid_amount    = 0;
       $query .= " AND ps.deleted_at IS NULL";
+      $query .= tenant_and('ps');
 
       if (isset($request->company_id)) {
          $query .= " AND ps.company_id = $request->company_id";

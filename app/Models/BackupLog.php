@@ -7,7 +7,10 @@ use Illuminate\Support\Facades\Storage;
 
 class BackupLog extends Model
 {
+    use \App\Models\Concerns\BelongsToTenant;
+
     protected $fillable = [
+        'tenant_id',
         'user_id',
         'zip_filename',
         'local_relative_path',
