@@ -69,6 +69,13 @@ class OrganizationController extends Controller
             ]);
          }
       }
+      // Print section: print logo (optional) + refund policy text
+      if ($request->hasFile('print_logo')) {
+         $data->print_logo   =   $request->print_logo->store('images', 'public');
+      } else {
+         $data->print_logo   =   $request->hidden_print_logo;
+      }
+      $data->refund_policy    =   $request->refund_policy;
       $data->name             =   $request->name;
       $data->phone_number     =   $request->phone_number;
       $data->fb_link          =   $request->fb_link;

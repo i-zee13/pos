@@ -26,11 +26,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $organization   =   Organization::first();
+        View::share('developer', "Storeeo.App +92-333-6701313");
 
-        View::share([
-            'organization'              =>  $organization,
-            'developer'                 =>  "Storeeo.App +92-333-6701313",
-        ]);
+        // Resolve organization lazily (per-request) so the tenant scope can use
+        // the logged-in user's tenant_id, which is not available yet at boot time.
+        View::composer('*', function ($view) {
+            static $organization = null;
+            static $loaded = false;
+
+            if (!$loaded) {
+                $organization = Organization::first();
+                $loaded = true;
+            }
+
+            $view->with('organization', $organization);
+        });
     }
 }
