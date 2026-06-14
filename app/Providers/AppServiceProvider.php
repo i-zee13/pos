@@ -36,6 +36,14 @@ class AppServiceProvider extends ServiceProvider
 
             if (!$loaded) {
                 $organization = Organization::first();
+
+                // Agar tenant scope ne row filter kar di (e.g. organization ka
+                // tenant_id abhi backfill nahi hua, ya user ke tenant_id se match
+                // nahi karta) to unscoped fallback le lein taake views na toote.
+                if (!$organization) {
+                    $organization = Organization::withoutGlobalScope('tenant')->first();
+                }
+
                 $loaded = true;
             }
 
