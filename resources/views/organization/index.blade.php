@@ -375,6 +375,9 @@
             </div>
           </div>
         </div>
+        <div class="col-md-12">
+        @include('includes.system-accounts-card')
+        </div>
         <div class="col-md-12 text-center" style="margin-bottom:50px">
           <button type="button" class="btn btn-primary mr-2 save_form">Save</button>
         </div>

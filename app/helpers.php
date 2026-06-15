@@ -70,6 +70,137 @@ if (!function_exists('tenant_where')) {
         return " {$prefix}{$column} = ".(int) $tenantId.' ';
     }
 }
+if (!function_exists('sys_customers')) {
+    /**
+     * Current tenant ke saare "system" customers ka map: [code => id].
+     * Ek hi query, per-request memoized. Agar `system_code` column abhi mojood
+     * nahi (SQL na chala ho) ya koi DB issue ho to khali array return hota hai
+     * taake site na ruke (JS purane literal id par fallback kar lega).
+     *
+     * Codes: COUNTER_SALE, EXPENSE, NET_PURCHASE, NET_PURCHASE_RETURN
+     */
+    function sys_customers()
+    {
+        static $map = null;
+
+        if ($map === null) {
+            try {
+                $map = Customer::whereNotNull('system_code')
+                    ->pluck('id', 'system_code')
+                    ->map(function ($id) { return (int) $id; })
+                    ->toArray();
+            } catch (\Throwable $e) {
+                $map = [];
+            }
+        }
+
+        return $map;
+    }
+}
+if (!function_exists('sys_customer_id')) {
+    /**
+     * Resolve a "system" customer's id by its stable code for the current tenant.
+     * Numeric IDs (e.g. Counter Sale = 8, Expense = 5) hardcode na karein; in ki
+     * jagah yeh helper use karein taake har tenant apna apna system-customer use kare.
+     */
+    function sys_customer_id($code)
+    {
+        $map = sys_customers();
+
+        return $map[$code] ?? null;
+    }
+}
+if (!function_exists('provision_system_customers')) {
+    /**
+     * Logged-in user ke tenant ke liye 4 system customers ensure karein:
+     * EXPENSE, COUNTER_SALE, NET_PURCHASE, NET_PURCHASE_RETURN.
+     * Sab mojood hon to skip; jo missing hon sirf woh banayein.
+     */
+    function provision_system_customers()
+    {
+        $tenantId = current_tenant_id();
+        if ($tenantId === null) {
+            return [
+                'status'  => 'error',
+                'message' => 'Logged-in user par tenant_id set nahi. Pehle users.tenant_id set karein.',
+            ];
+        }
+
+        $userId = Auth::id();
+        $definitions = [
+            ['name' => 'EXPENSE',             'type' => 2, 'code' => 'EXPENSE'],
+            ['name' => 'Counter Sale',        'type' => 2, 'code' => 'COUNTER_SALE'],
+            ['name' => 'NET PURCHASE',        'type' => 1, 'code' => 'NET_PURCHASE'],
+            ['name' => 'NET PURCHASE RETURN', 'type' => 1, 'code' => 'NET_PURCHASE_RETURN'],
+        ];
+        $codes = array_column($definitions, 'code');
+
+        try {
+            $existing = Customer::whereNotNull('system_code')
+                ->whereIn('system_code', $codes)
+                ->pluck('system_code')
+                ->all();
+        } catch (\Throwable $e) {
+            return [
+                'status'  => 'error',
+                'message' => 'customers.system_code column nahi mila. Pehle system_customers.sql chalayein.',
+            ];
+        }
+
+        $missing = array_diff($codes, $existing);
+
+        if ($missing === []) {
+            return [
+                'status'    => 'skipped',
+                'message'   => 'Accounts already created for tenant '.$tenantId.'.',
+                'tenant_id' => $tenantId,
+                'accounts'  => $existing,
+            ];
+        }
+
+        $created = [];
+        foreach ($definitions as $def) {
+            if (!in_array($def['code'], $missing, true)) {
+                continue;
+            }
+
+            $customer = Customer::create([
+                'tenant_id'     => $tenantId,
+                'customer_name' => $def['name'],
+                'customer_type' => $def['type'],
+                'system_code'   => $def['code'],
+                'created_by'    => $userId,
+            ]);
+
+            $created[] = $def['code'].' (id '.$customer->id.')';
+        }
+
+        return [
+            'status'    => 'success',
+            'message'   => 'System accounts created for tenant '.$tenantId.'.',
+            'tenant_id' => $tenantId,
+            'created'   => $created,
+        ];
+    }
+}
+if (!function_exists('system_accounts_ready')) {
+    /**
+     * Current tenant ke 4 system customers sab mojood hain ya nahi.
+     */
+    function system_accounts_ready()
+    {
+        $required = ['EXPENSE', 'COUNTER_SALE', 'NET_PURCHASE', 'NET_PURCHASE_RETURN'];
+        $map = sys_customers();
+
+        foreach ($required as $code) {
+            if (empty($map[$code])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
 if (!function_exists('fix_invoice_helper_case')) {
     /**
      * Linux (case-sensitive) par lowercase `app/invoice_helper.php` shim banata

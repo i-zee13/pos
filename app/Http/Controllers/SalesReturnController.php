@@ -61,7 +61,7 @@ class SalesReturnController extends Controller
         $invoice->invoice_type         = $request->invoice_type;
         $invoice->customer_id          = $request->customer_id;
         $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges) - $request->invoice_discount;
-        if ($request->invoice_type == 1 && $request->customer_id == 8) {
+        if ($request->invoice_type == 1 && $request->customer_id == sys_customer_id('COUNTER_SALE')) {
             $is_net_return = true;
             $invoice->paid_amount      = $request->amount_to_pay;
             $total_cr                  = $invoice->paid_amount;

@@ -58,9 +58,12 @@
         </a>
         <!-- Menu -->
         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sidebarIcon">
-          <a href="#" class="dropdown-item">Profile</a>
+          <a href="{{route('admin.profile')}}" class="dropdown-item">Profile</a>
           <a href="#" class="dropdown-item">Settings</a>
           <a href="{{route('admin.organization')}}" class="dropdown-item">Organization</a>
+          <a href="{{ route('admin.profile') }}#system-accounts" class="dropdown-item {{ system_accounts_ready() ? 'text-muted' : '' }}">
+            System Accounts{{ system_accounts_ready() ? ' ✓' : '' }}
+          </a>
           <a href="/admin-sale-close" class="dropdown-item">Admin Close</a>
           <hr class="dropdown-divider">
           <a href="{{ route('logout') }}" class="dropdown-item">Logout</a>
@@ -467,6 +470,9 @@
             <a href="{{route('admin.profile')}}" class="dropdown-item">Profile</a>
             <a href="#" class="dropdown-item">Settings</a>
             <a href="{{route('admin.organization')}}" class="dropdown-item">Organization</a>
+            <a href="{{ route('admin.profile') }}#system-accounts" class="dropdown-item {{ system_accounts_ready() ? 'text-muted' : '' }}">
+                System Accounts{{ system_accounts_ready() ? ' ✓' : '' }}
+            </a>
 
             <a href="/admin-sale-close" class="dropdown-item">Admin Close</a>
             <hr class="dropdown-divider">

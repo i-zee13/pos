@@ -87,6 +87,28 @@ Route::group(['middleware' => ['auth']], function () {
     Route::POST('/location-delete/{id}',        [OrganizationController::class, 'deleteLocation'])->name('admin.location-delete');
 
     /**End Organization  Routes */
+    /**
+     * Logged-in user ke tenant_id par 4 system customers (Expense, Counter Sale,
+     * Net Purchase, Net Purchase Return) check/create. Sab mojood hon to skip.
+     * Browser: /seed-system-customers (login zaroori)
+     */
+    Route::get('/seed-system-customers', function () {
+        $result = provision_system_customers();
+        $result['ready'] = system_accounts_ready();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($result);
+        }
+
+        if ($result['status'] === 'skipped') {
+            return $result['message'];
+        }
+        if ($result['status'] === 'error') {
+            return 'ERROR: '.$result['message'];
+        }
+
+        return $result['message'].' Created: '.implode(', ', $result['created']);
+    });
     Route::get('/get-city-against-states/{id}',     [OrganizationController::class, 'getCityAgainst_States'])->name('admin.getCityAgainst_States');
     Route::get('/get-state-against-country/{id}',   [OrganizationController::class, 'getStateAgainst_Country'])->name('admin.getStateAgainst_Country');
     Route::get('/get-countries',                    [OrganizationController::class, 'getCountries'])->name('admin.getCountries');
