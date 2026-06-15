@@ -17367,7 +17367,7 @@ $(document).ready(function () {
   $('.display').show();
   if (segments[3] == "stock-add") {
     setTimeout(function () {
-      $('#customer_id').val((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8).trigger('change');
+      $('#customer_id').val(window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE || 8).trigger('change');
     }, 2000);
 
     //
@@ -17983,7 +17983,7 @@ function getvendors() {
 }
 $('#customer_id').change(function () {
   var total_paid_for_net_sale = 0;
-  if ($(this).val() == ((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8)) {
+  if ($(this).val() == (window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE || 8)) {
     // $('#invoice_type').val('1').trigger('change');
     sales_product_array.forEach(function (data, key) {
       total_paid_for_net_sale += parseFloat(data.amount);
@@ -18034,17 +18034,17 @@ function grandSum() {
   var previous_payable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
   var service_charges = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   var discount = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-  var grandQty = 0;
   var sum = 0;
-    var productTotal = 0;
-    sales_product_array.forEach(function (data, key) {
-        productTotal++;
-        sum += parseFloat(data.amount);
-        grandQty += parseFloat(data.qty);
-    });
-    $('.product_net_total').val(sum.toFixed(2));
-    $('#total_qtys').html(grandQty.toFixed(2));
-    $('#total_items').html(productTotal);
+  var grandQty = 0;
+  var productTotal = 0;
+  sales_product_array.forEach(function (data, key) {
+    productTotal++;
+    sum += parseFloat(data.amount);
+    grandQty += parseFloat(data.qty);
+  });
+  $('.product_net_total').val(sum.toFixed(2));
+  $('#total_qtys').html(grandQty.toFixed(2));
+  $('#total_items').html(productTotal);
   $('.product_net_total').val(sum);
   // sum -= parseFloat(previous_payable)  // sum -= parseFloat(previous_payable ? previous_payable : 0);
   // previous_payable >= 0 ? sum -= parseFloat(previous_payable ? previous_payable : 0) : sum += parseFloat(previous_payable);

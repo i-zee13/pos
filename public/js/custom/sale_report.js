@@ -285,13 +285,13 @@ $('.reset-btn').on('click', function () {
   $('.teacher_attendance_list').append("\n            <div class=\"col-12 pb-10\">\n            <div class=\"no-info\">\n                <div class=\"m-auto\"><strong>Please Filter Your Sale Record !</strong></div>\n            </div>\n        </div>\n        ");
 });
 function addCommas(nStr) {
-  nStr = parseFloat(nStr).toFixed(2);
-  var x = nStr.split('.');
-  var x1 = x[0];
-  var x2 = x.length > 1 ? '.' + x[1] : '';
+  nStr += "";
+  x = nStr.split(".");
+  x1 = x[0];
+  x2 = x.length > 1 ? "." + x[1] : "";
   var rgx = /(\d+)(\d{3})/;
   while (rgx.test(x1)) {
-    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    x1 = x1.replace(rgx, "$1" + "," + "$2");
   }
   return x1 + x2;
 }

@@ -70,7 +70,6 @@ $('.search-btn').on('click', function () {
       var ttl_return_product_discount = 0;
       var ttl_return_invoice_discount = 0;
       if (response.reports.purchases && response.reports.purchases.length > 0) {
-          console.log('zeeshan')
         response.reports.purchases.forEach(function (element, key) {
           total_sales += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
           ttl_quantity += element['qty'] ? element['qty'] : 0;
@@ -78,9 +77,9 @@ $('.search-btn').on('click', function () {
           ttl_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
           var date = new Date(element.expire_date);
           var formattedDate = date.toDateString();
-          var invoice_no = ""; 
-            let invoicePrefix = element.invoice_no ? element.invoice_no.split('-')[0] : null;
-            reportTable(invoicePrefix, element)
+          var invoice_no = "";
+          invoice_no = element.invoice_no.split('-');
+          reportTable(invoice_no[0], element);
         });
         $('.TeacherAttendanceListTable').fadeIn();
         sale_return_total(ttl_quantity, ttl_product_discount, total_sales, 'Purchase');
@@ -93,8 +92,8 @@ $('.search-btn').on('click', function () {
           ttl_return_product_discount += element['product_discount'] ? element['product_discount'] : 0;
           ttl_return_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
           var invoice_no = "";
-           let invoicePrefix = element.invoice_no ? element.invoice_no.split('-')[0] : null;
-        reportTable(invoicePrefix, element)
+          invoice_no = element.invoice_no.split('-');
+          reportTable(invoice_no[0], element);
         });
         sale_return_total(ttl_return_quantity, ttl_return_product_discount, total_returns, 'Return');
       }

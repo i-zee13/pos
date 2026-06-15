@@ -130,7 +130,7 @@ $(document).ready(function () {
   $('.display').show();
   if (segments[3] == "stock-add") {
     setTimeout(function () {
-      $('#customer_id').val((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8).trigger('change');
+      $('#customer_id').val(window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE || 8).trigger('change');
     }, 2000);
   } else if (segments[3] == 'product-replacement-edit') {
     customer_id = $('#curren_customer_id').val();
@@ -708,7 +708,7 @@ function getvendors() {
 }
 $('#customer_id').change(function () {
   var total_paid_for_net_sale = 0;
-  if ($(this).val() == ((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8)) {
+  if ($(this).val() == (window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE || 8)) {
     // $('#invoice_type').val('1').trigger('change');
     sales_product_array.forEach(function (data, key) {
       total_paid_for_net_sale += parseFloat(data.amount);
@@ -761,10 +761,10 @@ function grandSum() {
     prod_type = data.prod_type;
     if (data.prod_type == 2) {
       new_sum += parseFloat(data.amount);
-      $('.product_net_total').val(new_sum.toFixed(2));
+      $('.product_net_total').val(new_sum);
     } else {
       return_sum += parseFloat(data.amount);
-      $('.return_total').val(return_sum.toFixed(2));
+      $('.return_total').val(return_sum);
     }
   });
   grandtotal(new_sum - return_sum);
@@ -777,9 +777,9 @@ function grandtotal(sum) {
   sale_total_amount = sum - invoice_discount;
   setTimeout(function () {
     $('.grand-total').text(addCommas(sale_total_amount - $('.amount_received').val()));
-    $('.amount_pay_input').val(sale_total_amount.toFixed(2));
+    $('.amount_pay_input').val(sale_total_amount);
   }, 500);
-  $('.amount_pay_input').val(sale_total_amount.toFixed(2));
+  $('.amount_pay_input').val(sale_total_amount);
   if (parseFloat($('.amount_pay_input').val()) < 0) {
     $('.th-hide').hide();
     $('.cash-return').text('Cash Paid');
