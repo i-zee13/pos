@@ -21,6 +21,7 @@ use App\Http\Controllers\SalesReturnController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\GodownController;
 use App\Http\Controllers\StockTransferController;
+use App\Http\Controllers\DatabaseBackupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -263,6 +264,16 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/sale-close-record/{closing_date}',     [ReportsController::class, 'adminSaleCloseRecord'])->name('sale-close-record');
     Route::post('/save-closing-cash',                   [AdminSaleCloseController::class, 'saveAdminSaleCloseRecord'])->name('save-closing-cash');
     Route::post('/update-closing-cash',                 [AdminSaleCloseController::class, 'updateAdminSaleCloseRecord'])->name('update-closing-cash');
+
+    // Database backups
+    Route::get('/backups', [DatabaseBackupController::class, 'index'])->name('backups.index');
+    Route::get('/backups/logs', [DatabaseBackupController::class, 'logs'])->name('backups.logs');
+    Route::get('/backups/google/connect', [DatabaseBackupController::class, 'connectGoogleDrive'])->name('backups.google.connect');
+    Route::get('/backups/google/callback', [DatabaseBackupController::class, 'googleDriveCallback'])->name('backups.google.callback');
+    Route::post('/backups/google/disconnect', [DatabaseBackupController::class, 'disconnectGoogleDrive'])->name('backups.google.disconnect');
+    Route::post('/backups', [DatabaseBackupController::class, 'store'])->name('backups.store');
+    Route::post('/backups/mail-settings', [DatabaseBackupController::class, 'storeMailSettings'])->name('backups.mail-settings.store');
+    Route::get('/backups/{backup}/download', [DatabaseBackupController::class, 'download'])->name('backups.download');
 
      // User Profile
   Route::get('/profile',                    [ProfileController::class, 'index'])->name('admin.profile');

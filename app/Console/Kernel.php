@@ -16,6 +16,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        $schedule->command('backup:databases --scheduled')->dailyAt('00:30');
+        $schedule->command('backup:refresh-drive-tokens')->twiceDaily(6, 18);
     }
 
     /**
