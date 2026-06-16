@@ -37,6 +37,7 @@
 
 
     <meta name="distribution" content="global"> <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>window.SYS_CUSTOMERS = {!! json_encode((object) sys_customers()) !!};</script>
     <meta name="csrf_token" content="{{ csrf_token() }}">
     <!-- Favicon -->
     <link rel="shortcut icon" href="https://dashkit.goodthemes.co/assets/favicon/favicon.ico" type="image/x-icon">
@@ -69,6 +70,7 @@
     <link rel="stylesheet" type="text/css" href="{{asset('/css/style.css?v=7.1')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('/css/menu.css?v=6.4')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('/css/product.css?v=8.1')}}" />
+    <link rel="stylesheet" type="text/css" href="{{asset('/css/invoice-responsive.css?v=1.0')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('/css/jquery.mCustomScrollbar.css')}}" />
     <link rel="stylesheet" href="{{asset('/css/animate.css')}}">
     <script src="{{asset('/js/moment.js')}}"></script>

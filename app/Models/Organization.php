@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Organization extends Model
 {
+    use \App\Models\Concerns\BelongsToTenant;
     use HasFactory;
         
     protected $guarded = [];

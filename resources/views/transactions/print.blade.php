@@ -172,7 +172,7 @@
     <div id="invoice-POS">
         <center id="top">
              <div class="info">
-                 <b> <img src="/images/print-logo.png" class="" alt="..." style="height:60px;margin:0px"> 
+                 <b> <img src="{{ ($organization && $organization->print_logo) ? asset('storage/'.$organization->print_logo) : asset('images/print-logo.png') }}" class="" alt="..." style="height:60px;margin:0px"> 
                 <p><b>{{$organization->name}}</b></p>
                 <p>{{$organization->address}}</p> 
                <p style="padding:0px;margin:0px!important">

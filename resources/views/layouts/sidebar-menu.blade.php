@@ -61,6 +61,7 @@
           <a href="#" class="dropdown-item">Profile</a>
           <a href="#" class="dropdown-item">Settings</a>
           <a href="{{route('admin.organization')}}" class="dropdown-item">Organization</a>
+          <a href="{{ route('admin.organization') }}#system-accounts" class="dropdown-item">System Accounts</a>
           <a href="/admin-sale-close" class="dropdown-item">Admin Close</a>
           <hr class="dropdown-divider">
           <a href="{{ route('logout') }}" class="dropdown-item">Logout</a>
@@ -481,6 +482,7 @@
             <a href="{{route('admin.profile')}}" class="dropdown-item">Profile</a>
             <a href="#" class="dropdown-item">Settings</a>
             <a href="{{route('admin.organization')}}" class="dropdown-item">Organization</a>
+          <a href="{{ route('admin.organization') }}#system-accounts" class="dropdown-item">System Accounts</a>
 
             <a href="/admin-sale-close" class="dropdown-item">Admin Close</a>
             <hr class="dropdown-divider">

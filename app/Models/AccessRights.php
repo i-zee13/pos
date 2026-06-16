@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AccessRights extends Model
 {
+    use \App\Models\Concerns\BelongsToTenant;
     protected $table = "access_rights";
     public $timestamps = false;
 }

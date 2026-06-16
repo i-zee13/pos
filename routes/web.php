@@ -47,6 +47,7 @@ use Illuminate\Support\Facades\Route;
  
 
 Route::get('/clear', function () {
+    fix_invoice_helper_case();
     Artisan::call('config:cache');
     Artisan::call('cache:clear');
     Artisan::call('route:clear');
@@ -54,6 +55,9 @@ Route::get('/clear', function () {
     Artisan::call('storage:link');
 
     return "All cache clear successfully";
+});
+Route::get('/fix-helper', function () {
+    return fix_invoice_helper_case();
 });
   Route::get('/clear-config', function () {
     Artisan::call('config:clear');
@@ -79,6 +83,20 @@ Route::group(['middleware' => ['auth']], function () {
     Route::POST('/location-delete/{id}',        [OrganizationController::class, 'deleteLocation'])->name('admin.location-delete');
 
     /**End Organization  Routes */
+    Route::get('/seed-system-customers', function () {
+        $result = provision_system_customers();
+        $result['ready'] = system_accounts_ready();
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($result);
+        }
+        if ($result['status'] === 'skipped') {
+            return $result['message'];
+        }
+        if ($result['status'] === 'error') {
+            return 'ERROR: '.$result['message'];
+        }
+        return $result['message'].' Created: '.implode(', ', $result['created']);
+    });
     Route::get('/get-city-against-states/{id}',     [OrganizationController::class, 'getCityAgainst_States'])->name('admin.getCityAgainst_States');
     Route::get('/get-state-against-country/{id}',   [OrganizationController::class, 'getStateAgainst_Country'])->name('admin.getStateAgainst_Country');
     Route::get('/get-countries',                    [OrganizationController::class, 'getCountries'])->name('admin.getCountries');

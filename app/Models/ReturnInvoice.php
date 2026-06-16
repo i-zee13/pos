@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReturnInvoice extends Model
 {
+    use \App\Models\Concerns\BelongsToTenant;
     use HasFactory;
     protected $guarded  =    [];
     protected $table    =   'purchase_return_invoices';

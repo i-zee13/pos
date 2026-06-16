@@ -215,7 +215,7 @@
     <div id="invoice-POS">
         <center id="top">
             <div class="info">
-                 <b> <img src="/images/print-logo.png" class="" alt="..." style="height:60px;margin:0px"> 
+                 <b> <img src="{{ ($organization && $organization->print_logo) ? asset('storage/'.$organization->print_logo) : asset('images/print-logo.png') }}" class="" alt="..." style="height:60px;margin:0px">
                 <p><b>{{$organization->name}}</b></p>
                 <p>{{$organization->address}}</p> 
                <p style="padding:0px;margin:0px!important">
@@ -402,18 +402,14 @@
 
             </table>
             @endif
+            @if($organization && $organization->refund_policy)
              <table class="bot-3-table w-50">
-                <tr class="tabletitle">
-                    <th>Refund Policy :</th>
-                </tr>
+                <tr class="tabletitle"><th>Refund Policy :</th></tr>
                 <tr class="body-description-tr">
-                    <td class="tableitem" style="text-align:right"><b>خریدا ہوا بیج نا قابلِ واپسی ہے</b></td>
+                    <td class="tableitem" dir="auto" style="text-align:start">{!! nl2br(e($organization->refund_policy)) !!}</td>
                 </tr>
-                   <tr class="body-description-tr">
-                    <td  style="text-align:right">اس کے علاؤہ تمام آئٹمز دس دن کے اندر بمعہ بل واپس یا تبدیل ہو جائیں گے شکریہ ۔</td>
-                </tr>
-
             </table>
+            @endif
             <table class="footer">
                 <tr class="thankyou">
                     <td>Thank for your kind visit </td>

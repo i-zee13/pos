@@ -58,8 +58,8 @@ class HomeController extends Controller
 
         $total_sale                =  ($total_sales + $total_service_charges) - ($total_product_discount + $total_invoice_discount);
 
-        $vendor_ldgr            =  DB::table("vendor_ledger")->selectRaw("customer_id as vendor_id,IFNULL(cr,0) as cr,IFNULL(dr,0) as dr,trx_type")->whereRaw("DATE(created_at) = '$current_date' AND trx_type = 3 AND is_deleted = 0")->get(); 
-        $customer_ldgr          =  DB::table("customer_ledger")->selectRaw("customer_id, IFNULL(cr,0) as cr,IFNULL(dr,0) as dr,trx_type")->whereRaw("DATE(created_at) = '$current_date'")->get();
+        $vendor_ldgr            =  DB::table("vendor_ledger")->selectRaw("customer_id as vendor_id,IFNULL(cr,0) as cr,IFNULL(dr,0) as dr,trx_type")->when(current_tenant_id(), function ($q, $t) { return $q->where('tenant_id', $t); })->whereRaw("DATE(created_at) = '$current_date' AND trx_type = 3 AND is_deleted = 0")->get(); 
+        $customer_ldgr          =  DB::table("customer_ledger")->selectRaw("customer_id, IFNULL(cr,0) as cr,IFNULL(dr,0) as dr,trx_type")->when(current_tenant_id(), function ($q, $t) { return $q->where('tenant_id', $t); })->whereRaw("DATE(created_at) = '$current_date'")->get();
       
         $total_pr_paid_amount      =  collect($saleRecords['pr_paid_amount'])->SUM('paid_amount'); //Purchase return invc payments //zee
         $total_pr_invc_amount      =  collect($saleRecords['pr_invc_amount'])->SUM('paid_amount');  //Purchase invoice payment //zee
@@ -84,7 +84,7 @@ class HomeController extends Controller
         $ttl_payments               =    $vendor_payment + $customer_payment + $total_credit_sale_returns_amount_received + $total_pr_paid_amount + $total_pr_invc_amount + $expense;
         // dd($total_net_sale_invoice_amount , $ttl_cash_recovery  , $total_net_sale_discount ,$ttl_payments , $total_net_sale_returns_invoice_amount);
         $ttl_in_hand                =    ($total_net_sale_invoice_amount + $ttl_cash_recovery ) - $total_net_sale_discount - $ttl_payments - $total_net_sale_returns_invoice_amount;
-          $top5Receivables            = DB::table("customers")->selectRaw("id, customer_name, balance")->where('customer_type', 2)->whereNotIn('id', [5, 49,356])->orderBy('balance', 'desc')->limit(5)->get();
+          $top5Receivables            = DB::table("customers")->selectRaw("id, customer_name, balance")->when(current_tenant_id(), function ($q, $t) { return $q->where('tenant_id', $t); })->where('customer_type', 2)->whereNotIn('id', [5, 49,356])->orderBy('balance', 'desc')->limit(5)->get();
         return view('home', compact('message', 'total_sale','ttl_sale_return','ttl_in_hand', 'total_purchase','expense','total_net_sale_returns_invoice_amount','top5Receivables'));
     }
     public function deleteInvoice(Request $request)

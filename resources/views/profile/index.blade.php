@@ -36,6 +36,7 @@
                 </div>
             </div>
         </div>
+        @include('includes.system-accounts-card')
     </div>
     <div class="col-lg-8 col-12 mb-30">
         <div class="row">

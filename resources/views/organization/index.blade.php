@@ -343,6 +343,31 @@
 
 
         </div>
+        @php
+        $defaultRefund = "خریدا ہوا بیج نا قابلِ واپسی ہے\nاس کے علاؤہ تمام آئٹمز دس دن کے اندر بمعہ بل واپس یا تبدیل ہو جائیں گے شکریہ ۔";
+        $refundValue = ($data != null && !empty($data->refund_policy)) ? $data->refund_policy : $defaultRefund;
+        @endphp
+        <div class="col-md-12">
+          <div class="card mb-30">
+            <div class="header"><h2>Print <span> Section</span></h2></div>
+            <div class="body PT-15">
+              <div class="row">
+                <div class="col-md-8 mb-20">
+                  <label class="control-label mb-10">Refund Policy (Invoice par print hogi)</label>
+                  <textarea class="form-control" rows="8" name="refund_policy" dir="auto" style="line-height:2.2;padding:12px 15px;font-size:15px;min-height:170px;resize:vertical;">{{ $refundValue }}</textarea>
+                </div>
+                <div class="col-md-4 mb-20">
+                  <label class="control-label mb-10">Print Logo</label>
+                  <input type="hidden" name="hidden_print_logo" value="{{ $data != null ? $data->print_logo : '' }}">
+                  <input type="file" id="input-file-print-logo" data-default-file="{{ ($data != null && $data->print_logo) ? '/storage/'.$data->print_logo : asset('images/print-logo.png') }}" class="dropify" name="print_logo" data-old_input="hidden_print_logo" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+        @include('includes.system-accounts-card')
+        </div>
         <div class="col-md-12 text-center" style="margin-bottom:50px">
           <button type="button" class="btn btn-primary mr-2 save_form">Save</button>
         </div>

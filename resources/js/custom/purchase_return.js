@@ -676,7 +676,7 @@ function getvendors() {
 }
 $('#customer_id').change(function () {
     var total_paid_for_net_sale = 0;
-    if ($(this).val() == 7) {
+    if ($(this).val() == ((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.NET_PURCHASE) || 7)) {
         returns_product_array.forEach(function (data, key) {
             total_paid_for_net_sale += parseFloat(data.amount)
         });

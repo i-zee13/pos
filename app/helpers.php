@@ -21,6 +21,173 @@ use Illuminate\Support\Facades\DB;
 use Stevebauman\Location\Facades\Location;
 
 
+if (!function_exists('current_tenant_id')) {
+    function current_tenant_id()
+    {
+        if (Auth::check()) {
+            $tenantId = Auth::user()->tenant_id ?? null;
+
+            return $tenantId !== null ? (int) $tenantId : null;
+        }
+
+        return null;
+    }
+}
+if (!function_exists('tenant_and')) {
+    function tenant_and($alias = null, $column = 'tenant_id')
+    {
+        $tenantId = current_tenant_id();
+        if ($tenantId === null) {
+            return '';
+        }
+        $prefix = $alias ? $alias.'.' : '';
+
+        return " AND {$prefix}{$column} = ".(int) $tenantId.' ';
+    }
+}
+if (!function_exists('tenant_where')) {
+    function tenant_where($alias = null, $column = 'tenant_id')
+    {
+        $tenantId = current_tenant_id();
+        if ($tenantId === null) {
+            return ' 1=1 ';
+        }
+        $prefix = $alias ? $alias.'.' : '';
+
+        return " {$prefix}{$column} = ".(int) $tenantId.' ';
+    }
+}
+if (!function_exists('sys_customers')) {
+    function sys_customers()
+    {
+        static $map = null;
+
+        if ($map === null) {
+            try {
+                $map = Customer::whereNotNull('system_code')
+                    ->pluck('id', 'system_code')
+                    ->map(function ($id) { return (int) $id; })
+                    ->toArray();
+            } catch (\Throwable $e) {
+                $map = [];
+            }
+        }
+
+        return $map;
+    }
+}
+if (!function_exists('sys_customer_id')) {
+    function sys_customer_id($code)
+    {
+        $map = sys_customers();
+
+        return $map[$code] ?? null;
+    }
+}
+if (!function_exists('provision_system_customers')) {
+    function provision_system_customers()
+    {
+        $tenantId = current_tenant_id();
+        if ($tenantId === null) {
+            return [
+                'status'  => 'error',
+                'message' => 'Logged-in user par tenant_id set nahi. Pehle users.tenant_id set karein.',
+            ];
+        }
+
+        $userId = Auth::id();
+        $definitions = [
+            ['name' => 'EXPENSE',             'type' => 2, 'code' => 'EXPENSE'],
+            ['name' => 'Counter Sale',        'type' => 2, 'code' => 'COUNTER_SALE'],
+            ['name' => 'NET PURCHASE',        'type' => 1, 'code' => 'NET_PURCHASE'],
+            ['name' => 'NET PURCHASE RETURN', 'type' => 1, 'code' => 'NET_PURCHASE_RETURN'],
+        ];
+        $codes = array_column($definitions, 'code');
+
+        try {
+            $existing = Customer::whereNotNull('system_code')
+                ->whereIn('system_code', $codes)
+                ->pluck('system_code')
+                ->all();
+        } catch (\Throwable $e) {
+            return [
+                'status'  => 'error',
+                'message' => 'customers.system_code column nahi mila. Pehle system_customers.sql chalayein.',
+            ];
+        }
+
+        $missing = array_diff($codes, $existing);
+
+        if ($missing === []) {
+            return [
+                'status'    => 'skipped',
+                'message'   => 'Accounts already created for tenant '.$tenantId.'.',
+                'tenant_id' => $tenantId,
+                'accounts'  => $existing,
+            ];
+        }
+
+        $created = [];
+        foreach ($definitions as $def) {
+            if (!in_array($def['code'], $missing, true)) {
+                continue;
+            }
+
+            $customer = Customer::create([
+                'tenant_id'     => $tenantId,
+                'customer_name' => $def['name'],
+                'customer_type' => $def['type'],
+                'system_code'   => $def['code'],
+                'created_by'    => $userId,
+            ]);
+
+            $created[] = $def['code'].' (id '.$customer->id.')';
+        }
+
+        return [
+            'status'    => 'success',
+            'message'   => 'System accounts created for tenant '.$tenantId.'.',
+            'tenant_id' => $tenantId,
+            'created'   => $created,
+        ];
+    }
+}
+if (!function_exists('system_accounts_ready')) {
+    function system_accounts_ready()
+    {
+        $required = ['EXPENSE', 'COUNTER_SALE', 'NET_PURCHASE', 'NET_PURCHASE_RETURN'];
+        $map = sys_customers();
+
+        foreach ($required as $code) {
+            if (empty($map[$code])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+if (!function_exists('fix_invoice_helper_case')) {
+    function fix_invoice_helper_case()
+    {
+        $upper = app_path('Invoice_helper.php');
+        $lower = app_path('invoice_helper.php');
+
+        if (!file_exists($upper)) {
+            return 'Source app/Invoice_helper.php not found; nothing to fix.';
+        }
+        if (file_exists($lower)) {
+            return 'invoice_helper.php already available (no change needed).';
+        }
+
+        $ok = @file_put_contents($lower, "<?php\n\nrequire_once __DIR__ . '/Invoice_helper.php';\n");
+
+        return $ok !== false
+            ? 'OK: created lowercase shim app/invoice_helper.php'
+            : 'FAILED: could not write app/invoice_helper.php (check app/ folder permissions).';
+    }
+}
+
 if (!function_exists('timeZoneList')) {
     function timeZoneList()
     {
@@ -641,6 +808,7 @@ function SaleReportRecords($request = null, $current_date, $is_admin_close = nul
       $purchase_return_paid_amount = 0;
       $purchase_inv_paid_amount    = 0;
       $query .= " AND ps.deleted_at IS NULL";
+      $query .= tenant_and('ps');
 
       if (isset($request->company_id)) {
          $query .= " AND ps.company_id = $request->company_id";

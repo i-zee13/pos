@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StockManagment extends Model
 {
+    use \App\Models\Concerns\BelongsToTenant;
     use HasFactory;
     protected $table    =   'vendor_stock_managment';
     protected $guarded  =    [];

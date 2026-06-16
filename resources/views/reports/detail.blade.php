@@ -615,6 +615,7 @@
                                               <th class="">ID</th>
                                               <th class="">Product Name</th> 
                                               <th style="">Expiry D.</th>
+                                              <th style="">P.Price</th>
                                               <th style="">R.Price</th>
                                               <th style="">QTY.</th>
                                               <th style="">Discount</th>
@@ -624,7 +625,8 @@
                                       <tbody id="productGrid">
                                           @foreach($invoice->invoice_products as $product)
                                           <?php
-                                                $url                    = ''; 
+                                                $url          = ''; 
+                                                $is_vendor    = false;
                                                 $product_total_amount   = 0;
                                                 if ($invoice->status == 'sale') {
                                                     $url = 'sale'; 
@@ -639,9 +641,11 @@
                                                     $url = 'purchase';
                                                     $product_total_amount =  $product->purchased_total_amount;
                                                 } else if ($invoice->status == 'purchase-return') {
+                                                    $is_vendor    = true;
                                                     $url = 'sale';
                                                     $product_total_amount = $product->product_return_total_amount ;
                                                 } else if ($invoice->status == 'product-replacement') {
+                                                    $is_vendor    = true;
                                                     $url = 'sale';
                                                     $product_total_amount =  0 ;
                                                 }
@@ -651,6 +655,9 @@
                                               <td>{{ $product->product_name }}</td>
                                               <!--<td> <input readonly type="number" value="{{ $product->purchase_price }}" class="inputSale" name="new_purchase_price " tabindex="3"  min="0"></td>-->
                                               <td> <input readonly type="date" id="expiry_date" class="inputSale expiry_date" value="{{ $product->expiry_date }}" name="expiry_date " tabindex="5" style=" width: 95;"></td>
+                                              @if($is_vendor)
+                                              <td> {{ number_format($product->purchase_price,2) }}</td>
+                                              @endif
                                               <td> {{ number_format($product->sale_price,2) }}</td>
                                               <td> {{$product->qty}}</td>
                                               <td> {{ $product->product_discount }}</td>

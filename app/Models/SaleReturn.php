@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SaleReturn extends Model
 {
+    use \App\Models\Concerns\BelongsToTenant;
     use HasFactory;
     use SoftDeletes;
     protected $table = 'sale_return_invoices';

@@ -41,7 +41,7 @@ $(document).ready(function () {
     $('.display').show();
     if (segments[3] == "stock-add") {
         setTimeout(() => {
-            $('#customer_id').val('8').trigger('change');
+            $('#customer_id').val((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8).trigger('change');
         }, 2000);
 
     } else if (segments[3] == 'product-replacement-edit') {
@@ -628,7 +628,7 @@ function getvendors() {
 }
 $('#customer_id').change(function () {
     var total_paid_for_net_sale = 0;
-    if ($(this).val() == 8) {
+    if ($(this).val() == ((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8)) {
         // $('#invoice_type').val('1').trigger('change');
         sales_product_array.forEach(function (data, key) {
             total_paid_for_net_sale += parseFloat(data.amount)
