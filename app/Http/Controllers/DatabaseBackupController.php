@@ -156,6 +156,10 @@ class DatabaseBackupController extends Controller
 
     public function store(Request $request)
     {
+        if (current_tenant_id() === null) {
+            return redirect()->route('backups.index')->with('error', 'Your login has no tenant_id. Assign a tenant to this user before taking a backup.');
+        }
+
         $databases = DatabaseBackupService::resolveDatabaseNamesFromConfig();
         if (empty($databases)) {
             return redirect()->route('backups.index')->with('error', 'No databases configured. Set BACKUP_DATABASES or DB_DATABASE in .env.');

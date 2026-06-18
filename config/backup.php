@@ -15,6 +15,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Tenant-scoped backup (manual + admin close)
+    |--------------------------------------------------------------------------
+    | Tables without tenant_id but needed for FK restore (organization locations).
+    | Scheduled backups (no tenant) still dump the full database.
+    */
+    'reference_tables' => array_values(array_filter(array_map('trim', explode(',', env(
+        'BACKUP_REFERENCE_TABLES',
+        'countries,states,cities,postal_codes,designations'
+    ))))),
+
+    'skip_tables' => array_values(array_filter(array_map('trim', explode(',', env(
+        'BACKUP_SKIP_TABLES',
+        'migrations,failed_jobs,password_resets,personal_access_tokens,jobs,job_batches,cache,cache_locks,sessions'
+    ))))),
+
+    /*
+    |--------------------------------------------------------------------------
     | Google Drive via rclone (recommended — same as scripts/backup-db-to-gdrive.ps1)
     |--------------------------------------------------------------------------
     | Set BACKUP_RCLONE_ENABLED=true after rclone is configured on the server.

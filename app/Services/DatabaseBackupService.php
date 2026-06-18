@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Models\BackupLog;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
 use ZipArchive;
@@ -47,6 +50,15 @@ class DatabaseBackupService
             return;
         }
 
+        $tenantId = $this->resolveTenantIdForBackup($backupLog);
+        $tenantScoped = $this->shouldUseTenantScopedDump($backupLog, $tenantId);
+
+        if ($tenantScoped && $tenantId === null) {
+            $this->fail($backupLog, 'Tenant backup requires tenant_id on the user or backup log.');
+
+            return;
+        }
+
         Storage::disk('local')->makeDirectory('db-backups');
         $tmpRelative = 'db-backups/tmp_'.$backupLog->id;
         $tmpAbs = storage_path('app/'.$tmpRelative);
@@ -64,9 +76,19 @@ class DatabaseBackupService
                     continue;
                 }
                 $safeFile = preg_replace('/[^\w\-]/', '_', $dbName) ?: 'database';
+                if ($tenantScoped && $tenantId !== null) {
+                    $safeFile .= '_tenant_'.$tenantId;
+                }
                 $sqlRel = $tmpRelative.'/'.$safeFile.'.sql';
                 $sqlAbs = storage_path('app/'.$sqlRel);
-                $this->runMysqldump($mysqldump, $host, $port, $user, $password, $dbName, $sqlAbs);
+
+                if ($tenantScoped && $tenantId !== null) {
+                    $this->runTenantScopedMysqldump($mysqldump, $host, $port, $user, $password, $dbName, $sqlAbs, $tenantId);
+                } else {
+                    $this->runFullMysqldump($mysqldump, $host, $port, $user, $password, $dbName, $sqlAbs);
+                }
+
+                $this->assertImportableSqlFile($sqlAbs, $tenantScoped);
                 $sqlFiles[] = $sqlAbs;
             }
 
@@ -76,7 +98,7 @@ class DatabaseBackupService
                 return;
             }
 
-            $zipBase = $this->buildZipBaseName($database);
+            $zipBase = $this->buildZipBaseName($database, $tenantScoped ? $tenantId : null);
             $zipFilename = $zipBase.'.zip';
             $zipRel = 'db-backups/'.$zipFilename;
             $zipAbs = storage_path('app/'.$zipRel);
@@ -97,6 +119,12 @@ class DatabaseBackupService
             foreach ($sqlFiles as $path) {
                 $zip->addFile($path, basename($path));
             }
+
+            if ($tenantScoped && $tenantId !== null) {
+                $readme = $this->buildRestoreReadme($database, $tenantId);
+                $zip->addFromString('RESTORE.txt', $readme);
+            }
+
             $zip->close();
 
             $this->deleteDirectory($tmpAbs);
@@ -165,13 +193,246 @@ class DatabaseBackupService
         return $db ? [(string) $db] : [];
     }
 
-    protected function buildZipBaseName(string $databaseName): string
+    protected function resolveTenantIdForBackup(BackupLog $backupLog): ?int
+    {
+        if ($backupLog->tenant_id !== null) {
+            return (int) $backupLog->tenant_id;
+        }
+
+        if ($backupLog->user_id) {
+            $tenantId = User::where('id', $backupLog->user_id)->value('tenant_id');
+            if ($tenantId !== null) {
+                return (int) $tenantId;
+            }
+        }
+
+        return null;
+    }
+
+    protected function shouldUseTenantScopedDump(BackupLog $backupLog, ?int $tenantId): bool
+    {
+        if ($backupLog->triggered_by === 'schedule') {
+            return false;
+        }
+
+        return $tenantId !== null;
+    }
+
+    protected function runFullMysqldump(string $binary, string $host, string $port, string $user, string $password, string $database, string $outputFile): void
+    {
+        $cmd = [
+            $binary,
+            '--host='.$host,
+            '--port='.$port,
+            '--user='.$user,
+            '--single-transaction',
+            '--quick',
+            '--routines',
+            '--skip-lock-tables',
+            '--default-character-set=utf8mb4',
+            '--add-drop-table',
+            '--result-file='.$outputFile,
+            $database,
+        ];
+
+        $this->executeMysqldump($cmd, $password, $database);
+    }
+
+    protected function runTenantScopedMysqldump(
+        string $binary,
+        string $host,
+        string $port,
+        string $user,
+        string $password,
+        string $database,
+        string $outputFile,
+        int $tenantId
+    ): void {
+        $this->writeTenantBackupHeader($outputFile, $database, $tenantId);
+
+        $skipTables = array_flip(array_map('strtolower', config('backup.skip_tables', [])));
+        $referenceTables = array_flip(array_map('strtolower', config('backup.reference_tables', [])));
+        $tables = $this->listDatabaseTables($database);
+        $dumpedTables = 0;
+
+        foreach ($tables as $table) {
+            $tableKey = strtolower($table);
+            if (isset($skipTables[$tableKey])) {
+                continue;
+            }
+
+            $this->runMysqldumpTable($binary, $host, $port, $user, $password, $database, $table, $outputFile, [
+                '--no-data',
+            ], true);
+            $dumpedTables++;
+
+            if ($this->tableHasColumn($table, 'tenant_id')) {
+                $this->runMysqldumpTable($binary, $host, $port, $user, $password, $database, $table, $outputFile, [
+                    '--no-create-info',
+                    '--where=tenant_id='.$tenantId,
+                ], true);
+            } elseif (isset($referenceTables[$tableKey])) {
+                $this->runMysqldumpTable($binary, $host, $port, $user, $password, $database, $table, $outputFile, [
+                    '--no-create-info',
+                ], true);
+            }
+        }
+
+        if ($dumpedTables === 0) {
+            throw new \RuntimeException('No tables were included in tenant backup for '.$database.'.');
+        }
+
+        file_put_contents($outputFile, "\nSET FOREIGN_KEY_CHECKS=1;\n", FILE_APPEND);
+    }
+
+    protected function runMysqldumpTable(
+        string $binary,
+        string $host,
+        string $port,
+        string $user,
+        string $password,
+        string $database,
+        string $table,
+        string $outputFile,
+        array $extraArgs,
+        bool $append
+    ): void {
+        $partFile = $append ? $outputFile.'.part.tmp' : $outputFile;
+
+        $cmd = array_merge([
+            $binary,
+            '--host='.$host,
+            '--port='.$port,
+            '--user='.$user,
+            '--single-transaction',
+            '--quick',
+            '--skip-lock-tables',
+            '--default-character-set=utf8mb4',
+            '--add-drop-table',
+            '--result-file='.$partFile,
+        ], $extraArgs, [$database, $table]);
+
+        $this->executeMysqldump($cmd, $password, $database.'.'.$table);
+
+        if ($append) {
+            if (is_file($partFile)) {
+                $content = file_get_contents($partFile);
+                if ($content !== false && $content !== '') {
+                    file_put_contents($outputFile, $content, FILE_APPEND);
+                }
+                @unlink($partFile);
+            }
+        }
+    }
+
+    protected function executeMysqldump(array $cmd, string $password, string $label): void
+    {
+        $env = $password !== '' ? ['MYSQL_PWD' => $password] : null;
+
+        $process = new Process($cmd, base_path(), $env);
+        $process->setTimeout(3600);
+        $process->run();
+
+        if (! $process->isSuccessful()) {
+            throw new \RuntimeException('mysqldump failed for '.$label.': '.$process->getErrorOutput().$process->getOutput());
+        }
+    }
+
+    protected function writeTenantBackupHeader(string $outputFile, string $database, int $tenantId): void
+    {
+        $now = now()->toDateTimeString();
+        $header = <<<SQL
+-- POS tenant backup (import-ready)
+-- Database: {$database}
+-- Tenant ID: {$tenantId}
+-- Generated: {$now}
+-- Restore: CREATE DATABASE your_db; then: mysql -u USER -p your_db < this_file.sql
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS=0;
+SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO';
+
+SQL;
+
+        file_put_contents($outputFile, $header);
+    }
+
+    protected function buildRestoreReadme(string $database, int $tenantId): string
+    {
+        return implode("\r\n", [
+            'POS Tenant Backup — Restore Instructions',
+            '========================================',
+            '',
+            'This zip contains ONLY tenant '.$tenantId.' data (plus shared reference tables).',
+            '',
+            '1. Create an empty MySQL database (or use a fresh one).',
+            '2. Import the .sql file:',
+            '   mysql -u USER -p '.$database.' < '.preg_replace('/[^\w\-]/', '_', $database).'_tenant_'.$tenantId.'.sql',
+            '',
+            'Each table includes DROP TABLE + CREATE TABLE + INSERT rows.',
+            'FOREIGN_KEY_CHECKS is disabled during import.',
+            '',
+            'Do NOT import this file into a live shared DB with other tenants',
+            'unless you intend to replace that tenant\'s tables entirely.',
+        ])."\r\n";
+    }
+
+    protected function assertImportableSqlFile(string $path, bool $tenantScoped): void
+    {
+        if (! is_file($path)) {
+            throw new \RuntimeException('Backup SQL file was not created.');
+        }
+
+        $size = filesize($path) ?: 0;
+        if ($size < 128) {
+            throw new \RuntimeException('Backup SQL file is too small to be importable.');
+        }
+
+        $sample = file_get_contents($path, false, null, 0, 65536);
+        if ($sample === false || stripos($sample, 'CREATE TABLE') === false) {
+            throw new \RuntimeException('Backup SQL file is missing CREATE TABLE statements and may not import.');
+        }
+
+        if ($tenantScoped && stripos($sample, 'FOREIGN_KEY_CHECKS=0') === false) {
+            throw new \RuntimeException('Tenant backup SQL is missing import guards.');
+        }
+    }
+
+    protected function listDatabaseTables(string $database): array
+    {
+        $rows = DB::select('SHOW TABLES');
+        $key = 'Tables_in_'.$database;
+        $tables = [];
+
+        foreach ($rows as $row) {
+            $table = $row->{$key} ?? null;
+            if (is_string($table) && $table !== '') {
+                $tables[] = $table;
+            }
+        }
+
+        sort($tables);
+
+        return $tables;
+    }
+
+    protected function tableHasColumn(string $table, string $column): bool
+    {
+        try {
+            return Schema::hasColumn($table, $column);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    protected function buildZipBaseName(string $databaseName, ?int $tenantId = null): string
     {
         $dt = new \DateTimeImmutable('now');
         $db = preg_replace('/[^\w\-]/', '_', $databaseName) ?: 'db';
         $datePart = strtolower($dt->format('d_M'));
+        $tenantPart = $tenantId !== null ? '_tenant'.$tenantId : '';
 
-        return $db.'_'.$datePart;
+        return $db.$tenantPart.'_'.$datePart;
     }
 
     protected function pruneLocalBackups(): void
@@ -192,33 +453,6 @@ class DatabaseBackupService
             if ($mtime !== false && $mtime < $cutoff) {
                 @unlink($zipFile);
             }
-        }
-    }
-
-    protected function runMysqldump(string $binary, string $host, string $port, string $user, string $password, string $database, string $outputFile): void
-    {
-        $cmd = [
-            $binary,
-            '--host='.$host,
-            '--port='.$port,
-            '--user='.$user,
-            '--single-transaction',
-            '--quick',
-            '--routines',
-            '--skip-lock-tables',
-            '--default-character-set=utf8mb4',
-            '--result-file='.$outputFile,
-            $database,
-        ];
-
-        $env = $password !== '' ? ['MYSQL_PWD' => $password] : null;
-
-        $process = new Process($cmd, base_path(), $env);
-        $process->setTimeout(3600);
-        $process->run();
-
-        if (! $process->isSuccessful()) {
-            throw new \RuntimeException('mysqldump failed for '.$database.': '.$process->getErrorOutput().$process->getOutput());
         }
     }
 

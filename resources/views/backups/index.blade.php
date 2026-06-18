@@ -125,10 +125,10 @@
                 <div>
                     <h2 class="mb-1">Take backup</h2>
                     <p class="text-muted mb-0" style="font-size: 13px;">
+                        Tenant backup: only your shop data (structure + rows for tenant {{ current_tenant_id() ?? '—' }}).
                         Databases in this run:
                         <strong>{{ implode(', ', $databases) }}</strong>
-                        — configure <code>BACKUP_DATABASES</code> in <code>.env</code> (comma-separated) or rely on default <code>DB_DATABASE</code>.
-                        Google Drive uses <strong>rclone</strong> when <code>BACKUP_RCLONE_ENABLED=true</code> (same remote as your nightly script).
+                        — nightly schedule without a tenant still dumps the full database for server admin.
                     </p>
                 </div>
                 <div class="d-flex flex-wrap align-items-center" style="gap: 8px;">
