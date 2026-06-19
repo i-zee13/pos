@@ -6,12 +6,7 @@ $(document).ready(function () {
             });
         });
     })(jQuery);
-    var close_date = $('.close_date').val();
-    SaleCloseRecord(close_date);
-    $('.search-btn').on('click', function () {
-        var close_date = $('.selected_date').val();
-        SaleCloseRecord(close_date);
-    })
+    bindCloseDateAutoLoad(SaleCloseRecord);
 });
 
 function SaleCloseRecord(close_date) {
@@ -33,78 +28,7 @@ function SaleCloseRecord(close_date) {
     $.ajax({
         url: `/sale-close-record/${close_date}`,
          success: function (response) {
-            console.log(response.records)
             var records = response.records;
-console.log(records['petrol_khata']);
-            //TOTAL TURN OVER 
-            // Define all item names (including amounts and quantities)
-            var items = [
-                "mutafirq_udhar_receive", "mutafirq_sody", "mutafariq_udhar_banam", "gawara_khata",
-                "sody_khareed","beej_khareed", "bank_payments", "ttl_in", "ttl_out", "total_meezan","ilyas_bakhtawar",
-                    // All Banam (dr) Customers
-                    "fazul_qadir_banam", "shafiq_karyana_banam", "abdul_ghaffar_ghar_banam",
-                    "ammar_abdullah_ghar_banam", "imdad_khata_banam", "imran_niazi_banam",
-                    "sir_murtaza_sahib_banam", "master_khalid_faroq_shah_banam","karaya_dokan_banam","karaya_dokan_receive","meezan_bank_jama","ubl_aftab_jama",
-                    // All Vendor Names
-                    "petrol_khata", "abdul_shakoor_exchange", "habib_bank_abdul_shakoor",'hbl_m_waqas_jama','ubl_m_waqas_jama','gandum_khareed_khata_receive',
-                    "dawaj_khareed", "angro_fertilizer", "fouji_fertilizer","np_khareed","angro_khata","dap_khata",
-                    "fatima_flink_ventilators", "wilkan_center_cotton", "tcs_tcs_wadha",
-                    "nmlf", "abl_ka", "ubl_waqas", "mcb_ka","mcb_ka_jama", "bank_al_habib_ka",
-                    "bop_card_loss", "hbl_m_waqas", "abdul_shakoor_habib_bank",
-                    "sarhad_punjab_cash", "alfalah_bank_card", "tameerat_khata",
-                    "tameerat_khata", "imported_pura_khata", "bop_bank","meezan_bank_banam","ubl_aftab_banam",
-                    "sonehri_bank", "askari_bank", "amanat_bank", "baghban_chemical","salries_banam","gandum_khareed_khata","land_company","prime_khata",
-                    //Vendor Jama
-                    "abdul_shakoor_exchange_jama",
-
-                    // Additional Vendors (Last Image)
-                    "wilkan_chemicals", "swat_agro_chemicals", "agro_lux",
-                    "kenzo_ag", "leader_ag", "arsta", "bayer", "fmc", "agro_mark",
-                    "advance_agro_tech",
- 
-                    // All Receiving (cr) Customers
-                    "fazul_qadir_receive", "shafiq_karyana_receive", "abdul_ghaffar_ghar_receive",
-                    "ammar_abdullah_ghar_receive", "imdad_khata_receive", "imran_niazi_receive",
-                    "sir_murtaza_sahib_receive", "master_khalid_faroq_shah_receive",
-                    
-                    "dawai", "dawai_qty", "beej", "beej_qty", "gandom", "gandom_qty",
-                    "kapas", "kapas_qty", "dhaan", "dhaan_qty", "dap_25kg", "dap_25kg_qty",
-                    "dap", "dap_qty", "urea", "urea_qty", "can", "can_qty", "np", "np_qty","tsp","tsp_qty",
-                    "ssp", "ssp_qty", "zarkhez", "zarkhez_qty", "sop", "sop_qty",
-                    "jimsam", "jimsam_qty", "sm_urea", "sm_urea_qty", "mop", "mop_qty"
-                ];
-
-            // Declare variables dynamically
-            var recordsData = {}; // Object to store values
-
-            items.forEach(function(item) { 
-                recordsData[item] = records[item] || 0; // Get value from 'records' or default to 0
-            });
-
-            // Append values dynamically
-            items.forEach(function(item) {
-                $('.' + item).text(addCommas(parseFloat(Math.round(recordsData[item]))));
-
-                // Show div if value is greater than 0
-                if (recordsData[item] > 0) {
-                    console.warn(recordsData[item]);
-                    $('.' + item + '_div').show();
-                }else{
-                    $('.' + item + '_div').hide();
-                }
-            });
-
-            // Special case for total_meezan (difference calculation)
-            var totalMeezan = recordsData["ttl_in"] - recordsData["ttl_out"];
-            console.log(recordsData);
-            $('.total_meezan').text(addCommas(Math.round(totalMeezan)));
-
-            if (totalMeezan > 0) {
-                $('.total_meezan_div').show();
-            }
-
-
-
 
             var saleRecords = records.saleRecords;
             var credit_sale_receivings = records.total_credit_sales_amount_received;
@@ -220,8 +144,6 @@ console.log(records['petrol_khata']);
             total_pr_paid_amount > 0 ? $('.total_pr_paid_amount_div').show() : '';
             total_pr_invc_amount > 0 ? $('.total_pr_invc_amount_div').show() : '';
             cash_in_hand > 0 ? $('.cash_in_hand_div').show() : '';
-
-
 
             $('.total_sale_table').empty();
             $('.total_sale_table').append(`

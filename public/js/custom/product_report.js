@@ -88,8 +88,8 @@ $('.search-btn').on('click', function () {
                 var inv_id = '';
                 var flag = false;
                 trx_inv = false;
-                totalCR += element['cr'] || 0;
-                totalDR += element['dr'] || 0;
+                totalCR += parseFloat(element['cr']) || 0;
+                totalDR += parseFloat(element['dr']) || 0;
                 if (element['sale_invoice_id'] != null && element['sale_invoice_id'] != 0) {
                     label = 'Sale Inv';
                     inv_id = element['sale_invoice_id'];

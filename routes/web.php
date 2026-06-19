@@ -269,6 +269,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     // Admin Close Report Fakhar
     Route::get('/admin-sale-close',                     [ReportsController::class, 'adminSaleClose'])->name('admin-sale-close');
+    Route::get('/admin-sale-close-purchi',              [ReportsController::class, 'adminSaleClosePurchi'])->name('admin-sale-close-purchi');
     Route::get('/sale-close-record/{closing_date}',     [ReportsController::class, 'adminSaleCloseRecord'])->name('sale-close-record');
     Route::post('/save-closing-cash',                   [AdminSaleCloseController::class, 'saveAdminSaleCloseRecord'])->name('save-closing-cash');
     Route::post('/update-closing-cash',                 [AdminSaleCloseController::class, 'updateAdminSaleCloseRecord'])->name('update-closing-cash');

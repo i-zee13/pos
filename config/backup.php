@@ -14,6 +14,23 @@ return [
     'retention_days' => (int) env('BACKUP_RETENTION_DAYS', 4),
 
     /*
+    | Tenant backup import mode (manual + admin close):
+    | merge  = safe inject into existing multi-tenant DB (default)
+    | fresh  = DROP + CREATE for empty database restore only
+    */
+    'tenant_import_mode' => env('BACKUP_TENANT_IMPORT_MODE', 'merge'),
+
+    'reference_tables' => array_values(array_filter(array_map('trim', explode(',', env(
+        'BACKUP_REFERENCE_TABLES',
+        'countries,states,cities,postal_codes,designations'
+    ))))),
+
+    'skip_tables' => array_values(array_filter(array_map('trim', explode(',', env(
+        'BACKUP_SKIP_TABLES',
+        'migrations,failed_jobs,password_resets,personal_access_tokens,jobs,job_batches,cache,cache_locks,sessions'
+    ))))),
+
+    /*
     |--------------------------------------------------------------------------
     | Google Drive via rclone (recommended — same as scripts/backup-db-to-gdrive.ps1)
     |--------------------------------------------------------------------------

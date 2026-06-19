@@ -560,6 +560,11 @@ class ReportsController extends Controller
       $customers  =   Customer::select('id', 'customer_name')->where('customer_type', 2)->get();
       return view('reports.admin-sale-close', compact(['companies', 'products', 'customers']));
    }
+
+   public function adminSaleClosePurchi()
+   {
+      return view('reports.admin-sale-close-purchi');
+   }
     public function adminSaleCloseRecord($closing_date)
    {
       $request                         =  "";

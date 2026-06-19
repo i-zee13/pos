@@ -44,7 +44,7 @@ class AdminSaleCloseController extends Controller
                 // Auto queue a DB backup on Admin Close without blocking close operation.
                 try {
                     $databases = DatabaseBackupService::resolveDatabaseNamesFromConfig();
-                    if (!empty($databases)) {
+                    if (! empty($databases) && current_tenant_id() !== null) {
                         $log = BackupLog::create([
                             'user_id' => Auth::user()->id,
                             'databases' => $databases,

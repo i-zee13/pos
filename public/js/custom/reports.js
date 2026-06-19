@@ -99,8 +99,8 @@ $('.search-btn').on('click', function () {
                 var inv_no = '';
                 var flag = false;
                 trx_inv = false;
-                totalCR += element['cr'] || 0;
-                totalDR += element['dr'] || 0;
+                totalCR += parseFloat(element['cr']) || 0;
+                totalDR += parseFloat(element['dr']) || 0;
                 if (element['sale_invoice_id'] != null && element['sale_invoice_id'] != 0) {
                     inv_no = element['invoice_no'];
                     label = 'Sale Inv';
@@ -271,6 +271,9 @@ $('.reset-btn').on('click', function () {
 })
 
 function customer_Data(element, inv_no, inv_id, label, formattedDate) {
+    var balance = parseFloat(element.balance) || 0;
+    var cr = parseFloat(element.cr) || 0;
+    var dr = parseFloat(element.dr) || 0;
     var comment = '';
     if((element.invoice_comment !='' &&  element.invoice_comment != null)){
       comment  = `<span class="comment"> ${element.invoice_comment}</span>`; 
@@ -278,17 +281,16 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
         comment  = `<span class="comment"> ${element.comment}</span>`; 
     }
     console.log(comment)
-    if (element.cr && element.dr) {
-        // Both CR and DR present
-        // First iteration: CR present, DR skipped 
-        if (element.balance > 0) {
-            var firstBalance = (element.balance + parseFloat(element.cr));
-            var secondBalance = element.balance;
+    if (cr && dr) {
+        // Both CR and DR present — split into two display rows
+        if (balance > 0) {
+            var firstBalance = balance + cr;
+            var secondBalance = balance;
             console.log(firstBalance, secondBalance);
         } else {
-            var firstBalance = (element.balance - parseFloat(element.dr) + parseFloat(element.cr)) + parseFloat(element.dr);
-            console.log((element.balance - parseFloat(element.dr) + parseFloat(element.cr)));
-            var secondBalance = element.balance;
+            var firstBalance = (balance - dr + cr) + dr;
+            console.log((balance - dr + cr));
+            var secondBalance = balance;
         }
         var firstRowHTML = `
             <tr>
@@ -296,7 +298,7 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
                 <td>${inv_no ?? 'NA'}</td>
                 <td>${formattedDate}</td> 
                 <td>${comment}</td> 
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.dr.toLocaleString('en-US')}</td>
+                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${dr.toLocaleString('en-US')}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${firstBalance.toLocaleString('en-US')}</td>
                 <td><a class="btn btn-default btn-detail  btn-line"
@@ -321,7 +323,7 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
                 <td>${formattedDate}</td> 
                 <td>${comment}</td>  
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">0</td>
-                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${element.cr.toLocaleString('en-US')}</td>
+                <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${cr.toLocaleString('en-US')}</td>
                 <td style="font-family: 'Rationale', sans-serif !important;font-size: 18px;">${secondBalance.toLocaleString('en-US')}</td>
                 <td><a class="btn btn-default btn-detail  btn-line"
                         data-inv-id="${inv_id}"
@@ -337,16 +339,16 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
     } else {
 
         // Only one of CR or DR present or neither
-        var crValue = element.cr ? element.cr.toLocaleString('en-US') : '0';
-        var drValue = element.dr ? element.dr.toLocaleString('en-US') : '0';
+        var crValue = cr ? cr.toLocaleString('en-US') : '0';
+        var drValue = dr ? dr.toLocaleString('en-US') : '0';
          
         var balance_text = '';
-        if (element.balance >= 0) {
-            balance_text = (element.balance).toLocaleString('en-US') + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>";
-        } else if (element.balance < 0) {
-            balance_text = (-element.balance).toLocaleString('en-US') + "<span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>";
+        if (balance >= 0) {
+            balance_text = balance.toLocaleString('en-US') + "<span style='color:red;font-size: 16px;font-weight: bold;'> DR</span>";
+        } else if (balance < 0) {
+            balance_text = (-balance).toLocaleString('en-US') + "<span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>";
         } else {
-            balance_text = element.balance.toLocaleString('en-US');
+            balance_text = balance.toLocaleString('en-US');
         }
         var rowHTML = `
             <tr>
@@ -371,19 +373,24 @@ function customer_Data(element, inv_no, inv_id, label, formattedDate) {
     }
 }
 function vendor_Data(element, inv_no, inv_id, label, formattedDate) {
-    if (element.cr && element.dr) {
+    var balance = parseFloat(element.balance) || 0;
+    var cr = parseFloat(element.cr) || 0;
+    var dr = parseFloat(element.dr) || 0;
+    var paidReturn = parseFloat(element.paid_p_return_amount) || 0;
+
+    if (cr && dr) {
         // Both CR and DR present
         // First iteration: CR present, DR skipped 
 
-        if (element.balance > 0) {
-            var firstBalance = (parseFloat(element.balance) + parseFloat(element.dr));
-            var secondBalance = element.balance;
+        if (balance > 0) {
+            var firstBalance = balance + dr;
+            var secondBalance = balance;
         } else {
-            var firstBalance = (element.balance - parseFloat(element.dr) + parseFloat(element.cr)) + parseFloat(element.dr);
-            var secondBalance = element.balance;
+            var firstBalance = (balance - dr + cr) + dr;
+            var secondBalance = balance;
         }
-        tableHtml(element, inv_id, inv_no, formattedDate, label, element.cr, firstBalance, "cr")
-        tableHtml(element, inv_id, inv_no, formattedDate, label, element.dr, secondBalance, "dr")
+        tableHtml(element, inv_id, inv_no, formattedDate, label, cr, firstBalance, "cr")
+        tableHtml(element, inv_id, inv_no, formattedDate, label, dr, secondBalance, "dr")
 
        
     } else {
@@ -426,21 +433,21 @@ function vendor_Data(element, inv_no, inv_id, label, formattedDate) {
             var crValue = element.cr ? element.cr.toLocaleString('en-US') : '0';
             var drValue = 0;
 
-            if (element.dr > 0) {
-                drValue = element.paid_p_return_amount > 0 ? (element.dr - element.paid_p_return_amount).toLocaleString('en-US') : element.dr.toLocaleString('en-US');
+            if (dr > 0) {
+                drValue = paidReturn > 0 ? (dr - paidReturn).toLocaleString('en-US') : dr.toLocaleString('en-US');
             }
-            if (element.balance > 0) {
-                var firstBalance = element.balance + element.paid_p_return_amount;
-                var secondBalance = element.balance;
+            if (balance > 0) {
+                var firstBalance = balance + paidReturn;
+                var secondBalance = balance;
             } else {
-                var firstBalance = (parseFloat(element.balance) + parseFloat(element.paid_p_return_amount));
-                var secondBalance = element.balance;
+                var firstBalance = balance + paidReturn;
+                var secondBalance = balance;
             }
             if (element.cr) {
                 tableHtml(element, inv_id, inv_no, formattedDate, label, crValue, firstBalance, "cr")
-            } else if (element.paid_p_return_amount > 0 && element.dr > 0) {
+            } else if (paidReturn > 0 && dr > 0) {
                 tableHtml(element, inv_id, inv_no, formattedDate, label, drValue, firstBalance, "dr")
-                tableHtml(element, inv_id, inv_no, formattedDate, label, element.paid_p_return_amount, secondBalance, "dr_with_payment")
+                tableHtml(element, inv_id, inv_no, formattedDate, label, paidReturn, secondBalance, "dr_with_payment")
             } else {
                 tableHtml(element, inv_id, inv_no, formattedDate, label, drValue, secondBalance, "dr")
             }
@@ -450,6 +457,7 @@ function vendor_Data(element, inv_no, inv_id, label, formattedDate) {
 }
 
 function tableHtml(element, inv_id, inv_no, formattedDate, label, dr_cr, balance, payment_flag = null) {
+    balance = parseFloat(balance) || 0;
     var dr_val = 0;
     var cr_val = 0;
     var balance_text = balance >= 0 ? balance.toLocaleString('en-US') + " <span style='color:green;font-size: 16px;font-weight: bold;'> CR </span>" : balance < 0 ? balance.toLocaleString('en-US') + " <span style='color:red;font-size: 16px;font-weight: bold;'> DR </span>" : balance.toLocaleString('en-US');

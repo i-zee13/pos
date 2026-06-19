@@ -8,6 +8,8 @@
 --  NOTE: jab tak users.tenant_id set nahi hota, app pehle ki tarah
 --        (bina filter ke) chalta rahega. Isliye STEP 2 poora chalayein
 --        aur users wali line sab se aakhir mein.
+--
+--  NAYI / COMPLETE SETUP: setup_tenant_database.sql (top par @t variable)
 -- =====================================================================
 
 

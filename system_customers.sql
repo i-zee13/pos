@@ -8,6 +8,8 @@
 --
 --  IMPORTANT: Yeh SQL app deploy karne se PEHLE chalayein, warna
 --  sale-return store par "Unknown column system_code" error aa sakta hai.
+--
+--  COMPLETE SETUP: setup_tenant_database.sql (STEP 4 auto-provision)
 -- =====================================================================
 
 -- STEP 1: column add karein
