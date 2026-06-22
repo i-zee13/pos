@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductSale;
 use App\Models\Stock;
 use App\Models\VendorLedger;
+use App\Services\AdminSaleClosePurchiService;
 use Illuminate\Http\Request;
 use DB;
 use DateTime;
@@ -423,9 +424,9 @@ class ReportsController extends Controller
                               ORDER BY si.invoice_no DESC
                         ");
       $sale_invoice_records                         =  new stdClass();
-      $sale_invoice_records->total_invoice_amount   =  collect($sales)->unique('invoice_no')->sum('total_invoice_amount'); 
-      $sale_invoice_records->invoice_discount       =  collect($sales)->unique('invoice_no')->sum('invoice_discount'); 
-      $sale_invoice_records->service_charges       =  collect($sales)->unique('invoice_no')->sum('service_charges');  
+      $sale_invoice_records->total_invoice_amount   =  sum_per_invoice($sales, 'total_invoice_amount');
+      $sale_invoice_records->invoice_discount       =  sum_per_invoice($sales, 'invoice_discount');
+      $sale_invoice_records->service_charges       =  sum_per_invoice($sales, 'service_charges');
       
       $returns        =  DB::select("
                               SELECT
@@ -563,7 +564,9 @@ class ReportsController extends Controller
 
    public function adminSaleClosePurchi()
    {
-      return view('reports.admin-sale-close-purchi');
+      return view('reports.admin-sale-close-purchi', [
+         'purchiUseDynamic' => purchi_use_dynamic(),
+      ]);
    }
     public function adminSaleCloseRecord($closing_date)
    {
@@ -687,10 +690,10 @@ class ReportsController extends Controller
 
       $records->total_pr_paid_amount   =  collect($saleRecords['pr_paid_amount'])->SUM('paid_amount'); //Purchase return invc payments
       $records->total_pr_invc_amount   =  collect($saleRecords['pr_invc_amount'])->SUM('paid_amount');  //Purchase invoice payment
-      $records->total_invoice_amount   =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('total_invoice_amount');
-      $records->total_invoice_discount =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('invoice_discount');
-      $records->total_net_sale_discount=  collect($saleRecords['sales'])->unique('invoice_no')->where('customer_id',8)->SUM('invoice_discount');
-      $records->total_service_charges  =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('service_charges');
+      $records->total_invoice_amount   =  sum_per_invoice($saleRecords['sales'], 'total_invoice_amount');
+      $records->total_invoice_discount =  sum_per_invoice($saleRecords['sales'], 'invoice_discount');
+      $records->total_net_sale_discount=  sum_per_invoice($saleRecords['sales'], 'invoice_discount', fn ($row) => (int) ($row->customer_id ?? 0) === 8);
+      $records->total_service_charges  =  sum_per_invoice($saleRecords['sales'], 'service_charges');
       $records->total_product_discount =  collect($saleRecords['sales'])->SUM('product_discount');
       $records->total_net_sales        =  collect($saleRecords['sales'])->WHERE('invoice_type', 1)->SUM('sale_total_amount');
       $records->total_credit_sales     =  collect($saleRecords['sales'])->WHERE('invoice_type', 2)->SUM('sale_total_amount');
@@ -873,10 +876,29 @@ class ReportsController extends Controller
      
       // Vendor ko pay kr diye  => DR  ,,, jo system ny DENY hen wo = > CR
       // customer ny jo diyee  => DR  ,,,  jo system ny LENY hen wo = > CR
- 
+
+        // Legacy blade uses habib_bank_abdul_shakoor; controller last key is abdul_shakoor_habib_bank
+        if (isset($records->abdul_shakoor_habib_bank) && !isset($records->habib_bank_abdul_shakoor)) {
+            $records->habib_bank_abdul_shakoor = $records->abdul_shakoor_habib_bank;
+        } elseif (isset($records->habib_bank_abdul_shakoor) && !isset($records->abdul_shakoor_habib_bank)) {
+            $records->abdul_shakoor_habib_bank = $records->habib_bank_abdul_shakoor;
+        }
+
+      $purchiDynamic = purchi_use_dynamic();
+      $purchiLayout = null;
+      if ($purchiDynamic) {
+         $result = app(AdminSaleClosePurchiService::class)->buildLayoutFromRecords(
+            purchi_config(),
+            $records
+         );
+         $purchiLayout = $result['layout'];
+      }
+
       return response()->JSON([
-         'status'    => 'success',
-         'records'   => $records
+         'status'         => 'success',
+         'records'        => $records,
+         'purchi_dynamic' => $purchiDynamic,
+         'purchi_layout'  => $purchiLayout,
       ]);
    }
 }

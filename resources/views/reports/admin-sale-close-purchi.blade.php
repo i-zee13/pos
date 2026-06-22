@@ -2,6 +2,7 @@
 @section('content')
 @php
     $closeDate = request('date', date('Y-m-d'));
+    $is_close = isClose();
 @endphp
 <style>
     body {
@@ -91,9 +92,17 @@
 <div class="card" style="padding: 0px">
     <div class="header m-0">
         <h2 style="width: 100%">Purchi <span>Detail</span>
-            <a href="{{ route('admin-sale-close', ['date' => $closeDate]) }}" class="btn add_button back-admin-close-link" style="right: 115px!important;top:-2px!important">
-                <i class="fa fa-arrow-left"></i> Admin Close
+            <a href="{{ route('admin-sale-close', ['date' => $closeDate]) }}" class="btn add_button back-admin-close-link" style="right: 230px!important;top:-2px!important">
+                <i class="fa fa-arrow-left"></i> Back
             </a>
+            <button class="btn add_button sale-close-btn-modal" data-toggle="modal" data-target="#close-modal" style="right: 115px!important;top:-2px!important" disabled>
+                <i class="fa fa-check"></i>
+                @if($is_close == 1)
+                Sale Open
+                @else
+                Sale Close
+                @endif
+            </button>
             <a class="btn add_button" style="right: 0px!important;top:-2px!important" data-toggle="modal" data-target="#print-modal">
                 <i class="fa fa-download"></i> Print DSR
             </a>
@@ -113,10 +122,12 @@
 </div>
 
 @include('reports.partials.admin-sale-close-print-modal')
+@include('reports.partials.admin-sale-close-modal')
 @endsection
 
 @push('js')
 @include('reports.partials.admin-sale-close-print-scripts')
 <script src="{{ asset('js/custom/admin-sale-close-date.js') }}"></script>
+<script src="{{ asset('js/custom/admin-sale-close-modal.js') }}"></script>
 <script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}"></script>
 @endpush

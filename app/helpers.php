@@ -70,6 +70,25 @@ if (!function_exists('tenant_where')) {
         return " {$prefix}{$column} = ".(int) $tenantId.' ';
     }
 }
+if (!function_exists('sum_per_invoice')) {
+    /**
+     * Sum an invoice-level field once per invoice_no (max per group).
+     * Fixes under-count when product lines carry different invoice_discount values.
+     */
+    function sum_per_invoice($collection, string $field, ?callable $invoiceFilter = null): float
+    {
+        return (float) collect($collection)
+            ->groupBy('invoice_no')
+            ->reduce(function (float $sum, $rows) use ($field, $invoiceFilter) {
+                $row = $rows->first();
+                if ($invoiceFilter && !$invoiceFilter($row)) {
+                    return $sum;
+                }
+
+                return $sum + (float) $rows->max($field);
+            }, 0.0);
+    }
+}
 if (!function_exists('sys_customers')) {
     /**
      * Current tenant ke saare "system" customers ka map: [code => id].
@@ -855,9 +874,9 @@ function SaleReportRecords($request = null, $current_date, $is_admin_close = nul
                               ORDER BY si.invoice_no DESC
                         ");
       $sale_invoice_records                         =  new stdClass();
-      $sale_invoice_records->total_invoice_amount   =  collect($sales)->unique('invoice_no')->sum('total_invoice_amount'); 
-      $sale_invoice_records->invoice_discount       =  collect($sales)->unique('invoice_no')->sum('invoice_discount'); 
-      $sale_invoice_records->service_charges       =  collect($sales)->unique('invoice_no')->sum('service_charges');  
+      $sale_invoice_records->total_invoice_amount   =  sum_per_invoice($sales, 'total_invoice_amount');
+      $sale_invoice_records->invoice_discount       =  sum_per_invoice($sales, 'invoice_discount');
+      $sale_invoice_records->service_charges       =  sum_per_invoice($sales, 'service_charges');  
       
       $returns        =  DB::select("
                               SELECT
@@ -964,3 +983,44 @@ function SaleReportRecords($request = null, $current_date, $is_admin_close = nul
       }
       return ['sales' => $sales, 'sale_returns' => $returns, 'pr_paid_amount' => $purchase_return_paid_amount, 'pr_invc_amount' => $purchase_inv_paid_amount,'sale_invoice_record' => $sale_invoice_records];
    }
+
+if (!function_exists('purchi_config')) {
+    /**
+     * Merged purchi layout config: organization.purchi_config JSON overrides config/admin_close_purchi.php
+     */
+    function purchi_config(): array
+    {
+        $defaults = config('admin_close_purchi', []);
+        try {
+            $org = \App\Models\Organization::first();
+            if (!$org || empty($org->purchi_config)) {
+                return $defaults;
+            }
+            $stored = $org->purchi_config;
+            if (is_string($stored)) {
+                $stored = json_decode($stored, true);
+            }
+            if (!is_array($stored)) {
+                return $defaults;
+            }
+
+            return array_replace_recursive($defaults, $stored);
+        } catch (\Throwable $e) {
+            return $defaults;
+        }
+    }
+}
+
+if (!function_exists('purchi_use_dynamic')) {
+    /** Revert: UPDATE organization SET purchi_use_dynamic = 0 */
+    function purchi_use_dynamic(): bool
+    {
+        try {
+            $org = \App\Models\Organization::first();
+
+            return $org && (int) ($org->purchi_use_dynamic ?? 0) === 1;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+}

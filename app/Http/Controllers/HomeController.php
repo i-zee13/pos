@@ -51,9 +51,9 @@ class HomeController extends Controller
         $saleRecords            =  SaleReportRecords(null,$current_date,1);  
         
         $total_sales            =  collect($saleRecords['sales'])->SUM('sale_total_amount');  
-        $total_invoice_discount =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('invoice_discount');
+        $total_invoice_discount =  sum_per_invoice($saleRecords['sales'], 'invoice_discount');
         $total_product_discount =  collect($saleRecords['sales'])->SUM('product_discount');
-        $total_service_charges  =  collect($saleRecords['sales'])->unique('invoice_no')->SUM('service_charges');
+        $total_service_charges  =  sum_per_invoice($saleRecords['sales'], 'service_charges');
         $ttl_sale_return        =  collect($saleRecords['sale_returns'])->unique('invoice_no')->SUM('total_invoice_amount'); //zee
 
         $total_sale                =  ($total_sales + $total_service_charges) - ($total_product_discount + $total_invoice_discount);
@@ -63,7 +63,7 @@ class HomeController extends Controller
       
         $total_pr_paid_amount      =  collect($saleRecords['pr_paid_amount'])->SUM('paid_amount'); //Purchase return invc payments //zee
         $total_pr_invc_amount      =  collect($saleRecords['pr_invc_amount'])->SUM('paid_amount');  //Purchase invoice payment //zee
-        $total_net_sale_discount   =  collect($saleRecords['sales'])->unique('invoice_no')->where('customer_id',8)->SUM('invoice_discount'); //zee
+        $total_net_sale_discount   =  sum_per_invoice($saleRecords['sales'], 'invoice_discount', fn ($row) => (int) ($row->customer_id ?? 0) === 8);
     
         // $total_sale_amount                             =  collect($saleRecords['sales'])->SUM('product_net_total'); //zeee
         $total_net_sale_invoice_amount                 =  collect($saleRecords['sales'])->WHERE('invoice_type', 1)->SUM('sale_total_amount'); //zeee

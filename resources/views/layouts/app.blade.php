@@ -128,6 +128,19 @@
             z-index: 1060 !important;
         }
 
+        /* Ensure top profile dropdown stays above report headers/cards */
+        nav.navbar.static-top {
+            position: relative;
+            z-index: 20000;
+        }
+        nav.navbar.static-top .dropdown-menu {
+            z-index: 20001 !important;
+        }
+        /* Sidebar user dropdown (bottom avatar) */
+        #sidebarUser .dropdown-menu {
+            z-index: 20001 !important;
+        }
+
         #repDelayBtn:hover,
         #addProdBtn:hover,
         #markComplBtn:hover {

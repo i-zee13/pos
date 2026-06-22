@@ -12,4 +12,9 @@ class Organization extends Model
         
     protected $guarded = [];
     protected $table = "organization";
+
+    protected $casts = [
+        'purchi_use_dynamic' => 'boolean',
+        'purchi_config' => 'array',
+    ];
 }
