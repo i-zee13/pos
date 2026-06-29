@@ -18,5 +18,15 @@ class GodownStock extends Model
         'product_id',
         'stock',
     ];
+
+    public function getStockAttribute($value)
+    {
+        return round_qty($value ?? 0);
+    }
+
+    public function setStockAttribute($value): void
+    {
+        $this->attributes['stock'] = round_qty($value ?? 0);
+    }
 }
 

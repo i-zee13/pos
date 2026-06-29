@@ -71,7 +71,7 @@ $('body').on('mouseenter', '.ProductTable tr', function () {
     $('.retail_price').text(r_price);
     $('.pp').text(purchase);
 
-    $('.stock_balance').text(stock);
+    $('.stock_balance').text(formatQty(stock));
 });
 $('body').on('mouseleave', '.ProductTable tr', function () {
     $('.retail_price').text(0);

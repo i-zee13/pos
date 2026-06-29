@@ -129,6 +129,63 @@ class GoogleDriveApiBackupUploader
         return true;
     }
 
+    /**
+     * @return array{ok:bool,message:string}
+     */
+    public function connectionStatus(?int $userId = null, bool $forceRefresh = false): array
+    {
+        if (! $this->isConfigured($userId)) {
+            return [
+                'ok' => false,
+                'message' => 'Google Drive is not connected. Use Connect Google Drive in DB Backups.',
+            ];
+        }
+
+        $cacheKey = 'backup.gdrive.status.'.($userId ?? 'admin');
+        if (! $forceRefresh) {
+            $cached = Cache::get($cacheKey);
+            if (is_array($cached) && isset($cached['ok'], $cached['message'])) {
+                return $cached;
+            }
+        }
+
+        try {
+            $this->keepAlive($userId);
+            $result = [
+                'ok' => true,
+                'message' => 'Google Drive token is valid and was refreshed successfully.',
+            ];
+        } catch (\Throwable $e) {
+            $result = [
+                'ok' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        Cache::put($cacheKey, $result, now()->addMinutes(5));
+
+        return $result;
+    }
+
+    public function clearConnectionStatusCache(?int $userId = null): void
+    {
+        Cache::forget('backup.gdrive.status.'.($userId ?? 'admin'));
+    }
+
+    /**
+     * Store access + rotated refresh tokens immediately after OAuth connect.
+     *
+     * @param  array<string,mixed>|null  $tokenJson
+     */
+    public function persistConnectResponse(int $userId, ?array $tokenJson): void
+    {
+        if (! is_array($tokenJson)) {
+            return;
+        }
+
+        $this->persistTokenResponse($tokenJson, $userId);
+    }
+
     protected function fetchAccessToken(?int $userId = null): string
     {
         $userRefreshToken = $this->userDriveRefreshToken($userId);
@@ -270,7 +327,10 @@ class GoogleDriveApiBackupUploader
 
         $payload = Cache::get('backup.gdrive.admin_access_token');
         if (is_array($payload) && ! empty($payload['token'])) {
-            return (string) $payload['token'];
+            $expiresAt = $payload['expires_at'] ?? null;
+            if ($expiresAt === null || now()->lt($expiresAt)) {
+                return (string) $payload['token'];
+            }
         }
 
         return null;
@@ -292,7 +352,10 @@ class GoogleDriveApiBackupUploader
         }
 
         $ttl = max(60, $expiresAt->getTimestamp() - time());
-        Cache::put('backup.gdrive.admin_access_token', ['token' => $accessToken], $ttl);
+        Cache::put('backup.gdrive.admin_access_token', [
+            'token' => $accessToken,
+            'expires_at' => $expiresAt,
+        ], $ttl);
     }
 
     protected function saveUserRefreshToken(?int $userId, string $refreshToken): void
@@ -480,6 +543,7 @@ class GoogleDriveApiBackupUploader
         $setting->google_drive_connected_at = null;
         $setting->save();
         $this->userDriveSettings[$userId] = $setting;
+        $this->clearConnectionStatusCache($userId);
     }
 
     protected function nonEmpty($value): bool

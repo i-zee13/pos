@@ -90,6 +90,29 @@ function addCommas(nStr) {
 
     return x1 + x2;
 }
+
+/** Round qty/stock to max 4 decimals; collapse float dust (e.g. 8e-15) to 0. */
+function roundQty(value, decimals) {
+    decimals = (decimals === undefined || decimals === null) ? 4 : decimals;
+    var n = parseFloat(value);
+    if (isNaN(n) || !isFinite(n)) {
+        return 0;
+    }
+    if (Math.abs(n) < Math.pow(10, -(decimals + 1))) {
+        return 0;
+    }
+    return parseFloat(n.toFixed(decimals));
+}
+
+/** Format qty for UI — trims trailing zeros after decimal. */
+function formatQty(value, decimals) {
+    var n = roundQty(value, decimals);
+    var s = String(n);
+    if (s.indexOf('.') !== -1) {
+        s = s.replace(/\.?0+$/, '');
+    }
+    return s === '' ? '0' : s;
+}
  
 
 $(document).on('click', '.btn-invoice-delete', function() {

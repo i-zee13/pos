@@ -56,3 +56,24 @@ function openSidebar(element = "#product-cl-sec") {
 
   $('.start_date').val(formattedStartDate);
   $('.end_date').val(formattedEndDate);
+
+function roundQty(value, decimals) {
+    decimals = (decimals === undefined || decimals === null) ? 4 : decimals;
+    var n = parseFloat(value);
+    if (isNaN(n) || !isFinite(n)) {
+        return 0;
+    }
+    if (Math.abs(n) < Math.pow(10, -(decimals + 1))) {
+        return 0;
+    }
+    return parseFloat(n.toFixed(decimals));
+}
+
+function formatQty(value, decimals) {
+    var n = roundQty(value, decimals);
+    var s = String(n);
+    if (s.indexOf('.') !== -1) {
+        s = s.replace(/\.?0+$/, '');
+    }
+    return s === '' ? '0' : s;
+}

@@ -132,6 +132,7 @@ class DatabaseBackupService
             $size = @filesize($zipAbs) ?: 0;
             $gdriveOk = false;
             $gdrivePath = null;
+            $driveError = null;
 
             $uploader = app(GoogleDriveApiBackupUploader::class);
             $driveUserId = $backupLog->user_id ? (int) $backupLog->user_id : null;
@@ -143,6 +144,7 @@ class DatabaseBackupService
                     $gdriveOk = true;
                 } catch (\Throwable $e) {
                     Log::warning('backup.google_drive_api_failed', ['message' => $e->getMessage(), 'log_id' => $backupLog->id]);
+                    $driveError = $e->getMessage();
                 }
             } elseif (config('backup.rclone.enabled')) {
                 try {
@@ -156,9 +158,13 @@ class DatabaseBackupService
             $uploadExpected = $useDriveApi || config('backup.rclone.enabled');
             $errorMessage = null;
             if (! $gdriveOk && $uploadExpected) {
-                $errorMessage = $useDriveApi
-                    ? 'Local backup OK; Google Drive API upload failed (see laravel.log).'
-                    : 'Local backup OK; Google Drive upload failed (see laravel.log).';
+                if ($useDriveApi && ! empty($driveError)) {
+                    $errorMessage = 'Local backup OK; Google Drive failed: '.$driveError;
+                } else {
+                    $errorMessage = $useDriveApi
+                        ? 'Local backup OK; Google Drive API upload failed (see laravel.log).'
+                        : 'Local backup OK; Google Drive upload failed (see laravel.log).';
+                }
             }
 
             $backupLog->update([

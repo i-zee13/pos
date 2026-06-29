@@ -17,7 +17,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('backup:databases --scheduled')->dailyAt('00:30');
-        $schedule->command('backup:refresh-drive-tokens')->twiceDaily(6, 18);
+        // Exercise refresh tokens every 6 hours so Google does not revoke them for inactivity.
+        $schedule->command('backup:refresh-drive-tokens')->cron('0 */6 * * *');
     }
 
     /**

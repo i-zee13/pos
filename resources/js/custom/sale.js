@@ -30,6 +30,25 @@ import swal from 'sweetalert';
  let invoice_discount = 0;
  let data_variable = '';
  let grand_total = '';
+
+ function normalizeStockBalance(value) {
+     if (typeof roundQty === 'function') {
+         return roundQty(value, 4);
+     }
+     var n = parseFloat(value);
+     if (isNaN(n) || !isFinite(n) || Math.abs(n) < 0.00001) {
+         return 0;
+     }
+     return parseFloat(n.toFixed(4));
+ }
+
+ function displayStockBalance(value) {
+     if (typeof formatQty === 'function') {
+         return formatQty(value, 4);
+     }
+     return String(normalizeStockBalance(value));
+ }
+
  $(document).ready(function () { 
     console.log(segments);
     if (segments[3] == "sale-add") {
@@ -216,7 +235,7 @@ import swal from 'sweetalert';
                                  sales_product_array = sales_product_array.filter(x => x.product_id != product_id);
                                  grandSum(previous_payable, service_charges);
                                  var filter_product = product_list.filter(x => x.id == product_id);
-                                 filter_product[0].stock_balance = response.updated_stock;
+                                 filter_product[0].stock_balance = normalizeStockBalance(response.updated_stock);
                              } else {
                                  deleteRef.removeAttr('disabled');
                                  deleteRef.text('Delete');
@@ -259,7 +278,7 @@ import swal from 'sweetalert';
 
      $('#retail_price').val(filter_product[0].sale_price);
 
-     $('.stock_balance').text(filter_product[0].stock_balance);
+     $('.stock_balance').text(displayStockBalance(filter_product[0].stock_balance));
      if (filter_product[0].new_purchase_price > 0) {
          $('.pp').text(filter_product[0].new_purchase_price);
      } else {
@@ -289,10 +308,10 @@ import swal from 'sweetalert';
              $('.purchase_price').val(filter_product[0].old_purchase_price);
          }
          $('#retail_price').val(filter_product[0].sale_price);
-         $('.stock_balance').text(filter_product[0].stock_balance); 
+         $('.stock_balance').text(displayStockBalance(filter_product[0].stock_balance)); 
          p_name = filter_product[0].product_name;
          product_id = filter_product[0].id;
-         stock_in_hand = filter_product[0].stock_balance;
+         stock_in_hand = normalizeStockBalance(filter_product[0].stock_balance);
          purchased_price = filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price;
          $('.expiry_date').val(filter_product[0].expiry_date)
          expiry_date = filter_product[0].expiry_date;
@@ -347,14 +366,14 @@ import swal from 'sweetalert';
         $('#products').val(filter_product[0].id).trigger('change');
          $('.calculate_by_amount').attr('data-price', filter_product[0].sale_price);
          $('.purchase_price').val(filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price);
-         $('.stock_balance').text(filter_product[0].stock_balance);
+         $('.stock_balance').text(displayStockBalance(filter_product[0].stock_balance));
          p_name = filter_product[0].product_name;
          expiry_date = filter_product[0].expiry_date;
          product_id = filter_product[0].id; 
 
 
          if (data_variable.length > 5) {
-             if (filter_product[0].stock_balance > 0) {
+             if (normalizeStockBalance(filter_product[0].stock_balance) > 0) {
                  $('.qty').val(1).trigger('change');
                  $('#add-product').click();
              } else {
@@ -389,7 +408,7 @@ import swal from 'sweetalert';
          $(this).focus();
          $('#notifDiv').fadeIn();
          $('#notifDiv').css('background', 'red');
-         $('#notifDiv').text(`${stock_in_hand > 0 ? "Qty should be less than " + stock_in_hand : 'Product is Out of Stock!'}`);
+         $('#notifDiv').text(`${stock_in_hand > 0 ? "Qty should be less than " + displayStockBalance(stock_in_hand) : 'Product is Out of Stock!'}`);
          setTimeout(() => {
              $('#notifDiv').fadeOut();
          }, 3000);
@@ -646,7 +665,7 @@ import swal from 'sweetalert';
         });
         console.log(filter_product);
         if (filter_product.length > 0) {  
-            filter_product[0].stock_balance = res.new_prod.stock_balance;
+            filter_product[0].stock_balance = normalizeStockBalance(res.new_prod.stock_balance);
         } else {
             console.log(res.new_prod);
             stock_products.push(res.new_prod);
@@ -782,7 +801,7 @@ $(document).on('input', '.qty-input', function () {
      $('.retail_price').text(r_price);
      $('.pp').text(purchase);
 
-     $('.stock_balance').text(stock);
+     $('.stock_balance').text(displayStockBalance(stock));
  });
  // $('body').on('mouseleave', '.ProductTable tr', function() {
  // $('.retail_price').text(0);
@@ -839,6 +858,9 @@ $(document).on('input', '.qty-input', function () {
      $("#products").append(`<option value="0">Select Product</option>`)
      stock_products.forEach(data => {
         console.log(data);
+         if (data.stock_balance !== undefined) {
+             data.stock_balance = normalizeStockBalance(data.stock_balance);
+         }
          $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name} Rs-${data.sale_price}</option>`)
          product_list.push(data);
      });
@@ -1013,8 +1035,8 @@ $(document).on('input', '.qty-input', function () {
     <tr id='tr-${product_id}' data-prod_id ="${product_id}">
         <td>${product_id}</td>
         <td>${p_name}</td>
-        <td><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product_id}" data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
-        <td><input type="number" value="${retail_price}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
+        <td><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${normalizeStockBalance(stock_in_hand)}" class="inputSale qty-input add-stock-input td-input-qty${product_id}" data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
+        <td><input type="number" value="${retail_price}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${normalizeStockBalance(stock_in_hand)}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
         <td><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
         <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
         <td  style="width:80px;"><a type="button" id="${product_id}" data-id="${invoice_id}" class="btn smBTN red-bg remove_btn" data-product-invoice="${sale_prod_id}" data-index="" data-quantity="${qty}" style="width:100%; ${!is_removable ? 'display:none' : ''}" >Remove</a></td>

@@ -270,6 +270,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/backups/logs', [DatabaseBackupController::class, 'logs'])->name('backups.logs');
     Route::get('/backups/google/connect', [DatabaseBackupController::class, 'connectGoogleDrive'])->name('backups.google.connect');
     Route::get('/backups/google/callback', [DatabaseBackupController::class, 'googleDriveCallback'])->name('backups.google.callback');
+    Route::post('/backups/google/test', [DatabaseBackupController::class, 'testGoogleDrive'])->name('backups.google.test');
     Route::post('/backups/google/disconnect', [DatabaseBackupController::class, 'disconnectGoogleDrive'])->name('backups.google.disconnect');
     Route::post('/backups', [DatabaseBackupController::class, 'store'])->name('backups.store');
     Route::post('/backups/mail-settings', [DatabaseBackupController::class, 'storeMailSettings'])->name('backups.mail-settings.store');
