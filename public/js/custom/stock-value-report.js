@@ -79,17 +79,15 @@ $('.search-btn').on('click', function () {
                 var amount = 0;
                 console.warn(filter_selected);
                 if (filter_selected == 1) {
-                    amount = element.ttl_avg_cost * parseInt(element.balance);
-                    // last_balance += parseInt(element.balance) * parseInt(element.avg_product_value);
-                    cost = element.ttl_avg_cost;
+                    amount = toNum(element.ttl_avg_cost) * toNum(element.balance);
+                    cost = toNum(element.ttl_avg_cost);
                 } else {
-                    amount = element.purchase_price * parseInt(element.balance);
-                    // last_balance += parseInt(element.balance) * parseInt(element.p_price);
-                    cost = element.purchase_price;
+                    amount = toNum(element.purchase_price) * toNum(element.balance);
+                    cost = toNum(element.purchase_price);
                 }
-                last_balance += amount;
-                total_balance += element['balance'];
-                ttl_qty_purchase += element.qty;
+                last_balance += toNum(amount);
+                total_balance += toNum(element['balance']);
+                ttl_qty_purchase += toNum(element.qty);
                 var percentageValue = (element.sale_price - element.p_price) / element.p_price * 100;
                 var date = new Date(element.expire_date);
                 var formattedDate = date.toDateString();

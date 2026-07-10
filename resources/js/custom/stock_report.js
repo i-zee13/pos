@@ -109,7 +109,7 @@ function getStock(CurrentRef = null,is_click = 0){
             }
             let total_balance = 0;
             response.records.forEach((element, key) => {
-                total_balance += element['balance'];
+                total_balance += toNum(element['balance']);
                 var percentageValue = (element.sale_price - element.p_price) / element.p_price * 100;
                 var date = new Date(element.expire_date);
                 var formattedDate = date.toDateString();

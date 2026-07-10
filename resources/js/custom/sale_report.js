@@ -77,17 +77,17 @@ $('.search-btn').on('click', function () {
             var total_sales = 0;
             var ttl_quantity = 0;
             var ttl_product_discount = 0;
-            var ttl_invoice_discount = response.stocks.sale_invoice_record['invoice_discount'];
+            var ttl_invoice_discount = toNum(response.stocks.sale_invoice_record['invoice_discount']);
             //Sale Return Variables
             var total_returns = 0;
             var ttl_return_quantity = 0;
             var ttl_return_product_discount = 0;
             var ttl_return_invoice_discount = 0;
             response.stocks.sales.forEach((element, key) => { 
-                total_sales             += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
+                total_sales             += toNum(element['sale_total_amount']);
 
-                ttl_quantity            += element['qty'] ? element['qty'] : 0;
-                ttl_product_discount    += element['product_discount'] ? element['product_discount'] : 0; 
+                ttl_quantity            += toNum(element['qty']);
+                ttl_product_discount    += toNum(element['product_discount']); 
                 var date                =  new Date(element.expire_date);
                 var formattedDate       =  date.toDateString();
                 var invoice_no          =  "";
@@ -99,10 +99,10 @@ $('.search-btn').on('click', function () {
             if (response.stocks.sale_returns.length > 0) {
                 //Sale Returns
                 response.stocks.sale_returns.forEach((element, key) => {
-                    total_returns += element['return_total_amount'] ? element['return_total_amount'] : 0;
-                    ttl_return_quantity += element['qty'] ? element['qty'] : 0;
-                    ttl_return_product_discount += element['product_discount'] ? element['product_discount'] : 0;
-                    ttl_return_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
+                    total_returns += toNum(element['return_total_amount']);
+                    ttl_return_quantity += toNum(element['qty']);
+                    ttl_return_product_discount += toNum(element['product_discount']);
+                    ttl_return_invoice_discount += toNum(element['invoice_discount']);
                     var invoice_no = "";
                     invoice_no = element.invoice_no.split('-');
                     reportTable(invoice_no[0], element);

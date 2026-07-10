@@ -89,21 +89,19 @@ $('.search-btn').on('click', function () {
                 } else {
                     purchase_price = element['old_purchase_price'];
                 }  
-                if(element['qty']){
-                  qty = element['qty'];
-                }else{
-                  qty = element['balance']
-                }
-                var avg_profit        =  ((element['sale_price'] - purchase_price) / purchase_price) * 100;
+                purchase_price = toNum(purchase_price);
+                var qty = toNum(element['qty'] ? element['qty'] : element['balance']);
+                var saleUnit = toNum(element['sale_price']);
+                var avg_profit        =  purchase_price ? ((saleUnit - purchase_price) / purchase_price) * 100 : 0;
                 total_avg_profit      += avg_profit;
-                ttl_quantity          += qty ? qty : 0; 
-                var sale_price        =  (element['sale_price'] ? element['sale_price'] : 0);
-                total_profit          += (element['sale_price'] - purchase_price) * qty;
+                ttl_quantity          += qty; 
+                var sale_price        =  saleUnit;
+                total_profit          += (saleUnit - purchase_price) * qty;
                 console.log(total_profit,element.id);
                 ttl_cost_product      += purchase_price * qty;
                 ttl_sale_product      += sale_price * qty; 
-                ttl_invoice_discount  += element['invoice_discount'] ? element['invoice_discount'] : 0;
-                ttl_product_discount  += element['product_discount'] ? element['product_discount'] : 0;
+                ttl_invoice_discount  += toNum(element['invoice_discount']);
+                ttl_product_discount  += toNum(element['product_discount']);
                 var date               =  new Date(element.expire_date);
                 var formattedDate      = date.toDateString();
                 var invoice_no         = key;

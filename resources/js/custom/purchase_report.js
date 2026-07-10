@@ -85,10 +85,10 @@ $('.search-btn').on('click', function () {
 
             if (response.reports.purchases && response.reports.purchases.length > 0) {
                 response.reports.purchases.forEach((element, key) => {
-                    total_sales += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
-                    ttl_quantity += element['qty'] ? element['qty'] : 0;
-                    ttl_product_discount += element['product_discount'] ? element['product_discount'] : 0;
-                    ttl_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
+                    total_sales += toNum(element['sale_total_amount']);
+                    ttl_quantity += toNum(element['qty']);
+                    ttl_product_discount += toNum(element['product_discount']);
+                    ttl_invoice_discount += toNum(element['invoice_discount']);
                     var date = new Date(element.expire_date);
                     var formattedDate = date.toDateString();
                     var invoice_no = "";
@@ -102,10 +102,10 @@ $('.search-btn').on('click', function () {
             if (response.reports.purchase_returns && response.reports.purchase_returns.length > 0) {
                 //Sale Returns
                 response.reports.purchase_returns.forEach((element, key) => {
-                    total_returns += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
-                    ttl_return_quantity += element['qty'] ? element['qty'] : 0;
-                    ttl_return_product_discount += element['product_discount'] ? element['product_discount'] : 0;
-                    ttl_return_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
+                    total_returns += toNum(element['sale_total_amount']);
+                    ttl_return_quantity += toNum(element['qty']);
+                    ttl_return_product_discount += toNum(element['product_discount']);
+                    ttl_return_invoice_discount += toNum(element['invoice_discount']);
                     var invoice_no = "";
                     invoice_no = element.invoice_no.split('-');
                     reportTable(invoice_no[0], element);
@@ -344,6 +344,12 @@ $('.reset-btn').on('click', function () {
 })
 
 function addCommas(nStr) {
+    if (typeof toNum === 'function') {
+        nStr = toNum(nStr);
+        nStr = Math.round(nStr * 10000) / 10000;
+    } else {
+        nStr = parseFloat(nStr) || 0;
+    }
     nStr += "";
     x = nStr.split(".");
     x1 = x[0];
