@@ -88,6 +88,7 @@ $('.search-btn').on('click', function () {
                 last_balance += toNum(amount);
                 total_balance += toNum(element['balance']);
                 ttl_qty_purchase += toNum(element.qty);
+                var balance = toNum(element.balance);
                 var percentageValue = (element.sale_price - element.p_price) / element.p_price * 100;
                 var date = new Date(element.expire_date);
                 var formattedDate = date.toDateString();
@@ -97,9 +98,9 @@ $('.search-btn').on('click', function () {
                   <td>${key+1}</td>
                   <td>${element['company_name'] }</td>
                   <td>${element['product_name'] }</td>
-                  <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${cost ? addCommas(cost.toFixed(2)) : 0}</td>
-                   <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(element.balance.toFixed(2))}</td>
-                  <td style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(amount.toFixed(2))}</td> 
+                  <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${cost ? addCommas(cost) : 0}</td>
+                   <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(balance)}</td>
+                  <td style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(amount)}</td> 
               </tr>`);
             });
             // if (filter_selected == 1) {
@@ -111,18 +112,18 @@ $('.search-btn').on('click', function () {
                   <td class="font18" align="right" ></td>
                   <td class="font18" align="center" colspan="3">Grand Total :</td>
                   <td class="totalNo">
-                      <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(total_balance.toFixed(2))}</span>
+                      <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(total_balance)}</span>
                   </td>
                   <td class="totalNo">
-                      <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(last_balance.toFixed(2))}</span>
+                      <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(last_balance)}</span>
                   </td>
               </tr>
           `);
-            $('.ttl_stock_in_hand').html(addCommas(last_balance.toFixed(2)));
+            $('.ttl_stock_in_hand').html(addCommas(last_balance));
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
 
-            $('.ttl_stock_in_hand').html(last_balance ? '<span>Rs. </span>' + addCommas(last_balance.toFixed(2)) : '<span>Rs. </span>' + 0);
+            $('.ttl_stock_in_hand').html(last_balance ? '<span>Rs. </span>' + addCommas(last_balance) : '<span>Rs. </span>' + 0);
             $('.ttl_products').html(response.records.length ? addCommas(response.records.length) : 0);
             if ($('.expiry-select').val() != '') {
                 $('.ttl_stock_in').html(0);

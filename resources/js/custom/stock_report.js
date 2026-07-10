@@ -128,11 +128,11 @@ function getStock(CurrentRef = null,is_click = 0){
                 <td class="font18" align="right" colspan="3"></td>
                 <td class="font18" align="center">Grand Total :</td>
                 <td class="totalNo">
-                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${total_balance}</span>
+                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(total_balance)}</span>
                 </td>
             </tr>
         `);
-            $('.ttl_stock_in_hand').html(addCommas(last_balance.toFixed(2)));
+            $('.ttl_stock_in_hand').html(addCommas(total_balance));
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
             var title = '';

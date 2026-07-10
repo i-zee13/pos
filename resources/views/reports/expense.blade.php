@@ -3702,8 +3702,7 @@
                     var ttl_sale_product = 0;
                     var purchase_price = 0;
                     response.sales.forEach((element, key) => {
-
-                        ttl_expense += element['dr'];
+                        ttl_expense += (typeof toNum === 'function' ? toNum(element['dr']) : (parseFloat(element['dr']) || 0));
                         var date = new Date(element.created_at);
                         var formattedDate = date.toDateString();
                         var invoice_no = "";
@@ -3724,12 +3723,12 @@
                                 <td class="font18" colspan="2"></td> 
                                 <td class="font18">Grand Total :</td> 
                                 <td class="totalNo" >
-                                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(ttl_expense.toFixed(2)) } <span style="color: ${total_avg_profit > 0 ? '#29f129' : 'red' };font-size: 18px">${ttl_expense.toFixed(2)}% </span></span>
+                                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(ttl_expense)}</span>
                                 </td>
                             </tr>
                      `);
 
-                    $('.ttl_expenses').html('<span>Rs.</span>' + addCommas(ttl_expense.toFixed(2)) + ` <span style="font-size: 28px"> ( <span style="color: ${total_avg_profit > 0 ? '#29f129' : 'red' };font-size: 25px">  ${total_avg_profit.toFixed(2)}% </span> )</span>`);
+                    $('.ttl_expenses').html('<span>Rs.</span> ' + addCommas(ttl_expense));
                     $('.ttl_payment').html(ttl_expense ? addCommas(ttl_expense) : 0);
                     $('.ttl_quantity').html(ttl_quantity ? addCommas(ttl_quantity) : 0);
                     $('.ttl_product_discount').html(ttl_sale_product ? addCommas(ttl_sale_product) : 0);
@@ -3919,6 +3918,12 @@
 })
 
 function addCommas(nStr) {
+    if (typeof toNum === 'function') {
+        nStr = toNum(nStr);
+        nStr = Math.round(nStr * 10000) / 10000;
+    } else {
+        nStr = parseFloat(nStr) || 0;
+    }
     nStr += "";
     x = nStr.split(".");
     x1 = x[0];
