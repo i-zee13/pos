@@ -23,10 +23,24 @@
                                                 <br><small>Connected {{ $mailSetting->google_drive_connected_at->format('d M Y h:i A') }}</small>
                                             @endif
                                         </div>
-                                        <form method="post" action="{{ route('backups.google.disconnect') }}" class="mb-0">
-                                            @csrf
-                                            <button type="submit" class="btn btn-default btn-line">Disconnect Google Drive</button>
-                                        </form>
+                                        <div class="d-flex flex-wrap mb-2" style="gap: 8px;">
+                                            <form method="post" action="{{ route('backups.google.refresh') }}" class="m-0">
+                                                @csrf
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fa fa-sync"></i> Refresh Token
+                                                </button>
+                                            </form>
+                                            <form method="post" action="{{ route('backups.google.disconnect') }}" class="m-0">
+                                                @csrf
+                                                <button type="submit" class="btn btn-default btn-line">Disconnect</button>
+                                            </form>
+                                            <a href="{{ route('backups.google.connect') }}" class="btn btn-default btn-line">
+                                                Reconnect
+                                            </a>
+                                        </div>
+                                        <p class="font12 text-muted mb-0" style="line-height: 1.4;">
+                                            Use <strong>Refresh Token</strong> if Drive upload fails. If refresh fails, use <strong>Reconnect</strong>.
+                                        </p>
                                     @else
                                         <a href="{{ route('backups.google.connect') }}" class="btn btn-primary">
                                             <i class="fa fa-google"></i> Connect Google Drive
@@ -134,6 +148,14 @@
                     <button type="button" class="btn btn-default btn-line" onclick="openSidebar('#product-cl-sec'); return false;">
                         <i class="fa fa-google"></i> Google Drive
                     </button>
+                    @if($mailSetting && $mailSetting->hasConnectedGoogleDrive())
+                    <form action="{{ route('backups.google.refresh') }}" method="post" class="m-0">
+                        @csrf
+                        <button type="submit" class="btn btn-default btn-line" style="font-size: 13px; padding: 8px 14px;" title="Refresh Google Drive token">
+                            <i class="fa fa-sync"></i> Refresh Token
+                        </button>
+                    </form>
+                    @endif
                     <form action="{{ route('backups.store') }}" method="post" class="m-0">
                         @csrf
                         <button type="submit" class="btn btn-primary" style="font-size: 13px; padding: 8px 14px;">

@@ -6,6 +6,7 @@ use App\Jobs\RunDatabaseBackupJob;
 use App\Models\BackupLog;
 use App\Models\UserBackupMailSetting;
 use App\Services\DatabaseBackupService;
+use App\Services\GoogleDriveApiBackupUploader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -146,12 +147,41 @@ class DatabaseBackupController extends Controller
         $setting = UserBackupMailSetting::where('user_id', Auth::id())->first();
         if ($setting) {
             $setting->google_drive_refresh_token_encrypted = null;
+            $setting->google_drive_access_token_encrypted = null;
+            $setting->google_drive_token_expires_at = null;
             $setting->google_drive_folder_id = null;
             $setting->google_drive_connected_at = null;
             $setting->save();
         }
 
         return redirect()->route('backups.index')->with('success', 'Google Drive disconnected for your user.');
+    }
+
+    /**
+     * Manually refresh the Google Drive access token for the logged-in user.
+     */
+    public function refreshGoogleDrive(GoogleDriveApiBackupUploader $driveUploader)
+    {
+        $setting = UserBackupMailSetting::where('user_id', Auth::id())->first();
+        if (! $setting || ! $setting->hasConnectedGoogleDrive()) {
+            return redirect()->route('backups.index')->with('error', 'Google Drive is not connected. Connect first, then refresh the token.');
+        }
+
+        try {
+            $driveUploader->keepAlive((int) Auth::id());
+
+            return redirect()->route('backups.index')->with('success', 'Google Drive token refreshed successfully. Backups can upload to Drive.');
+        } catch (\Throwable $e) {
+            Log::warning('backup.google_drive_manual_refresh_failed', [
+                'user_id' => Auth::id(),
+                'message' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('backups.index')->with(
+                'error',
+                'Token refresh failed: '.$e->getMessage().' Disconnect and Connect Google Drive again.'
+            );
+        }
     }
 
     public function store(Request $request)
