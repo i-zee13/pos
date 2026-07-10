@@ -3635,6 +3635,21 @@
 @endsection
 @push('js')
 <script>
+    /** Safe number for expense totals (production returns DECIMAL as strings). */
+    function num(value) {
+        if (typeof toNum === 'function') {
+            return toNum(value);
+        }
+        if (value === null || value === undefined || value === '') {
+            return 0;
+        }
+        if (typeof value === 'string') {
+            value = value.replace(/,/g, '').trim();
+        }
+        var n = parseFloat(value);
+        return isNaN(n) || !isFinite(n) ? 0 : n;
+    }
+
     $(document).ready(function() {
         $('.search-btn').on('click', function() {
             var start_date = $('.start_date').val();
@@ -3701,14 +3716,13 @@
                     var ttl_expense = 0;
                     var ttl_sale_product = 0;
                     var purchase_price = 0;
-                    response.sales.forEach((element, key) => {
-                        ttl_expense += (typeof toNum === 'function' ? toNum(element['dr']) : (parseFloat(element['dr']) || 0));
+                    (response.sales || []).forEach((element, key) => {
+                        ttl_expense += num(element['dr']);
                         var date = new Date(element.created_at);
                         var formattedDate = date.toDateString();
-                        var invoice_no = "";
-                        invoice_no = 0;
                         reportTable(element, formattedDate, 22)
                     });
+                    ttl_expense = num(ttl_expense);
                     $('.TeacherAttendanceListTable').fadeIn();
                     // sale_return_total(ttl_quantity,ttl_product_discount,total_profit,'Sale')
                     $('.filter_name').empty();
@@ -3918,12 +3932,8 @@
 })
 
 function addCommas(nStr) {
-    if (typeof toNum === 'function') {
-        nStr = toNum(nStr);
-        nStr = Math.round(nStr * 10000) / 10000;
-    } else {
-        nStr = parseFloat(nStr) || 0;
-    }
+    nStr = num(nStr);
+    nStr = Math.round(nStr * 10000) / 10000;
     nStr += "";
     x = nStr.split(".");
     x1 = x[0];
