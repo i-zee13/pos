@@ -134,6 +134,16 @@ $('.search-btn').on('click', function () {
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
             var title = 'Product Report';
+            var partyName = '';
+            var partyLabel = 'Product';
+            if ($('.product_id').val()) {
+                partyName = ($('.product_id option:selected').text() || '').trim();
+                partyLabel = 'Product';
+            } else if ($('.company_id').val()) {
+                partyName = ($('.company_id option:selected').text() || '').trim();
+                partyLabel = 'Company';
+            }
+            var balanceText = ($('.prod-bal-div').text() || '').replace(/Stk In Hand\s*:\s*/i, '').trim();
 
             if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
                 $('.TeacherAttendanceListTable').DataTable().clear().destroy();
@@ -146,7 +156,17 @@ $('.search-btn').on('click', function () {
                  scrollCollapse: true,
                  dom: 'Bfrtip',
                 buttons: typeof ledgerExportButtons === 'function'
-                    ? ledgerExportButtons(title)
+                    ? ledgerExportButtons(title, {
+                        partyLabel: partyLabel,
+                        partyName: partyName,
+                        balance: balanceText || String(stock_in_hand || 0),
+                        totalOut: totalCR.toLocaleString('en-US'),
+                        totalIn: totalDR.toLocaleString('en-US'),
+                        finalBalance: String(stock_in_hand || 0),
+                        outLabel: 'Total Out',
+                        inLabel: 'Total In',
+                        reportLabel: 'Ledger Report'
+                    })
                     : [{
                         extend: 'excelHtml5',
                         text: 'Excel',

@@ -171,11 +171,18 @@ $('.search-btn').on('click', function () {
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
             var title = '';
+            var partyLabel = 'Customer';
             if (report_segments[3] == 'customer-reports') {
                 title = 'Customer Report'
+                partyLabel = 'Customer';
             } else {
                 title = 'Vendor Report'
+                partyLabel = 'Vendor';
             }
+            var partyName = ($('.vendor_id option:selected').text() || '').replace(/^\s*\d+\s*-\s*/, '').trim();
+            var balanceText = ($('.prod-bal-div').text() || '').replace(/Previous Balance\s*:\s*/i, '').trim();
+            var exportBalance = balanceText || (typeof addCommas === 'function' ? addCommas(stock) : stock);
+            var exportFinalBalance = String(final_balance || '').replace(/-/g, '').trim();
             if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
                 $('.TeacherAttendanceListTable').DataTable().clear().destroy();
             }
@@ -187,7 +194,17 @@ $('.search-btn').on('click', function () {
                  scrollCollapse: true,
                  dom: 'Bfrtip',
                 buttons: typeof ledgerExportButtons === 'function'
-                    ? ledgerExportButtons(title)
+                    ? ledgerExportButtons(title, {
+                        partyLabel: partyLabel,
+                        partyName: partyName,
+                        balance: exportBalance,
+                        totalOut: totalDR.toLocaleString('en-US'),
+                        totalIn: totalCR.toLocaleString('en-US'),
+                        finalBalance: exportFinalBalance || exportBalance,
+                        outLabel: 'Total Out',
+                        inLabel: 'Total In',
+                        reportLabel: 'Ledger Report'
+                    })
                     : [{
                         extend: 'excelHtml5',
                         text: 'Excel',

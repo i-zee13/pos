@@ -212,5 +212,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/reports.js') }}?v=2"></script>
+<script src="{{asset('js/custom/reports.js') }}?v=3"></script>
 @endpush

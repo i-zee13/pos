@@ -577,7 +577,7 @@
             }
         }
     </script>
-    <script src="{{asset('/js/custom/master.js')}}?v=2"> </script>
+    <script src="{{asset('/js/custom/master.js')}}?v=3"> </script>
 </body>
 
 </html>

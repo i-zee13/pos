@@ -3715,5 +3715,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/product_report.js') }}?v=2"></script>
+<script src="{{asset('js/custom/product_report.js') }}?v=3"></script>
 @endpush
