@@ -38,6 +38,14 @@
 
     <meta name="distribution" content="global"> <meta name="csrf-token" content="{{ csrf_token() }}">
     <script>window.SYS_CUSTOMERS = {!! json_encode((object) sys_customers()) !!};</script>
+    <script>
+        window.EXPORT_META = {
+            companyName: @json(optional($organization)->name ?? ''),
+            companyAddress: @json(optional($organization)->address ?? ''),
+            companyPhone: @json(optional($organization)->phone_number ?? ''),
+            userName: @json(optional(Auth::user())->name ?? '')
+        };
+    </script>
     <meta name="csrf_token" content="{{ csrf_token() }}">
     <!-- Favicon -->
     <link rel="shortcut icon" href="https://dashkit.goodthemes.co/assets/favicon/favicon.ico" type="image/x-icon">
@@ -606,7 +614,7 @@
             }
         }
     </script>
-    <script src="{{asset('/js/custom/master.js')}}"> </script>
+    <script src="{{asset('/js/custom/master.js')}}?v=3"> </script>
 </body>
 
 </html>

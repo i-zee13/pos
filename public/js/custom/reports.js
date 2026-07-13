@@ -76,7 +76,7 @@ $('.search-btn').on('click', function () {
                             <th style="color:red">Outgoing</th>
                             <th style="color:rgb(11, 246, 11)">Incoming</th>
                             <th>Balance</th>
-                            <th>Action</th>
+                            <th class="no-export">Action</th>
                         </tr>
                     </thead><tbody>
                 </tbody>
@@ -171,11 +171,18 @@ $('.search-btn').on('click', function () {
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
             var title = '';
+            var partyLabel = 'Customer';
             if (report_segments[3] == 'customer-reports') {
                 title = 'Customer Report'
+                partyLabel = 'Customer';
             } else {
                 title = 'Vendor Report'
+                partyLabel = 'Vendor';
             }
+            var partyName = ($('.vendor_id option:selected').text() || '').replace(/^\s*\d+\s*-\s*/, '').trim();
+            var balanceText = ($('.prod-bal-div').text() || '').replace(/Previous Balance\s*:\s*/i, '').trim();
+            var exportBalance = balanceText || (typeof addCommas === 'function' ? addCommas(stock) : stock);
+            var exportFinalBalance = String(final_balance || '').replace(/-/g, '').trim();
             if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
                 $('.TeacherAttendanceListTable').DataTable().clear().destroy();
             }
@@ -186,48 +193,31 @@ $('.search-btn').on('click', function () {
                  scrollY: '400px',
                  scrollCollapse: true,
                  dom: 'Bfrtip',
-                buttons: [{
+                buttons: typeof ledgerExportButtons === 'function'
+                    ? ledgerExportButtons(title, {
+                        partyLabel: partyLabel,
+                        partyName: partyName,
+                        balance: exportBalance,
+                        totalOut: (typeof toNum === 'function' ? toNum(totalDR) : Number(totalDR) || 0).toLocaleString('en-US'),
+                        totalIn: (typeof toNum === 'function' ? toNum(totalCR) : Number(totalCR) || 0).toLocaleString('en-US'),
+                        finalBalance: exportFinalBalance || exportBalance,
+                        outLabel: 'Total Out',
+                        inLabel: 'Total In',
+                        reportLabel: 'Ledger Report'
+                    })
+                    : [{
                         extend: 'excelHtml5',
                         text: 'Excel',
                         title: title,
                         exportOptions: {
-                            // columns: ':visible:not(:last-child)',
+                            columns: ':visible:not(:last-child)',
                             format: {
                                 body: function (innerHtml, rowIdx, colIdx, node) {
                                     return node.textContent;
                                 }
                             }
-                        },
-                        customize: function (xlsx) {
-
-                            //copy _createNode function from source
-                            function _createNode(doc, nodeName, opts) {
-                                var tempNode = doc.createElement(nodeName);
-
-                                if (opts) {
-                                    if (opts.attr) {
-                                        $(tempNode).attr(opts.attr);
-                                    }
-
-                                    if (opts.children) {
-                                        $.each(opts.children, function (key, value) {
-                                            tempNode.appendChild(value);
-                                        });
-                                    }
-
-                                    if (opts.text !== null && opts.text !== undefined) {
-                                        tempNode.appendChild(doc.createTextNode(opts.text));
-                                    }
-                                }
-
-                                return tempNode;
-                            }
-
                         }
-                    },
-
-                ],
-
+                    }],
             })
 
             $('.TeacherAttendanceListTable tbody').append(`

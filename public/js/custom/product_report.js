@@ -134,6 +134,16 @@ $('.search-btn').on('click', function () {
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
             var title = 'Product Report';
+            var partyName = '';
+            var partyLabel = 'Product';
+            if ($('.product_id').val()) {
+                partyName = ($('.product_id option:selected').text() || '').trim();
+                partyLabel = 'Product';
+            } else if ($('.company_id').val()) {
+                partyName = ($('.company_id option:selected').text() || '').trim();
+                partyLabel = 'Company';
+            }
+            var balanceText = ($('.prod-bal-div').text() || '').replace(/Stk In Hand\s*:\s*/i, '').trim();
 
             if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
                 $('.TeacherAttendanceListTable').DataTable().clear().destroy();
@@ -145,48 +155,31 @@ $('.search-btn').on('click', function () {
                  scrollY: '400px',
                  scrollCollapse: true,
                  dom: 'Bfrtip',
-                buttons: [{
+                buttons: typeof ledgerExportButtons === 'function'
+                    ? ledgerExportButtons(title, {
+                        partyLabel: partyLabel,
+                        partyName: partyName,
+                        balance: balanceText || String(stock_in_hand || 0),
+                        totalOut: (Number(totalCR) || 0).toLocaleString('en-US'),
+                        totalIn: (Number(totalDR) || 0).toLocaleString('en-US'),
+                        finalBalance: String(stock_in_hand || 0),
+                        outLabel: 'Total Out',
+                        inLabel: 'Total In',
+                        reportLabel: 'Ledger Report'
+                    })
+                    : [{
                         extend: 'excelHtml5',
                         text: 'Excel',
                         title: title,
                         exportOptions: {
-                            // columns: ':visible:not(:last-child)',
+                            columns: ':visible',
                             format: {
                                 body: function (innerHtml, rowIdx, colIdx, node) {
                                     return node.textContent;
                                 }
                             }
-                        },
-                        customize: function (xlsx) {
-
-                            //copy _createNode function from source
-                            function _createNode(doc, nodeName, opts) {
-                                var tempNode = doc.createElement(nodeName);
-
-                                if (opts) {
-                                    if (opts.attr) {
-                                        $(tempNode).attr(opts.attr);
-                                    }
-
-                                    if (opts.children) {
-                                        $.each(opts.children, function (key, value) {
-                                            tempNode.appendChild(value);
-                                        });
-                                    }
-
-                                    if (opts.text !== null && opts.text !== undefined) {
-                                        tempNode.appendChild(doc.createTextNode(opts.text));
-                                    }
-                                }
-
-                                return tempNode;
-                            }
-
                         }
-                    },
-
-                ],
-
+                    }],
             })
 
             $('.TeacherAttendanceListTable tbody').append(`
