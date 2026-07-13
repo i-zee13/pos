@@ -80,11 +80,25 @@
     .mix-bar-fill { height: 100%; background: linear-gradient(90deg, #0038ba, #1e54d3); border-radius: 6px; width: 0; transition: width .5s ease; }
     .mix-bar-meta { display: flex; justify-content: space-between; font-size: 11px; color: #8896a8; margin-top: 4px; }
     .product-cards {
-        display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        max-height: 340px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 6px;
+        scrollbar-width: thin;
+        scrollbar-color: #152e4d #eef1f5;
+    }
+    .product-cards::-webkit-scrollbar { width: 4px; }
+    .product-cards::-webkit-scrollbar-track { background: #eef1f5; border-radius: 4px; }
+    .product-cards::-webkit-scrollbar-thumb {
+        background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
+        border-radius: 4px;
     }
     .product-card-an {
-        min-width: 160px; max-width: 180px; flex: 0 0 160px;
-        border: 1px solid #e8ecf1; border-radius: 10px; padding: 12px 14px;
+        min-width: 0;
+        border: 1px solid #e8ecf1; border-radius: 10px; padding: 10px 12px 10px 14px;
         position: relative; background: #fff;
         transition: transform .2s ease, box-shadow .2s ease;
     }
@@ -95,12 +109,15 @@
         content: ''; position: absolute; left: 0; top: 12px; width: 3px; height: 28px; background: #0038ba; border-radius: 0 2px 2px 0;
     }
     .product-card-an .pc-name {
-        font-size: 13px; font-weight: 700; color: #243447; height: 38px; overflow: hidden; line-height: 1.3; margin-bottom: 10px;
+        font-size: 12px; font-weight: 700; color: #243447; height: 32px; overflow: hidden; line-height: 1.25; margin-bottom: 8px;
     }
     .product-card-an .pc-amount {
-        font-family: 'Rationale', sans-serif !important; font-size: 22px; color: #0038ba; line-height: 1;
+        font-family: 'Rationale', sans-serif !important; font-size: 20px; color: #0038ba; line-height: 1;
     }
-    .product-card-an .pc-qty { font-size: 12px; color: #8896a8; margin-top: 4px; }
+    .product-card-an .pc-qty { font-size: 11px; color: #8896a8; margin-top: 3px; }
+    @media (max-width: 767px) {
+        .product-cards { grid-template-columns: 1fr; max-height: 280px; }
+    }
     .split-pill {
         display: flex; justify-content: space-between; background: #f4f6f9; border-radius: 8px;
         padding: 10px 12px; margin-bottom: 8px; font-size: 13px;
@@ -274,6 +291,10 @@
                     <tbody id="topCustomersBody"><tr><td colspan="3">Loading…</td></tr></tbody>
                 </table>
             </div>
+            <div class="an-section">
+                <h3 class="an-section-title">Top Products</h3>
+                <div class="product-cards" id="topProductCards"></div>
+            </div>
         </div>
         <div class="col-lg-4">
             <div class="an-section">
@@ -298,11 +319,6 @@
             </div>
         </div>
     </div>
-
-    <div class="an-section">
-        <h3 class="an-section-title">Top Products</h3>
-        <div class="product-cards" id="topProductCards"></div>
-    </div>
 </div>
 @endsection
 
@@ -311,5 +327,5 @@
 <script src="https://code.highcharts.com/highcharts-more.js"></script>
 <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-<script src="{{ asset('js/custom/analytics.js') }}?v=4"></script>
+<script src="{{ asset('js/custom/analytics.js') }}?v=5"></script>
 @endpush
