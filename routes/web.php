@@ -106,6 +106,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/', [HomeController::class,   'index'])->name('home');
     Route::get('/home', [HomeController::class,   'index'])->name('home');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/analytics/summary', [DashboardController::class, 'summary'])->name('analytics.summary');
     Route::get('/get-companies', [CompanyController::class, 'getCompanies'])->name('get-companies');
     Route::post('/get-customers', [CustomerController::class, 'getCustomers'])->name('get-customers');
     /** Product Routes */

@@ -80,6 +80,11 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link " href="{{route('dashboard')}}">
+            <i class="fa fa-bar-chart" aria-hidden="true"></i> Analytics
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link collapsed" href="#sidebarSystemBackups" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarSystemBackups">
             <i class="fa fa-cloud" aria-hidden="true"></i> System Backups
           </a>
