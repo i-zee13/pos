@@ -79,6 +79,45 @@
     .mix-bar-track { height: 7px; background: #eef1f5; border-radius: 6px; overflow: hidden; }
     .mix-bar-fill { height: 100%; background: linear-gradient(90deg, #0038ba, #1e54d3); border-radius: 6px; width: 0; transition: width .5s ease; }
     .mix-bar-meta { display: flex; justify-content: space-between; font-size: 11px; color: #8896a8; margin-top: 4px; }
+    .mix-chart-wrap {
+        position: relative;
+        margin-top: 12px;
+        max-width: 260px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .mix-chart-center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        pointer-events: none;
+        width: 55%;
+        z-index: 2;
+    }
+    .mix-center-label {
+        font-size: 11px;
+        color: #8896a8;
+        font-weight: 600;
+        line-height: 1.2;
+        max-height: 28px;
+        overflow: hidden;
+    }
+    .mix-center-value {
+        font-family: 'Rationale', sans-serif !important;
+        font-size: 18px;
+        color: #0038ba;
+        line-height: 1.15;
+        margin-top: 2px;
+        word-break: break-word;
+    }
+    .mix-center-sub {
+        font-size: 11px;
+        color: #6b7a90;
+        margin-top: 2px;
+        font-weight: 600;
+    }
     .product-cards {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -300,7 +339,14 @@
             <div class="an-section">
                 <h3 class="an-section-title">Top Categories</h3>
                 <div id="mixBars" class="mix-bars"></div>
-                <canvas id="mixChart" height="180" style="margin-top:12px;"></canvas>
+                <div class="mix-chart-wrap">
+                    <canvas id="mixChart" height="180"></canvas>
+                    <div class="mix-chart-center" id="mixChartCenter">
+                        <div class="mix-center-label" id="mixCenterLabel">Gross Sales</div>
+                        <div class="mix-center-value" id="mixCenterValue">Rs. 0</div>
+                        <div class="mix-center-sub" id="mixCenterSub"></div>
+                    </div>
+                </div>
             </div>
             <div class="an-section">
                 <h3 class="an-section-title">Top Receivables</h3>
@@ -327,5 +373,5 @@
 <script src="https://code.highcharts.com/highcharts-more.js"></script>
 <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-<script src="{{ asset('js/custom/analytics.js') }}?v=5"></script>
+<script src="{{ asset('js/custom/analytics.js') }}?v=6"></script>
 @endpush
