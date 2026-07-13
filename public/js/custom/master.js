@@ -107,6 +107,118 @@ function addCommas(nStr) {
 
     return x1 + x2;
 }
+
+/**
+ * Shared Excel/PDF export buttons for ledger DataTables.
+ * - Header: company brand (like invoice) + exported-by user
+ * - Filename includes user name
+ * - Skips hidden columns and any "Action" column (index may differ per table)
+ */
+function ledgerExportMessageTop() {
+    var meta = window.EXPORT_META || {};
+    var lines = [];
+    if (meta.companyName) lines.push(meta.companyName);
+    if (meta.companyAddress) lines.push(meta.companyAddress);
+    if (meta.companyPhone) lines.push('Phone: ' + meta.companyPhone);
+    if (meta.userName) lines.push('Exported by: ' + meta.userName);
+    return lines.join('\n');
+}
+
+function ledgerExportFilename(title) {
+    var meta = window.EXPORT_META || {};
+    var user = (meta.userName || 'user').toString().replace(/[^\w\-]+/g, '_');
+    var safeTitle = (title || 'Report').toString().replace(/[^\w\-]+/g, '_');
+    var day = new Date().toISOString().slice(0, 10);
+    return safeTitle + '_' + user + '_' + day;
+}
+
+function ledgerExportColumns(idx, data, node) {
+    var $th = $(node);
+    if ($th.attr('hidden') !== undefined || $th.prop('hidden')) {
+        return false;
+    }
+    var label = $.trim($th.text()).toLowerCase();
+    if (label === 'action') {
+        return false;
+    }
+    return true;
+}
+
+function ledgerExportButtons(title) {
+    var messageTop = ledgerExportMessageTop();
+    var filename = ledgerExportFilename(title);
+    var meta = window.EXPORT_META || {};
+
+    var commonExport = {
+        columns: ledgerExportColumns,
+        format: {
+            body: function (innerHtml, rowIdx, colIdx, node) {
+                return node ? node.textContent : innerHtml;
+            }
+        }
+    };
+
+    return [
+        {
+            extend: 'excelHtml5',
+            text: 'Excel',
+            title: title,
+            filename: filename,
+            messageTop: messageTop,
+            exportOptions: commonExport
+        },
+        {
+            extend: 'pdfHtml5',
+            text: 'PDF',
+            title: title,
+            filename: filename,
+            orientation: 'landscape',
+            pageSize: 'A4',
+            exportOptions: commonExport,
+            customize: function (doc) {
+                var headerLines = [];
+                if (meta.companyName) {
+                    headerLines.push({ text: meta.companyName, bold: true, fontSize: 16, alignment: 'center' });
+                }
+                if (meta.companyAddress) {
+                    headerLines.push({ text: meta.companyAddress, fontSize: 9, alignment: 'center', margin: [0, 2, 0, 0] });
+                }
+                if (meta.companyPhone) {
+                    headerLines.push({ text: 'Phone: ' + meta.companyPhone, fontSize: 9, alignment: 'center', margin: [0, 1, 0, 0] });
+                }
+                headerLines.push({ text: title, bold: true, fontSize: 12, alignment: 'center', margin: [0, 8, 0, 0] });
+                if (meta.userName) {
+                    headerLines.push({ text: 'Exported by: ' + meta.userName, fontSize: 9, alignment: 'center', margin: [0, 2, 0, 0] });
+                }
+
+                doc.content.splice(0, 1, {
+                    stack: headerLines,
+                    margin: [0, 0, 0, 12]
+                });
+
+                doc.pageMargins = [20, 20, 20, 20];
+                if (doc.styles && doc.styles.tableHeader) {
+                    doc.styles.tableHeader.fillColor = '#E6E6E6';
+                    doc.styles.tableHeader.color = 'black';
+                    doc.styles.tableHeader.alignment = 'left';
+                }
+                var tableNode = doc.content.find(function (c) { return c.table; });
+                if (tableNode) {
+                    tableNode.layout = {
+                        hLineWidth: function () { return 0.5; },
+                        vLineWidth: function () { return 0.5; },
+                        hLineColor: function () { return '#E6E6E6'; },
+                        vLineColor: function () { return '#E6E6E6'; },
+                        paddingLeft: function () { return 3; },
+                        paddingRight: function () { return 3; },
+                        paddingTop: function () { return 4; },
+                        paddingBottom: function () { return 4; }
+                    };
+                }
+            }
+        }
+    ];
+}
  
 
 $(document).on('click', '.btn-invoice-delete', function() {

@@ -151,7 +151,7 @@ if (!function_exists('PurchaseReportRecords')) {
 if (!function_exists('StockProfitReport')) {
    function StockProfitReport($request, $current_date)
    {
-      $query = " 1=1";
+      $query = " 1=1 AND IFNULL(ps.batch_wise_balance, 0) > 0";
       if (isset($request->company_id)) {
          $query .= " AND ps.company_id = $request->company_id";
       }
@@ -159,19 +159,30 @@ if (!function_exists('StockProfitReport')) {
          $query .= " AND ps.product_id = $request->product_id";
       }
       $query .= tenant_and('ps');
-    
-      $sales          =  DB::select("
+
+      // Batch-wise stock profit: each open batch bucket with its own unit cost.
+      $sales = DB::select("
                               SELECT
-                                 DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created, 
-                                 ps.*,
-                                 IFNULL(ps.sale_price,0) AS sale_price,
-                                 IFNULL(ps.purchase_price,0) AS purchase_price,
-                                 IFNULL(ps.balance,0) AS balance
+                                 DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
+                                 ps.id,
+                                 ps.company_id,
+                                 ps.product_id,
+                                 IFNULL(ps.company_name, (SELECT company_name FROM companies WHERE id = ps.company_id)) AS company_name,
+                                 IFNULL(ps.product_name, (SELECT product_name FROM products WHERE id = ps.product_id)) AS product_name,
+                                 IFNULL(ps.batch_wise_balance, 0) AS balance,
+                                 IFNULL(ps.batch_wise_balance, 0) AS qty,
+                                 IFNULL(NULLIF(ps.unit_cost_price, 0), IFNULL(ps.avg_cost_price_per_unit, 0)) AS purchase_price,
+                                 IFNULL(ps.avg_cost_price_per_unit, 0) AS avg_cost_price_per_unit,
+                                 IFNULL(ps.ttl_cost_price, 0) AS ttl_cost_price,
+                                 IFNULL((SELECT sale_price FROM products WHERE id = ps.product_id), 0) AS sale_price,
+                                 ps.expiry_date,
+                                 DATE_FORMAT(ps.expiry_date, '%d %b %Y') AS expiry_label
                               FROM
-                              vendor_stock_managment as ps  
-                              WHERE  
-                              $query AND balance > 0 
-                        "); 
+                              stock_batches_items as ps
+                              WHERE
+                              $query
+                              ORDER BY ps.company_id ASC, ps.product_id ASC, ps.expiry_date ASC, ps.id ASC
+                        ");
 
       return $sales;
    }

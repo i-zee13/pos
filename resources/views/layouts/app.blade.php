@@ -11,6 +11,14 @@
     {{-- Logged-in tenant ke system customers (Counter Sale / Expense / Net Purchase ...).
          JS me numeric id hardcode karne ke bajaye window.SYS_CUSTOMERS.<CODE> use karein. --}}
     <script>window.SYS_CUSTOMERS = {!! json_encode((object) sys_customers()) !!};</script>
+    <script>
+        window.EXPORT_META = {
+            companyName: @json(optional($organization)->name ?? ''),
+            companyAddress: @json(optional($organization)->address ?? ''),
+            companyPhone: @json(optional($organization)->phone_number ?? ''),
+            userName: @json(optional(Auth::user())->name ?? '')
+        };
+    </script>
     <!-- Favicon -->
     <link rel="shortcut icon" href="https://dashkit.goodthemes.co/assets/favicon/favicon.ico" type="image/x-icon">
     {{ seo()->render() }}
@@ -569,7 +577,7 @@
             }
         }
     </script>
-    <script src="{{asset('/js/custom/master.js')}}"> </script>
+    <script src="{{asset('/js/custom/master.js')}}?v=2"> </script>
 </body>
 
 </html>

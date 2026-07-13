@@ -76,7 +76,7 @@ $('.search-btn').on('click', function () {
                             <th style="color:red">Outgoing</th>
                             <th style="color:rgb(11, 246, 11)">Incoming</th>
                             <th>Balance</th>
-                            <th>Action</th>
+                            <th class="no-export">Action</th>
                         </tr>
                     </thead><tbody>
                 </tbody>
@@ -186,48 +186,21 @@ $('.search-btn').on('click', function () {
                  scrollY: '400px',
                  scrollCollapse: true,
                  dom: 'Bfrtip',
-                buttons: [{
+                buttons: typeof ledgerExportButtons === 'function'
+                    ? ledgerExportButtons(title)
+                    : [{
                         extend: 'excelHtml5',
                         text: 'Excel',
                         title: title,
                         exportOptions: {
-                            // columns: ':visible:not(:last-child)',
+                            columns: ':visible:not(:last-child)',
                             format: {
                                 body: function (innerHtml, rowIdx, colIdx, node) {
                                     return node.textContent;
                                 }
                             }
-                        },
-                        customize: function (xlsx) {
-
-                            //copy _createNode function from source
-                            function _createNode(doc, nodeName, opts) {
-                                var tempNode = doc.createElement(nodeName);
-
-                                if (opts) {
-                                    if (opts.attr) {
-                                        $(tempNode).attr(opts.attr);
-                                    }
-
-                                    if (opts.children) {
-                                        $.each(opts.children, function (key, value) {
-                                            tempNode.appendChild(value);
-                                        });
-                                    }
-
-                                    if (opts.text !== null && opts.text !== undefined) {
-                                        tempNode.appendChild(doc.createTextNode(opts.text));
-                                    }
-                                }
-
-                                return tempNode;
-                            }
-
                         }
-                    },
-
-                ],
-
+                    }],
             })
 
             $('.TeacherAttendanceListTable tbody').append(`
