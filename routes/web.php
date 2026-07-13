@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminSaleCloseController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseReturnController;
@@ -116,6 +117,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/', [HomeController::class,   'index'])->name('home');
     Route::get('/home', [HomeController::class,   'index'])->name('home');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/analytics/summary', [DashboardController::class, 'summary'])->name('analytics.summary');
     Route::get('/backups', [DatabaseBackupController::class, 'index'])->name('backups.index');
     Route::get('/backups/logs', [DatabaseBackupController::class, 'logs'])->name('backups.logs');
     Route::get('/backups/google/connect', [DatabaseBackupController::class, 'connectGoogleDrive'])->name('backups.google.connect');
