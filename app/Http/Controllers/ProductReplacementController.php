@@ -145,7 +145,7 @@ class ProductReplacementController extends Controller
                             $v_stock = updateStock($sale, $balance, $change_qty_value, $In_out_status, 'replacement', 6, $sale_product['prod_type']);
                             $vs_id              = $v_stock->id; 
                             // BatchWiseDeleteProduct($request->sale_invoice_id, $request->product_invoice_id, $request->qty, $In_out_status, 6);
-                            BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, $In_out_status, $request->hidden_invoice_id);
+                            BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, 6, $request->hidden_invoice_id);
                             StockManagment($v_stock->id, $sale, $change_qty_value, $In_out_status);
                             if ($v_stock->save()) {
                                 $sale->vendor_stock_id = $v_stock->id;

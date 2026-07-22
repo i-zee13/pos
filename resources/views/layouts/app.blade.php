@@ -431,7 +431,11 @@
         var segments = location.href.split('/');
         var action = segments[3];
         $(document).ready(function() {
-            setTimeout(() => { 
+            setTimeout(() => {
+                // Analytics page owns its own loader until /analytics/summary returns
+                if ($('#analyticsPage').length) {
+                    return;
+                }
                 $('#tblLoader').hide();
                 $('.parent-div').show();
             }, 1500);

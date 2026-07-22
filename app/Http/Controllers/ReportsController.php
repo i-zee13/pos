@@ -202,84 +202,149 @@ class ReportsController extends Controller
    public function allStockValueReport()
    {
       $companies  =   Company::select('id', 'company_name')->get();
-      $products   =   Product::select('id', 'product_name')->get();
+      $products   =   Product::select('id', 'product_name', 'company_id')->get();
       return view('reports.stock-value-report', compact('companies', 'products'));
    }
    public function fetchStockValueReport(Request $request)
    {
-      $query               =  " 1=1";
-      if (isset($request->company_id)) {
-         $query      .= " AND vs.company_id =  $request->company_id";
+      $query = " 1=1";
+      if ($request->filled('company_id')) {
+         $query .= " AND vs.company_id = ".(int) $request->company_id;
       }
-      if (isset($request->product_id)) {
-         $query      .= " AND vs.product_id = $request->product_id";
+      if ($request->filled('product_id')) {
+         $query .= " AND vs.product_id = ".(int) $request->product_id;
       }
       $query .= tenant_and('vs');
-// ;      if ($request->filter_by_value == '2') {
-         // $where            =  " DATE(vs.created_at) BETWEEN '$request->start_date' AND '$request->end_date' AND vs.transaction_type != 4 ";
-         // $where            =  " DATE(vs.created_at) <= $request->end_date";
-      // }
-      //  else {
-      //    $where            =  " DATE(vs.created_at) <= '$request->end_date' ";
-      //    $group_order_by   =   "ORDER BY vs.id DESC";
-      //    $select_query     =  "( SELECT SUM(purchased_total_amount)/ SUM(qty) as avg_product_value FROM products_purchases vs  WHERE $query ) as avg_product_value ";
-      // }
+      // Stock value report: only products that currently have stock
+      $query .= " AND vs.balance > 0";
 
-      $records = DB::select("SELECT vs.balance AS balance, vs.vs_id,vs.product_id,vs.ttl_avg_cost,vs.ttl_cost,vs.purchase_price,
-                                 IFNULL(
-                                    (SELECT company_name FROM companies WHERE id = vs.company_id),'') AS company_name,
-                                 IFNULL(
-                                    (SELECT product_name FROM products WHERE id = vs.product_id),'') AS product_name,
-                                 IFNULL(
-                                    (SELECT sale_price FROM products WHERE id = vs.product_id),'') AS sale_price
-                              FROM
-                              vendor_stock_managment vs
-                              WHERE
-                              $query
-                              ");
-                              
-      // dd($records);
-      // $records             =  DB::select("
-      //                            SELECT
-      //                               vs.balance AS balance,
-      //                               vs.id AS vs_id,
-      //                               IFNULL(
-      //                                  (SELECT company_name FROM companies WHERE id = vs.company_id),
-      //                                  ''
-      //                               ) as company_name,
-      //                               IFNULL(
-      //                                  (SELECT product_name FROM products WHERE id = vs.product_id),
-      //                                  ''
-      //                               ) AS product_name,
-      //                               product_unit_price AS p_price,
-      //                               (SELECT invoice_no FROM purchase_invoices where purchase_invoices.id =  vs.purchase_invoice_id) AS purchase_invoice_id,
-      //                               vs.qty AS qty,
-      //                               vs.transaction_type,
-      //                               vs.status,
-      //                               vs.product_id,
-      //                               (SELECT invoice_no FROM sale_invoices where sale_invoices.id =  vs.sale_invoice_id) AS sale_invoice_id,
-      //                               (SELECT customer_name FROM customers WHERE id = vs.vendor_id) AS vendor_name,
-      //                               IFNULL((SELECT customer_name FROM customers WHERE id = (SELECT customer_id FROM sale_invoices WHERE sale_invoices.id=vs.sale_invoice_id)),'') AS customer_name,
-      //                               $select_query
-      //                            FROM
-      //                            vendor_stocks vs
-      //                            JOIN (
-      //                               SELECT product_id, MAX(id) AS max_id
-      //                               FROM `vendor_stocks` as vs
-      //                               WHERE $inner_join_where
-      //                               GROUP BY product_id
-      //                           ) AS max_ids
-      //                           ON vs.product_id = max_ids.product_id
-      //                           AND vs.id = max_ids.max_id
-      //                            WHERE
-      //                            $query
-      //                            $group_order_by
-      //                         ");
-    
+      $mode = (string) $request->get('filter_by_value', '1');
+
+      // Latest vendor_stock_managment row per product only
+      $records = DB::select("
+         SELECT
+            vs.balance AS balance,
+            vs.vs_id,
+            vs.product_id,
+            vs.company_id,
+            vs.ttl_avg_cost,
+            vs.ttl_cost,
+            vs.purchase_price,
+            IFNULL((SELECT company_name FROM companies WHERE id = vs.company_id), '') AS company_name,
+            IFNULL((SELECT product_name FROM products WHERE id = vs.product_id), '') AS product_name,
+            IFNULL((SELECT sale_price FROM products WHERE id = vs.product_id), '') AS sale_price
+         FROM vendor_stock_managment vs
+         INNER JOIN (
+            SELECT product_id, MAX(id) AS mid
+            FROM vendor_stock_managment
+            GROUP BY product_id
+         ) latest ON latest.mid = vs.id
+         WHERE $query
+         ORDER BY vs.company_id ASC, vs.product_id ASC
+      ");
+
+      $productIds = array_values(array_unique(array_map(function ($r) {
+         return (int) $r->product_id;
+      }, $records)));
+
+      $batchesByProduct = [];
+      $totalBatchCount = 0;
+      if (count($productIds) > 0) {
+         $idList = implode(',', $productIds);
+         $batchRows = DB::select("
+            SELECT
+               product_id,
+               IFNULL(NULLIF(expiry_date, '0000-00-00'), 'NO-EXPIRY') AS expiry_date,
+               ROUND(batch_wise_balance, 6) AS batch_wise_balance,
+               ROUND(IFNULL(unit_cost_price, 0), 6) AS unit_cost_price,
+               ROUND(IFNULL(unit_cost_price, 0) * batch_wise_balance, 6) AS line_cost
+            FROM stock_batches_items
+            WHERE batch_wise_balance >= 1
+              AND product_id IN ($idList)
+            ORDER BY product_id ASC, expiry_date ASC, unit_cost_price ASC, id ASC
+         ");
+         foreach ($batchRows as $b) {
+            $pid = (int) $b->product_id;
+            if (!isset($batchesByProduct[$pid])) {
+               $batchesByProduct[$pid] = [];
+            }
+            $batchesByProduct[$pid][] = $b;
+            $totalBatchCount++;
+         }
+      }
+
+      $console = [];
+      $console[] = '=== Stock Value Report — formula console ===';
+      $console[] = 'Mode: '.($mode === '2' ? 'By Last Price (purchase_price)' : 'By Average (ttl_avg_cost from open batches)');
+      $console[] = 'Request: company_id='.($request->company_id ?: 'ALL').' product_id='.($request->product_id ?: 'ALL');
+      $console[] = 'Path: POST /fetch-stock-value-report → ReportsController@fetchStockValueReport → vendor_stock_managment (+ stock_batches_items breakdown)';
+      $console[] = '';
+
+      foreach ($records as $row) {
+         $pid = (int) $row->product_id;
+         $batches = $batchesByProduct[$pid] ?? [];
+         $row->batch_count = count($batches);
+         $row->batches = $batches;
+
+         $sumQty = 0.0;
+         $sumCost = 0.0;
+         $console[] = '--------------------------------------------------';
+         $console[] = '#'.$pid.' '.$row->product_name.' ('.$row->company_name.')';
+         $console[] = 'Stock balance (VSM): '.$row->balance;
+         $console[] = 'Open batches: '.$row->batch_count;
+
+         if ($mode === '2') {
+            $unit = (float) $row->purchase_price;
+            $console[] = 'By Last Price: unit = purchase_price = '.$unit;
+            $console[] = 'Value = '.$unit.' × '.$row->balance.' = '.round($unit * (float) $row->balance, 4);
+            $row->computed_avg = $unit;
+            $row->avg_formula = 'last_price';
+         } else {
+            if (count($batches) === 0) {
+               // No open batches ⇒ average cannot be calculated from stock.
+               // Do NOT reuse old VSM ttl_avg_cost (that is leftover from when stock existed).
+               $console[] = 'No open batches — average = 0 (old stored avg ignored)';
+               $row->computed_avg = 0;
+               $row->ttl_avg_cost = 0;
+               $row->avg_formula = 'no_open_batches';
+            } else {
+               $console[] = 'Average formula: Σ(unit_cost × batch_qty) / Σ(batch_qty)';
+               foreach ($batches as $i => $b) {
+                  $sumQty += (float) $b->batch_wise_balance;
+                  $sumCost += (float) $b->line_cost;
+                  $console[] = '  batch['.($i + 1).'] expiry='.$b->expiry_date
+                     .' qty='.$b->batch_wise_balance
+                     .' cost='.$b->unit_cost_price
+                     .' → line='.$b->line_cost;
+               }
+               $computed = $sumQty > 0 ? round($sumCost / $sumQty, 6) : 0.0;
+               $console[] = 'Σ cost = '.$sumCost.' | Σ qty = '.$sumQty.' | AVG = '.$computed;
+               $console[] = 'VSM ttl_avg_cost (stored) = '.(float) $row->ttl_avg_cost;
+               $console[] = 'Value = '.$computed.' × '.$row->balance.' = '.round($computed * (float) $row->balance, 4);
+               $row->computed_avg = $computed;
+               $row->batch_qty_sum = round($sumQty, 6);
+               $row->batch_cost_sum = round($sumCost, 6);
+               $row->avg_formula = 'sum(unit_cost*qty)/sum(qty)';
+               // Prefer live batch avg for display when available
+               $row->ttl_avg_cost = $computed;
+            }
+         }
+      }
+
+      $console[] = '--------------------------------------------------';
+      $console[] = 'TOTAL open batches in result: '.$totalBatchCount;
+      $console[] = 'TOTAL products: '.count($records);
+
       return response()->json([
-         'msg'     =>   'Stock reports list fetched',
-         'status'  =>   'success',
-         'records' =>   $records
+         'msg' => 'Stock reports list fetched',
+         'status' => 'success',
+         'records' => $records,
+         'meta' => [
+            'mode' => $mode === '2' ? 'last_price' : 'average',
+            'total_products' => count($records),
+            'total_batches' => $totalBatchCount,
+            'console' => $console,
+         ],
       ]);
    }
    //Expense Reports 

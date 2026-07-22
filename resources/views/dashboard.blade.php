@@ -448,5 +448,5 @@
 <script src="https://code.highcharts.com/highcharts-more.js"></script>
 <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-<script src="{{ asset('js/custom/analytics.js') }}?v=8"></script>
+<script src="{{ asset('js/custom/analytics.js') }}?v={{ time() }}"></script>
 @endpush

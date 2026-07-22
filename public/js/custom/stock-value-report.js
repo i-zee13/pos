@@ -3,6 +3,232 @@ var batches = [];
 var sessions = [];
 var CurrentRef = '';
 var segments = location.href.split('/');
+var allProductOptions = null;
+
+function cacheProductOptions() {
+    if (allProductOptions !== null) return;
+    allProductOptions = $('.product_id').first().find('option').clone();
+}
+
+function filterProductsByCompany(companyId) {
+    cacheProductOptions();
+    var $product = $('.product_id').first();
+    var current = $product.val();
+    $product.empty();
+    allProductOptions.each(function () {
+        var $opt = $(this);
+        var cid = $opt.data('company-id');
+        if ($opt.val() === '' || !companyId || String(cid) === String(companyId)) {
+            $product.append($opt.clone());
+        }
+    });
+    if (current && $product.find('option[value="' + current + '"]').length) {
+        $product.val(current);
+    } else {
+        $product.val('');
+    }
+    if ($product.hasClass('select2-hidden-accessible')) {
+        $product.trigger('change.select2');
+    }
+}
+
+function setAvgConsoleHtml(html) {
+    $('#avgConsoleBody').html(html || '<p class="avg-hint">No breakdown available.</p>');
+}
+
+function setAvgConsoleMessage(msg) {
+    setAvgConsoleHtml('<p class="avg-hint">' + msg + '</p>');
+}
+
+function fmtMoney(n) {
+    var v = toNum(n);
+    return addCommas(Number.isInteger(v) ? v : parseFloat(v.toFixed(4)));
+}
+
+function buildAvgConsoleHtml(records, meta, mode) {
+    meta = meta || {};
+    records = records || [];
+    var isAvg = String(mode) === '1';
+    var html = '';
+
+    html += '<div class="avg-summary">';
+    html += '<strong>Mode:</strong> ' + (isAvg ? 'By Average (weighted average of open batches)' : 'By Last Price') + '<br>';
+    html += '<strong>Products:</strong> ' + (meta.total_products != null ? meta.total_products : records.length);
+    html += ' &nbsp;|&nbsp; <strong>Open Batches:</strong> ' + (meta.total_batches != null ? meta.total_batches : 0);
+    html += '</div>';
+
+    if (!records.length) {
+        html += '<p class="avg-hint">Is filter pe koi stock record nahi mila.</p>';
+        return html;
+    }
+
+    records.forEach(function (row, idx) {
+        var name = (row.product_name || 'Product') + ' <span style="opacity:.75;font-weight:500">(' + (row.company_name || '') + ')</span>';
+        var balance = toNum(row.balance);
+        var batchList = row.batches || [];
+        var cost = isAvg
+            ? toNum(row.computed_avg != null ? row.computed_avg : row.ttl_avg_cost)
+            : toNum(row.purchase_price);
+        var value = cost * balance;
+
+        var displayAvg = cost; // may update after batch sum
+
+        html += '<div class="avg-product-block">';
+        html += '<div class="avg-product-head">';
+        html += '<div class="avg-product-title">' + (idx + 1) + '. ' + name + '</div>';
+        html += '<div class="avg-rate-badge" data-avg-slot="' + idx + '"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(displayAvg) + '</span></div>';
+        html += '</div>';
+        html += '<div class="avg-product-meta">Stock Qty: <strong>' + fmtMoney(balance) + '</strong>';
+        html += ' &nbsp;|&nbsp; Open Batches: <strong>' + (row.batch_count != null ? row.batch_count : batchList.length) + '</strong></div>';
+
+        if (!isAvg) {
+            html += '<div class="avg-formula-note">Last purchase price use ho rahi hai (average nahi).</div>';
+            html += '<div class="avg-result-box avg-result-flex">';
+            html += '<div class="avg-result-left">';
+            html += 'Unit Price = <span class="avg-big">' + fmtMoney(cost) + '</span><br>';
+            html += 'Stock Value = ' + fmtMoney(cost) + ' × ' + fmtMoney(balance) + ' = <span class="avg-big">' + fmtMoney(value) + '</span>';
+            html += '</div>';
+            html += '<div class="avg-rate-badge large"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(cost) + '</span></div>';
+            html += '</div></div>';
+            return;
+        }
+
+        html += '<div class="avg-formula-note"><strong>Simple formula:</strong> (har batch ka Rate × Qty) ka total ÷ total Qty = Average Rate</div>';
+
+        if (!batchList.length) {
+            html += '<div class="avg-empty">Is product pe <strong>open batch nahi</strong> — is liye average rate <strong>0</strong> (purani saved average use nahi hoti).</div>';
+            html += '<div class="avg-result-box avg-result-flex">';
+            html += '<div class="avg-result-left">Stock Value = 0 × ' + fmtMoney(balance) + ' = <span class="avg-big">0</span></div>';
+            html += '<div class="avg-rate-badge large"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">0</span></div>';
+            html += '</div></div>';
+            return;
+        }
+
+        var sumQty = 0;
+        var sumCost = 0;
+        html += '<table class="avg-batch-table"><thead><tr>';
+        html += '<th>#</th><th>Expiry Date</th><th>Qty</th><th>Rate (per unit)</th><th>Batch Value (Rate × Qty)</th>';
+        html += '</tr></thead><tbody>';
+
+        batchList.forEach(function (b, i) {
+            var qty = toNum(b.batch_wise_balance);
+            var rate = toNum(b.unit_cost_price);
+            var line = toNum(b.line_cost != null ? b.line_cost : (rate * qty));
+            sumQty += qty;
+            sumCost += line;
+            var exp = (b.expiry_date && b.expiry_date !== 'NO-EXPIRY') ? b.expiry_date : 'No Expiry';
+            html += '<tr>';
+            html += '<td>Batch ' + (i + 1) + '</td>';
+            html += '<td>' + exp + '</td>';
+            html += '<td>' + fmtMoney(qty) + '</td>';
+            html += '<td>' + fmtMoney(rate) + '</td>';
+            html += '<td><strong>' + fmtMoney(line) + '</strong></td>';
+            html += '</tr>';
+        });
+
+        html += '</tbody><tfoot><tr>';
+        html += '<td colspan="2">TOTAL</td>';
+        html += '<td>' + fmtMoney(sumQty) + '</td>';
+        html += '<td></td>';
+        html += '<td>' + fmtMoney(sumCost) + '</td>';
+        html += '</tr></tfoot></table>';
+
+        var avg = sumQty > 0 ? sumCost / sumQty : cost;
+        // Fix header badge with live batch avg (header was written with pre-calc cost which matches after API sets computed_avg)
+        html = html.replace(
+            'data-avg-slot="' + idx + '"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(displayAvg) + '</span>',
+            'data-avg-slot="' + idx + '"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(avg) + '</span>'
+        );
+
+        html += '<div class="avg-result-box avg-result-flex">';
+        html += '<div class="avg-result-left">';
+        html += 'Total Batch Value = <strong>' + fmtMoney(sumCost) + '</strong><br>';
+        html += 'Total Qty = <strong>' + fmtMoney(sumQty) + '</strong><br>';
+        html += 'Average Rate = ' + fmtMoney(sumCost) + ' ÷ ' + fmtMoney(sumQty) + ' = <span class="avg-big">' + fmtMoney(avg) + '</span><br>';
+        html += 'Stock Value = ' + fmtMoney(avg) + ' × ' + fmtMoney(balance) + ' = <span class="avg-big">' + fmtMoney(avg * balance) + '</span>';
+        html += '</div>';
+        html += '<div class="avg-rate-badge large"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(avg) + '</span></div>';
+        html += '</div></div>';
+    });
+
+    return html;
+}
+
+function openAvgConsole() {
+    $('#avgFormulaConsole').addClass('open').attr('aria-hidden', 'false');
+    $('#avgConsoleToggle').addClass('active');
+}
+
+function closeAvgConsole() {
+    $('#avgFormulaConsole').removeClass('open').attr('aria-hidden', 'true');
+    $('#avgConsoleToggle').removeClass('active');
+}
+
+function toggleAvgConsole() {
+    if ($('#avgFormulaConsole').hasClass('open')) {
+        closeAvgConsole();
+    } else {
+        openAvgConsole();
+    }
+}
+
+$(document).on('click', '#avgConsoleToggle', toggleAvgConsole);
+$(document).on('click', '#avgConsoleClose', closeAvgConsole);
+
+(function initAvgConsoleResize() {
+    var $panel = $('#avgFormulaConsole');
+    var $handle = $('#avgConsoleResize');
+    if (!$panel.length || !$handle.length) return;
+
+    var dragging = false;
+    var minH = 160;
+    var maxRatio = 0.92;
+
+    function applyHeight(px) {
+        var maxH = Math.floor(window.innerHeight * maxRatio);
+        var h = Math.max(minH, Math.min(maxH, px));
+        $panel.css('height', h + 'px');
+        try { localStorage.setItem('avgConsoleHeight', String(h)); } catch (e) {}
+    }
+
+    function restoreHeight() {
+        var saved = null;
+        try { saved = localStorage.getItem('avgConsoleHeight'); } catch (e) {}
+        if (saved) {
+            applyHeight(parseInt(saved, 10));
+        }
+    }
+
+    $handle.on('mousedown touchstart', function (e) {
+        if (!$panel.hasClass('open')) return;
+        dragging = true;
+        $panel.addClass('resizing');
+        e.preventDefault();
+    });
+
+    $(document).on('mousemove touchmove', function (e) {
+        if (!dragging) return;
+        var clientY = e.type.indexOf('touch') === 0
+            ? (e.originalEvent.touches[0] && e.originalEvent.touches[0].clientY)
+            : e.clientY;
+        if (clientY == null) return;
+        applyHeight(window.innerHeight - clientY);
+    });
+
+    $(document).on('mouseup touchend touchcancel', function () {
+        if (!dragging) return;
+        dragging = false;
+        $panel.removeClass('resizing');
+    });
+
+    restoreHeight();
+    var _open = openAvgConsole;
+    openAvgConsole = function () {
+        _open();
+        restoreHeight();
+    };
+})();
+
 $('.search-btn').on('click', function () {
     var start_date = $('.start_date').val();
     var end_date = $('.end_date').val();
@@ -22,6 +248,7 @@ $('.search-btn').on('click', function () {
         }, 3000);
         return;
     }
+    // Company alone is enough — shows all products of that company
     if ($('.company_id').val() == 0 && $('.product_id').val() == 0 && $('.expiry-select').val() == '') {
         $('#notifDiv').fadeIn().css('background', 'red').text('Please Select Company/Product First.');
         setTimeout(function () {
@@ -41,8 +268,7 @@ $('.search-btn').on('click', function () {
         },
         success: function success(response) {
             CurrentRef.attr('disabled', false);
-            
-            CurrentRef.attr('disabled', false);
+
             var filter_selected = $('.filter_by_value').val();
             $('.loader').show();
             $('.teacher_attendance_list').empty();
@@ -53,16 +279,17 @@ $('.search-btn').on('click', function () {
                       <th hidden>id</th>
                       <th>#</th>
                       <th>Company Name</th>
-                      <th>Product Name</th> 
+                      <th>Product Name</th>
                       <th>Unit Cost</th>
-                       <th>QTY</th>
-                      <th>Balance</th> 
+                      <th>Batches</th>
+                      <th>QTY</th>
+                      <th>Balance</th>
                   </tr>
               </thead><tbody>
           </tbody>
           </table>`);
             $('.TeacherAttendanceListTable tbody').empty();
-            if (response.records.length == 0) {
+            if (!response.records || response.records.length == 0) {
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'green');
                 $('#notifDiv').text('No data available');
@@ -72,15 +299,14 @@ $('.search-btn').on('click', function () {
             }
             let total_balance = 0;
             var last_balance = 0;
-            var ttl_qty_purchase = 0; 
-            response.records.forEach((element, key) => {
-                console.log(element)
+            var ttl_qty_purchase = 0;
+            (response.records || []).forEach((element, key) => {
                 var cost = 0;
                 var amount = 0;
-                console.warn(filter_selected);
                 if (filter_selected == 1) {
-                    amount = toNum(element.ttl_avg_cost) * toNum(element.balance);
-                    cost = toNum(element.ttl_avg_cost);
+                    // Prefer live computed avg from API when present
+                    cost = toNum(element.computed_avg != null ? element.computed_avg : element.ttl_avg_cost);
+                    amount = cost * toNum(element.balance);
                 } else {
                     amount = toNum(element.purchase_price) * toNum(element.balance);
                     cost = toNum(element.purchase_price);
@@ -89,59 +315,54 @@ $('.search-btn').on('click', function () {
                 total_balance += toNum(element['balance']);
                 ttl_qty_purchase += toNum(element.qty);
                 var balance = toNum(element.balance);
-                var percentageValue = (element.sale_price - element.p_price) / element.p_price * 100;
-                var date = new Date(element.expire_date);
-                var formattedDate = date.toDateString();
+                var batchCount = element.batch_count != null ? element.batch_count : 0;
                 $('.TeacherAttendanceListTable tbody').append(`
               <tr>
-                  <td hidden>${element['id']}</td>
+                  <td hidden>${element['id'] || element['vs_id'] || ''}</td>
                   <td>${key+1}</td>
                   <td>${element['company_name'] }</td>
                   <td>${element['product_name'] }</td>
                   <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${cost ? addCommas(cost) : 0}</td>
-                   <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(balance)}</td>
-                  <td style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(amount)}</td> 
+                  <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${batchCount}</td>
+                  <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(balance)}</td>
+                  <td style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(amount)}</td>
               </tr>`);
             });
-            // if (filter_selected == 1) {
-            //     console.log(last_balance, ttl_qty_purchase);
-            //     last_balance = parseFloat(last_balance / ttl_qty_purchase).toFixed(3);
-            // }
             $('.TeacherAttendanceListTable tbody').append(`
               <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
                   <td class="font18" align="right" ></td>
-                  <td class="font18" align="center" colspan="3">Grand Total :</td>
+                  <td class="font18" align="center" colspan="4">Grand Total :</td>
                   <td class="totalNo">
                       <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(total_balance)}</span>
                   </td>
                   <td class="totalNo">
-                      <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(last_balance)}</span>
+                      <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;color:#7CFFB2;">${addCommas(last_balance)}</span>
                   </td>
               </tr>
           `);
-            $('.ttl_stock_in_hand').html(addCommas(last_balance));
             $('.TeacherAttendanceListTable').fadeIn();
             $('.loader').hide();
 
+            var meta = response.meta || {};
             $('.ttl_stock_in_hand').html(last_balance ? '<span>Rs. </span>' + addCommas(last_balance) : '<span>Rs. </span>' + 0);
-            $('.ttl_products').html(response.records.length ? addCommas(response.records.length) : 0);
-            if ($('.expiry-select').val() != '') {
-                $('.ttl_stock_in').html(0);
-                $('.ttl_stock_out').html(0);
-            } else {
-                $('.ttl_stock_in').html(stock_in ? addCommas(stock_in) : 0);
-                $('.ttl_stock_out').html(stock_out ? addCommas(stock_out) : 0);
+            $('.ttl_products').html(meta.total_products != null ? addCommas(meta.total_products) : (response.records ? response.records.length : 0));
+            $('.ttl_batches').html(meta.total_batches != null ? addCommas(meta.total_batches) : 0);
+
+            setAvgConsoleHtml(buildAvgConsoleHtml(response.records || [], meta, filter_selected));
+            if (filter_selected == 1) {
+                openAvgConsole();
             }
+
             var title = '';
             if (segments[3] == 'customer-reports') {
                 title = 'Customer Report';
             } else {
                 title = 'Vendor Report';
             }
-            if ($.fn.DataTable.isDataTable(".StockListTable")) {
-                $('.StockListTable').DataTable().clear().destroy();
+            if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
+                $('.TeacherAttendanceListTable').DataTable().clear().destroy();
             }
-            var table = $('.StockListTable').DataTable({
+            var table = $('.TeacherAttendanceListTable').DataTable({
                 "bSort": false,
                 "bPaginate": false,
                 scrollX: false,
@@ -155,7 +376,6 @@ $('.search-btn').on('click', function () {
                         header: true,
                         exportOptions: {
                             alignment: 'left',
-                            // columns: ':visible:not(:last-child)',
                         },
                         customize: function (doc) {
                             doc.content.splice(0, 1, {
@@ -165,31 +385,16 @@ $('.search-btn').on('click', function () {
                                         fontSize: 14,
                                         alignment: 'left'
                                     },
-                                    // {
-                                    //     text: 'Sale Report ',
-                                    //     bold: false,
-                                    //     fontSize: 14,
-                                    //     alignment: 'left'
-                                    // },
-                                    // {
-                                    //     text: `()`,
-                                    //     bold: true,
-                                    //     fontSize: 11,
-                                    //     alignment: 'right',
-                                    // }
                                 ],
                                 margin: [0, 0, 0, 12],
                             });
-                            console.log(doc);
                             doc.pageMargins = [20, 12, 20, 12];
-                            // doc.styles.tableBodyOdd.fillColor = "#FFA07A";
                             doc.styles.tableHeader.fillColor = "#E6E6E6";
                             doc.styles.tableFooter.fillColor = "#E6E6E6";
                             doc.styles.tableHeader.color = "black";
                             doc.styles.tableHeader.alignment = "left";
                             doc.styles.title.alignment = "left";
                             doc.content[1].table.widths = 'auto';
-                            //cell border
                             var objLayout = {};
                             objLayout['hLineWidth'] = function (i) {
                                 return 0.5;
@@ -217,10 +422,6 @@ $('.search-btn').on('click', function () {
                             };
                             doc.content[1].layout = objLayout;
 
-                            //cell border
-                            age = table.column(3).data().toArray();
-
-                            // testing for the background of the row
                             doc.content[1].table.body.forEach((element) => {
                                 element.forEach((el) => {
                                     element.forEach((cell) => {
@@ -259,24 +460,28 @@ $('.search-btn').on('click', function () {
                             }
                         },
                         customize: function customize(win) {
-                            // Change the default print title
                             $(win.document.body).find('h1').text(title);
-
-                            // Add a footer with the current date and time
                             var date = new Date().toLocaleString();
                             $(win.document.body).append('<div style="text-align:center;font-size:10px;">' + date + '</div>');
-
-                            // Remove the default DataTables styling from the print view
                             $(win.document.body).find('table').removeClass('display').addClass('table').css('font-size', 'inherit');
                         }
                     }
                 ]
             });
+        },
+        error: function () {
+            CurrentRef.attr('disabled', false);
+            $('.loader').hide();
+            setAvgConsoleMessage('Request failed. Please try Search again.');
+            openAvgConsole();
         }
     });
 });
+
 $('.company_id').on('change', function () {
     var company_id = $(this).val();
+    filterProductsByCompany(company_id);
+
     var batch = batches.filter(function (x) {
         return x.company_id == company_id;
     });
@@ -290,9 +495,16 @@ $('.company_id').on('change', function () {
         });
     }
 });
+
 $('.reset-btn').on('click', function () {
     $('.company_id,.expiry-select,.product_id').val('').trigger('change');
+    filterProductsByCompany('');
     $('#search-form')[0].reset();
+    $('.ttl_stock_in_hand').html('<span>Rs. </span>0');
+    $('.ttl_products').html('0');
+    $('.ttl_batches').html('0');
+    setAvgConsoleMessage('Company / Product select karke <strong>By Average</strong> + Search karen — yahan har product ka batch-wise hisaab table mein dikhega.');
+    closeAvgConsole();
     $('.teacher_attendance_list').empty();
     $('.teacher_attendance_list').append("\n            <div class=\"col-12 pb-10\">\n            <div class=\"no-info\"> <div class=\"m-auto\"><strong>Please Filter Your Stock Record !</strong></div>\n            </div>\n        </div>\n        ");
 });
@@ -307,4 +519,10 @@ function addCommas(nStr) {
         x1 = x1.replace(rgx, "$1" + "," + "$2");
     }
     return x1 + x2;
+}
+
+function toNum(v) {
+    if (v === null || v === undefined || v === '') return 0;
+    var n = parseFloat(String(v).replace(/,/g, ''));
+    return isNaN(n) ? 0 : n;
 }

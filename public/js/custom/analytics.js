@@ -480,12 +480,9 @@
         $('#analyticsMonth').on('change', function () {
             if (mode === 'monthly') loadSummary();
         });
+        // Keep page hidden until first summary response (layout no longer forces show at 1.5s)
+        $('#analyticsPage').hide();
+        $('#tblLoader').show();
         setMode('daily');
-        setTimeout(function () {
-            if (loading) {
-                $('#tblLoader').show();
-                $('#analyticsPage').addClass('blur-div');
-            }
-        }, 1600);
     });
 })();
