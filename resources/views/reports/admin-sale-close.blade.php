@@ -2,6 +2,8 @@
 @section('content')
 @php
     $closeDate = request('date', date('Y-m-d'));
+    // Tenant 1 = show Purchi on this same Admin Close page (no redirect)
+    $inlinePurchi = ((int) (current_tenant_id() ?? 0) === 1);
 @endphp
 <style>
     body {
@@ -291,9 +293,15 @@
 <div class="card" style="padding: 0px">
     <div class="header m-0">
         <h2 style="width: 100%">Sale Close <span>Detail</span>
+            @if($inlinePurchi)
+            <button type="button" id="viewPurchiBtn" class="btn add_button view-purchi-inline-btn" style="right: 115px!important;top:-2px!important">
+                <i class="fa fa-file-alt"></i> <span class="view-purchi-label">View Purchi</span>
+            </button>
+            @else
             <a href="{{ route('admin-sale-close-purchi', ['date' => $closeDate]) }}" class="btn add_button view-purchi-link" style="right: 115px!important;top:-2px!important">
                 <i class="fa fa-file-alt"></i> View Purchi
             </a>
+            @endif
             <button class="btn add_button sale-close-btn-modal" data-toggle="modal" data-target="#close-modal" style="right: 0px!important;top:-2px!important">
                 <i class="fa fa-check"></i>
                 @php
@@ -510,6 +518,30 @@
         </div>
     </div>
     @include('reports.partials.admin-sale-close-modal')
+
+    @if($inlinePurchi)
+    <div class="card mt-3" id="inlinePurchiPanel" style="padding: 0px; display: none;">
+        <div class="header m-0">
+            <h2 style="width: 100%">Purchi <span>Detail</span>
+                <a class="btn add_button" style="right: 0px!important;top:-2px!important" data-toggle="modal" data-target="#print-modal">
+                    <i class="fa fa-download"></i> Print DSR
+                </a>
+            </h2>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="body teacher_attendance_list">
+                    <div class="col-md-12">
+                        <div class="row">
+                            @include('reports.partials.admin-sale-close-purchi')
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @include('reports.partials.admin-sale-close-print-modal')
+    @endif
 @endsection
 @push('js')
     <script>
@@ -520,8 +552,57 @@
                 });
             });
         })(jQuery);
+        window.INLINE_PURCHI = {{ $inlinePurchi ? 'true' : 'false' }};
+        window.CURRENT_TENANT_ID = {{ (int) (current_tenant_id() ?? 0) }};
     </script>
-    <script src="{{ asset('js/custom/admin-sale-close-date.js') }}"></script>
+    <script src="{{ asset('js/custom/admin-sale-close-date.js') }}?v=2"></script>
     <script src="{{ asset('js/custom/admin-sale-close-modal.js') }}"></script>
     <script src="{{ asset('js/custom/admin-sale-close.js') }}"></script>
+    @if($inlinePurchi)
+    @include('reports.partials.admin-sale-close-print-scripts')
+    <script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}?v=2"></script>
+    <script>
+        (function ($) {
+            var purchiVisible = false;
+
+            function loadInlinePurchi(date) {
+                date = date || (typeof getSelectedCloseDate === 'function' ? getSelectedCloseDate() : $('.selected_date').val());
+                if (!date || typeof PurchiRecord !== 'function') {
+                    return;
+                }
+                PurchiRecord(date);
+            }
+
+            function toggleInlinePurchi(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                purchiVisible = !purchiVisible;
+                if (purchiVisible) {
+                    $('#inlinePurchiPanel').slideDown(200);
+                    $('.view-purchi-label').text('Hide Purchi');
+                    loadInlinePurchi();
+                    setTimeout(function () {
+                        var $panel = $('#inlinePurchiPanel');
+                        if ($panel.length) {
+                            $('html, body').animate({ scrollTop: $panel.offset().top - 80 }, 300);
+                        }
+                    }, 220);
+                } else {
+                    $('#inlinePurchiPanel').slideUp(200);
+                    $('.view-purchi-label').text('View Purchi');
+                }
+            }
+
+            $(document).on('click', '#viewPurchiBtn, .view-purchi-inline-btn', toggleInlinePurchi);
+
+            $('.selected_date').on('change', function () {
+                if (purchiVisible) {
+                    loadInlinePurchi($(this).val());
+                }
+            });
+        })(jQuery);
+    </script>
+    @endif
 @endpush

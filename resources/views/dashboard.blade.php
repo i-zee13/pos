@@ -73,7 +73,6 @@
         font-family: 'Rationale', sans-serif !important; font-size: 28px; color: #0038ba; margin-left: 6px;
     }
     .mix-bars { margin-top: 8px; }
-    .mix-bar-row { margin-bottom: 14px; }
     .mix-bar-head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #243447; margin-bottom: 5px; }
     .mix-bar-head .pct { color: #0038ba; }
     .mix-bar-track { height: 7px; background: #eef1f5; border-radius: 6px; overflow: hidden; }
@@ -139,10 +138,26 @@
         min-width: 0;
         border: 1px solid #e8ecf1; border-radius: 10px; padding: 10px 12px 10px 14px;
         position: relative; background: #fff;
-        transition: transform .2s ease, box-shadow .2s ease;
+        border-bottom: solid 1px #e8ecf1;
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        cursor: default;
     }
     .product-card-an:hover {
-        transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,.08);
+        background-color: #ffffff;
+        box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
+        border-bottom: solid 1px #0038ba;
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+        -ms-transform: scale(1.02);
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
+        z-index: 1;
     }
     .product-card-an:before {
         content: ''; position: absolute; left: 0; top: 12px; width: 3px; height: 28px; background: #0038ba; border-radius: 0 2px 2px 0;
@@ -160,6 +175,22 @@
     .split-pill {
         display: flex; justify-content: space-between; background: #f4f6f9; border-radius: 8px;
         padding: 10px 12px; margin-bottom: 8px; font-size: 13px;
+        border-bottom: solid 1px transparent;
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        cursor: default;
+    }
+    .split-pill:hover {
+        background-color: #ffffff;
+        box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
+        border-bottom: solid 1px #0038ba;
+        -ms-transform: scale(1.02);
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
     }
     .split-pill span:last-child { font-family: 'Rationale', sans-serif !important; font-size: 18px; color: #152e4d; }
     .analytics-table { width: 100%; font-size: 13px; }
@@ -169,7 +200,51 @@
     .analytics-table td {
         padding: 8px 6px; border-bottom: 1px solid #f3f5f8; font-weight: 600; color: #243447;
     }
+    .analytics-table tbody tr {
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        background-color: #fbfbfb;
+    }
+    .analytics-table tbody tr:hover {
+        background-color: #ffffff;
+        box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
+        -ms-transform: scale(1.02);
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
+    }
+    .analytics-table tbody tr:hover td {
+        border-bottom-color: #0038ba;
+    }
     .analytics-table td.num, .analytics-table th.num { text-align: right; font-family: 'Rationale', sans-serif !important; font-size: 16px; }
+    .mix-bar-row {
+        border-bottom: solid 1px #eef1f5;
+        padding: 6px 4px 10px;
+        margin-bottom: 14px;
+        border-radius: 6px;
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        cursor: default;
+    }
+    .mix-bar-row:hover {
+        background-color: #ffffff;
+        box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
+        border-bottom: solid 1px #0038ba;
+        -ms-transform: scale(1.02);
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
+    }
+    .hero-secondary .hs-item .hs-label { font-size: 12px; color: #8896a8; font-weight: 600; }
+    .hero-secondary .hs-item .hs-value {
+        font-family: 'Rationale', sans-serif !important; font-size: 22px; color: #243447; margin-top: 2px;
+    }
     @media (max-width: 991px) {
         .hero-grid { grid-template-columns: repeat(2, 1fr); }
         .hero-grid .hg-cell:nth-child(2n) { border-right: none; }
@@ -223,9 +298,9 @@
         </div>
     </div>
 
-    {{-- Hero Gross / Net Sales --}}
+    {{-- Hero Gross / Net Sales (Total Sale = Admin Close Total Sale) --}}
     <div class="an-section hero-sales">
-        <h3 class="an-section-title">Net Sales</h3>
+        <h3 class="an-section-title">Total Sale</h3>
         <div>
             <span class="hero-amount" data-kpi="net_sales">0</span>
             <span class="hero-change" data-kpi-change="sales_change_pct"></span>
@@ -255,7 +330,7 @@
             </div>
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="purchases">0</div>
-                <div class="hg-label">Purchases</div>
+                <div class="hg-label">Purchase Paid</div>
             </div>
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="expense">0</div>
@@ -373,5 +448,5 @@
 <script src="https://code.highcharts.com/highcharts-more.js"></script>
 <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-<script src="{{ asset('js/custom/analytics.js') }}?v=6"></script>
+<script src="{{ asset('js/custom/analytics.js') }}?v=8"></script>
 @endpush

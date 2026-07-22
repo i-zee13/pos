@@ -102,7 +102,8 @@
                 type: 'solidgauge',
                 backgroundColor: 'transparent',
                 height: 150,
-                margin: [0, 0, 0, 0]
+                margin: [0, 0, 0, 0],
+                animation: { duration: 1500 }
             },
             title: null,
             pane: {
@@ -136,6 +137,7 @@
             },
             plotOptions: {
                 solidgauge: {
+                    animation: { duration: 1500 },
                     dataLabels: {
                         y: -18,
                         borderWidth: 0,
@@ -149,9 +151,39 @@
             credits: { enabled: false },
             series: [{
                 name: 'Score',
-                data: [v]
+                data: [v],
+                animation: { duration: 1500 }
             }]
         };
+    }
+
+    /**
+     * 0 → 100% (full blue) → hold → settle to actual value.
+     * Slow on purpose so the fill is clearly visible.
+     */
+    function animateGaugeTo(chart, target, staggerMs) {
+        if (!chart || !chart.series || !chart.series[0] || !chart.series[0].points[0]) {
+            return;
+        }
+        var finalVal = Math.max(0, Math.min(100, Number(target) || 0));
+        var startDelay = staggerMs || 0;
+        var fillDuration = 1600;
+        var holdAtFull = 1200;
+        var settleDuration = 1800;
+
+        setTimeout(function () {
+            if (!chart.series || !chart.series[0] || !chart.series[0].points[0]) {
+                return;
+            }
+            chart.series[0].points[0].update(100, true, { duration: fillDuration });
+
+            setTimeout(function () {
+                if (!chart.series || !chart.series[0] || !chart.series[0].points[0]) {
+                    return;
+                }
+                chart.series[0].points[0].update(finalVal, true, { duration: settleDuration });
+            }, fillDuration + holdAtFull);
+        }, startDelay);
     }
 
     function renderGauges(performance) {
@@ -161,13 +193,21 @@
             collection: 'gaugeCollection',
             return_control: 'gaugeReturns'
         };
-        (performance || []).forEach(function (item) {
+        (performance || []).forEach(function (item, index) {
             var id = map[item.key];
             if (!id || !document.getElementById(id)) return;
+            var target = Math.max(0, Math.min(100, Number(item.value) || 0));
+            var stagger = index * 280;
+
             if (gaugeCharts[id]) {
-                gaugeCharts[id].series[0].points[0].update(Number(item.value) || 0, true);
+                try {
+                    gaugeCharts[id].series[0].points[0].update(0, false);
+                    gaugeCharts[id].redraw();
+                } catch (e) { /* ignore */ }
+                animateGaugeTo(gaugeCharts[id], target, stagger);
             } else {
-                gaugeCharts[id] = Highcharts.chart(id, gaugeOptions(item.value));
+                gaugeCharts[id] = Highcharts.chart(id, gaugeOptions(0));
+                animateGaugeTo(gaugeCharts[id], target, 300 + stagger);
             }
             var $card = $('#' + id).closest('.gauge-card');
             $card.find('.gauge-label').text(item.label || '');

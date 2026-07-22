@@ -25,7 +25,10 @@ function updateSaleCloseNavLinks(date) {
         return;
     }
     var encoded = encodeURIComponent(date);
-    $('.view-purchi-link').attr('href', '/admin-sale-close-purchi?date=' + encoded);
+    // Tenant 1 uses inline Purchi on Admin Close — do not point the button to another page
+    if (!window.INLINE_PURCHI) {
+        $('.view-purchi-link').attr('href', '/admin-sale-close-purchi?date=' + encoded);
+    }
     $('.back-admin-close-link').attr('href', '/admin-sale-close?date=' + encoded);
 }
 

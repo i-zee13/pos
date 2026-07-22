@@ -1,4 +1,8 @@
 $(document).ready(function () {
+    // On Admin Close (tenant 1), page toggle loads Purchi — do not re-bind date.
+    if (window.INLINE_PURCHI) {
+        return;
+    }
     bindCloseDateAutoLoad(PurchiRecord);
 });
 

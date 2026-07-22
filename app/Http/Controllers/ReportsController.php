@@ -559,7 +559,16 @@ class ReportsController extends Controller
       $companies  =   Company::select('id', 'company_name')->get();
       $products   =   Product::select('id', 'product_name')->get();
       $customers  =   Customer::select('id', 'customer_name')->where('customer_type', 2)->get();
-      return view('reports.admin-sale-close', compact(['companies', 'products', 'customers']));
+      $inlinePurchi = ((int) (current_tenant_id() ?? 0) === 1);
+      $purchiUseDynamic = $inlinePurchi ? purchi_use_dynamic() : false;
+
+      return view('reports.admin-sale-close', [
+         'companies' => $companies,
+         'products' => $products,
+         'customers' => $customers,
+         'inlinePurchi' => $inlinePurchi,
+         'purchiUseDynamic' => $purchiUseDynamic,
+      ]);
    }
 
    public function adminSaleClosePurchi()
