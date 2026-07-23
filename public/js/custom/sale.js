@@ -17704,7 +17704,8 @@ function getProduct(data_variable) {
   }
 }
 $(document).on('input change', '.qty', function () {
-  var qty = parseFloat($(this).val());
+  // Must update module-level `qty` — productRetailAmount() uses it for Total
+  qty = parseFloat($(this).val());
   var maxStock = parseFloat(stock_in_hand);
   if (isNaN(qty)) {
     return;
@@ -17712,14 +17713,14 @@ $(document).on('input change', '.qty', function () {
   if (isNaN(maxStock)) {
     maxStock = 0;
   }
-  // Numeric compare only — string compare breaks e.g. "2" > "15" === true
   if (qty > maxStock) {
     $(this).val('');
+    qty = '';
     $('.qty').css('border-color', 'red');
     $(this).focus();
     $('#notifDiv').fadeIn();
     $('#notifDiv').css('background', 'red');
-    $('#notifDiv').text(maxStock > 0 ? 'Qty should be less than or equal to ' + maxStock : 'Product is Out of Stock!');
+    $('#notifDiv').text("".concat(maxStock > 0 ? "Qty should be less than " + maxStock : 'Product is Out of Stock!'));
     setTimeout(function () {
       $('#notifDiv').fadeOut();
     }, 3000);
@@ -18010,10 +18011,10 @@ $(document).on('input', '.qty-input', function () {
       data.qty = update_qty;
       current_product_qty = data.stock_in_hand;
       current_product_price = p_price;
-      if (parseFloat(update_qty) > parseFloat(current_product_qty)) {
+      if (parseInt(update_qty) > parseInt(current_product_qty)) {
         // update_qty      = update_qty.replace(update_qty, current_product_qty)
         $(".td-input-qty".concat(current_product_id)).val(current_product_qty).css('border-color', 'red').focus();
-        $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less than or equal to ' + current_product_qty);
+        $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then ' + current_product_qty);
         setTimeout(function () {
           $('#notifDiv').fadeOut();
         }, 3000);

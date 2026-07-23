@@ -10,12 +10,16 @@ This document explains the batch-wise stock / average cost work: what changed, h
 
 **Cause:** In `sale.js`, qty was compared as strings. In JavaScript `"2" > "15"` is `true`.
 
-**Fix:** Compare with `parseFloat` in `resources/js/custom/sale.js`, then rebuild:
+**Safe fix (minimal — does not change sale save / batch / stock logic):**
+- Only numeric `parseFloat` before `qty > stock` check on the add-row `.qty` field
+- Notification text kept same as old: `Qty should be less than {stock}`
+- Table row qty already used `parseInt` — left unchanged
+
+**Deploy for this bug only:** upload `public/js/custom/sale.js` (do not need full project / DB push for this fix).
+
 ```bash
-npm run dev
-# or npm run production
+npm run dev   # or mix — rebuilds public/js/custom/sale.js
 ```
-Deploy updated `public/js/custom/sale.js` (mix output) to live.
 
 ---
 
