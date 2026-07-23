@@ -4,6 +4,21 @@ This document explains the batch-wise stock / average cost work: what changed, h
 
 ---
 
+## Invoice edit must not create duplicate batches
+
+**Rule:** Edit pe (qty kam ya zyada) **usi invoice / line ke existing batch** pe adjust hota hai — **naya batch nahi** banta.
+
+**Bugs fixed:**
+1. Controllers pe `BatchWiseStockManagment` `$flag` ke bahar call ho raha tha → qty same pe bhi full qty dubara IN.
+2. Edit pe FEFO/exact path naya layer bana sakta tha → ab `existing_inv_id` set hone par `batch_adjust_existing_invoice_batch()`:
+   - pehle `invoice_product_id` / `invoice_id` se batch dhundhta hai
+   - usi pe +/− qty
+   - naya batch sirf tab (last resort) jab edit-IN pe koi batch mile hi na (nayi line pe pehli dafa)
+
+**Files:** `app/helpers.php` + purchase/sale/return controllers (`$flag` ke andar call).
+
+---
+
 ## Sale qty validation bug (string compare)
 
 **Symptom:** Stock shows e.g. `15`, but typing qty `2` shows `Qty should be less than 15`.

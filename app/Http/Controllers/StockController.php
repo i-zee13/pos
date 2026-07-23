@@ -193,8 +193,9 @@ class StockController extends Controller
                                     'stock_balance' =>  $v_stock->balance,
                                 ]);
                             }
+                            // Only when qty actually changed (same as stock update)
+                            BatchWiseStockManagment($vs_id, $invoice->id, $purchased, $change_qty_value, $In_out_status, 1, $request->hidden_invoice_id);
                         }
-                        BatchWiseStockManagment($vs_id,  $invoice->id, $purchased, $change_qty_value, $In_out_status, 1, $request->hidden_invoice_id);
                         //Update Product Price
                         $product              = Product::where('id', $purchased->product_id)->first();
                         $company_id           = $product->company_id;

@@ -558,8 +558,29 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     $productId = (int) ($purchase->product_id ?? 0);
     $txType = (int) $transaction_type;
     $isIn = ((int) $In_out_status === 1);
-    $unitCostIn = round((float) ($purchase->purchase_price ?? 0), 6);
+    $unitCostIn = round((float) ($purchase->purchase_price ?? ($purchase->purchased_price ?? 0)), 6);
     $trxEnum = batch_trx_enum($txType);
+    $lineId = (int) ($purchase->id ?? 0);
+
+    // EDIT invoice: always adjust the SAME invoice's batch — never create a 2nd batch for this invoice.
+    if (!empty($existing_inv_id) && !empty($invoice_id)) {
+        batch_adjust_existing_invoice_batch(
+            (int) $vendor_stock_id,
+            (int) $invoice_id,
+            $purchase,
+            $remainingQty,
+            $isIn,
+            $txType,
+            $trxEnum,
+            $expiryDate,
+            $companyId,
+            $productId,
+            $unitCostIn,
+            $lineId
+        );
+
+        return;
+    }
 
     // OUT → FEFO. IN → exact expiry + unit-cost layer (never overwrite different rates).
     $strategy = $isIn ? 'exact' : 'fifo';
@@ -602,7 +623,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
                 ]);
                 break;
             }
-            // IN with no matching layer → create new expiry+cost bucket
+            // NEW invoice IN only — create expiry+cost bucket
             $s = new BatchStockMgt();
             $s->batch_id = 'B-'.$productId.'-'.uniqid();
             $s->company_name = batch_ascii(DB::table('companies')->where('id', $companyId)->value('company_name'));
@@ -687,6 +708,211 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     // Avg cost only — never touch vendor_stock_managment.balance (except dust scrap above)
     refreshVendorStockAvgCost($productId, $companyId);
 }
+
+/**
+ * Edit-path: change qty on the existing batch for this invoice/line.
+ * Never creates a second batch for the same invoice.
+ */
+if (!function_exists('batch_adjust_existing_invoice_batch')) {
+    function batch_adjust_existing_invoice_batch(
+        int $vendorStockId,
+        int $invoiceId,
+        $purchase,
+        float $qty,
+        bool $isIn,
+        int $txType,
+        string $trxEnum,
+        string $expiryDate,
+        int $companyId,
+        int $productId,
+        float $unitCostIn,
+        int $lineId
+    ): void {
+        $s = null;
+
+        // 1) Prefer exact line link
+        if ($lineId > 0) {
+            $s = BatchStockMgt::where('product_id', $productId)
+                ->where('invoice_product_id', $lineId)
+                ->orderByDesc('id')
+                ->first();
+        }
+
+        // 2) Same invoice + product
+        if (!$s) {
+            $s = BatchStockMgt::where('product_id', $productId)
+                ->where('invoice_id', $invoiceId)
+                ->orderByDesc('id')
+                ->first();
+        }
+
+        // 3) Same expiry + unit cost open layer (merged historical rows / rebuild)
+        if (!$s) {
+            $q = BatchStockMgt::where('product_id', $productId)
+                ->where('company_id', $companyId)
+                ->where('batch_wise_balance', '>', 0)
+                ->whereRaw('ABS(IFNULL(unit_cost_price,0) - ?) < 0.0001', [$unitCostIn])
+                ->where(function ($q2) use ($expiryDate) {
+                    if ($expiryDate === '0000-00-00') {
+                        $q2->where(function ($q3) {
+                            $q3->whereNull('expiry_date')->orWhere('expiry_date', '0000-00-00');
+                        });
+                    } else {
+                        $q2->whereDate('expiry_date', $expiryDate);
+                    }
+                })
+                ->orderByDesc('id');
+            $s = $q->first();
+        }
+
+        // 4) OUT only: if this invoice batch already emptied by sales, FEFO from other open batches
+        if (!$s && !$isIn) {
+            $s = BatchStockMgt::where('product_id', $productId)
+                ->where('company_id', $companyId)
+                ->where('batch_wise_balance', '>=', 1)
+                ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
+                ->orderBy('expiry_date', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->first();
+        }
+
+        if (!$s) {
+            // Edit IN but no existing batch to attach — still must not invent a "second" invoice batch blindly.
+            // Create only once and stamp this invoice so further edits hit the same row.
+            if ($isIn) {
+                Log::warning('batch.edit_in_without_existing_batch_creating_once', [
+                    'invoice_id' => $invoiceId,
+                    'product_id' => $productId,
+                    'line_id' => $lineId,
+                    'qty' => $qty,
+                ]);
+                $s = new BatchStockMgt();
+                $s->batch_id = 'B-'.$productId.'-'.uniqid();
+                $s->company_name = batch_ascii(DB::table('companies')->where('id', $companyId)->value('company_name'));
+                $s->product_name = batch_ascii(DB::table('products')->where('id', $productId)->value('product_name'));
+                $s->mfg_date = '0000-00-00';
+                $s->expiry_date = $expiryDate;
+                $s->batch_wise_balance = 0;
+                $s->unit_cost_price = $unitCostIn;
+                $s->ttl_cost_price = 0;
+                $s->created_by = (int) (Auth::id() ?? 0);
+            } else {
+                Log::warning('batch.edit_out_without_available_batch', [
+                    'invoice_id' => $invoiceId,
+                    'product_id' => $productId,
+                    'qty' => $qty,
+                    'transaction_type' => $txType,
+                ]);
+                refreshVendorStockAvgCost($productId, $companyId);
+
+                return;
+            }
+        }
+
+        $existingBalance = (float) ($s->batch_wise_balance ?? 0);
+        $appliedQty = $qty;
+        if (!$isIn) {
+            $appliedQty = min($qty, max(0, $existingBalance));
+        }
+
+        $newBalance = $isIn
+            ? round($existingBalance + $appliedQty, 6)
+            : round($existingBalance - $appliedQty, 6);
+
+        $unitCost = (float) ($s->unit_cost_price ?? 0);
+        if ($unitCost <= 0 || ($isIn && !$s->exists)) {
+            $unitCost = $unitCostIn;
+        }
+        // On purchase edit IN, keep / refresh cost from invoice line (same batch, not a new one)
+        if ($isIn && $txType === 1 && $unitCostIn > 0) {
+            $unitCost = $unitCostIn;
+        }
+
+        $s->company_id = $companyId;
+        $s->product_id = $productId;
+        $s->actual_qty = (float) ($purchase->qty ?? $appliedQty);
+        $s->actual_status = $isIn ? 1 : 2;
+        $s->qty = (int) max(1, (int) round($appliedQty));
+        $s->batch_wise_balance = $newBalance;
+        $s->total_balance = 0;
+        $s->vs_id = $vendorStockId;
+        $s->trx_type = $trxEnum;
+        $s->unit_cost_price = $unitCost;
+        $s->ttl_cost_price = round($unitCost * max(0, $newBalance), 6);
+        $s->avg_cost_price_per_unit = $newBalance > 0 ? $unitCost : 0;
+        $s->invoice_id = $invoiceId;
+        if ($lineId > 0) {
+            $s->invoice_product_id = $lineId;
+        }
+        if ($isIn) {
+            $s->expiry_date = $expiryDate;
+        } elseif (empty($s->expiry_date) || $s->expiry_date === '0000-00-00') {
+            $s->expiry_date = $expiryDate;
+        }
+        $s->save();
+
+        if ($newBalance > 0.000001 && $newBalance < 1) {
+            $dust = $newBalance;
+            try {
+                $s->delete();
+            } catch (\Throwable $e) {
+                $s->batch_wise_balance = 0;
+                $s->ttl_cost_price = 0;
+                $s->save();
+            }
+            batch_scrap_dust_qty($productId, $companyId, $dust);
+        } elseif ($newBalance <= 0.000001) {
+            try {
+                $s->delete();
+            } catch (\Throwable $e) {
+                // keep
+            }
+        }
+
+        // If OUT needed more than this invoice batch had, continue FEFO for leftover only (no new batch)
+        $left = round($qty - $appliedQty, 6);
+        if (!$isIn && $left > 0.000001) {
+            $guard = 0;
+            while ($left > 0.000001 && $guard < 50) {
+                $guard++;
+                $next = BatchStockMgt::where('product_id', $productId)
+                    ->where('company_id', $companyId)
+                    ->where('batch_wise_balance', '>=', 1)
+                    ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
+                    ->orderBy('expiry_date', 'ASC')
+                    ->orderBy('id', 'ASC')
+                    ->first();
+                if (!$next) {
+                    break;
+                }
+                $take = min($left, (float) $next->batch_wise_balance);
+                $nb = round(((float) $next->batch_wise_balance) - $take, 6);
+                $uc = (float) ($next->unit_cost_price ?? 0);
+                $next->batch_wise_balance = $nb;
+                $next->ttl_cost_price = round($uc * max(0, $nb), 6);
+                $next->actual_status = 2;
+                $next->trx_type = $trxEnum;
+                $next->save();
+                if ($nb <= 0.000001) {
+                    try {
+                        $next->delete();
+                    } catch (\Throwable $e) {
+                    }
+                } elseif ($nb < 1) {
+                    batch_scrap_dust_qty($productId, $companyId, $nb);
+                    try {
+                        $next->delete();
+                    } catch (\Throwable $e) {
+                    }
+                }
+                $left = round($left - $take, 6);
+            }
+        }
+
+        refreshVendorStockAvgCost($productId, $companyId);
+    }
+}
+
 
 if (!function_exists('batch_normalize_expiry')) {
     function batch_normalize_expiry($expiry): string
