@@ -4,6 +4,29 @@ This document explains the batch-wise stock / average cost work: what changed, h
 
 ---
 
+## Exact batch put-back (same batch in / out)
+
+**Rule:** Jis batch se qty nikle, delete / sale-return pe **usi batch** mein wapas.
+
+**How:** `stock_batch_allocations` table (auto-created) records each sale OUT per `stock_batches_items` row. Put-back reverses those rows.
+
+**Also:** Purchase return with expiry → OUT from that expiry; if none → FEFO.
+
+**Verify:**
+```bash
+php artisan stock:test-batch-identity
+```
+
+---
+
+## Sale delete / return put-back (FEFO restore)
+
+**Not caused by rebuild.** Sale delete pe stock wapas `exact` match se **sale line ke `purchase_price`** (aksar latest rate) wale batch mein ja rahi thi — is liye Batch 3 (1200) barh jati, Batch 1 (1000) nahi.
+
+**Fix:** Sale delete / sale return / sale qty-reduce IN ab **putback = FEFO** (sab se pehli open batch, same order sale ne consume ki). Batch ka apna unit cost rehta hai.
+
+---
+
 ## Invoice edit must not create duplicate batches
 
 **Rule:** Edit pe (qty kam ya zyada) **usi invoice / line ke existing batch** pe adjust hota hai — **naya batch nahi** banta.

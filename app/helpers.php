@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Stevebauman\Location\Facades\Location;
 
 
@@ -548,6 +549,8 @@ function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type,
  */
 function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stock_qty, $In_out_status, $transaction_type, $existing_inv_id = null)
 {
+    batch_ensure_allocations_table();
+
     $remainingQty = (float) $stock_qty;
     if ($remainingQty <= 0) {
         return;
@@ -562,8 +565,31 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
     $trxEnum = batch_trx_enum($txType);
     $lineId = (int) ($purchase->id ?? 0);
 
-    // EDIT invoice: always adjust the SAME invoice's batch — never create a 2nd batch for this invoice.
-    if (!empty($existing_inv_id) && !empty($invoice_id)) {
+    // Sale delete / sale return / sale qty-reduce: restore to THE SAME batches that were consumed
+    $isSalePutBack = $isIn && in_array($txType, [2, 4, 5], true);
+
+    if ($isSalePutBack) {
+        $restored = batch_putback_from_allocations(
+            $productId,
+            $companyId,
+            (int) $vendor_stock_id,
+            (int) $invoice_id,
+            $lineId,
+            $remainingQty,
+            $trxEnum,
+            $unitCostIn,
+            $expiryDate
+        );
+        if ($restored) {
+            refreshVendorStockAvgCost($productId, $companyId);
+
+            return;
+        }
+        // fallback below: FEFO putback if no allocation rows (legacy sales)
+    }
+
+    // EDIT purchase/purchase-return only: adjust SAME invoice batch — never create a 2nd batch.
+    if (!$isSalePutBack && !empty($existing_inv_id) && !empty($invoice_id) && in_array($txType, [1, 3], true)) {
         batch_adjust_existing_invoice_batch(
             (int) $vendor_stock_id,
             (int) $invoice_id,
@@ -582,8 +608,18 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         return;
     }
 
-    // OUT → FEFO. IN → exact expiry + unit-cost layer (never overwrite different rates).
-    $strategy = $isIn ? 'exact' : 'fifo';
+    // OUT → FEFO (purchase return with expiry → that expiry first).
+    // Purchase IN → exact expiry + unit-cost.
+    // Sale put-back fallback → FEFO restore.
+    if ($isSalePutBack) {
+        $strategy = 'putback';
+    } elseif ($isIn) {
+        $strategy = 'exact';
+    } elseif ($txType === 3 && $expiryDate !== '0000-00-00') {
+        $strategy = 'expiry_out'; // purchase return: consume from mentioned expiry
+    } else {
+        $strategy = 'fifo';
+    }
 
     $guard = 0;
     while ($remainingQty > 0.000001 && $guard < 100) {
@@ -592,13 +628,16 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         $query = BatchStockMgt::where('product_id', $productId)
             ->where('company_id', $companyId);
 
-        if ($strategy === 'fifo') {
-            $query->where('batch_wise_balance', '>=', 1)
+        if ($strategy === 'fifo' || $strategy === 'putback') {
+            $query->where('batch_wise_balance', '>', 0)
                 ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
                 ->orderBy('expiry_date', 'ASC')
                 ->orderBy('id', 'ASC');
+        } elseif ($strategy === 'expiry_out') {
+            $query->where('batch_wise_balance', '>', 0)
+                ->whereDate('expiry_date', $expiryDate)
+                ->orderBy('id', 'ASC');
         } else {
-            // exact: same expiry + same unit cost (do not overwrite different rates on same expiry)
             $query->where(function ($q) use ($expiryDate) {
                 if ($expiryDate === '0000-00-00') {
                     $q->where(function ($q2) {
@@ -613,6 +652,13 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         }
 
         $s = $query->first();
+
+        // Purchase return expiry miss → fall back to FEFO once
+        if (!$s && $strategy === 'expiry_out') {
+            $strategy = 'fifo';
+            continue;
+        }
+
         if (!$s) {
             if (!$isIn) {
                 Log::warning('batch.out_without_available_batch', [
@@ -623,7 +669,6 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
                 ]);
                 break;
             }
-            // NEW invoice IN only — create expiry+cost bucket
             $s = new BatchStockMgt();
             $s->batch_id = 'B-'.$productId.'-'.uniqid();
             $s->company_name = batch_ascii(DB::table('companies')->where('id', $companyId)->value('company_name'));
@@ -649,7 +694,6 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
             ? round($existingBalance + $appliedQty, 6)
             : round($existingBalance - $appliedQty, 6);
 
-        // Never overwrite an existing layer's unit cost on OUT / different-rate merge.
         $unitCost = (float) ($s->unit_cost_price ?? 0);
         if ($isIn && $unitCost <= 0) {
             $unitCost = $unitCostIn;
@@ -670,8 +714,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         $s->unit_cost_price = $unitCost;
         $s->ttl_cost_price = round($unitCost * max(0, $newBalance), 6);
         $s->avg_cost_price_per_unit = $newBalance > 0 ? $unitCost : 0;
-        if ($isIn) {
-            // Keep purchase identity on IN only (OUT must not erase purchase link)
+        if ($isIn && $txType === 1) {
             $s->invoice_id = $invoice_id;
             $s->invoice_product_id = $purchase->id ?? null;
             if (empty($s->expiry_date) || $s->expiry_date === '0000-00-00') {
@@ -680,8 +723,20 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         }
         $s->save();
 
-        // Only keep batches with qty >= 1. Scrap dust leftovers (< 1) so avg never uses them.
-        $dustScrapped = 0.0;
+        // Track sale OUT so delete/return can put back into the SAME batch rows
+        if (!$isIn && in_array($txType, [2, 4, 5, 6], true) && $appliedQty > 0 && $s->id) {
+            batch_record_allocation([
+                'product_id' => $productId,
+                'batch_row_id' => (int) $s->id,
+                'invoice_id' => (int) $invoice_id,
+                'invoice_product_id' => $lineId,
+                'trx_type' => $trxEnum,
+                'direction' => 'out',
+                'qty' => $appliedQty,
+                'unit_cost' => $unitCost,
+            ]);
+        }
+
         if ($newBalance > 0.000001 && $newBalance < 1) {
             $dustScrapped = $newBalance;
             try {
@@ -692,22 +747,179 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
                 $s->save();
             }
             batch_scrap_dust_qty($productId, $companyId, $dustScrapped);
-            $newBalance = 0;
         } elseif (!$isIn && $newBalance <= 0.000001) {
-            // Drop empty noise rows after full OUT
-            try {
-                $s->delete();
-            } catch (\Throwable $e) {
-                // keep zero row if delete fails
+            // Keep zero row if it has allocations pending; else delete
+            $hasAlloc = DB::table('stock_batch_allocations')
+                ->where('batch_row_id', $s->id)
+                ->where('direction', 'out')
+                ->where('reversed', 0)
+                ->exists();
+            if (!$hasAlloc) {
+                try {
+                    $s->delete();
+                } catch (\Throwable $e) {
+                }
             }
         }
 
         $remainingQty = round($remainingQty - $appliedQty, 6);
     }
 
-    // Avg cost only — never touch vendor_stock_managment.balance (except dust scrap above)
     refreshVendorStockAvgCost($productId, $companyId);
 }
+
+if (!function_exists('batch_ensure_allocations_table')) {
+    function batch_ensure_allocations_table(): void
+    {
+        static $ready = false;
+        if ($ready) {
+            return;
+        }
+        if (!Schema::hasTable('stock_batch_allocations')) {
+            Schema::create('stock_batch_allocations', function ($t) {
+                $t->bigIncrements('id');
+                $t->unsignedBigInteger('product_id')->index();
+                $t->unsignedBigInteger('batch_row_id')->index();
+                $t->unsignedBigInteger('invoice_id')->nullable()->index();
+                $t->unsignedBigInteger('invoice_product_id')->nullable()->index();
+                $t->string('trx_type', 32)->nullable();
+                $t->string('direction', 8)->default('out');
+                $t->decimal('qty', 18, 6)->default(0);
+                $t->decimal('unit_cost', 18, 6)->default(0);
+                $t->tinyInteger('reversed')->default(0)->index();
+                $t->timestamps();
+            });
+        }
+        $ready = true;
+    }
+}
+
+if (!function_exists('batch_record_allocation')) {
+    function batch_record_allocation(array $row): void
+    {
+        batch_ensure_allocations_table();
+        DB::table('stock_batch_allocations')->insert([
+            'product_id' => $row['product_id'],
+            'batch_row_id' => $row['batch_row_id'],
+            'invoice_id' => $row['invoice_id'] ?: null,
+            'invoice_product_id' => $row['invoice_product_id'] ?: null,
+            'trx_type' => $row['trx_type'] ?? null,
+            'direction' => $row['direction'] ?? 'out',
+            'qty' => $row['qty'],
+            'unit_cost' => $row['unit_cost'] ?? 0,
+            'reversed' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+}
+
+/**
+ * Put qty back into the exact batches that were consumed (allocations).
+ * Returns true if any allocation was applied.
+ */
+if (!function_exists('batch_putback_from_allocations')) {
+    function batch_putback_from_allocations(
+        int $productId,
+        int $companyId,
+        int $vendorStockId,
+        int $invoiceId,
+        int $lineId,
+        float $qtyNeeded,
+        string $trxEnum,
+        float $fallbackCost,
+        string $fallbackExpiry
+    ): bool {
+        batch_ensure_allocations_table();
+
+        $q = DB::table('stock_batch_allocations')
+            ->where('product_id', $productId)
+            ->where('direction', 'out')
+            ->where('reversed', 0)
+            ->orderByDesc('id'); // reverse of consumption order
+
+        if ($lineId > 0) {
+            $q->where('invoice_product_id', $lineId);
+        } elseif ($invoiceId > 0) {
+            $q->where('invoice_id', $invoiceId);
+        } else {
+            return false;
+        }
+
+        $rows = $q->get();
+        if ($rows->isEmpty()) {
+            return false;
+        }
+
+        $left = $qtyNeeded;
+        foreach ($rows as $row) {
+            if ($left <= 0.000001) {
+                break;
+            }
+            $give = min($left, (float) $row->qty);
+            if ($give <= 0) {
+                continue;
+            }
+
+            $s = BatchStockMgt::find($row->batch_row_id);
+            if (!$s) {
+                // Batch row was deleted — recreate with same cost identity
+                $s = new BatchStockMgt();
+                $s->batch_id = 'B-'.$productId.'-'.uniqid();
+                $s->company_id = $companyId;
+                $s->product_id = $productId;
+                $s->company_name = batch_ascii(DB::table('companies')->where('id', $companyId)->value('company_name'));
+                $s->product_name = batch_ascii(DB::table('products')->where('id', $productId)->value('product_name'));
+                $s->mfg_date = '0000-00-00';
+                $s->expiry_date = $fallbackExpiry;
+                $s->batch_wise_balance = 0;
+                $s->unit_cost_price = (float) ($row->unit_cost ?: $fallbackCost);
+                $s->created_by = (int) (Auth::id() ?? 0);
+            }
+
+            $bal = round(((float) $s->batch_wise_balance) + $give, 6);
+            $uc = (float) ($s->unit_cost_price ?: $row->unit_cost ?: $fallbackCost);
+            $s->company_id = $companyId;
+            $s->product_id = $productId;
+            $s->batch_wise_balance = $bal;
+            $s->unit_cost_price = $uc;
+            $s->ttl_cost_price = round($uc * $bal, 6);
+            $s->avg_cost_price_per_unit = $uc;
+            $s->actual_status = 1;
+            $s->trx_type = $trxEnum;
+            $s->vs_id = $vendorStockId;
+            $s->save();
+
+            DB::table('stock_batch_allocations')->where('id', $row->id)->update([
+                'reversed' => 1,
+                'updated_at' => now(),
+            ]);
+
+            $left = round($left - $give, 6);
+        }
+
+        // If still leftover (partial), FEFO putback for remainder
+        if ($left > 0.000001) {
+            $first = BatchStockMgt::where('product_id', $productId)
+                ->where('company_id', $companyId)
+                ->where('batch_wise_balance', '>', 0)
+                ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
+                ->orderBy('expiry_date', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->first();
+            if ($first) {
+                $bal = round(((float) $first->batch_wise_balance) + $left, 6);
+                $uc = (float) $first->unit_cost_price;
+                $first->batch_wise_balance = $bal;
+                $first->ttl_cost_price = round($uc * $bal, 6);
+                $first->save();
+            }
+        }
+
+        return true;
+    }
+}
+
 
 /**
  * Edit-path: change qty on the existing batch for this invoice/line.
@@ -1086,14 +1298,16 @@ function BatchWiseDeleteProduct($delete_for, $product, $qty, $in_out, $type)
         return;
     }
 
-    // Reuse central batch manager so delete flow follows same FIFO/reverse-FIFO rules.
+    $invoiceId = is_numeric($delete_for) ? (int) $delete_for : 0;
+
+    // Pass real invoice id so put-back can reverse exact batch allocations.
     BatchWiseStockManagment(
         0,
-        0,
+        $invoiceId,
         $product,
         $qty,
         $in_out,
-        5, // delete rollback transaction marker
+        (int) $type,
         null
     );
 }
@@ -1102,6 +1316,9 @@ function customerLedger($request,$column){
     $balance                     =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->value('balance');
     
     $c                           =  CustomerLedger::where($column, $request->id)->orderBy('id', 'DESC')->first();
+    if (!$c) {
+        return;
+    }
     $bbalance                    =  $column == 'sale_return_invoice_id' ?  abs(((-$balance) + $c->dr) - $c->cr) :  ($balance + $c->cr) - $c->dr;
     $cust_ldr                    =  new  CustomerLedger();
     $cust_ldr->cr                =  0;
