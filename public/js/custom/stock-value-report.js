@@ -78,7 +78,7 @@ function buildAvgConsoleHtml(records, meta, mode) {
         html += '<div class="avg-product-title">' + (idx + 1) + '. ' + name + '</div>';
         html += '<div class="avg-rate-badge" data-avg-slot="' + idx + '"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(displayAvg) + '</span></div>';
         html += '</div>';
-        html += '<div class="avg-product-meta">Stock Qty: <strong>' + fmtMoney(balance) + '</strong>';
+        html += '<div class="avg-product-meta">Stock Qty (system): <strong>' + fmtMoney(balance) + '</strong>';
         html += ' &nbsp;|&nbsp; Open Batches: <strong>' + (row.batch_count != null ? row.batch_count : batchList.length) + '</strong></div>';
 
         if (!isAvg) {
@@ -127,11 +127,23 @@ function buildAvgConsoleHtml(records, meta, mode) {
         });
 
         html += '</tbody><tfoot><tr>';
-        html += '<td colspan="2">TOTAL</td>';
+        html += '<td colspan="2">TOTAL (batches)</td>';
         html += '<td>' + fmtMoney(sumQty) + '</td>';
         html += '<td></td>';
         html += '<td>' + fmtMoney(sumCost) + '</td>';
         html += '</tr></tfoot></table>';
+
+        var qtyDiff = Math.abs(sumQty - balance);
+        if (qtyDiff > 0.02) {
+            html += '<div class="avg-mismatch">';
+            html += '<strong>MISMATCH:</strong> Batches total = <strong>' + fmtMoney(sumQty) + '</strong>';
+            html += ' but Stock Qty = <strong>' + fmtMoney(balance) + '</strong>';
+            html += ' (farq = ' + fmtMoney(sumQty - balance) + '). ';
+            html += 'Yeh usually purchase/sale <em>edit</em> se batch inflate hone ki wajah se hota hai. ';
+            html += 'Avg batches se bani, Stock Value stock qty × avg se. ';
+            html += 'Fix: <code>php artisan stock:rebuild-batches --product=' + (row.product_id || '') + '</code>';
+            html += '</div>';
+        }
 
         var avg = sumQty > 0 ? sumCost / sumQty : cost;
         // Fix header badge with live batch avg (header was written with pre-calc cost which matches after API sets computed_avg)

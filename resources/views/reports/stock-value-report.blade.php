@@ -3787,8 +3787,16 @@
     color: #1aff8c; font-weight: 700; font-size: 15px;
 }
 .avg-console-body .avg-empty { color: #9ae6b4; padding: 8px 12px; }
+.avg-console-body .avg-mismatch {
+    margin: 0; padding: 10px 12px; background: #2a1510; border-top: 2px solid #ff6b4a;
+    color: #ffb4a2; font-size: 12px; line-height: 1.45;
+}
+.avg-console-body .avg-mismatch strong { color: #ff6b4a; }
+.avg-console-body .avg-mismatch code {
+    color: #1aff8c; background: #0b0f0c; padding: 1px 6px; border-radius: 3px;
+}
 </style>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/stock-value-report.js') }}?v=6"></script>
+<script src="{{asset('js/custom/stock-value-report.js') }}?v=7"></script>
 @endpush
