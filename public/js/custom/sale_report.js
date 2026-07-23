@@ -1,1 +1,317 @@
-(()=>{var t=[],n="",e=location.href.split("/");function o(t){if("function"==typeof toNum)return toNum(t);if(null==t||""===t)return 0;"string"==typeof t&&(t=t.replace(/,/g,"").trim());var n=parseFloat(t);return isNaN(n)||!isFinite(n)?0:n}function a(t,n){var e;$(".TeacherAttendanceListTable tbody").append("\n                    <tr>\n                        <td>".concat(n.invoice_no,"</td>\n                        <td>").concat(n.created,"</td>\n                        <td>").concat(n.company_name,"</td>\n                        <td>").concat(n.product_name,"</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 16px;\">").concat(n.qty,"</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 16px;\">").concat(n.product_discount?n.product_discount:0,"</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 16px;\">").concat(l(null!==(e=n.sale_total_amount)&&void 0!==e?e:n.return_total_amount),"</td>\n                    </tr>"))}function i(t,n,e,o){$(".TeacherAttendanceListTable tfoot").append('\n    <tr style="background:#eaf1fa ; color:#152e4d" >\n        <th colspan="3"></th>\n        <th class="font18" align="center">'.concat(o,' Total</th>\n        <th class="totalNo"   style="font-family: \'Rationale\', sans-serif !important;font-size: 25px;">').concat(t?l(t):0,'</th>\n        <th class="totalNo"   style="font-family: \'Rationale\', sans-serif !important;font-size: 25px;">').concat(n?l(n):0,'</th>\n        <th class="totalNo"   style="font-family: \'Rationale\', sans-serif !important;font-size: 25px;">').concat(e?l(e):0,"</th>\n    </tr>\n"))}function l(t){t=o(t),t=Math.round(1e4*t)/1e4,t+="",x=t.split("."),x1=x[0],x2=x.length>1?"."+x[1]:"";for(var n=/(\d+)(\d{3})/;n.test(x1);)x1=x1.replace(n,"$1,$2");return x1+x2}$(".search-btn").on("click",(function(){var t=$(".start_date").val(),s=$(".end_date").val();return""!=t&&""==s?($("#notifDiv").fadeIn().css("background","red").text("End Date should not be Empty").focus(),$(".end_date").focus(),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3)):""!=s&&""==t?($("#notifDiv").fadeIn().css("background","red").text("End Date should not be Empty"),$(".start_date").focus(),void setTimeout((function(){$("#notifDiv").fadeOut()}),3e3)):((n=$(this)).text("Fetching..."),n.attr("disabled","disabled"),url="/sales-list",void $("#search-form").ajaxSubmit({type:"POST",url,data:{_token:$('meta[name="csrf_token"]').attr("content"),current_url:e[3]},success:function(t){n.text("Search"),n.attr("disabled",!1),$(".loader").show(),$(".teacher_attendance_list").empty(),$(".teacher_attendance_list").append('\n                <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">\n                    <thead>\n                        <tr>\n                            <th>Bill #</th>\n                            <th>Date</th>\n                            <th>Company Name</th>\n                            <th>Product Name</th>\n                            <th>Qty</th>\n                            <th>Discount</th>\n                            <th>Amount</th>\n\n                        </tr>\n                    </thead><tbody>\n                    </tbody>\n                    <tfoot></tfoot>\n                </table>'),$(".TeacherAttendanceListTable tbody").empty(),0==t.stocks.length&&($("#notifDiv").fadeIn(),$("#notifDiv").css("background","green"),$("#notifDiv").text("No data available"),setTimeout((function(){$("#notifDiv").fadeOut()}),3e3));var s=0,c=0,r=0,d=o(t.stocks.sale_invoice_record&&t.stocks.sale_invoice_record.invoice_discount),f=0,u=0,p=0,h=0;(t.stocks.sales||[]).forEach((function(t,n){s+=o(t.sale_total_amount),c+=o(t.qty),r+=o(t.product_discount);new Date(t.expire_date).toDateString();a(t.invoice_no.split("-")[0],t)})),$(".TeacherAttendanceListTable").fadeIn(),i(c,r,s,"Sale"),t.stocks.sale_returns&&t.stocks.sale_returns.length>0&&(t.stocks.sale_returns.forEach((function(t,n){f+=o(t.return_total_amount),u+=o(t.qty),p+=o(t.product_discount),h+=o(t.invoice_discount);a(t.invoice_no.split("-")[0],t)})),i(u,p,f,"Return"));var m=o(d)+o(h),_=o(c)-o(u),b=o(s)-o(f);$(".TeacherAttendanceListTable tfoot").append('\n            <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">\n                <td colspan="3"></td> \n                <td class="font18">Grand Total :</td>\n                <td class="totalNo"   style="font-family: \'Rationale\', sans-serif !important;font-size: 25px;"> '.concat(l(_),' </td>\n                <td class="totalNo"  style="font-family: \'Rationale\', sans-serif !important;font-size: 25px;">  ').concat(l(o(r)-o(p)),' </td>\n                <td class="totalNo" colspan="2">\n                    <span class="grand-total" style="font-family: \'Rationale\', sans-serif !important;font-size: 25px;">').concat(l(b),"</span>\n                </td>\n            </tr>\n        ")),$(".ttl_sales").html("<span>Rs.</span>"+l(b-m)),$(".ttl_payment").html(s?l(s):0),$(".ttl_quantity").html(_?l(_):0),$(".ttl_product_discount").html(r?l(r):0),$(".ttl_invoice_discount").html(m?l(m):0),$(".ttl_discount").html(f?l(f):0),$(".loader").hide();var y="";y="customer-reports"==e[3]?"Customer Report":"Vendor Report",$.fn.DataTable.isDataTable(".TeacherAttendanceListTable")&&$(".TeacherAttendanceListTable").DataTable().clear().destroy();var v=$(".TeacherAttendanceListTable").DataTable({bSort:!1,bPaginate:!1,scrollX:!1,scrollY:"400px",scrollCollapse:!0,dom:"Bfrtip",buttons:[{extend:"pdfHtml5",title:"Sale Report",orientation:"landscape",header:!0,exportOptions:{alignment:"left"},customize:function(t){t.content.splice(0,1,{text:[{text:"Sale Report",bold:!0,fontSize:14,alignment:"left"}],margin:[0,0,0,12]}),console.log(t),t.pageMargins=[20,12,20,12],t.styles.tableHeader.fillColor="#E6E6E6",t.styles.tableFooter.fillColor="#E6E6E6",t.styles.tableHeader.color="black",t.styles.tableHeader.alignment="left",t.styles.title.alignment="left",t.content[1].table.widths="auto";var n={hLineWidth:function(t){return.5},vLineWidth:function(t){return.5},hLineColor:function(t){return"#E6E6E6"},vLineColor:function(t){return"#E6E6E6"},paddingLeft:function(t){return 3},paddingRight:function(t){return 3},paddingTop:function(t){return 4},paddingBottom:function(t){return 4}};t.content[1].layout=n,age=v.column(3).data().toArray(),t.content[1].table.body.forEach((function(t){t.forEach((function(n){t.forEach((function(t){t.fillColor="white",t.fontSize="9"}))}))})),t.content[1].table.body.forEach((function(t){t.forEach((function(n){"Sale Total"!=n.text&&"Return Total"!=n.text||t.forEach((function(t){t.fillColor="#F2F2F2",t.fontSize="9",t.bold=!0}))}))}))}},{title:"Stock Report",extend:"excelHtml5",exportOptions:{}},{extend:"print",text:"Print",title:y,exportOptions:{format:{body:function(t,n,e,o){return o.textContent}}},customize:function(t){$(t.document.body).find("h1").text(y);var n=(new Date).toLocaleString();$(t.document.body).append('<div style="text-align:center;font-size:10px;">'+n+"</div>"),$(t.document.body).find("table").removeClass("display").addClass("table").css("font-size","inherit")}}]})}}))})),$(".company_id").on("change",(function(){var n=$(this).val(),e=t.filter((function(t){return t.company_id==n}));e&&($(".batch_id").empty(),$(".batch_id").append('<option value="">Select Batch Code</option>'),$(".session_id").empty(),$(".session_id").append('<option value="">Select Session Code</option>'),e.forEach((function(t){$(".batch_id").append('<option value="'.concat(t.id,'" >').concat(t.batch_code,"</option>"))})))})),$(".reset-btn").on("click",(function(){$(".company_id").val("").trigger("change"),$(".product_id").val("").trigger("change"),$(".customer_id").val("").trigger("change"),$('input[name="bill_no"]').val(""),$(".ttl_sales").html("<span>Rs.</span> 0"),$(".ttl_payment").html(0),$(".ttl_quantity").html(0),$(".ttl_product_discount").html(0),$(".ttl_invoice_discount").html(0),$(".teacher_attendance_list").empty(),$(".teacher_attendance_list").append('\n            <div class="col-12 pb-10">\n            <div class="no-info">\n                <div class="m-auto"><strong>Please Filter Your Sale Record !</strong></div>\n            </div>\n        </div>\n        ')}))})();
+/******/ (() => { // webpackBootstrap
+var __webpack_exports__ = {};
+/*!********************************************!*\
+  !*** ./resources/js/custom/sale_report.js ***!
+  \********************************************/
+var deleteRef = '';
+var batches = [];
+var sessions = [];
+var CurrentRef = '';
+var segments = location.href.split('/');
+
+/** Local number helper — works even if master.js toNum is missing on live. */
+function num(value) {
+  if (typeof toNum === 'function') {
+    return toNum(value);
+  }
+  if (value === null || value === undefined || value === '') {
+    return 0;
+  }
+  if (typeof value === 'string') {
+    value = value.replace(/,/g, '').trim();
+  }
+  var n = parseFloat(value);
+  return isNaN(n) || !isFinite(n) ? 0 : n;
+}
+$('.search-btn').on('click', function () {
+  var start_date = $('.start_date').val();
+  var end_date = $('.end_date').val();
+  if (start_date != '' && end_date == '') {
+    $('#notifDiv').fadeIn().css('background', 'red').text('End Date should not be Empty').focus();
+    $('.end_date').focus();
+    setTimeout(function () {
+      $('#notifDiv').fadeOut();
+    }, 3000);
+    return;
+  }
+  if (end_date != '' && start_date == '') {
+    $('#notifDiv').fadeIn().css('background', 'red').text('End Date should not be Empty');
+    $('.start_date').focus();
+    setTimeout(function () {
+      $('#notifDiv').fadeOut();
+    }, 3000);
+    return;
+  }
+  // if($('.company_id').val() == 0 && $('.product_id').val() == 0){
+  //     $('#notifDiv').fadeIn().css('background', 'red').text('Please Select Company/Product First.');
+  //     setTimeout(() => {
+  //         $('#notifDiv').fadeOut();
+  //     }, 3000);
+  //     return
+  // }
+  CurrentRef = $(this);
+  CurrentRef.text('Fetching...');
+  CurrentRef.attr('disabled', 'disabled');
+  url = '/sales-list';
+  $("#search-form").ajaxSubmit({
+    type: 'POST',
+    url: url,
+    data: {
+      _token: $('meta[name="csrf_token"]').attr('content'),
+      current_url: segments[3]
+    },
+    success: function success(response) {
+      CurrentRef.text('Search');
+      CurrentRef.attr('disabled', false);
+      $('.loader').show();
+      $('.teacher_attendance_list').empty();
+      $('.teacher_attendance_list').append("\n                <table class=\"table table-hover dt-responsive nowrap TeacherAttendanceListTable\" style=\"width:100%;\">\n                    <thead>\n                        <tr>\n                            <th>Bill #</th>\n                            <th>Date</th>\n                            <th>Company Name</th>\n                            <th>Product Name</th>\n                            <th>Qty</th>\n                            <th>Discount</th>\n                            <th>Amount</th>\n\n                        </tr>\n                    </thead><tbody>\n                    </tbody>\n                    <tfoot></tfoot>\n                </table>");
+      $('.TeacherAttendanceListTable tbody').empty();
+      if (response.stocks.length == 0) {
+        $('#notifDiv').fadeIn();
+        $('#notifDiv').css('background', 'green');
+        $('#notifDiv').text('No data available');
+        setTimeout(function () {
+          $('#notifDiv').fadeOut();
+        }, 3000);
+      }
+      var total_sales = 0;
+      var ttl_quantity = 0;
+      var ttl_product_discount = 0;
+      var ttl_invoice_discount = num(response.stocks.sale_invoice_record && response.stocks.sale_invoice_record['invoice_discount']);
+      //Sale Return Variables
+      var total_returns = 0;
+      var ttl_return_quantity = 0;
+      var ttl_return_product_discount = 0;
+      var ttl_return_invoice_discount = 0;
+      (response.stocks.sales || []).forEach(function (element, key) {
+        total_sales += num(element['sale_total_amount']);
+        ttl_quantity += num(element['qty']);
+        ttl_product_discount += num(element['product_discount']);
+        var date = new Date(element.expire_date);
+        var formattedDate = date.toDateString();
+        var invoice_no = "";
+        invoice_no = element.invoice_no.split('-');
+        reportTable(invoice_no[0], element);
+      });
+      $('.TeacherAttendanceListTable').fadeIn();
+      sale_return_total(ttl_quantity, ttl_product_discount, total_sales, 'Sale');
+      if (response.stocks.sale_returns && response.stocks.sale_returns.length > 0) {
+        //Sale Returns
+        response.stocks.sale_returns.forEach(function (element, key) {
+          total_returns += num(element['return_total_amount']);
+          ttl_return_quantity += num(element['qty']);
+          ttl_return_product_discount += num(element['product_discount']);
+          ttl_return_invoice_discount += num(element['invoice_discount']);
+          var invoice_no = "";
+          invoice_no = element.invoice_no.split('-');
+          reportTable(invoice_no[0], element);
+        });
+        sale_return_total(ttl_return_quantity, ttl_return_product_discount, total_returns, 'Return');
+      }
+      var grand_total_discount = num(ttl_invoice_discount) + num(ttl_return_invoice_discount);
+      var grand_qty = num(ttl_quantity) - num(ttl_return_quantity);
+      var grand_amount = num(total_sales) - num(total_returns);
+      //Grand Total
+      $('.TeacherAttendanceListTable tfoot').append("\n            <tr style=\"background: #152e4d;border: solid 1px #dbdbdb;color: white\">\n                <td colspan=\"3\"></td> \n                <td class=\"font18\">Grand Total :</td>\n                <td class=\"totalNo\"   style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\"> ".concat(addCommas(grand_qty), " </td>\n                <td class=\"totalNo\"  style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">  ").concat(addCommas(num(ttl_product_discount) - num(ttl_return_product_discount)), " </td>\n                <td class=\"totalNo\" colspan=\"2\">\n                    <span class=\"grand-total\" style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(addCommas(grand_amount), "</span>\n                </td>\n            </tr>\n        "));
+      $('.ttl_sales').html('<span>Rs.</span>' + addCommas(grand_amount - grand_total_discount));
+      // $('.ttl_payment').html(total_sales ? addCommas(addCommas(parseInt(total_sales + ttl_invoice_discount + ttl_product_discount))) : 0);
+      $('.ttl_payment').html(total_sales ? addCommas(total_sales) : 0);
+      $('.ttl_quantity').html(grand_qty ? addCommas(grand_qty) : 0);
+      $('.ttl_product_discount').html(ttl_product_discount ? addCommas(ttl_product_discount) : 0);
+      $('.ttl_invoice_discount').html(grand_total_discount ? addCommas(grand_total_discount) : 0);
+      $('.ttl_discount').html(total_returns ? addCommas(total_returns) : 0);
+      $('.loader').hide();
+      var title = '';
+      if (segments[3] == 'customer-reports') {
+        title = 'Customer Report';
+      } else {
+        title = 'Vendor Report';
+      }
+      if ($.fn.DataTable.isDataTable(".TeacherAttendanceListTable")) {
+        $('.TeacherAttendanceListTable').DataTable().clear().destroy();
+      }
+      var table = $('.TeacherAttendanceListTable').DataTable({
+        "bSort": false,
+        "bPaginate": false,
+        scrollX: false,
+        scrollY: '400px',
+        scrollCollapse: true,
+        dom: 'Bfrtip',
+        buttons: [{
+          extend: 'pdfHtml5',
+          title: "Sale Report",
+          orientation: 'landscape',
+          header: true,
+          exportOptions: {
+            alignment: 'left'
+            // columns: ':visible:not(:last-child)',
+          },
+
+          customize: function customize(doc) {
+            doc.content.splice(0, 1, {
+              text: [{
+                text: "Sale Report",
+                bold: true,
+                fontSize: 14,
+                alignment: 'left'
+              }
+              // {
+              //     text: 'Sale Report ',
+              //     bold: false,
+              //     fontSize: 14,
+              //     alignment: 'left'
+              // },
+              // {
+              //     text: `()`,
+              //     bold: true,
+              //     fontSize: 11,
+              //     alignment: 'right',
+              // }
+              ],
+
+              margin: [0, 0, 0, 12]
+            });
+            console.log(doc);
+            doc.pageMargins = [20, 12, 20, 12];
+            // doc.styles.tableBodyOdd.fillColor = "#FFA07A";
+            doc.styles.tableHeader.fillColor = "#E6E6E6";
+            doc.styles.tableFooter.fillColor = "#E6E6E6";
+            doc.styles.tableHeader.color = "black";
+            doc.styles.tableHeader.alignment = "left";
+            doc.styles.title.alignment = "left";
+            doc.content[1].table.widths = 'auto';
+            //cell border
+            var objLayout = {};
+            objLayout['hLineWidth'] = function (i) {
+              return 0.5;
+            };
+            objLayout['vLineWidth'] = function (i) {
+              return 0.5;
+            };
+            objLayout['hLineColor'] = function (i) {
+              return '#E6E6E6';
+            };
+            objLayout['vLineColor'] = function (i) {
+              return '#E6E6E6';
+            };
+            objLayout['paddingLeft'] = function (i) {
+              return 3;
+            };
+            objLayout['paddingRight'] = function (i) {
+              return 3;
+            };
+            objLayout['paddingTop'] = function (i) {
+              return 4;
+            };
+            objLayout['paddingBottom'] = function (i) {
+              return 4;
+            };
+            doc.content[1].layout = objLayout;
+
+            //cell border
+            age = table.column(3).data().toArray();
+
+            // testing for the background of the row
+            doc.content[1].table.body.forEach(function (element) {
+              element.forEach(function (el) {
+                element.forEach(function (cell) {
+                  cell.fillColor = 'white';
+                  cell.fontSize = '9';
+                });
+              });
+            });
+            doc.content[1].table.body.forEach(function (element) {
+              element.forEach(function (el) {
+                if (el.text == "Sale Total" || el.text == "Return Total") {
+                  element.forEach(function (cell) {
+                    cell.fillColor = '#F2F2F2';
+                    cell.fontSize = '9';
+                    cell.bold = true;
+                  });
+                }
+              });
+            });
+          }
+        }, {
+          title: 'Stock Report',
+          extend: 'excelHtml5',
+          exportOptions: {}
+        }, {
+          extend: 'print',
+          text: 'Print',
+          title: title,
+          exportOptions: {
+            format: {
+              body: function body(innerHtml, rowIdx, colIdx, node) {
+                return node.textContent;
+              }
+            }
+          },
+          customize: function customize(win) {
+            // Change the default print title
+            $(win.document.body).find('h1').text(title);
+
+            // Add a footer with the current date and time
+            var date = new Date().toLocaleString();
+            $(win.document.body).append('<div style="text-align:center;font-size:10px;">' + date + '</div>');
+
+            // Remove the default DataTables styling from the print view
+            $(win.document.body).find('table').removeClass('display').addClass('table').css('font-size', 'inherit');
+          }
+        }]
+      });
+    }
+  });
+});
+function reportTable(invoice_no, element) {
+  var _element$sale_total_a;
+  $('.TeacherAttendanceListTable tbody').append("\n                    <tr>\n                        <td>".concat(element['invoice_no'], "</td>\n                        <td>").concat(element['created'], "</td>\n                        <td>").concat(element['company_name'], "</td>\n                        <td>").concat(element['product_name'], "</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 16px;\">").concat(element['qty'], "</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 16px;\">").concat(element['product_discount'] ? element['product_discount'] : 0, "</td>\n                        <td style=\"font-family: 'Rationale', sans-serif !important;font-size: 16px;\">").concat(addCommas((_element$sale_total_a = element['sale_total_amount']) !== null && _element$sale_total_a !== void 0 ? _element$sale_total_a : element['return_total_amount']), "</td>\n                    </tr>"));
+}
+function sale_return_total(ttl_quantity, ttl_product_discount, total, flag) {
+  $('.TeacherAttendanceListTable tfoot').append("\n    <tr style=\"background:#eaf1fa ; color:#152e4d\" >\n        <th colspan=\"3\"></th>\n        <th class=\"font18\" align=\"center\">".concat(flag, " Total</th>\n        <th class=\"totalNo\"   style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(ttl_quantity ? addCommas(ttl_quantity) : 0, "</th>\n        <th class=\"totalNo\"   style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(ttl_product_discount ? addCommas(ttl_product_discount) : 0, "</th>\n        <th class=\"totalNo\"   style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(total ? addCommas(total) : 0, "</th>\n    </tr>\n"));
+}
+$('.company_id').on('change', function () {
+  var company_id = $(this).val();
+  var batch = batches.filter(function (x) {
+    return x.company_id == company_id;
+  });
+  if (batch) {
+    $('.batch_id').empty();
+    $('.batch_id').append("<option value=\"\">Select Batch Code</option>");
+    $('.session_id').empty();
+    $('.session_id').append("<option value=\"\">Select Session Code</option>");
+    batch.forEach(function (data) {
+      $('.batch_id').append("<option value=\"".concat(data.id, "\" >").concat(data.batch_code, "</option>"));
+    });
+  }
+});
+$('.reset-btn').on('click', function () {
+  $('.company_id').val('').trigger('change');
+  $('.product_id').val('').trigger('change');
+  $('.customer_id').val('').trigger('change');
+  $('input[name="bill_no"]').val('');
+  $('.ttl_sales').html('<span>Rs.</span> 0');
+  $('.ttl_payment').html(0);
+  $('.ttl_quantity').html(0);
+  $('.ttl_product_discount').html(0);
+  $('.ttl_invoice_discount').html(0);
+  // $('#search-form')[0].reset();
+  $('.teacher_attendance_list').empty();
+  $('.teacher_attendance_list').append("\n            <div class=\"col-12 pb-10\">\n            <div class=\"no-info\">\n                <div class=\"m-auto\"><strong>Please Filter Your Sale Record !</strong></div>\n            </div>\n        </div>\n        ");
+});
+function addCommas(nStr) {
+  nStr = num(nStr);
+  nStr = Math.round(nStr * 10000) / 10000;
+  nStr += "";
+  x = nStr.split(".");
+  x1 = x[0];
+  x2 = x.length > 1 ? "." + x[1] : "";
+  var rgx = /(\d+)(\d{3})/;
+  while (rgx.test(x1)) {
+    x1 = x1.replace(rgx, "$1" + "," + "$2");
+  }
+  return x1 + x2;
+}
+/******/ })()
+;
