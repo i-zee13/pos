@@ -320,8 +320,8 @@
         <div class="col-md-12">
             <div class="body teacher_attendance_list">
                 <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-6 demo-y" style="max-height: 430px">
+                    <div class="row" id="adminCloseDetailRow">
+                        <div class="col-md-6 demo-y" id="adminCloseSummaryCol" style="max-height: 430px">
                             <div class="c-address-info">
                                 <div class="net_sale_div" style="display: none;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-receipt" viewBox="0 0 16 16">
@@ -512,6 +512,19 @@
 
                             </div>
                         </div>
+                        @if($inlinePurchi)
+                        <div class="col-md-8" id="inlinePurchiPanel" style="display: none; max-height: 430px; overflow: auto;">
+                            <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                                <strong>Purchi Detail</strong>
+                                <a class="btn btn-sm add_button" style="position: static !important; right: auto !important; top: auto !important;" data-toggle="modal" data-target="#print-modal">
+                                    <i class="fa fa-download"></i> Print DSR
+                                </a>
+                            </div>
+                            <div class="row">
+                                @include('reports.partials.admin-sale-close-purchi')
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -520,26 +533,6 @@
     @include('reports.partials.admin-sale-close-modal')
 
     @if($inlinePurchi)
-    <div class="card mt-3" id="inlinePurchiPanel" style="padding: 0px; display: none;">
-        <div class="header m-0">
-            <h2 style="width: 100%">Purchi <span>Detail</span>
-                <a class="btn add_button" style="right: 0px!important;top:-2px!important" data-toggle="modal" data-target="#print-modal">
-                    <i class="fa fa-download"></i> Print DSR
-                </a>
-            </h2>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="body teacher_attendance_list">
-                    <div class="col-md-12">
-                        <div class="row">
-                            @include('reports.partials.admin-sale-close-purchi')
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     @include('reports.partials.admin-sale-close-print-modal')
     @endif
 @endsection
@@ -564,6 +557,26 @@
     <script>
         (function ($) {
             var purchiVisible = false;
+            var $summary = $('#adminCloseSummaryCol');
+            var $panel = $('#inlinePurchiPanel');
+
+            function setPurchiLayout(show) {
+                if (show) {
+                    $summary.removeClass('col-md-6').addClass('col-md-4');
+                    $panel.stop(true, true).fadeIn(200, function () {
+                        if ($summary.data('mCS')) {
+                            $summary.mCustomScrollbar('update');
+                        }
+                    });
+                } else {
+                    $panel.stop(true, true).fadeOut(150, function () {
+                        $summary.removeClass('col-md-4').addClass('col-md-6');
+                        if ($summary.data('mCS')) {
+                            $summary.mCustomScrollbar('update');
+                        }
+                    });
+                }
+            }
 
             function loadInlinePurchi(date) {
                 date = date || (typeof getSelectedCloseDate === 'function' ? getSelectedCloseDate() : $('.selected_date').val());
@@ -580,17 +593,11 @@
                 }
                 purchiVisible = !purchiVisible;
                 if (purchiVisible) {
-                    $('#inlinePurchiPanel').slideDown(200);
+                    setPurchiLayout(true);
                     $('.view-purchi-label').text('Hide Purchi');
                     loadInlinePurchi();
-                    setTimeout(function () {
-                        var $panel = $('#inlinePurchiPanel');
-                        if ($panel.length) {
-                            $('html, body').animate({ scrollTop: $panel.offset().top - 80 }, 300);
-                        }
-                    }, 220);
                 } else {
-                    $('#inlinePurchiPanel').slideUp(200);
+                    setPurchiLayout(false);
                     $('.view-purchi-label').text('View Purchi');
                 }
             }
