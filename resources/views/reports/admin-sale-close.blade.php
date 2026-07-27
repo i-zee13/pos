@@ -517,10 +517,23 @@
                         </div>
                         @if($inlinePurchi)
                         <div class="col-md-8" id="inlinePurchiPanel" style="display: none; max-height: 430px; overflow: auto;">
-                            <div class="row">
+                            <div class="row inline-purchi-row">
                                 @include('reports.partials.admin-sale-close-purchi')
                             </div>
                         </div>
+                        <style>
+                            /* Pack purchas to the right and fill the col-8 panel (no trailing gap) */
+                            #inlinePurchiPanel .inline-purchi-row {
+                                direction: rtl;
+                                justify-content: flex-start;
+                                margin-left: 0;
+                                margin-right: 0;
+                            }
+                            #inlinePurchiPanel .inline-purchi-row > .report.col-md-4 {
+                                flex: 0 0 50%;
+                                max-width: 50%;
+                            }
+                        </style>
                         @endif
                     </div>
                 </div>
