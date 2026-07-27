@@ -294,15 +294,18 @@
     <div class="header m-0">
         <h2 style="width: 100%">Sale Close <span>Detail</span>
             @if($inlinePurchi)
-            <button type="button" id="viewPurchiBtn" class="btn add_button view-purchi-inline-btn" style="right: 115px!important;top:-2px!important">
+            <button type="button" id="viewPurchiBtn" class="btn add_button view-purchi-inline-btn" style="right: 230px!important;top:-2px!important">
                 <i class="fa fa-file-alt"></i> <span class="view-purchi-label">View Purchi</span>
             </button>
+            <a class="btn add_button" id="printDsrBtn" style="right: 0px!important;top:-2px!important" data-toggle="modal" data-target="#print-modal">
+                <i class="fa fa-download"></i> Print DSR
+            </a>
             @else
             <a href="{{ route('admin-sale-close-purchi', ['date' => $closeDate]) }}" class="btn add_button view-purchi-link" style="right: 115px!important;top:-2px!important">
                 <i class="fa fa-file-alt"></i> View Purchi
             </a>
             @endif
-            <button class="btn add_button sale-close-btn-modal" data-toggle="modal" data-target="#close-modal" style="right: 0px!important;top:-2px!important">
+            <button class="btn add_button sale-close-btn-modal" data-toggle="modal" data-target="#close-modal" style="right: {{ $inlinePurchi ? '115px' : '0px' }}!important;top:-2px!important">
                 <i class="fa fa-check"></i>
                 @php
                 $is_close = isClose();
@@ -514,12 +517,6 @@
                         </div>
                         @if($inlinePurchi)
                         <div class="col-md-8" id="inlinePurchiPanel" style="display: none; max-height: 430px; overflow: auto;">
-                            <div class="d-flex justify-content-between align-items-center mb-2 px-1">
-                                <strong>Purchi Detail</strong>
-                                <a class="btn btn-sm add_button" style="position: static !important; right: auto !important; top: auto !important;" data-toggle="modal" data-target="#print-modal">
-                                    <i class="fa fa-download"></i> Print DSR
-                                </a>
-                            </div>
                             <div class="row">
                                 @include('reports.partials.admin-sale-close-purchi')
                             </div>
