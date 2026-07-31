@@ -263,4 +263,3 @@ class BatchIdentityFlowTestCommand extends Command
         $this->info("OK: {$label}");
     }
 }
-image.png
