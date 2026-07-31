@@ -1190,20 +1190,44 @@ if (!function_exists('applyPurchaseWeightedAvg')) {
             return;
         }
 
-        // Called from BatchWiseStockManagment before/alongside StockManagment —
-        // balance here is qty BEFORE this purchase IN.
-        $oldQty = max(0, (float) ($stock->balance ?? 0));
+        // Purchase controller calls StockManagment() BEFORE BatchWiseStockManagment(),
+        // so VSM.balance already includes this IN qty. Strip it to get pre-purchase qty.
+        $balanceNow = max(0, (float) ($stock->balance ?? 0));
+        $oldQty = max(0, round($balanceNow - $inQty, 6));
+        // If StockManagment has not run yet (balance still pre-IN), use balance as-is.
+        if ($balanceNow + 0.000001 < $inQty) {
+            $oldQty = $balanceNow;
+        }
+
         $oldAvg = (float) ($stock->ttl_avg_cost ?? 0);
         $newTotalQty = round($oldQty + $inQty, 6);
 
-        if ($oldQty <= 0.000001 || $oldAvg <= 0) {
+        // Legacy rows: stock exists but ttl_avg_cost never saved — seed once from open batches
+        // (exclude this purchase's contribution so we don't circular-seed to unitCost).
+        if ($oldQty > 0.000001 && $oldAvg <= 0) {
+            $agg = BatchStockMgt::where('product_id', $productId)
+                ->where('company_id', $companyId)
+                ->where('batch_wise_balance', '>=', 1)
+                ->selectRaw('SUM(batch_wise_balance) AS qty, SUM(IFNULL(unit_cost_price,0) * batch_wise_balance) AS cost')
+                ->first();
+            $seedQty = max(0, round(((float) ($agg->qty ?? 0)) - $inQty, 6));
+            $seedCost = round(((float) ($agg->cost ?? 0)) - ($unitCost * $inQty), 6);
+            if ($seedQty >= 1 && $seedCost > 0) {
+                $oldAvg = round($seedCost / $seedQty, 6);
+            }
+        }
+
+        if ($oldQty <= 0.000001) {
+            $newAvg = $unitCost; // first STOCK IN
+        } elseif ($oldAvg <= 0) {
             $newAvg = $unitCost;
         } else {
             $newAvg = round((($oldAvg * $oldQty) + ($unitCost * $inQty)) / $newTotalQty, 6);
         }
 
         $stock->ttl_avg_cost = $newAvg;
-        $stock->ttl_cost = round($newAvg * $newTotalQty, 6);
+        // Persist against actual on-hand balance after this purchase
+        $stock->ttl_cost = round($newAvg * max($balanceNow, $newTotalQty), 6);
         $stock->save();
     }
 }
