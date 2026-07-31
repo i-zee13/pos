@@ -52,7 +52,7 @@ function buildAvgConsoleHtml(records, meta, mode) {
     var html = '';
 
     html += '<div class="avg-summary">';
-    html += '<strong>Mode:</strong> ' + (isAvg ? 'By Average (weighted average of open batches)' : 'By Last Price') + '<br>';
+    html += '<strong>Mode:</strong> ' + (isAvg ? 'By Average (purchase-weighted running avg — updates only on STOCK IN)' : 'By Last Price') + '<br>';
     html += '<strong>Products:</strong> ' + (meta.total_products != null ? meta.total_products : records.length);
     html += ' &nbsp;|&nbsp; <strong>Open Batches:</strong> ' + (meta.total_batches != null ? meta.total_batches : 0);
     html += '</div>';
@@ -70,8 +70,7 @@ function buildAvgConsoleHtml(records, meta, mode) {
             ? toNum(row.computed_avg != null ? row.computed_avg : row.ttl_avg_cost)
             : toNum(row.purchase_price);
         var value = cost * balance;
-
-        var displayAvg = cost; // may update after batch sum
+        var displayAvg = cost;
 
         html += '<div class="avg-product-block">';
         html += '<div class="avg-product-head">';
@@ -93,13 +92,13 @@ function buildAvgConsoleHtml(records, meta, mode) {
             return;
         }
 
-        html += '<div class="avg-formula-note"><strong>Simple formula:</strong> (har batch ka Rate × Qty) ka total ÷ total Qty = Average Rate</div>';
+        html += '<div class="avg-formula-note"><strong>Formula (purchase IN only):</strong> (old_avg × old_qty + purchase_price × purchase_qty) ÷ (old_qty + purchase_qty). Sale pe avg change nahi hoti.</div>';
 
         if (!batchList.length) {
-            html += '<div class="avg-empty">Is product pe <strong>open batch nahi</strong> — is liye average rate <strong>0</strong> (purani saved average use nahi hoti).</div>';
+            html += '<div class="avg-empty">Open batch nahi — stored avg = <strong>' + fmtMoney(displayAvg) + '</strong>.</div>';
             html += '<div class="avg-result-box avg-result-flex">';
-            html += '<div class="avg-result-left">Stock Value = 0 × ' + fmtMoney(balance) + ' = <span class="avg-big">0</span></div>';
-            html += '<div class="avg-rate-badge large"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">0</span></div>';
+            html += '<div class="avg-result-left">Stock Value = ' + fmtMoney(displayAvg) + ' × ' + fmtMoney(balance) + ' = <span class="avg-big">' + fmtMoney(value) + '</span></div>';
+            html += '<div class="avg-rate-badge large"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(displayAvg) + '</span></div>';
             html += '</div></div>';
             return;
         }
@@ -139,27 +138,24 @@ function buildAvgConsoleHtml(records, meta, mode) {
             html += '<strong>MISMATCH:</strong> Batches total = <strong>' + fmtMoney(sumQty) + '</strong>';
             html += ' but Stock Qty = <strong>' + fmtMoney(balance) + '</strong>';
             html += ' (farq = ' + fmtMoney(sumQty - balance) + '). ';
-            html += 'Yeh usually purchase/sale <em>edit</em> se batch inflate hone ki wajah se hota hai. ';
-            html += 'Avg batches se bani, Stock Value stock qty × avg se. ';
             html += 'Fix: <code>php artisan stock:rebuild-batches --product=' + (row.product_id || '') + '</code>';
             html += '</div>';
         }
 
-        var avg = sumQty > 0 ? sumCost / sumQty : cost;
-        // Fix header badge with live batch avg (header was written with pre-calc cost which matches after API sets computed_avg)
-        html = html.replace(
-            'data-avg-slot="' + idx + '"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(displayAvg) + '</span>',
-            'data-avg-slot="' + idx + '"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(avg) + '</span>'
-        );
+        var batchAvg = sumQty > 0 ? sumCost / sumQty : 0;
+        if (batchAvg > 0 && Math.abs(batchAvg - displayAvg) > 0.0001) {
+            html += '<div class="avg-mismatch">';
+            html += 'Batch Σ-avg = <strong>' + fmtMoney(batchAvg) + '</strong> (info only). ';
+            html += 'Stored avg = <strong>' + fmtMoney(displayAvg) + '</strong> — sale ke baad farq normal hai jab tak naya purchase na aaye.';
+            html += '</div>';
+        }
 
         html += '<div class="avg-result-box avg-result-flex">';
         html += '<div class="avg-result-left">';
-        html += 'Total Batch Value = <strong>' + fmtMoney(sumCost) + '</strong><br>';
-        html += 'Total Qty = <strong>' + fmtMoney(sumQty) + '</strong><br>';
-        html += 'Average Rate = ' + fmtMoney(sumCost) + ' ÷ ' + fmtMoney(sumQty) + ' = <span class="avg-big">' + fmtMoney(avg) + '</span><br>';
-        html += 'Stock Value = ' + fmtMoney(avg) + ' × ' + fmtMoney(balance) + ' = <span class="avg-big">' + fmtMoney(avg * balance) + '</span>';
+        html += 'Stored Avg Rate = <span class="avg-big">' + fmtMoney(displayAvg) + '</span><br>';
+        html += 'Stock Value = ' + fmtMoney(displayAvg) + ' × ' + fmtMoney(balance) + ' = <span class="avg-big">' + fmtMoney(value) + '</span>';
         html += '</div>';
-        html += '<div class="avg-rate-badge large"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(avg) + '</span></div>';
+        html += '<div class="avg-rate-badge large"><span class="avg-rate-label">Avg Rate</span><span class="avg-rate-value">' + fmtMoney(displayAvg) + '</span></div>';
         html += '</div></div>';
     });
 

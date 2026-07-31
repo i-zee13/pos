@@ -275,7 +275,7 @@ class ReportsController extends Controller
 
       $console = [];
       $console[] = '=== Stock Value Report — formula console ===';
-      $console[] = 'Mode: '.($mode === '2' ? 'By Last Price (purchase_price)' : 'By Average (ttl_avg_cost from open batches)');
+      $console[] = 'Mode: '.($mode === '2' ? 'By Last Price (purchase_price)' : 'By Average (stored ttl_avg_cost — purchase-weighted running avg)');
       $console[] = 'Request: company_id='.($request->company_id ?: 'ALL').' product_id='.($request->product_id ?: 'ALL');
       $console[] = 'Path: POST /fetch-stock-value-report → ReportsController@fetchStockValueReport → vendor_stock_managment (+ stock_batches_items breakdown)';
       $console[] = '';
@@ -300,15 +300,15 @@ class ReportsController extends Controller
             $row->computed_avg = $unit;
             $row->avg_formula = 'last_price';
          } else {
-            if (count($batches) === 0) {
-               // No open batches ⇒ average cannot be calculated from stock.
-               // Do NOT reuse old VSM ttl_avg_cost (that is leftover from when stock existed).
-               $console[] = 'No open batches — average = 0 (old stored avg ignored)';
-               $row->computed_avg = 0;
-               $row->ttl_avg_cost = 0;
-               $row->avg_formula = 'no_open_batches';
-            } else {
-               $console[] = 'Average formula: Σ(unit_cost × batch_qty) / Σ(batch_qty)';
+            // Purchase-weighted running avg stored on VSM — do NOT recompute from open batches
+            $storedAvg = (float) ($row->ttl_avg_cost ?? 0);
+            $console[] = 'Avg rule: updates ONLY on purchase STOCK IN';
+            $console[] = '  new_avg = (old_avg × old_qty + purchase_price × purchase_qty) / (old_qty + purchase_qty)';
+            $console[] = 'Stored ttl_avg_cost = '.$storedAvg;
+            $console[] = 'Value = '.$storedAvg.' × '.$row->balance.' = '.round($storedAvg * (float) $row->balance, 4);
+
+            if (count($batches) > 0) {
+               $console[] = 'Open-batch breakdown (identity only — not used for avg):';
                foreach ($batches as $i => $b) {
                   $sumQty += (float) $b->batch_wise_balance;
                   $sumCost += (float) $b->line_cost;
@@ -317,17 +317,20 @@ class ReportsController extends Controller
                      .' cost='.$b->unit_cost_price
                      .' → line='.$b->line_cost;
                }
-               $computed = $sumQty > 0 ? round($sumCost / $sumQty, 6) : 0.0;
-               $console[] = 'Σ cost = '.$sumCost.' | Σ qty = '.$sumQty.' | AVG = '.$computed;
-               $console[] = 'VSM ttl_avg_cost (stored) = '.(float) $row->ttl_avg_cost;
-               $console[] = 'Value = '.$computed.' × '.$row->balance.' = '.round($computed * (float) $row->balance, 4);
-               $row->computed_avg = $computed;
+               $batchAvg = $sumQty > 0 ? round($sumCost / $sumQty, 6) : 0.0;
+               $console[] = 'Batch Σ-avg (info) = '.$batchAvg.' | stored avg = '.$storedAvg;
+               if ($batchAvg > 0 && abs($batchAvg - $storedAvg) > 0.0001) {
+                  $console[] = 'NOTE: batch Σ-avg differs from stored avg (expected after sales — avg stays until next purchase)';
+               }
                $row->batch_qty_sum = round($sumQty, 6);
                $row->batch_cost_sum = round($sumCost, 6);
-               $row->avg_formula = 'sum(unit_cost*qty)/sum(qty)';
-               // Prefer live batch avg for display when available
-               $row->ttl_avg_cost = $computed;
+            } else {
+               $console[] = 'No open batches — showing stored avg only';
             }
+
+            $row->computed_avg = $storedAvg;
+            $row->avg_formula = 'purchase_weighted_running_avg';
+            // Keep stored ttl_avg_cost — do not overwrite from batch Σ
          }
       }
 

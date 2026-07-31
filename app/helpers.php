@@ -581,8 +581,7 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
             $expiryDate
         );
         if ($restored) {
-            refreshVendorStockAvgCost($productId, $companyId);
-
+            // Sale put-back must NOT change running avg (purchase-only rule)
             return;
         }
         // fallback below: FEFO putback if no allocation rows (legacy sales)
@@ -765,7 +764,10 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         $remainingQty = round($remainingQty - $appliedQty, 6);
     }
 
-    refreshVendorStockAvgCost($productId, $companyId);
+    // Running avg updates ONLY on purchase STOCK IN (not sale / return / put-back)
+    if ($isIn && $txType === 1) {
+        applyPurchaseWeightedAvg($productId, $companyId, (float) $stock_qty, $unitCostIn);
+    }
 }
 
 if (!function_exists('batch_ensure_allocations_table')) {
@@ -1015,7 +1017,6 @@ if (!function_exists('batch_adjust_existing_invoice_batch')) {
                     'qty' => $qty,
                     'transaction_type' => $txType,
                 ]);
-                refreshVendorStockAvgCost($productId, $companyId);
 
                 return;
             }
@@ -1121,7 +1122,10 @@ if (!function_exists('batch_adjust_existing_invoice_batch')) {
             }
         }
 
-        refreshVendorStockAvgCost($productId, $companyId);
+        // Purchase edit IN only — running avg; OUT / purchase-return leave avg unchanged
+        if ($isIn && $txType === 1 && $qty > 0) {
+            applyPurchaseWeightedAvg($productId, $companyId, (float) $qty, $unitCostIn);
+        }
     }
 }
 
@@ -1165,8 +1169,48 @@ if (!function_exists('batch_ascii')) {
 }
 
 /**
- * Recalc ttl_avg_cost / ttl_cost from open batches with qty >= 1 only.
- * Fractional leftovers are ignored (and should be scrubbed).
+ * Running weighted average — updates ONLY on purchase STOCK IN.
+ * new_avg = (old_avg × old_qty + unit_cost × in_qty) / (old_qty + in_qty)
+ * Sale / sale-return / purchase-return must NOT call this.
+ */
+if (!function_exists('applyPurchaseWeightedAvg')) {
+    function applyPurchaseWeightedAvg(int $productId, int $companyId, float $inQty, float $unitCost): void
+    {
+        $inQty = round($inQty, 6);
+        $unitCost = round($unitCost, 6);
+        if ($inQty <= 0.000001) {
+            return;
+        }
+
+        $stock = StockManagment::where('product_id', $productId)
+            ->where('company_id', $companyId)
+            ->orderBy('id', 'DESC')
+            ->first();
+        if (!$stock) {
+            return;
+        }
+
+        // Called from BatchWiseStockManagment before/alongside StockManagment —
+        // balance here is qty BEFORE this purchase IN.
+        $oldQty = max(0, (float) ($stock->balance ?? 0));
+        $oldAvg = (float) ($stock->ttl_avg_cost ?? 0);
+        $newTotalQty = round($oldQty + $inQty, 6);
+
+        if ($oldQty <= 0.000001 || $oldAvg <= 0) {
+            $newAvg = $unitCost;
+        } else {
+            $newAvg = round((($oldAvg * $oldQty) + ($unitCost * $inQty)) / $newTotalQty, 6);
+        }
+
+        $stock->ttl_avg_cost = $newAvg;
+        $stock->ttl_cost = round($newAvg * $newTotalQty, 6);
+        $stock->save();
+    }
+}
+
+/**
+ * Optional: recalc ttl_avg_cost from open batches (qty >= 1).
+ * Used by rebuild/scrub commands only — NOT by live sale/purchase invoice flow.
  */
 if (!function_exists('refreshVendorStockAvgCost')) {
     function refreshVendorStockAvgCost(int $productId, int $companyId): void

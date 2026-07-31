@@ -269,30 +269,30 @@
       <div class="bar bar7"></div>
       <div class="bar bar8"></div>
     </div>
-  </div>
+</div>
 
 <div class="parent-div analytics-page" id="analyticsPage" style="display:none">
     <div class="analytics-toolbar">
-        <div>
+<div>
             <h2 class="_head01 mb-1" style="font-size:22px;">Monthly / Daily <span>Analytics</span></h2>
             <div class="analytics-meta">
                 <span>Company:</span> <strong id="metaCompany">-</strong>
                 &nbsp;·&nbsp;
                 <span>User:</span> <strong id="metaUser">-</strong>
-            </div>
-        </div>
+                        </div>
+                    </div>
         <div class="d-flex flex-wrap align-items-center gap-2">
             <div class="btn-group analytics-modes" role="group">
                 <button type="button" class="btn btn-outline-primary active" data-mode="daily">Daily</button>
                 <button type="button" class="btn btn-outline-primary" data-mode="monthly">Monthly</button>
-            </div>
+                            </div>
             <div class="analytics-pickers">
                 <div id="dailyPickerWrap">
                     <input type="date" id="analyticsDate" class="form-control" value="{{ date('Y-m-d') }}">
-                </div>
+                        </div>
                 <div id="monthlyPickerWrap" style="display:none;">
                     <input type="month" id="analyticsMonth" class="form-control" value="{{ date('Y-m') }}">
-                </div>
+                        </div>
                 <span class="analytics-meta" id="periodLabel"></span>
             </div>
         </div>
@@ -304,7 +304,7 @@
         <div>
             <span class="hero-amount" data-kpi="net_sales">0</span>
             <span class="hero-change" data-kpi-change="sales_change_pct"></span>
-        </div>
+                </div>
         <div class="hero-secondary">
             <div class="hs-item">
                 <div class="hs-label">Invoices</div>
@@ -313,51 +313,51 @@
             <div class="hs-item">
                 <div class="hs-label">Total Units</div>
                 <div class="hs-value" data-kpi="units_qty">0</div>
-            </div>
+        </div>
             <div class="hs-item">
                 <div class="hs-label">Gross Profit</div>
                 <div class="hs-value" data-kpi="gross_profit">0</div>
-            </div>
+    </div>
             <div class="hs-item">
                 <div class="hs-label">AOV</div>
                 <div class="hs-value" data-kpi="aov">0</div>
-            </div>
-        </div>
+                                    </div>
+                                    </div>
         <div class="hero-grid">
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="sale_returns">0</div>
                 <div class="hg-label">Sale Returns</div>
-            </div>
+                                </div>
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="purchases">0</div>
                 <div class="hg-label">Purchase Paid</div>
-            </div>
+                            </div>
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="expense">0</div>
                 <div class="hg-label">Expense</div>
-            </div>
+                                    </div>
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="cash_in_hand">0</div>
                 <div class="hg-label">Cash In Hand</div>
-            </div>
+                                    </div>
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="cash_recoveries">0</div>
                 <div class="hg-label">Cash Recoveries</div>
-            </div>
+                                </div>
             <div class="hg-cell">
                 <div class="hg-value" data-split="cash_sales">0</div>
                 <div class="hg-label">Cash Sales</div>
-            </div>
+                            </div>
             <div class="hg-cell">
                 <div class="hg-value" data-split="credit_sales_received">0</div>
                 <div class="hg-label">Credit Received</div>
-            </div>
+                                    </div>
             <div class="hg-cell">
                 <div class="hg-value" data-snap="receivables">0</div>
                 <div class="hg-label">Receivables</div>
-            </div>
-        </div>
-    </div>
+                                    </div>
+                                </div>
+                            </div>
 
     {{-- Key Performance Metrics (gauges) --}}
     <div class="an-section">
@@ -367,49 +367,49 @@
                 <div class="gauge-chart" id="gaugeProfit"></div>
                 <div class="gauge-label">Profit Margin</div>
                 <div class="gauge-hint">Gross profit / net sales</div>
-            </div>
+                                    </div>
             <div class="gauge-card">
                 <div class="gauge-chart" id="gaugeCash"></div>
                 <div class="gauge-label">Cash Sales Share</div>
                 <div class="gauge-hint">Cash sales vs net sales</div>
-            </div>
+                                    </div>
             <div class="gauge-card">
                 <div class="gauge-chart" id="gaugeCollection"></div>
                 <div class="gauge-label">Collection Strength</div>
                 <div class="gauge-hint">Recoveries vs outstanding</div>
-            </div>
+                                </div>
             <div class="gauge-card">
                 <div class="gauge-chart" id="gaugeReturns"></div>
                 <div class="gauge-label">Return Control</div>
                 <div class="gauge-hint">Lower returns = higher score</div>
-            </div>
+                            </div>
         </div>
     </div>
 
-    <div class="row">
+            <div class="row">
         <div class="col-lg-8">
             <div class="an-section">
                 <h3 class="an-section-title" id="trendTitle">Daily Sale Trend</h3>
                 <div class="trend-avg">AVG. Sale/Day <strong data-kpi="avg_daily_sales">0</strong></div>
                 <div id="trendChart" style="height:280px;"></div>
-            </div>
+                                            </div>
             <div class="an-section">
                 <h3 class="an-section-title">In vs Out</h3>
                 <div class="trend-avg mb-2" style="font-size:12px;">Sales &amp; recoveries vs purchases, expense &amp; returns</div>
                 <div id="flowChart" style="height:260px;"></div>
-            </div>
+                                        </div>
             <div class="an-section">
                 <h3 class="an-section-title">Top Customers</h3>
                 <table class="analytics-table">
                     <thead><tr><th>Customer</th><th class="num">Invoices</th><th class="num">Amount</th></tr></thead>
                     <tbody id="topCustomersBody"><tr><td colspan="3">Loading…</td></tr></tbody>
                 </table>
-            </div>
+                                            </div>
             <div class="an-section">
                 <h3 class="an-section-title">Top Products</h3>
                 <div class="product-cards" id="topProductCards"></div>
-            </div>
-        </div>
+                                        </div>
+                                    </div>
         <div class="col-lg-4">
             <div class="an-section">
                 <h3 class="an-section-title">Top Categories</h3>
@@ -420,16 +420,16 @@
                         <div class="mix-center-label" id="mixCenterLabel">Gross Sales</div>
                         <div class="mix-center-value" id="mixCenterValue">Rs. 0</div>
                         <div class="mix-center-sub" id="mixCenterSub"></div>
-                    </div>
-                </div>
-            </div>
+                                </div>
+                                                </div>
+                                            </div>
             <div class="an-section">
                 <h3 class="an-section-title">Top Receivables</h3>
                 <table class="analytics-table">
                     <thead><tr><th>Customer</th><th class="num">Balance</th></tr></thead>
                     <tbody id="topReceivablesBody"><tr><td colspan="2">Loading…</td></tr></tbody>
                 </table>
-            </div>
+                                        </div>
             <div class="an-section">
                 <h3 class="an-section-title">Cash Split</h3>
                 <div class="split-pill"><span>Cash Sales</span><span data-split="cash_sales">0</span></div>
@@ -437,9 +437,9 @@
                 <div class="split-pill"><span>Customer Receipts</span><span data-split="customer_receipts">0</span></div>
                 <div class="split-pill"><span>Vendor Payments</span><span data-split="vendor_payments">0</span></div>
                 <div class="split-pill"><span>Payables</span><span data-snap="payables">0</span></div>
-            </div>
-        </div>
-    </div>
+                                    </div>
+                                </div>
+                                            </div>
 </div>
 @endsection
 

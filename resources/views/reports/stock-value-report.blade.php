@@ -3532,6 +3532,71 @@
         height: 31px !important;
     }
 
+    /* Stock Value Report filter row — aligned heights */
+    .Product-Filter #search-form > .row > .col-auto {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        float: none;
+    }
+    .Product-Filter .CL-Product.inputmonth {
+        width: 160px;
+        margin-left: 0;
+        padding-top: 0;
+        float: none;
+    }
+    .Product-Filter .CL-Product.inputmonth .fa {
+        display: none;
+    }
+    .Product-Filter .CL-Product.inputmonth input.form-control {
+        height: 32px !important;
+        padding: 4px 8px !important;
+        font-size: 13px;
+        line-height: 1.2;
+        border: 1px solid #dedede;
+        box-shadow: none;
+    }
+    .Product-Filter ._cust_filter {
+        width: 180px;
+        float: none;
+        padding: 0;
+        margin: 0;
+    }
+    .Product-Filter ._cust_filter .form-s2,
+    .Product-Filter ._cust_filter .select2-container {
+        width: 100% !important;
+    }
+    .Product-Filter ._cust_filter .select2-container .select2-selection--single {
+        height: 32px !important;
+        border: 1px solid #dedede !important;
+        border-radius: 2px;
+    }
+    .Product-Filter ._cust_filter .select2-container .select2-selection--single .select2-selection__rendered {
+        line-height: 30px !important;
+        font-size: 13px;
+        padding-left: 8px;
+    }
+    .Product-Filter ._cust_filter .select2-container .select2-selection--single .select2-selection__arrow {
+        height: 30px !important;
+    }
+    .Product-Filter .svr-filter-actions {
+        float: none !important;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 !important;
+    }
+    .Product-Filter .svr-filter-actions .btn-primary {
+        height: 32px;
+        padding: 0 18px !important;
+        font-size: 13px !important;
+        line-height: 30px;
+        margin: 0 !important;
+    }
+
     .reset-btn {
         box-shadow: none;
     }
@@ -3569,13 +3634,13 @@
             <form id="search-form">
                 <div class="row">
                     <div class="col-auto">
-                        <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
-                            <input type="date" autocomplete="off" class="form-control " placeholder="Start Date" name="start_date" value="{{date('Y-m-d')}}">
+                        <div class="CL-Product inputmonth">
+                            <input type="date" autocomplete="off" class="form-control" placeholder="Start Date" name="start_date" value="{{date('Y-m-d')}}">
                         </div>
-                        <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
+                        <div class="CL-Product inputmonth">
                             <input type="date" autocomplete="off" class="form-control" placeholder="End Date" name="end_date" value="{{date('Y-m-d')}}">
                         </div>
-                        <div class="_cust_filter ">
+                        <div class="_cust_filter">
                             <div class="form-s2">
                                 <select class="form-control formselect company_id" name="company_id">
                                     <option value="">Select Company</option>
@@ -3585,7 +3650,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter ">
+                        <div class="_cust_filter">
                             <div class="form-s2">
                                 <select class="form-control formselect product_id" name="product_id">
                                     <option value="">Select Product (all of company if empty)</option>
@@ -3595,7 +3660,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter ">
+                        <div class="_cust_filter">
                             <div class="form-s2">
                                 <select class="form-control formselect filter_by_value" name="filter_by_value">
                                     <option value="">Select Value</option>
@@ -3604,14 +3669,12 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-auto" style="float:right;">
-                            <button type="button" class="btn btn-primary m-0 search-btn" style=" margin-right:10px !important"> Search</button>
-                            <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#152e4d !important"> Reset</button>
+                        <div class="svr-filter-actions">
+                            <button type="button" class="btn btn-primary search-btn">Search</button>
+                            <button type="button" class="btn btn-primary btn-line reset-btn" style="color:#152e4d !important">Reset</button>
                         </div>
                     </div>
-
                 </div>
-
             </form>
             <div class="clearfix"></div>
         </div>
@@ -3798,5 +3861,5 @@
 </style>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/stock-value-report.js') }}?v=7"></script>
+<script src="{{asset('js/custom/stock-value-report.js') }}?v=8"></script>
 @endpush

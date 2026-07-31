@@ -65,31 +65,36 @@ npm run dev   # or mix — rebuilds public/js/custom/sale.js
 
 ### Goal
 - Track stock in **open batches** (`stock_batches_items`) with real **unit cost** and **expiry**.
-- Compute **weighted average cost** from open batches and store it on the latest `vendor_stock_managment` row (`ttl_avg_cost` / `ttl_cost`).
-- Show / verify that average on **Stock Value Report → By Average**, with a bottom AVG console (black/green, resizable).
+- Maintain a **purchase-weighted running average** on the latest `vendor_stock_managment` row (`ttl_avg_cost` / `ttl_cost`).
+- Show that average on **Stock Value Report → By Average**, with a bottom AVG console (black/green, resizable).
 
-### Average formula
+### Average formula (purchase STOCK IN only)
 ```
-Avg Rate = Σ (batch_unit_cost × batch_qty) / Σ (batch_qty)
-Stock Value = Avg Rate × current stock balance
+new_avg = (old_avg × old_qty + purchase_price × purchase_qty) / (old_qty + purchase_qty)
+Stock Value = stored Avg Rate × current stock balance
 ```
 
-**Only batches with `batch_wise_balance >= 1` are used.**  
-Leftover fractional qty (`0 < qty < 1`) is treated as dust and scrubbed so it cannot distort the average.
+**Avg does NOT recalculate on sale, sale-return, or purchase-return.**  
+After a sale, open-batch Σ may differ from stored avg — that is expected until the next purchase.
+
+Example: batches 100×10 + 110×5 → avg **103.33**. Sale of 5 leaves batches that would Σ to 105, but **stored avg stays 103.33**. Next purchase 120×5 blends: `(103.33×10 + 120×5) / 15`.
+
+Leftover fractional qty (`0 < qty < 1`) is still scrubbed as dust so it cannot pollute batch layers.
 
 ### Runtime behaviour (`BatchWiseStockManagment` in `app/helpers.php`)
 | Direction | Rule |
 |-----------|------|
-| **IN** (purchase / sale return / etc.) | Merge only when **same expiry + same unit cost**. Different rates on the same expiry = separate layers. |
-| **OUT** (sale / purchase return / etc.) | **FEFO**: real expiry first, then `0000-00-00` / no-expiry; within that, oldest row first. |
+| **IN** (purchase) | Merge only when **same expiry + same unit cost**. Then `applyPurchaseWeightedAvg()`. |
+| **IN** (sale return / sale delete put-back) | Restore exact consumed batches (allocations). **Avg unchanged.** |
+| **OUT** (sale / purchase return) | **FEFO** (purchase return with expiry → that expiry first). **Avg unchanged.** |
 | After OUT | If leftover on a batch is **&lt; 1**, scrap that dust (delete batch row + reduce product + VSM balance). |
-| After every IN/OUT | `refreshVendorStockAvgCost()` recalculates `ttl_avg_cost` from open batches with qty **≥ 1** only. Does **not** rewrite stock balances (except dust scrap). |
+| Rebuild/scrub only | `refreshVendorStockAvgCost()` may recalc from open batches — **not** used on live invoice flow. |
 
 ### Stock Value Report
 - Route: `POST /fetch-stock-value-report` → `ReportsController@fetchStockValueReport`
 - UI: `resources/views/reports/stock-value-report.blade.php` + `public/js/custom/stock-value-report.js`
-- Filters: company only → all products of that company; **balance &gt; 0** only; By Average uses live batch formula
-- Console: toggleable AVG panel — batch table + bold **Avg Rate** badge; drag top border to resize
+- Filters: company only → all products of that company; **balance &gt; 0** only; By Average uses **stored** `ttl_avg_cost`
+- Console: batch table for identity; Avg Rate badge from stored running avg (batch Σ shown as info if it differs)
 
 ### Artisan commands
 | Command | Purpose |
@@ -117,7 +122,7 @@ Do this on a **copy / staging DB first**, then production. Always take a full ba
 
 ### Step 1 — Deploy code
 Deploy at least:
-- `app/helpers.php` (`BatchWiseStockManagment`, `refreshVendorStockAvgCost`, `batch_scrap_dust_qty`)
+- `app/helpers.php` (`BatchWiseStockManagment`, `applyPurchaseWeightedAvg`, `batch_scrap_dust_qty`)
 - `app/Console/Commands/RebuildBatchStockCommand.php`
 - `app/Console/Commands/ScrubFractionalBatchesCommand.php`
 - Stock Value Report controller + blade + JS (if you want the console)
