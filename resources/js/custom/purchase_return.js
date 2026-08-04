@@ -32,8 +32,12 @@ let grand_total = 0;
 
 $(document).ready(function () {
 
-    $('.parent-div').show();
-    $('#tblLoader').hide();
+    if (segments[3] == 'purchase-return-edit') {
+        toggleInvoiceBalanceLoader(true);
+    } else {
+        $('.parent-div').show();
+        $('#tblLoader').hide();
+    }
     $('#bar-code').focus();
     stock_products = JSON.parse($('#stock_products').val());
     customer_ledger = JSON.parse($('#customer_ledger').val());
@@ -642,6 +646,9 @@ $('#customer_id').change(function () {
                 segment: segment,
                 lastSegment: lastSegment
             },
+            beforeSend: function () {
+                toggleInvoiceBalanceLoader(true);
+            },
             success: function (response) {
                 previous_payable = response.customer_balance;
                 $('#previous_receivable').val(previous_payable);
@@ -655,10 +662,15 @@ $('#customer_id').change(function () {
                     $('.paid_amount').text(customer_ledger['cr']);
                 }
                 $('.display').css('display', '');
+            },
+            complete: function () {
+                toggleInvoiceBalanceLoader(false);
             }
         })
         var customer = vendors.filter(x => x.id == selected_index);
 
+    } else {
+        toggleInvoiceBalanceLoader(false);
     }
 })
 

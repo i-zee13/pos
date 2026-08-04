@@ -433,7 +433,8 @@
         $(document).ready(function() {
             setTimeout(() => {
                 // Analytics page owns its own loader until /analytics/summary returns
-                if ($('#analyticsPage').length) {
+                // Invoice pages keep loader while previous balance is still loading
+                if ($('#analyticsPage').length || window.invoiceBalanceLoading) {
                     return;
                 }
                 $('#tblLoader').hide();

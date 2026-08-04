@@ -20,7 +20,22 @@
 
 }(jQuery);
 
- 
+/**
+ * Invoice pages: hide form + show #tblLoader until previous balance AJAX finishes.
+ * Usage: toggleInvoiceBalanceLoader(true) before fetch, false in complete/error.
+ */
+window.invoiceBalanceLoading = false;
+function toggleInvoiceBalanceLoader(isLoading) {
+    window.invoiceBalanceLoading = !!isLoading;
+    if (isLoading) {
+        $('.parent-div').hide();
+        $('#tblLoader').show();
+    } else {
+        $('#tblLoader').hide();
+        $('.parent-div').show();
+    }
+}
+
  
 function readURL(input) {
             if (input.files && input.files[0]) {

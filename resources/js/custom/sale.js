@@ -32,13 +32,17 @@ import swal from 'sweetalert';
  let grand_total = '';
  $(document).ready(function () { 
     console.log(segments);
+    if (segments[3] == "sale-add" || segments[3] == 'sale-edit') {
+         toggleInvoiceBalanceLoader(true);
+     } else {
+         $('.parent-div').show();
+         $('#tblLoader').hide();
+     }
     if (segments[3] == "sale-add") {
          setTimeout(() => {
              $('#customer_id').val((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8).trigger('change');
          }, 2000);
      } 
-     $('.parent-div').show();
-     $('#tblLoader').hide();
      $('#bar-code').focus();
      stock_products = JSON.parse($('#stock_products').val());
      customer_ledger = JSON.parse($('#customer_ledger').val());
@@ -894,6 +898,9 @@ $(document).on('input', '.qty-input', function () {
              data: {
                  segment: segment
              },
+             beforeSend: function () {
+                 toggleInvoiceBalanceLoader(true);
+             },
              success: function (response) {
                  previous_payable = response.customer_balance;
                  $('#previous_receivable').val(previous_payable);
@@ -910,11 +917,16 @@ $(document).on('input', '.qty-input', function () {
                  }
 
                  $('.display').css('display', '');
+             },
+             complete: function () {
+                 toggleInvoiceBalanceLoader(false);
              }
          })
          var customer = vendors.filter(x => x.id == selected_index);
          // $('#invoice_type').val('2').trigger('change');
 
+     } else {
+         toggleInvoiceBalanceLoader(false);
      }
  })
 

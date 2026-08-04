@@ -121,8 +121,12 @@ var invoice_discount = 0;
 var previous_paid = 0;
 var data_variable = '';
 $(document).ready(function () {
-  $('.parent_body-div').show();
-  $('#tblLoader').hide();
+  if (segments[3] == "stock-add" || segments[3] == 'product-replacement-edit') {
+    toggleInvoiceBalanceLoader(true);
+  } else {
+    $('.parent_body-div').show();
+    $('#tblLoader').hide();
+  }
   $('#bar-code').focus();
   stock_products = JSON.parse($('#stock_products').val());
   customer_ledger = JSON.parse($('#customer_ledger').val());
@@ -731,6 +735,9 @@ $('#customer_id').change(function () {
       data: {
         segment: segment
       },
+      beforeSend: function beforeSend() {
+        toggleInvoiceBalanceLoader(true);
+      },
       success: function success(response) {
         previous_payable = response.customer_balance;
         $('#previous_receivable').val(previous_payable);
@@ -744,11 +751,16 @@ $('#customer_id').change(function () {
           $('.paid_amount').text(customer_ledger['dr']);
         }
         $('.display').css('display', '');
+      },
+      complete: function complete() {
+        toggleInvoiceBalanceLoader(false);
       }
     });
     vendors.filter(function (x) {
       return x.id == selected_index;
     });
+  } else {
+    toggleInvoiceBalanceLoader(false);
   }
 });
 function grandSum() {

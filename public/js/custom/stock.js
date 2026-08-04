@@ -130,6 +130,7 @@ $(document).ready(function () {
   if (segments[3] == "stock-add") {
     //
   } else if (segments[3] == 'purchase-edit') {
+    toggleInvoiceBalanceLoader(true);
     var is_removable = true;
     if (queryString.includes('invoice=detail')) {
       is_removable = false;
@@ -665,6 +666,9 @@ $('.customer_id').change(function () {
         segment: segment,
         purchase_id: lastSegment
       },
+      beforeSend: function beforeSend() {
+        toggleInvoiceBalanceLoader(true);
+      },
       success: function success(response) {
         previous_payable = response.customer_balance;
         $('#previous_receivable').val(previous_payable);
@@ -697,12 +701,17 @@ $('.customer_id').change(function () {
         // $('.remaning_amount').val(vendor_ledger['balance'])
         // grandSum(previous_payable)
         // $('.display').css('display', '');
+      },
+      complete: function complete() {
+        toggleInvoiceBalanceLoader(false);
       }
     });
 
     vendors.filter(function (x) {
       return x.id == selected_index;
     });
+  } else {
+    toggleInvoiceBalanceLoader(false);
   }
 });
 $('.products').change(function () {

@@ -17358,8 +17358,12 @@ var data_variable = '';
 var return_total = 0;
 $(document).ready(function () {
   $('.expiry_date').removeAttr('min');
-  $('.parent-div').show();
-  $('#tblLoader').hide();
+  if (segments[3] == "stock-add" || segments[3] == 'edit-sale-return') {
+    toggleInvoiceBalanceLoader(true);
+  } else {
+    $('.parent-div').show();
+    $('#tblLoader').hide();
+  }
   $('#bar-code').focus();
   stock_products = JSON.parse($('#stock_products').val());
   customer_ledger = JSON.parse($('#customer_ledger').val());
@@ -18006,6 +18010,9 @@ $('#customer_id').change(function () {
       data: {
         segment: segment
       },
+      beforeSend: function beforeSend() {
+        toggleInvoiceBalanceLoader(true);
+      },
       success: function success(response) {
         previous_payable = response.customer_balance;
         $('#previous_receivable').val(previous_payable);
@@ -18021,12 +18028,17 @@ $('#customer_id').change(function () {
         }
 
         $('.display').css('display', '');
+      },
+      complete: function complete() {
+        toggleInvoiceBalanceLoader(false);
       }
     });
     var customer = vendors.filter(function (x) {
       return x.id == selected_index;
     });
     // $('#invoice_type').val('2').trigger('change');
+  } else {
+    toggleInvoiceBalanceLoader(false);
   }
 });
 
