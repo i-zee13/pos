@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BatchStockMgt;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\Product;
@@ -63,7 +64,14 @@ class SalesReturnController extends Controller
         $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges) - $request->invoice_discount;
         if ($request->invoice_type == 1 && $request->customer_id == sys_customer_id('COUNTER_SALE')) {
             $is_net_return = true;
-            $invoice->paid_amount      = $request->amount_to_pay;
+            // Counter Sale has no receivable — cash return = product net (± charges/discount)
+            $net_return = (float) $request->product_net_total + (float) $request->service_charges - (float) $request->invoice_discount;
+            $invoice->paid_amount      = $request->amount_to_pay !== null && $request->amount_to_pay !== ''
+                ? (float) $request->amount_to_pay
+                : $net_return;
+            if ((float) $invoice->paid_amount <= 0 && $net_return > 0) {
+                $invoice->paid_amount = $net_return;
+            }
             $total_cr                  = $invoice->paid_amount;
             $invoice->invoice_remaining_amount_after_pay  = 0;
         } else {
@@ -99,7 +107,7 @@ class SalesReturnController extends Controller
                     $sale->product_id          = $sale_product['product_id'];
                     $sale->purchase_price      = $sale_product['purchased_price'];
                     $sale->qty                 = $sale_product['qty'];
-                    $sale->expiry_date         = $sale_product['expiry_date'] ?? 0000-00-00;
+                    $sale->expiry_date         = $sale_product['expiry_date'] ?? '0000-00-00';
                     $sale->return_total_amount = $sale_product['amount'];
                     $sale->product_discount    = $sale_product['prod_discount'];
                     $sale->created_by          = FacadesAuth::id();
@@ -111,6 +119,8 @@ class SalesReturnController extends Controller
                         ->value('qty');
 
                     if ($sale->save()) {
+                        // Runtime only — not a DB column; used by BatchWiseStockManagment
+                        $sale->batch_row_id = $sale_product['batch_row_id'] ?? null;
                         $sale_products_array[] = $sale->id;
                         $check_stock           =  VendorStock::where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
                         $vendor_id  = 0;
@@ -293,6 +303,25 @@ class SalesReturnController extends Controller
             }
         }
     }
+
+    /**
+     * Open batches for sale-return Exp. Date dropdown (balance > 0).
+     */
+    public function openBatches($product_id)
+    {
+        $batches = BatchStockMgt::where('product_id', (int) $product_id)
+            ->where('batch_wise_balance', '>', 0)
+            ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
+            ->orderBy('expiry_date', 'ASC')
+            ->orderBy('id', 'ASC')
+            ->get(['id', 'expiry_date', 'batch_wise_balance', 'unit_cost_price', 'company_id']);
+
+        return response()->json([
+            'status'  => 'success',
+            'batches' => $batches,
+        ]);
+    }
+
     public function deleteInvoice(Request $request)
     {
         $invoice_products   =  SaleReturnProduct::where('sale_return_invoice_id', $request->id)->get();

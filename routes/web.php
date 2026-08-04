@@ -189,6 +189,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/sale-returns',                 [SalesReturnController::class, 'index'])->name('salereturn.index');
     Route::get('/edit-sale-return/{id}',        [SalesReturnController::class, 'edit'])->name('salereturn-edit');
     Route::get('/get-sale-return-products/{id}',[SalesReturnController::class, 'getReturnProduct'])->name('get-salereturn-products');
+    Route::get('/open-batches/{product_id}',    [SalesReturnController::class, 'openBatches'])->name('salereturn.open-batches');
     Route::get('/print-salereturn-invoice/{invoice_id}/{customer_id}/{received_amount}', [SalesReturnController::class, 'printInvoice'])->name('print-salereturn-invoice');
     Route::delete('/delete-product-from-sale-return',[SalesReturnController::class, 'deleteProduct'])->name('sale-return-delete-product');
     Route::delete('/delete-sale-return-invoice',     [SalesReturnController::class, 'deleteInvoice'])->name('delete-purchase-invoice');

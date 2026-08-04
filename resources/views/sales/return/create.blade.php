@@ -736,7 +736,11 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td style="width:80px"> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " style=" width: 100%;"></td>
+                                            <td style="width:140px">
+                                                <select id="expiry_date" class="inputSale expiry_date" name="expiry_date" style="width:100%;">
+                                                    <option value="">Select Batch</option>
+                                                </select>
+                                            </td>
                                             <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
                                             <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px" readonly></td>
                                             <td style="width:80px"><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;width:100%;" tabindex="4" min="0"></td>

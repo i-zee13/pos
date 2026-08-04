@@ -584,7 +584,31 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
             // Sale put-back must NOT change running avg (purchase-only rule)
             return;
         }
-        // fallback below: FEFO putback if no allocation rows (legacy sales)
+        // Sale return with user-selected batch: put IN only into that batch
+        $batchRowId = (int) ($purchase->batch_row_id ?? 0);
+        if ($txType === 4 && $batchRowId > 0) {
+            $target = BatchStockMgt::where('id', $batchRowId)
+                ->where('product_id', $productId)
+                ->where('company_id', $companyId)
+                ->first();
+            if ($target) {
+                $existingBalance = (float) ($target->batch_wise_balance ?? 0);
+                $newBalance = round($existingBalance + $remainingQty, 6);
+                $unitCost = (float) ($target->unit_cost_price ?? 0);
+                if ($unitCost <= 0) {
+                    $unitCost = $unitCostIn;
+                    $target->unit_cost_price = $unitCost;
+                }
+                $target->batch_wise_balance = $newBalance;
+                $target->ttl_cost_price = round($unitCost * $newBalance, 6);
+                $target->actual_qty = (float) ($purchase->qty ?? $remainingQty);
+                $target->actual_status = (int) $In_out_status;
+                $target->qty = (int) max(1, (int) round($remainingQty));
+                $target->save();
+                return;
+            }
+        }
+        // fallback below: selected expiry, else FEFO putback (legacy)
     }
 
     // EDIT purchase/purchase-return only: adjust SAME invoice batch — never create a 2nd batch.
@@ -609,9 +633,14 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
 
     // OUT → FEFO (purchase return with expiry → that expiry first).
     // Purchase IN → exact expiry + unit-cost.
+    // Sale return with selected expiry → put into that expiry batch only.
     // Sale put-back fallback → FEFO restore.
     if ($isSalePutBack) {
-        $strategy = 'putback';
+        if ($txType === 4 && $expiryDate !== '0000-00-00' && $expiryDate !== '' && $expiryDate !== '0') {
+            $strategy = 'expiry_in';
+        } else {
+            $strategy = 'putback';
+        }
     } elseif ($isIn) {
         $strategy = 'exact';
     } elseif ($txType === 3 && $expiryDate !== '0000-00-00') {
@@ -636,6 +665,17 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
             $query->where('batch_wise_balance', '>', 0)
                 ->whereDate('expiry_date', $expiryDate)
                 ->orderBy('id', 'ASC');
+        } elseif ($strategy === 'expiry_in') {
+            // Sale return: match selected expiry only (any unit cost)
+            $query->where(function ($q) use ($expiryDate) {
+                if ($expiryDate === '0000-00-00') {
+                    $q->where(function ($q2) {
+                        $q2->whereNull('expiry_date')->orWhere('expiry_date', '0000-00-00');
+                    });
+                } else {
+                    $q->whereDate('expiry_date', $expiryDate);
+                }
+            })->orderBy('id', 'ASC');
         } else {
             $query->where(function ($q) use ($expiryDate) {
                 if ($expiryDate === '0000-00-00') {
@@ -655,6 +695,11 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
         // Purchase return expiry miss → fall back to FEFO once
         if (!$s && $strategy === 'expiry_out') {
             $strategy = 'fifo';
+            continue;
+        }
+        // Sale return selected expiry miss → FEFO putback
+        if (!$s && $strategy === 'expiry_in') {
+            $strategy = 'putback';
             continue;
         }
 

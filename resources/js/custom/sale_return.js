@@ -31,6 +31,59 @@ let service_charges = 0;
 let invoice_discount = 0;
 let data_variable = '';
 let return_total = 0;
+let selected_batch_row_id = '';
+
+function formatBatchExpiryLabel(expiryDate) {
+    if (!expiryDate || expiryDate === '0000-00-00' || expiryDate === 'null') {
+        return 'No Expiry';
+    }
+    const parts = String(expiryDate).substring(0, 10).split('-');
+    if (parts.length !== 3) {
+        return expiryDate;
+    }
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const day = parseInt(parts[2], 10);
+    const month = months[parseInt(parts[1], 10) - 1] || parts[1];
+    return `${day} ${month}, ${parts[0]}`;
+}
+
+function isCounterSaleCustomer(customerId) {
+    const counterId = (window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8;
+    return String(customerId) === String(counterId);
+}
+
+function loadOpenBatches(productId, selectedExpiry = '', selectedBatchId = '') {
+    const $sel = $('#expiry_date');
+    $sel.empty().append(`<option value="">Select Batch</option>`);
+    selected_batch_row_id = '';
+    expiry_date = '';
+    if (!productId || productId <= 0) {
+        return;
+    }
+    $.ajax({
+        url: '/open-batches/' + productId,
+        type: 'get',
+        success: function (response) {
+            const batches = response.batches || [];
+            if (batches.length === 0) {
+                $sel.append(`<option value="" disabled>No open batches</option>`);
+                return;
+            }
+            batches.forEach(function (b) {
+                const exp = (b.expiry_date || '').substring(0, 10);
+                const label = formatBatchExpiryLabel(exp) + ' (bal: ' + parseFloat(b.batch_wise_balance).toFixed(0) + ')';
+                const selected = (selectedBatchId && String(b.id) === String(selectedBatchId))
+                    || (!selectedBatchId && selectedExpiry && exp === String(selectedExpiry).substring(0, 10));
+                $sel.append(`<option value="${exp}" data-batch-id="${b.id}" ${selected ? 'selected' : ''}>${label}</option>`);
+            });
+            if ($sel.val()) {
+                selected_batch_row_id = $sel.find('option:selected').data('batch-id') || '';
+                expiry_date = $sel.val();
+            }
+        }
+    });
+}
+
 $(document).ready(function () {
     $('.expiry_date').removeAttr('min');
     if (segments[3] == "stock-add" || segments[3] == 'edit-sale-return') {
@@ -95,13 +148,14 @@ $(document).ready(function () {
                         <tr id='tr-${product.product_id}'>
                             <td>${product.product_id}</td>
                             <td>${product.p_name}</td>
-                            <td><input type="date" value="${product.expiry_date}" class="inputSale   expiry_input"  data-id="${product.product_id}" style="font-size: 13px;width:110;" min="0" ></td>
+                            <td><select class="inputSale expiry_input" data-id="${product.product_id}" style="font-size: 13px;width:140px;"></select></td>
                             <td><input type="number" value="${product.qty}"  data-retail="${product.retail_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product.product_id}" data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
                             <td><input type="number" value="${product.retail_price}"  data-retail="${product.retail_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
                             <td><input type="number" value="${product.prod_discount}"  class="inputSale discount-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  style="font-size: 13px" min="0"></td>
                             <td class='purchase-product-amount${product.product_id} add- S-input '>${product.amount}</td>
                             <td style="width: 10%;"><a type="button" id="${product.product_id}" data-id="${product.sale_return_invoice_id}" data-product-invoice="${product.id}" class="btn smBTN red-bg remove_btn" data-index="" data-quantity="${product.qty}"  style="width: 100%;">Remove</a></td>
                         `);
+                    fillRowBatchSelect(product.product_id, product.expiry_date, product.batch_row_id || '');
                 })
             }
         })
@@ -136,11 +190,24 @@ $('#add-product').on('click', function () {
         }
         var prod_discount = $('#discount').val();
         expiry_date = $('#expiry_date').val();
+        selected_batch_row_id = $('#expiry_date option:selected').data('batch-id') || '';
+        if (!expiry_date) {
+            $('#expiry_date').css('border-color', 'red');
+            $('#notifDiv').fadeIn();
+            $('#notifDiv').css('background', 'red');
+            $('#notifDiv').text('Please select batch / expiry');
+            setTimeout(() => {
+                $('#notifDiv').fadeOut();
+            }, 3000);
+            return;
+        }
+        $('#expiry_date').css('border-color', '');
         sales_product_array.push({
             'sale_return_nvoice_id': '',
             'prod_discount': prod_discount ? prod_discount : 0,
             'product_id': `${product_id}`,
             'expiry_date': `${expiry_date}`,
+            'batch_row_id': `${selected_batch_row_id}`,
             'qty': `${qty}`,
             'amount': `${amount-prod_discount}`,
             'retail_price': `${retail_price}`,
@@ -156,7 +223,7 @@ $('#add-product').on('click', function () {
         // $(".products").val('0');
         // $(".products").select2();
         let rowCount = $('#designationsTable tbody tr').length + 1;
-        tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount)
+        tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, 0, selected_batch_row_id)
         grandSum(previous_payable, service_charges);
         $('.show_existing_div').show()
 
@@ -176,6 +243,8 @@ $('#add-product').on('click', function () {
     $('#discount').val('');
     $('#bar-code').focus();
     data_variable = '';
+    selected_batch_row_id = '';
+    expiry_date = '';
 
 });
 
@@ -315,6 +384,8 @@ $('.products').change(function () {
     $('#amount').val('');
     $('.calculate_by_amount').val('');
     $('.calculate_by_amount_text').html('0');
+    selected_batch_row_id = '';
+    expiry_date = '';
     if (selected_product > 0) {
         var filter_product = product_list.filter(x => x.id == selected_product)
         $('.retail_price').text(filter_product[0].sale_price);
@@ -333,12 +404,54 @@ $('.products').change(function () {
         product_id = filter_product[0].id;
         stock_in_hand = filter_product[0].stock_balance;
         purchased_price = filter_product[0].old_purchase_price;
-        $('.expiry_date').val(filter_product[0].expiry_date)
         $('.bar-code').val(filter_product[0].barcode);
+        loadOpenBatches(product_id);
 
+    } else {
+        loadOpenBatches(0);
     }
 
 });
+$(document).on('change', '#expiry_date', function () {
+    expiry_date = $(this).val() || '';
+    selected_batch_row_id = $(this).find('option:selected').data('batch-id') || '';
+});
+$(document).on('change', '.expiry_input', function () {
+    const pid = $(this).data('id');
+    const exp = $(this).val() || '';
+    const batchId = $(this).find('option:selected').data('batch-id') || '';
+    sales_product_array.forEach(function (row) {
+        if (String(row.product_id) === String(pid)) {
+            row.expiry_date = exp;
+            row.batch_row_id = batchId;
+        }
+    });
+});
+function fillRowBatchSelect(productId, selectedExpiry = '', selectedBatchId = '') {
+    const $sel = $(`.expiry_input[data-id="${productId}"]`);
+    if (!$sel.length) {
+        return;
+    }
+    $sel.empty().append(`<option value="">Select Batch</option>`);
+    $.ajax({
+        url: '/open-batches/' + productId,
+        type: 'get',
+        success: function (response) {
+            const batches = response.batches || [];
+            batches.forEach(function (b) {
+                const exp = (b.expiry_date || '').substring(0, 10);
+                const label = formatBatchExpiryLabel(exp) + ' (bal: ' + parseFloat(b.batch_wise_balance).toFixed(0) + ')';
+                const selected = (selectedBatchId && String(b.id) === String(selectedBatchId))
+                    || (!selectedBatchId && selectedExpiry && exp === String(selectedExpiry).substring(0, 10));
+                $sel.append(`<option value="${exp}" data-batch-id="${b.id}" ${selected ? 'selected' : ''}>${label}</option>`);
+            });
+            // Keep previously saved expiry even if batch now empty
+            if (selectedExpiry && !$sel.val()) {
+                $sel.append(`<option value="${String(selectedExpiry).substring(0, 10)}" selected>${formatBatchExpiryLabel(selectedExpiry)}</option>`);
+            }
+        }
+    });
+}
 $(document).on('focusout', '.bar-code', function () {
     data_variable = $(this).val();
     $('.purchase_price').val('');
@@ -695,7 +808,7 @@ function getvendors() {
 }
 $('#customer_id').change(function () {
     var total_paid_for_net_sale = 0;
-    if ($(this).val() == ((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8)) {
+    if (isCounterSaleCustomer($(this).val())) {
         // $('#invoice_type').val('1').trigger('change');
         sales_product_array.forEach(function (data, key) {
             total_paid_for_net_sale += parseFloat(data.amount)
@@ -730,7 +843,9 @@ $('#customer_id').change(function () {
                 $('.previous_payable_heading').text(previous_payable >= 0 ? 'Previous Receivable' : 'Previous Payable');
                 $('.previous_payable').text(previous_payable_text);
                 $('.previous_payable').val(previous_payable);
-                grandSum(previous_payable, service_charges, invoice_discount)
+                // Counter Sale / Net return: do NOT subtract ledger balance from return total
+                var payableForSum = isCounterSaleCustomer(selected_index) ? 0 : previous_payable;
+                grandSum(payableForSum, service_charges, invoice_discount)
                 if (segments[3] == "edit-sale-return") {
                     $('.paid_amount').text(customer_ledger['dr']);
                     // $('.remaning_amount').val(customer_ledger['balance']);
@@ -763,9 +878,12 @@ function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
     $('#total_qtys').html(grandQty.toFixed(2));
     $('#total_items').html(productTotal);
     $('.product_net_total').val(sum);
-    // sum -= parseFloat(previous_payable)  // sum -= parseFloat(previous_payable ? previous_payable : 0);
-    // previous_payable >= 0 ? sum -= parseFloat(previous_payable ? previous_payable : 0) : sum += parseFloat(previous_payable);
-    sum = Math.abs(sum - parseFloat(previous_payable));
+    // Counter Sale / Net Sale return: return cash = product net only (no ledger offset)
+    var payable = parseFloat(previous_payable) || 0;
+    if (isCounterSaleCustomer($('#customer_id').val()) || String($('#invoice_type').val()) === '1') {
+        payable = 0;
+    }
+    sum = Math.abs(sum - payable);
 
     sum += parseFloat(service_charges ? service_charges : 0);
     return_total_amount = sum - invoice_discount;
@@ -829,16 +947,17 @@ $(document).on('mouseenter', '.show_purchase', function () {
     $('.pp').hide();
 });
 
-function tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0) {
+function tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0, batch_row_id = '') {
     $('#designationsTable tbody').append(`
     <tr class='tr-${product_id}' data-prod_id ="${product_id}">
         <td>${product_id}</td>
         <td>${p_name}</td> 
-        <td><input type="date" value="${expiry_date}" class="inputSale   expiry_input"  data-id="${product_id}" style="font-size: 13px;width:110;" min="0" ></td>
+        <td><select class="inputSale expiry_input" data-id="${product_id}" style="font-size: 13px;width:140px;"></select></td>
         <td ><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}"  class="inputSale qty-input add-stock-input td-input-qty${product_id}"   data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
         <td><input type="number" value="${retail_price}" data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
         <td style="width:80px;"><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${prod_discount}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"    style="font-size: 13px;width:100%" min="0"></td>
         <td class='purchase-product-amount${product_id} add- S-input ' >${amount - prod_discount}</td>
         <td style="width:80px;"><button type="button" id="${product_id}" class="btn smBTN red-bg remove_btn"   data-quantity="${qty}" data-invoice-id="${invoice_id}" style="width:100%;">Remove</button></td>
         </tr>`);
+    fillRowBatchSelect(product_id, expiry_date, batch_row_id);
 }

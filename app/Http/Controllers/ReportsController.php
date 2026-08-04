@@ -40,20 +40,22 @@ class ReportsController extends Controller
    {
       $query               =  " 1=1 ";
       $current_date        =   date('Y-m-d');
-      if (isset($request->company_id)) {
-         $query      .= " AND vs.company_id =  $request->company_id ";
+      if (isset($request->company_id) && $request->company_id !== '') {
+         $query      .= " AND vs.company_id =  " . (int) $request->company_id . " ";
       }
-      if (isset($request->product_id)) {
-         $query      .= " AND vs.product_id = $request->product_id ";
+      if (isset($request->product_id) && $request->product_id !== '') {
+         $query      .= " AND vs.product_id = " . (int) $request->product_id . " ";
       }
       $query .= tenant_and('vs');
-      if (isset($request->expiry) && $request->expiry > 0  || $request->is_click == 0) { //is_click = 0 mean on page load get 3 months expires
-         $query                .=  "AND batch_wise_balance > 0 ";
-         $expiry_month         =   $request->is_click == 0 ? 3 :  $request->expiry;
+      // Always show open batches (balance > 0). Optional "Expiry In Month" narrows to near-expiry only.
+      $query .= " AND batch_wise_balance > 0 ";
+      if (isset($request->expiry) && (int) $request->expiry > 0) {
+         $expiry_month         =   (int) $request->expiry;
          $dateTime             =   new DateTime($current_date);
-         $expiry_limit_date    =   $dateTime->modify('+ '. $expiry_month .'month')->format('Y-m-d');
+         $expiry_limit_date    =   $dateTime->modify('+ ' . $expiry_month . ' month')->format('Y-m-d');
          $query               .=  " AND vs.expiry_date BETWEEN '$current_date' AND '$expiry_limit_date'";
-         $records    = DB::select("
+      }
+      $records    = DB::select("
                                  SELECT
                                      vs.batch_wise_balance AS balance,
                                      vs.vs_id,
@@ -64,39 +66,19 @@ class ReportsController extends Controller
                                      IFNULL(
                                          (SELECT product_name FROM products WHERE id = vs.product_id),
                                          ''
-                                     ) AS product_name, 
+                                     ) AS product_name,
+                                     IFNULL(
+                                         (SELECT sale_price FROM products WHERE id = vs.product_id),
+                                         ''
+                                     ) AS sale_price,
                                      vs.product_id,
                                      DATE_FORMAT(vs.expiry_date, '%d %b %Y') AS expiry_date
                                  FROM
                                    stock_batches_items vs
                                  WHERE
                                      $query
-                             "); 
-      } else {
-
-         $records = DB::select("
-                              SELECT
-                              vs.balance AS balance,
-                              vs.vs_id,
-                              IFNULL(
-                                 (SELECT company_name FROM companies WHERE id = vs.company_id),
-                                 ''
-                              ) AS company_name,
-                              IFNULL(
-                                 (SELECT product_name FROM products WHERE id = vs.product_id),
-                                 ''
-                              ) AS product_name,
-                              IFNULL(
-                                 (SELECT sale_price FROM products WHERE id = vs.product_id),
-                                 ''
-                                 ) AS sale_price,
-                              vs.product_id 
-                           FROM
-                           vendor_stock_managment vs
-                           WHERE
-                           $query
-                           ");
-      }
+                                 ORDER BY vs.expiry_date ASC, vs.id ASC
+                             ");
       return response()->json([
          'msg'     =>   'Stock reports list fetched',
          'status'  =>   'success',
