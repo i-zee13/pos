@@ -23,17 +23,40 @@
 /**
  * Invoice pages: hide form + show #tblLoader until previous balance AJAX finishes.
  * Usage: toggleInvoiceBalanceLoader(true) before fetch, false in complete/error.
+ * saleSave must refuse while invoiceBalanceLoading OR invoiceBalanceLoadedFor !== current customer.
  */
 window.invoiceBalanceLoading = false;
+window.invoiceBalanceLoadedFor = null;
 function toggleInvoiceBalanceLoader(isLoading) {
     window.invoiceBalanceLoading = !!isLoading;
     if (isLoading) {
+        window.invoiceBalanceLoadedFor = null;
         $('.parent-div').hide();
         $('#tblLoader').show();
+        $('#save, #print-invoice').prop('disabled', true);
     } else {
         $('#tblLoader').hide();
         $('.parent-div').show();
+        $('#save, #print-invoice').prop('disabled', false);
     }
+}
+
+function ensureInvoiceBalanceReady() {
+    if (window.invoiceBalanceLoading) {
+        $('#notifDiv').fadeIn().css('background', 'red').text('Please wait — customer previous balance is still loading…');
+        setTimeout(function () { $('#notifDiv').fadeOut(); }, 3000);
+        return false;
+    }
+    var custId = String($('#customer_id').val() || '');
+    if (!custId || custId === '0') {
+        return true; // caller handles missing customer
+    }
+    if (String(window.invoiceBalanceLoadedFor || '') !== custId) {
+        $('#notifDiv').fadeIn().css('background', 'red').text('Customer previous balance not loaded yet. Please wait or re-select customer.');
+        setTimeout(function () { $('#notifDiv').fadeOut(); }, 3000);
+        return false;
+    }
+    return true;
 }
 
  

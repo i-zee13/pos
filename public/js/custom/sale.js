@@ -17357,6 +17357,7 @@ var service_charges = 0;
 var invoice_discount = 0;
 var data_variable = '';
 var grand_total = '';
+var balanceRequestSeq = 0;
 $(document).ready(function () {
   console.log(segments);
   if (segments[3] == "sale-add" || segments[3] == 'sale-edit') {
@@ -17753,6 +17754,9 @@ $("#print-invoice").on('click', function () {
   current_action.text('Print');
 });
 function saleSave(current_action, type) {
+  if (typeof ensureInvoiceBalanceReady === 'function' && !ensureInvoiceBalanceReady()) {
+    return;
+  }
   var dirty = false;
   $('.required').each(function () {
     if (!$(this).val() || $(this).val() == 0) {
@@ -18194,6 +18198,7 @@ $('#customer_id').change(function () {
   // $('.current_balance').text('0').trigger('change');
   var selected_index = $(this).val();
   if (selected_index > 0) {
+    var reqId = ++balanceRequestSeq;
     $.ajax({
       url: '/get-customer-balance/' + selected_index,
       type: 'get',
@@ -18204,6 +18209,9 @@ $('#customer_id').change(function () {
         toggleInvoiceBalanceLoader(true);
       },
       success: function success(response) {
+        if (reqId !== balanceRequestSeq) {
+          return;
+        }
         previous_payable = response.customer_balance;
         $('#previous_receivable').val(previous_payable);
         var previous_payable_text = previous_payable >= 0 ? previous_payable + " DR" : previous_payable < 0 ? -previous_payable + " CR" : previous_payable;
@@ -18219,9 +18227,23 @@ $('#customer_id').change(function () {
         }
 
         $('.display').css('display', '');
+        window.invoiceBalanceLoadedFor = String(selected_index);
       },
       complete: function complete() {
+        if (reqId !== balanceRequestSeq) {
+          return;
+        }
         toggleInvoiceBalanceLoader(false);
+      },
+      error: function error() {
+        if (reqId !== balanceRequestSeq) {
+          return;
+        }
+        window.invoiceBalanceLoadedFor = null;
+        $('#notifDiv').fadeIn().css('background', 'red').text('Failed to load customer previous balance. Please try again.');
+        setTimeout(function () {
+          $('#notifDiv').fadeOut();
+        }, 3000);
       }
     });
     var customer = vendors.filter(function (x) {
@@ -18229,6 +18251,7 @@ $('#customer_id').change(function () {
     });
     // $('#invoice_type').val('2').trigger('change');
   } else {
+    window.invoiceBalanceLoadedFor = null;
     toggleInvoiceBalanceLoader(false);
   }
 });

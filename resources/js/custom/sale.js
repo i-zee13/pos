@@ -30,6 +30,7 @@ import swal from 'sweetalert';
  let invoice_discount = 0;
  let data_variable = '';
  let grand_total = '';
+ let balanceRequestSeq = 0;
  $(document).ready(function () { 
     console.log(segments);
     if (segments[3] == "sale-add" || segments[3] == 'sale-edit') {
@@ -431,6 +432,9 @@ import swal from 'sweetalert';
      current_action.text('Print')
  }) 
  function saleSave(current_action, type) {
+     if (typeof ensureInvoiceBalanceReady === 'function' && !ensureInvoiceBalanceReady()) {
+         return;
+     }
      let dirty = false;
      $('.required').each(function () {
          if (!$(this).val() || $(this).val() == 0) {
@@ -892,6 +896,7 @@ $(document).on('input', '.qty-input', function () {
      // $('.current_balance').text('0').trigger('change');
      var selected_index = $(this).val();
      if (selected_index > 0) {
+         var reqId = ++balanceRequestSeq;
          $.ajax({
              url: '/get-customer-balance/' + selected_index,
              type: 'get',
@@ -902,6 +907,9 @@ $(document).on('input', '.qty-input', function () {
                  toggleInvoiceBalanceLoader(true);
              },
              success: function (response) {
+                 if (reqId !== balanceRequestSeq) {
+                     return;
+                 }
                  previous_payable = response.customer_balance;
                  $('#previous_receivable').val(previous_payable);
                  var previous_payable_text = previous_payable >= 0 ? previous_payable + " DR" : previous_payable < 0 ? (-previous_payable) + " CR" : previous_payable;
@@ -917,15 +925,28 @@ $(document).on('input', '.qty-input', function () {
                  }
 
                  $('.display').css('display', '');
+                 window.invoiceBalanceLoadedFor = String(selected_index);
              },
              complete: function () {
+                 if (reqId !== balanceRequestSeq) {
+                     return;
+                 }
                  toggleInvoiceBalanceLoader(false);
+             },
+             error: function () {
+                 if (reqId !== balanceRequestSeq) {
+                     return;
+                 }
+                 window.invoiceBalanceLoadedFor = null;
+                 $('#notifDiv').fadeIn().css('background', 'red').text('Failed to load customer previous balance. Please try again.');
+                 setTimeout(() => { $('#notifDiv').fadeOut(); }, 3000);
              }
          })
          var customer = vendors.filter(x => x.id == selected_index);
          // $('#invoice_type').val('2').trigger('change');
 
      } else {
+         window.invoiceBalanceLoadedFor = null;
          toggleInvoiceBalanceLoader(false);
      }
  })
