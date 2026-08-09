@@ -373,7 +373,7 @@ $('.products').change(function () {
     $('.stock_balance').text(filter_product[0].stock_balance);
     p_name = filter_product[0].product_name;
     product_id = filter_product[0].id;
-    stock_in_hand = filter_product[0].stock_balance;
+    stock_in_hand = parseFloat(filter_product[0].stock_balance) || 0;
     purchased_price = p_price;
     $('.expiry_date').val(filter_product[0].expiry_date);
     $('.bar-code').val(filter_product[0].barcode);
@@ -418,14 +418,15 @@ $(document).on('focusout', '.bar-code', function () {
   return 0;
 });
 $('#qty').on('input', function () {
-  qty = $(this).val();
-  if (qty > stock_in_hand) {
+  qty = parseFloat($(this).val()) || 0;
+  var maxStock = parseFloat(stock_in_hand) || 0;
+  if (qty > maxStock) {
     $(this).val('');
     $('#qty').css('border-color', 'red');
     $(this).focus();
     $('#notifDiv').fadeIn();
     $('#notifDiv').css('background', 'red');
-    $('#notifDiv').text('Qty should be less then ' + stock_in_hand);
+    $('#notifDiv').text('Qty should be less than or equal to ' + maxStock);
     setTimeout(function () {
       $('#notifDiv').fadeOut();
     }, 3000);
@@ -606,12 +607,12 @@ $(document).on('input', '.qty-input', function () {
     if (data.product_id == current_product_id) {
       p_price = data.retail_price;
       data.qty = update_qty;
-      current_product_qty = data.stock_in_hand;
+      current_product_qty = parseFloat(data.stock_in_hand) || 0;
       current_product_price = p_price;
-      if (parseInt(update_qty) > parseInt(current_product_qty)) {
+      if ((parseFloat(update_qty) || 0) > current_product_qty) {
         // update_qty      = update_qty.replace(update_qty, current_product_qty)
         $(".td-input-qty".concat(current_product_id)).val(current_product_qty).css('border-color', 'red').focus();
-        $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then ' + current_product_qty);
+        $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less than or equal to ' + current_product_qty);
         setTimeout(function () {
           $('#notifDiv').fadeOut();
         }, 3000);

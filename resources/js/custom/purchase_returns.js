@@ -251,13 +251,14 @@ $(document).on('focusout input', '.bar-code', function () {
 $('#qty').on('input', function () {
     new_price = $('#new_purchase_price').val();
     old_price = $('#purchase_price').val();
-    qty       = $(this).val();
-    if(qty > stock_in_hand){
-        qty = stock_in_hand;
-        $(this).val(stock_in_hand);
+    qty = parseFloat($(this).val()) || 0;
+    var maxStock = parseFloat(stock_in_hand) || 0;
+    if (qty > maxStock) {
+        qty = maxStock;
+        $(this).val(maxStock);
         $('#notifDiv').fadeIn();
         $('#notifDiv').css('background', 'red');
-        $('#notifDiv').text(`Quantity should be less than or equal to ${stock_in_hand}`);
+        $('#notifDiv').text(`Quantity should be less than or equal to ${maxStock}`);
         setTimeout(() => {
             $('#notifDiv').fadeOut();
         }, 3000);
