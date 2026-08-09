@@ -516,13 +516,13 @@
                             </div>
                         </div>
                         @if($inlinePurchi)
-                        <div class="col-md-9" id="inlinePurchiPanel" style="display: none; max-height: 520px; overflow: auto;">
+                        <div class="col-md-8" id="inlinePurchiPanel" style="display: none; max-height: 520px; overflow: auto;">
                             <div class="row inline-purchi-row">
                                 @include('reports.partials.admin-sale-close-purchi')
                             </div>
                         </div>
                         <style>
-                            /* Wider purchi: fill panel, stop fixed rem widths from squeezing totals */
+                            /* Purchi columns fill panel without crushing English summary */
                             #inlinePurchiPanel .inline-purchi-row {
                                 direction: rtl;
                                 display: flex;
@@ -542,32 +542,58 @@
                                 flex: 1 1 50%;
                                 max-width: 50%;
                                 width: 50%;
-                                padding-left: 12px;
-                                padding-right: 12px;
+                                padding-left: 10px;
+                                padding-right: 10px;
                             }
                             #inlinePurchiPanel .c-address-info div {
                                 display: flex;
                                 align-items: center;
-                                justify-content: space-between;
-                                gap: 8px;
+                                justify-content: flex-start;
+                                gap: 0;
                                 width: 100%;
                             }
                             #inlinePurchiPanel .c-address-info div span {
                                 width: auto !important;
                                 flex: 1 1 auto;
                                 min-width: 0;
+                                white-space: nowrap;
                             }
                             #inlinePurchiPanel .c-address-info div strong.digit:empty {
                                 display: none;
                             }
-                            #inlinePurchiPanel .c-address-info div strong {
+                            /* Amount column — fixed slot so qty never sticks to price */
+                            #inlinePurchiPanel .c-address-info div strong.digit {
                                 width: auto !important;
-                                flex: 0 0 auto;
+                                flex: 0 0 5.75rem;
+                                min-width: 5.75rem;
                                 text-align: left;
+                            }
+                            /* Qty sits beside label with clear gap before amount */
+                            #inlinePurchiPanel .c-address-info div strong.digit[class*="_qty"] {
+                                flex: 0 0 2.75rem;
+                                min-width: 2.75rem;
+                                max-width: 2.75rem;
+                                text-align: center;
+                                margin-inline-end: 1.75rem;
                             }
                             #inlinePurchiPanel .purchi-footer-row {
                                 margin-top: 4px !important;
                                 padding: 4px 8px;
+                            }
+                            #inlinePurchiPanel .purchi-footer-row span {
+                                white-space: nowrap;
+                            }
+                            /* Keep English summary labels on one line */
+                            #adminCloseSummaryCol.c-address-info div span,
+                            #adminCloseSummaryCol .c-address-info div span {
+                                white-space: nowrap;
+                                width: auto !important;
+                                flex: 1 1 auto;
+                            }
+                            #adminCloseSummaryCol .c-address-info div strong {
+                                width: auto !important;
+                                flex: 0 0 auto;
+                                white-space: nowrap;
                             }
                         </style>
                         @endif
@@ -608,8 +634,8 @@
 
             function setPurchiLayout(show) {
                 if (show) {
-                    $summary.removeClass('col-md-6 col-md-4').addClass('col-md-3');
-                    $panel.removeClass('col-md-8').addClass('col-md-9');
+                    $summary.removeClass('col-md-6 col-md-3').addClass('col-md-4');
+                    $panel.removeClass('col-md-9').addClass('col-md-8');
                     $panel.stop(true, true).fadeIn(200, function () {
                         if ($summary.data('mCS')) {
                             $summary.mCustomScrollbar('update');
@@ -617,7 +643,7 @@
                     });
                 } else {
                     $panel.stop(true, true).fadeOut(150, function () {
-                        $summary.removeClass('col-md-3 col-md-4').addClass('col-md-6');
+                        $summary.removeClass('col-md-4 col-md-3').addClass('col-md-6');
                         $panel.removeClass('col-md-9').addClass('col-md-8');
                         if ($summary.data('mCS')) {
                             $summary.mCustomScrollbar('update');
