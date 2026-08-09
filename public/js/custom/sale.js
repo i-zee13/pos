@@ -17366,11 +17366,7 @@ $(document).ready(function () {
     $('.parent-div').show();
     $('#tblLoader').hide();
   }
-  if (segments[3] == "sale-add") {
-    setTimeout(function () {
-      $('#customer_id').val(window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE || 8).trigger('change');
-    }, 2000);
-  }
+  // Counter Sale selected in getvendors() after options load (avoids race with val(0) / empty dropdown)
   $('#bar-code').focus();
   stock_products = JSON.parse($('#stock_products').val());
   customer_ledger = JSON.parse($('#customer_ledger').val());
@@ -18172,10 +18168,25 @@ function getvendors() {
     success: function success(response) {
       $("#customer_id").append("<option value=\"0\">Select Customer</option>");
       response.customers.forEach(function (data) {
-        $("#customer_id").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.customer_name, "\" ").concat(data.id == customer_id ? 'seleced' : '', ">").concat(data.id, "-").concat(data.customer_name, "</option>"));
+        $("#customer_id").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.customer_name, "\" ").concat(data.id == customer_id ? 'selected' : '', ">").concat(data.id, "-").concat(data.customer_name, "</option>"));
         vendors.push(data);
       });
-      $("#customer_id").val(customer_id).trigger('change');
+      var selectCustomerId = customer_id;
+      if (segments[3] == 'sale-add' && (!selectCustomerId || selectCustomerId == 0)) {
+        selectCustomerId = window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE || 8;
+      }
+      $("#customer_id").val(String(selectCustomerId));
+      if ($("#customer_id").hasClass('select2-hidden-accessible')) {
+        $("#customer_id").trigger('change.select2');
+      }
+      $("#customer_id").trigger('change');
+    },
+    error: function error() {
+      toggleInvoiceBalanceLoader(false);
+      $('#notifDiv').fadeIn().css('background', 'red').text('Failed to load customers. Please refresh.');
+      setTimeout(function () {
+        $('#notifDiv').fadeOut();
+      }, 3000);
     }
   });
 }

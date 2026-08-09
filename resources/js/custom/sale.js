@@ -39,11 +39,7 @@ import swal from 'sweetalert';
          $('.parent-div').show();
          $('#tblLoader').hide();
      }
-    if (segments[3] == "sale-add") {
-         setTimeout(() => {
-             $('#customer_id').val((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8).trigger('change');
-         }, 2000);
-     } 
+     // Counter Sale is selected after getvendors() loads options (avoid race with empty dropdown / val(0))
      $('#bar-code').focus();
      stock_products = JSON.parse($('#stock_products').val());
      customer_ledger = JSON.parse($('#customer_ledger').val());
@@ -869,10 +865,24 @@ $(document).on('input', '.qty-input', function () {
          success: function (response) {
              $("#customer_id").append(`<option value="0">Select Customer</option>`)
              response.customers.forEach(data => {
-                 $("#customer_id").append(`<option value="${data.id}" data-name="${data.customer_name}" ${data.id == customer_id ? 'seleced' : ''}>${data.id}-${data.customer_name}</option>`)
+                 $("#customer_id").append(`<option value="${data.id}" data-name="${data.customer_name}" ${data.id == customer_id ? 'selected' : ''}>${data.id}-${data.customer_name}</option>`)
                  vendors.push(data);
              });
-             $("#customer_id").val(customer_id).trigger('change');
+             var selectCustomerId = customer_id;
+             if (segments[3] == 'sale-add' && (!selectCustomerId || selectCustomerId == 0)) {
+                 selectCustomerId = (window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8;
+             }
+             // Select2 may init slightly later — set native value then refresh plugin if present
+             $("#customer_id").val(String(selectCustomerId));
+             if ($("#customer_id").hasClass('select2-hidden-accessible')) {
+                 $("#customer_id").trigger('change.select2');
+             }
+             $("#customer_id").trigger('change');
+         },
+         error: function () {
+             toggleInvoiceBalanceLoader(false);
+             $('#notifDiv').fadeIn().css('background', 'red').text('Failed to load customers. Please refresh.');
+             setTimeout(() => { $('#notifDiv').fadeOut(); }, 3000);
          }
      })
  }
