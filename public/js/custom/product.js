@@ -562,6 +562,38 @@ function fetchcompanies() {
     }
   });
 }
+function escapeProductHtml(str) {
+  return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function renderProductBarcodeCell(barcode, id) {
+  var full = barcode != null && String(barcode).trim() !== '' ? String(barcode).trim() : String(id == null ? '' : id);
+  var maxLen = 16;
+  var needsMore = full.length > maxLen;
+  var shortText = needsMore ? full.substring(0, maxLen) + '…' : full;
+  var moreBtn = needsMore ? " <button type=\"button\" class=\"btn btn-default btn-line show-all-barcodes\" data-barcodes=\"".concat(encodeURIComponent(full), "\" style=\"padding:1px 7px;font-size:11px;line-height:1.2;vertical-align:middle;\">more</button>") : '';
+  return "<td style=\"max-width:170px;white-space:normal;position:relative;\">\n        <span class=\"barcode-search-haystack\" style=\"position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;\">".concat(escapeProductHtml(full), "</span>\n        <span class=\"barcode-preview\" title=\"").concat(escapeProductHtml(full), "\" style=\"display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;\">").concat(escapeProductHtml(shortText), "</span>").concat(moreBtn, "\n    </td>");
+}
+$(document).on('click', '.show-all-barcodes', function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  var full = '';
+  try {
+    full = decodeURIComponent($(this).attr('data-barcodes') || '');
+  } catch (err) {
+    full = $(this).attr('data-barcodes') || '';
+  }
+  var list = full.split(',').map(function (c) {
+    return c.trim();
+  }).filter(Boolean);
+  if (!list.length) {
+    list = [full || 'N/A'];
+  }
+  sweetalert__WEBPACK_IMPORTED_MODULE_0___default()({
+    title: 'Barcodes (' + list.length + ')',
+    text: list.join('\n'),
+    button: 'Close'
+  });
+});
 function fetchproducts() {
   $.ajax({
     type: 'GET',
@@ -588,7 +620,7 @@ function fetchproducts() {
         } else {
           delet_status = "<button type=\"button\" id=\"".concat(element['id'], "\" class=\"btn btn-default btn-line  delete_product\" name=\"Sub_cat\" title=\"Restore\" data-status =\"restore\">Restore</button>");
         }
-        $('.subCatsListTable tbody').append("\n                        <tr> \n                            <td>".concat(element['barcode'] ? element['barcode'] : element['id'], " </td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td> <img src=\"").concat(element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                            <td>").concat(element['size'], " </td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                                ").concat(delet_status, "\n                            </td>\n                        </tr>"));
+        $('.subCatsListTable tbody').append("\n                        <tr> \n                            ".concat(renderProductBarcodeCell(element['barcode'], element['id']), "\n                            <td> ").concat(element['company_name'], "</td>\n                            <td> <img src=\"").concat(element['product_icon'] ? '/storage/' + element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                            <td>").concat(element['size'], " </td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                                ").concat(delet_status, "\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();

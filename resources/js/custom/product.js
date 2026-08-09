@@ -512,6 +512,50 @@ function fetchcompanies() {
                 }
     });
 }
+function escapeProductHtml(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function renderProductBarcodeCell(barcode, id) {
+    var full = (barcode != null && String(barcode).trim() !== '') ? String(barcode).trim() : String(id == null ? '' : id);
+    var maxLen = 16;
+    var needsMore = full.length > maxLen;
+    var shortText = needsMore ? (full.substring(0, maxLen) + '…') : full;
+    var moreBtn = needsMore
+        ? ` <button type="button" class="btn btn-default btn-line show-all-barcodes" data-barcodes="${encodeURIComponent(full)}" style="padding:1px 7px;font-size:11px;line-height:1.2;vertical-align:middle;">more</button>`
+        : '';
+    // Hidden haystack keeps full barcode searchable in DataTables even when truncated
+    return `<td style="max-width:170px;white-space:normal;position:relative;">
+        <span class="barcode-search-haystack" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;">${escapeProductHtml(full)}</span>
+        <span class="barcode-preview" title="${escapeProductHtml(full)}" style="display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;">${escapeProductHtml(shortText)}</span>${moreBtn}
+    </td>`;
+}
+
+$(document).on('click', '.show-all-barcodes', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var full = '';
+    try {
+        full = decodeURIComponent($(this).attr('data-barcodes') || '');
+    } catch (err) {
+        full = $(this).attr('data-barcodes') || '';
+    }
+    var list = full.split(',').map(function (c) { return c.trim(); }).filter(Boolean);
+    if (!list.length) {
+        list = [full || 'N/A'];
+    }
+    swal({
+        title: 'Barcodes (' + list.length + ')',
+        text: list.join('\n'),
+        button: 'Close'
+    });
+});
+
 function fetchproducts() {
     $.ajax({
         type    : 'GET',
@@ -549,7 +593,7 @@ function fetchproducts() {
                         }
                         $('.subCatsListTable tbody').append(`
                         <tr> 
-                            <td>${element['barcode'] ? element['barcode'] : element['id']} </td>
+                            ${renderProductBarcodeCell(element['barcode'], element['id'])}
                             <td> ${element['company_name']}</td>
                             <td> <img src="${element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png'}"  style="height:25px; width:25px;"> ${element['product_name']}</td>
                             <td>${element['size']} </td>
