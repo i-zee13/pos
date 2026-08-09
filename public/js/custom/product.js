@@ -167,20 +167,28 @@ $(document).ready(function () {
         $('input[name="size"]').focus();
         $('input[name="size"]').val(response.product.size);
         $('input[name="size"]').blur();
+        var purchaseRaw = response.product.new_purchase_price != null && response.product.new_purchase_price !== '' ? response.product.new_purchase_price : response.product.old_purchase_price;
+        var purchasePrice = parseFloat(purchaseRaw);
         $('input[name="purchase_price"]').focus();
-        $('input[name="purchase_price"]').val(response.product.new_purchase_price ? response.product.new_purchase_price : response.product.old_purchase_price.toFixed(2));
+        $('input[name="purchase_price"]').val(!isNaN(purchasePrice) ? purchasePrice.toFixed(2) : '');
         $('input[name="purchase_price"]').blur();
+        var salePrice = parseFloat(response.product.sale_price);
         $('input[name="sale_price"]').focus();
-        $('input[name="sale_price"]').val(response.product.sale_price.toFixed(2));
+        $('input[name="sale_price"]').val(!isNaN(salePrice) ? salePrice.toFixed(2) : '');
         $('input[name="sale_price"]').blur();
+        var selectedCompanyId = response.product.company_id;
         $.ajax({
           url: "/get-companies",
           success: function success(subcat) {
-            $('select[name="company_id"]').empty();
-            $('select[name="company_id"]').append("<option value=\"0\">Select Company</option>");
-            subcat.companies.forEach(function (data) {
-              $('select[name="company_id"]').append("<option value=\"".concat(data.id, "\" ").concat(response.product.company_id == data.id ? 'selected' : '', ">").concat(data.company_name, "</option>")).focus();
+            var $company = $('select[name="company_id"]');
+            $company.empty();
+            $company.append("<option value=\"0\">Select Company</option>");
+            (subcat.companies || []).forEach(function (data) {
+              $company.append("<option value=\"".concat(data.id, "\">").concat(data.company_name, "</option>"));
             });
+            if (selectedCompanyId != null && selectedCompanyId !== '') {
+              $company.val(String(selectedCompanyId)).trigger('change');
+            }
           }
         });
         var input = "<input type=\"hidden\"  name=\"hidden_product_icon\" value=\"".concat(response.product.product_icon, "\"/> \n                <input type=\"file\" id=\"input-file-now\" class=\"dropify\"  name=\"product_icon\" data-old_input=\"hidden_product_icon\"  data-default-file = \"/storage/").concat(response.product.product_icon, "\" value=\"").concat(response.product.product_icon, "\"  accept=\"image/*\" data-allowed-file-extensions=\"jpg png jpeg JPEG\"/>");
