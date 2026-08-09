@@ -47,9 +47,9 @@ $(document).ready(function () {
         $('#transactionTable tbody').empty();
         $('.customer_balnce').val(response.customer.balance);
         response.transactions.forEach(function (data) {
-          balance_sum += data.balance;
-          cr_sum += data.cr;
-          dr_sum += data.dr;
+          balance_sum += parseFloat(data.balance) || 0;
+          cr_sum += parseFloat(data.cr) || 0;
+          dr_sum += parseFloat(data.dr) || 0;
           if (action == operation + '-ledger-banam' && data.dr > 0) {
             console.log(data.cr);
             $('#transactionTable tbody').append("\n                                <tr id='tr-".concat(data.id, "'>\n                                    <td>").concat(data.cpv_no, "</td> \n                                    <td>").concat(data.dr, "</td>\n                                    <td>").concat(data.comment, "</td> \n                                    </tr>"));

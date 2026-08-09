@@ -45,9 +45,9 @@ $(document).ready(function () {
                 $('.customer_balnce').val(response.customer.balance);
                 response.transactions.forEach(data => {
                     console.log(data)
-                    balance_sum += data.balance;
-                    cr_sum += data.cr;
-                    dr_sum += data.dr;
+                    balance_sum += parseFloat(data.balance) || 0;
+                    cr_sum += parseFloat(data.cr) || 0;
+                    dr_sum += parseFloat(data.dr) || 0;
                     if (action == operation + '-ledger-jama' && data.cr > 0) {
                         $('#transactionTable tbody').append(`
                                 <tr id='tr-${data.id}'>
