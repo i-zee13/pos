@@ -166,6 +166,8 @@ $(document).ready(function () {
           x++;
           tableHtml(product.product_id, product.p_name, product.expiry_date, product.retail_price, product.purchased_price, product.stock_in_hand, product.amount, product.qty, product.prod_discount, product.return_invoice_id, product.return_invoice_prod_id);
         });
+        previous_payable = parseFloat($('.previous_payable').first().text()) || 0;
+        grandSum(previous_payable, service_charges, invoice_discount);
       }
     });
   }
@@ -753,18 +755,17 @@ function grandSum() {
   var productTotal = 0;
   returns_product_array.forEach(function (data, key) {
     productTotal++;
-    sum += parseFloat(data.amount);
-    grandQty += parseFloat(data.qty);
+    sum += parseFloat(data.amount) || 0;
+    grandQty += parseFloat(data.qty) || 0;
   });
-  console.log(productTotal);
   $('.product_net_total').val(sum.toFixed(2));
   $('#total_qtys').html(grandQty.toFixed(2));
   $('#total_items').html(productTotal);
   $('.product_net_total').val(sum);
-  sum -= parseFloat(previous_payable);
+  sum -= parseFloat(previous_payable) || 0;
   sum += parseFloat(service_charges ? service_charges : 0);
   // sum += parseFloat($('.paid_amount').text().trim());
-  sale_total_amount = sum - invoice_discount;
+  sale_total_amount = sum - (parseFloat(invoice_discount) || 0);
   console.log(sale_total_amount, ' then');
   setTimeout(function () {
     grand_total = sale_total_amount;
