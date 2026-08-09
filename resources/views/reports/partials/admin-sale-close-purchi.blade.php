@@ -1,6 +1,6 @@
                         <div class="col-md-8" id="contentToPrint" style="direction: rtl;display: contents;">
 
-                            <div class="col-md-4 report" style="direction: rtl;">
+                            <div class="col-md-6 report" style="direction: rtl;">
                                 <div class="c-address-info ">
                                     <div class="mutafariq_udhar_banam_div" style="display: none;">
                                         <span>متفرق ادھار : </span>
@@ -295,15 +295,13 @@
                                         <strong class="digit"></strong> 
                                         <strong class="digit karaya_dokan_banam">Loading...</strong>
                                     </div>
-                                    <div style="border-bottom: 1px solid #f4f4f4;color: white; border-bottom: 1px solid #f4f4f4;background: #152e4d;">
+                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #152e4d;">
                                         <span> کل نکاس : </span>
-                                        <strong class="digit"></strong>
-
                                         <strong class="digit ttl_out f-17"></strong>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4 report" style="direction: rtl;">
+                            <div class="col-md-6 report" style="direction: rtl;">
                                 <div class="c-address-info">
                                     <div class="openning_balance_div" style="display: none;">
                                         <span> نقد دکان : </span>
@@ -494,21 +492,16 @@
                                         <strong class="digit mop">Loading...</strong>
                                     </div>
                                  
-                                    <div style="border-bottom: 1px solid #f4f4f4;color: white; border-bottom: 1px solid #f4f4f4;background: #152e4d;">
+                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #152e4d;">
                                         <span> <b> کل آمد : </b> </span>
-                                        <strong class="digit"></strong>
                                         <strong class="digit ttl_in f-17"></strong>
                                     </div>
-                                    <div>
+                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #152e4d;">
                                         <span> <b> کل نکاس : </b> </span>
-                                        <strong class="digit"></strong>
-
                                         <strong class="digit ttl_out f-17"></strong>
                                     </div>
-
-                                    <div class="total_meezan_div" style="border-bottom: 1px solid #f4f4f4;color: white; border-bottom: 1px solid #f4f4f4;background: #152e4d;">
+                                    <div class="total_meezan_div purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #152e4d;">
                                         <span> کل میزان : </span>
-                                        <strong class="digit"></strong>
                                         <strong class="digit total_meezan f-17"></strong>
                                     </div>
                                 </div>

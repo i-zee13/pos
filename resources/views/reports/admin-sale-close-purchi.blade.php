@@ -25,15 +25,26 @@
     .c-address-info div {
         margin-bottom: 8px !important;
         display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
     }
 
     .c-address-info div span {
-        width: 15.625rem;
+        width: auto !important;
+        flex: 1 1 auto;
+        min-width: 0;
         display: inline-block;
     }
 
     .c-address-info div strong {
-        width: 14.25rem;
+        width: auto !important;
+        flex: 0 0 auto;
+    }
+
+    .c-address-info div strong.digit:empty {
+        display: none;
     }
 
     .digit {
@@ -43,6 +54,11 @@
 
     .f-17 {
         font-size: 17px
+    }
+
+    .purchi-footer-row {
+        padding: 4px 8px;
+        margin-top: 4px !important;
     }
 
     .Product-Filter {

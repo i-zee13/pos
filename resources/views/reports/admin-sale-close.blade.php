@@ -516,22 +516,58 @@
                             </div>
                         </div>
                         @if($inlinePurchi)
-                        <div class="col-md-8" id="inlinePurchiPanel" style="display: none; max-height: 430px; overflow: auto;">
+                        <div class="col-md-9" id="inlinePurchiPanel" style="display: none; max-height: 520px; overflow: auto;">
                             <div class="row inline-purchi-row">
                                 @include('reports.partials.admin-sale-close-purchi')
                             </div>
                         </div>
                         <style>
-                            /* Pack purchas to the right and fill the col-8 panel (no trailing gap) */
+                            /* Wider purchi: fill panel, stop fixed rem widths from squeezing totals */
                             #inlinePurchiPanel .inline-purchi-row {
                                 direction: rtl;
-                                justify-content: flex-start;
+                                display: flex;
+                                flex-wrap: nowrap;
+                                justify-content: stretch;
                                 margin-left: 0;
                                 margin-right: 0;
+                                width: 100%;
                             }
-                            #inlinePurchiPanel .inline-purchi-row > .report.col-md-4 {
-                                flex: 0 0 50%;
+                            #inlinePurchiPanel .inline-purchi-row > #contentToPrint {
+                                display: contents;
+                            }
+                            #inlinePurchiPanel .inline-purchi-row > .report.col-md-4,
+                            #inlinePurchiPanel .inline-purchi-row > .report.col-md-6,
+                            #inlinePurchiPanel .inline-purchi-row #contentToPrint > .report.col-md-4,
+                            #inlinePurchiPanel .inline-purchi-row #contentToPrint > .report.col-md-6 {
+                                flex: 1 1 50%;
                                 max-width: 50%;
+                                width: 50%;
+                                padding-left: 12px;
+                                padding-right: 12px;
+                            }
+                            #inlinePurchiPanel .c-address-info div {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                gap: 8px;
+                                width: 100%;
+                            }
+                            #inlinePurchiPanel .c-address-info div span {
+                                width: auto !important;
+                                flex: 1 1 auto;
+                                min-width: 0;
+                            }
+                            #inlinePurchiPanel .c-address-info div strong.digit:empty {
+                                display: none;
+                            }
+                            #inlinePurchiPanel .c-address-info div strong {
+                                width: auto !important;
+                                flex: 0 0 auto;
+                                text-align: left;
+                            }
+                            #inlinePurchiPanel .purchi-footer-row {
+                                margin-top: 4px !important;
+                                padding: 4px 8px;
                             }
                         </style>
                         @endif
@@ -572,7 +608,8 @@
 
             function setPurchiLayout(show) {
                 if (show) {
-                    $summary.removeClass('col-md-6').addClass('col-md-4');
+                    $summary.removeClass('col-md-6 col-md-4').addClass('col-md-3');
+                    $panel.removeClass('col-md-8').addClass('col-md-9');
                     $panel.stop(true, true).fadeIn(200, function () {
                         if ($summary.data('mCS')) {
                             $summary.mCustomScrollbar('update');
@@ -580,7 +617,8 @@
                     });
                 } else {
                     $panel.stop(true, true).fadeOut(150, function () {
-                        $summary.removeClass('col-md-4').addClass('col-md-6');
+                        $summary.removeClass('col-md-3 col-md-4').addClass('col-md-6');
+                        $panel.removeClass('col-md-9').addClass('col-md-8');
                         if ($summary.data('mCS')) {
                             $summary.mCustomScrollbar('update');
                         }
