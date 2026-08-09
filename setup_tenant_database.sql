@@ -1,40 +1,84 @@
 -- =====================================================================
---  POS — TENANT DATABASE SETUP (single DB, multi-tenant)
+--  POS — TENANT + FEATURE DB SETUP (idempotent / MySQL + MariaDB)
 --  -------------------------------------------------------------------
---  Kab chalayein:
---    • Purani DB jis mein tenant_id / system_code waghera nahi
---    • Nayi DB par pehli dafa tenant-based code deploy karne se pehle
+--  Works on:
+--    • MariaDB 10.x (shared hosting)
+--    • MySQL 8+/9 (Homebrew local)
 --
---  Kaise chalayein (phpMyAdmin / MySQL client):
---    1) Neeche sirf @t (aur zarurat ho to @admin_user_id) change karein
---    2) Poora file order se ek martaba run karein
---    3) Agar koi ALTER "Duplicate column" de — us line skip karein (pehle se mojood)
---    4) Last mein VERIFY queries check karein (0 hona chahiye jahan likha hai)
---
---  Zaroori:
---    • STEP 2 (backfill) poora chalayein — users sab se aakhir mein
---    • Jab tak users.tenant_id NULL hai, app bina tenant filter ke chalti hai
---    • System customers: STEP 4 auto-create karta hai; legacy IDs optional hain
+--  Safe to re-run: missing columns/indexes only; no duplicate errors.
+--  Run:  mysql -u USER -p DB < setup_tenant_database.sql
 -- =====================================================================
 
+SET @t := 1;
+SET @admin_user_id := (SELECT `id` FROM `users` ORDER BY `id` ASC LIMIT 1);
+SET @admin_user_id := IFNULL(@admin_user_id, 1);
+
+-- MySQL 8+/9 strict mode: legacy dumps often have '0000-00-00' dates.
+-- Relax only for this session so ALTER/UPDATE on old rows don't fail.
+SET @pos_old_sql_mode := @@SESSION.sql_mode;
+SET SESSION sql_mode = REPLACE(REPLACE(REPLACE(@@SESSION.sql_mode,
+  'NO_ZERO_DATE', ''),
+  'NO_ZERO_IN_DATE', ''),
+  'STRICT_TRANS_TABLES', '');
+
+DROP PROCEDURE IF EXISTS `pos_add_column_if_missing`;
+DROP PROCEDURE IF EXISTS `pos_add_index_if_missing`;
+
+DELIMITER $$
+
+CREATE PROCEDURE `pos_add_column_if_missing`(
+  IN p_table VARCHAR(64),
+  IN p_column VARCHAR(64),
+  IN p_definition TEXT
+)
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.TABLES
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = p_table
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = p_table
+      AND COLUMN_NAME = p_column
+  ) THEN
+    SET @pos_sql := CONCAT(
+      'ALTER TABLE `', p_table, '` ADD COLUMN `', p_column, '` ', p_definition
+    );
+    PREPARE pos_stmt FROM @pos_sql;
+    EXECUTE pos_stmt;
+    DEALLOCATE PREPARE pos_stmt;
+  END IF;
+END$$
+
+CREATE PROCEDURE `pos_add_index_if_missing`(
+  IN p_table VARCHAR(64),
+  IN p_index VARCHAR(64),
+  IN p_columns VARCHAR(255)
+)
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.TABLES
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = p_table
+  ) AND NOT EXISTS (
+    SELECT 1 FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = p_table
+      AND INDEX_NAME = p_index
+  ) THEN
+    SET @pos_sql := CONCAT(
+      'ALTER TABLE `', p_table, '` ADD INDEX `', p_index, '` (', p_columns, ')'
+    );
+    PREPARE pos_stmt FROM @pos_sql;
+    EXECUTE pos_stmt;
+    DEALLOCATE PREPARE pos_stmt;
+  END IF;
+END$$
+
+DELIMITER ;
+
 
 -- =============================================================================
--- CONFIG — yahan sirf values change karein
--- =============================================================================
-SET @t := 1;                 -- mojooda / default tenant (saara purana data is par)
-SET @admin_user_id := 1;     -- pehla admin user id (system customers ke created_by ke liye)
-
--- OPTIONAL: agar tenant @t ke system customers ki IDs pehle se pata hon (legacy shop)
---           to uncomment karke set karein; warna STEP 4 khud INSERT karega
--- SET @sys_expense_id             := 5;
--- SET @sys_net_purchase_return_id := 6;
--- SET @sys_net_purchase_id        := 7;
--- SET @sys_counter_sale_id        := 8;
-
-
--- =============================================================================
--- STEP 0 — Backup module tables (agar abhi DB mein nahi)
---         Agar pehle se hain to CREATE skip ho jayega; phir STEP 1 ALTER chalega
+-- STEP 0 — Tables only if completely missing
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS `backup_logs` (
@@ -78,148 +122,210 @@ CREATE TABLE IF NOT EXISTS `user_backup_mail_settings` (
   KEY `user_backup_mail_settings_tenant_id_index` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- =============================================================================
--- STEP 1 — tenant_id column + index (har tenant-scoped table par)
--- =============================================================================
-
-ALTER TABLE `users`                       ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `users_tenant_id_index` (`tenant_id`);
-
-ALTER TABLE `products`                    ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `products_tenant_id_index` (`tenant_id`);
-ALTER TABLE `companies`                   ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `companies_tenant_id_index` (`tenant_id`);
-ALTER TABLE `customers`                   ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `customers_tenant_id_index` (`tenant_id`);
-
-ALTER TABLE `purchase_invoices`           ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `purchase_invoices_tenant_id_index` (`tenant_id`);
-ALTER TABLE `products_purchases`          ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `products_purchases_tenant_id_index` (`tenant_id`);
-ALTER TABLE `purchase_return_invoices`    ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `purchase_return_invoices_tenant_id_index` (`tenant_id`);
-ALTER TABLE `products_returns`            ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `products_returns_tenant_id_index` (`tenant_id`);
-ALTER TABLE `return_invoices`             ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `return_invoices_tenant_id_index` (`tenant_id`);
-
-ALTER TABLE `sale_invoices`               ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `sale_invoices_tenant_id_index` (`tenant_id`);
-ALTER TABLE `products_sales`              ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `products_sales_tenant_id_index` (`tenant_id`);
-ALTER TABLE `sale_return_invoices`        ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `sale_return_invoices_tenant_id_index` (`tenant_id`);
-ALTER TABLE `sale_return_products`        ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `sale_return_products_tenant_id_index` (`tenant_id`);
-
-ALTER TABLE `product_replacment_invoices` ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `product_replacment_invoices_tenant_id_index` (`tenant_id`);
-ALTER TABLE `product_replacements`        ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `product_replacements_tenant_id_index` (`tenant_id`);
-
-ALTER TABLE `vendor_stocks`               ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `vendor_stocks_tenant_id_index` (`tenant_id`);
-ALTER TABLE `vendor_stock_managment`      ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `vendor_stock_managment_tenant_id_index` (`tenant_id`);
-ALTER TABLE `stock_batches_items`         ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `stock_batches_items_tenant_id_index` (`tenant_id`);
-ALTER TABLE `stocks`                      ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `stocks_tenant_id_index` (`tenant_id`);
-
-ALTER TABLE `customer_ledger`             ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `customer_ledger_tenant_id_index` (`tenant_id`);
-ALTER TABLE `vendor_ledger`               ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `vendor_ledger_tenant_id_index` (`tenant_id`);
-
-ALTER TABLE `admin_sale_close`            ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `admin_sale_close_tenant_id_index` (`tenant_id`);
-
-ALTER TABLE `organization`                ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `organization_tenant_id_index` (`tenant_id`);
-ALTER TABLE `organization_location`       ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `organization_location_tenant_id_index` (`tenant_id`);
-ALTER TABLE `access_rights`               ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `access_rights_tenant_id_index` (`tenant_id`);
-
-ALTER TABLE `customer_transactions`       ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `customer_transactions_tenant_id_index` (`tenant_id`);
-ALTER TABLE `vendor_transactions`         ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `vendor_transactions_tenant_id_index` (`tenant_id`);
-
--- integrations table kuch purani DBs mein nahi — error aaye to is ALTER ko skip karein
-ALTER TABLE `integrations`                ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `integrations_tenant_id_index` (`tenant_id`);
-
-ALTER TABLE `backup_logs`                 ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `backup_logs_tenant_id_index` (`tenant_id`);
-ALTER TABLE `user_backup_mail_settings`   ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `user_backup_mail_settings_tenant_id_index` (`tenant_id`);
+CREATE TABLE IF NOT EXISTS `stock_batch_allocations` (
+  `id`                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `product_id`          BIGINT UNSIGNED NOT NULL,
+  `batch_row_id`        BIGINT UNSIGNED NOT NULL,
+  `invoice_id`          BIGINT UNSIGNED NULL,
+  `invoice_product_id`  BIGINT UNSIGNED NULL,
+  `trx_type`            VARCHAR(32) NULL,
+  `direction`           VARCHAR(8) NOT NULL DEFAULT 'out',
+  `qty`                 DECIMAL(18,6) NOT NULL DEFAULT 0,
+  `unit_cost`           DECIMAL(18,6) NOT NULL DEFAULT 0,
+  `reversed`            TINYINT NOT NULL DEFAULT 0,
+  `created_at`          TIMESTAMP NULL DEFAULT NULL,
+  `updated_at`          TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `stock_batch_allocations_product_id_index` (`product_id`),
+  KEY `stock_batch_allocations_batch_row_id_index` (`batch_row_id`),
+  KEY `stock_batch_allocations_invoice_id_index` (`invoice_id`),
+  KEY `stock_batch_allocations_invoice_product_id_index` (`invoice_product_id`),
+  KEY `stock_batch_allocations_reversed_index` (`reversed`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- =============================================================================
--- STEP 1b — Feature columns (tenant ke ilawa jo code expect karta hai)
---           Duplicate column error = pehle se mojood, skip karein
+-- STEP 1 — tenant_id + index
 -- =============================================================================
 
--- System customers: code se resolve (sys_customer_id helper)
-ALTER TABLE `customers`
-  ADD COLUMN `system_code` VARCHAR(50) NULL AFTER `customer_type`,
-  ADD INDEX `customers_system_code_index` (`system_code`);
+CALL pos_add_column_if_missing('users', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('users', 'users_tenant_id_index', '`tenant_id`');
 
--- Organization > Print Section (invoice logo / refund policy)
-ALTER TABLE `organization`
-  ADD COLUMN `print_logo`    VARCHAR(255) NULL AFTER `logo_img`,
-  ADD COLUMN `refund_policy` TEXT         NULL AFTER `print_logo`;
+CALL pos_add_column_if_missing('products', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('products', 'products_tenant_id_index', '`tenant_id`');
 
--- Google Drive token auto-refresh (backup module)
--- Agar refresh_token column nahi: pehle yeh line chalayein, phir baqi
--- ALTER TABLE `user_backup_mail_settings` ADD COLUMN `google_drive_refresh_token_encrypted` TEXT NULL AFTER `app_password_encrypted`;
+CALL pos_add_column_if_missing('companies', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('companies', 'companies_tenant_id_index', '`tenant_id`');
 
-ALTER TABLE `user_backup_mail_settings`
-  ADD COLUMN `google_drive_access_token_encrypted` TEXT NULL AFTER `google_drive_refresh_token_encrypted`,
-  ADD COLUMN `google_drive_token_expires_at` TIMESTAMP NULL AFTER `google_drive_access_token_encrypted`;
+CALL pos_add_column_if_missing('customers', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('customers', 'customers_tenant_id_index', '`tenant_id`');
 
-ALTER TABLE `user_backup_mail_settings`
-  ADD COLUMN `google_drive_folder_id` VARCHAR(255) NULL AFTER `google_drive_token_expires_at`,
-  ADD COLUMN `google_drive_folder_name` VARCHAR(255) NULL AFTER `google_drive_folder_id`,
-  ADD COLUMN `google_drive_connected_at` TIMESTAMP NULL AFTER `google_drive_folder_name`;
+CALL pos_add_column_if_missing('purchase_invoices', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('purchase_invoices', 'purchase_invoices_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('products_purchases', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('products_purchases', 'products_purchases_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('purchase_return_invoices', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('purchase_return_invoices', 'purchase_return_invoices_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('products_returns', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('products_returns', 'products_returns_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('return_invoices', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('return_invoices', 'return_invoices_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('sale_invoices', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('sale_invoices', 'sale_invoices_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('products_sales', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('products_sales', 'products_sales_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('sale_return_invoices', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('sale_return_invoices', 'sale_return_invoices_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('sale_return_products', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('sale_return_products', 'sale_return_products_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('product_replacment_invoices', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('product_replacment_invoices', 'product_replacment_invoices_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('product_replacements', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('product_replacements', 'product_replacements_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('vendor_stocks', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('vendor_stocks', 'vendor_stocks_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('vendor_stock_managment', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('vendor_stock_managment', 'vendor_stock_managment_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('stock_batches_items', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('stock_batches_items', 'stock_batches_items_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('stocks', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('stocks', 'stocks_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('customer_ledger', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('customer_ledger', 'customer_ledger_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('vendor_ledger', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('vendor_ledger', 'vendor_ledger_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('admin_sale_close', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('admin_sale_close', 'admin_sale_close_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('organization', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('organization', 'organization_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('organization_location', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('organization_location', 'organization_location_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('access_rights', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('access_rights', 'access_rights_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('customer_transactions', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('customer_transactions', 'customer_transactions_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('vendor_transactions', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('vendor_transactions', 'vendor_transactions_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('integrations', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('integrations', 'integrations_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('backup_logs', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('backup_logs', 'backup_logs_tenant_id_index', '`tenant_id`');
+
+CALL pos_add_column_if_missing('user_backup_mail_settings', 'tenant_id', 'BIGINT UNSIGNED NULL AFTER `id`');
+CALL pos_add_index_if_missing('user_backup_mail_settings', 'user_backup_mail_settings_tenant_id_index', '`tenant_id`');
 
 
 -- =============================================================================
--- STEP 2 — BACKFILL: saara mojooda data @t par
---           Pehle business tables, users sab se aakhir mein
+-- STEP 1b — Feature columns
 -- =============================================================================
 
-UPDATE `products`                    SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `companies`                   SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `customers`                   SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+CALL pos_add_column_if_missing('customers', 'system_code', 'VARCHAR(50) NULL AFTER `customer_type`');
+CALL pos_add_index_if_missing('customers', 'customers_system_code_index', '`system_code`');
 
-UPDATE `purchase_invoices`           SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `products_purchases`          SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `purchase_return_invoices`    SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `products_returns`            SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `return_invoices`             SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+CALL pos_add_column_if_missing('organization', 'print_logo', 'VARCHAR(255) NULL AFTER `logo_img`');
+CALL pos_add_column_if_missing('organization', 'refund_policy', 'TEXT NULL AFTER `print_logo`');
+CALL pos_add_column_if_missing('organization', 'purchi_use_dynamic', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER `refund_policy`');
+CALL pos_add_column_if_missing('organization', 'purchi_config', 'JSON NULL AFTER `purchi_use_dynamic`');
 
-UPDATE `sale_invoices`               SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `products_sales`              SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `sale_return_invoices`        SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `sale_return_products`        SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+CALL pos_add_column_if_missing('user_backup_mail_settings', 'google_drive_refresh_token_encrypted', 'TEXT NULL AFTER `app_password_encrypted`');
+CALL pos_add_column_if_missing('user_backup_mail_settings', 'google_drive_access_token_encrypted', 'TEXT NULL AFTER `google_drive_refresh_token_encrypted`');
+CALL pos_add_column_if_missing('user_backup_mail_settings', 'google_drive_token_expires_at', 'TIMESTAMP NULL DEFAULT NULL AFTER `google_drive_access_token_encrypted`');
+CALL pos_add_column_if_missing('user_backup_mail_settings', 'google_drive_folder_id', 'VARCHAR(255) NULL AFTER `google_drive_token_expires_at`');
+CALL pos_add_column_if_missing('user_backup_mail_settings', 'google_drive_folder_name', 'VARCHAR(255) NULL AFTER `google_drive_folder_id`');
+CALL pos_add_column_if_missing('user_backup_mail_settings', 'google_drive_connected_at', 'TIMESTAMP NULL DEFAULT NULL AFTER `google_drive_folder_name`');
+
+CALL pos_add_column_if_missing('stock_batches_items', 'unit_cost_price', 'DOUBLE NOT NULL DEFAULT 0 AFTER `total_balance`');
+
+
+-- =============================================================================
+-- STEP 2 — BACKFILL tenant_id = @t (users LAST)
+-- =============================================================================
+
+UPDATE `products` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `companies` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `customers` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+
+UPDATE `purchase_invoices` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `products_purchases` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `purchase_return_invoices` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `products_returns` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `return_invoices` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+
+UPDATE `sale_invoices` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `products_sales` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `sale_return_invoices` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `sale_return_products` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
 
 UPDATE `product_replacment_invoices` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `product_replacements`        SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `product_replacements` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
 
-UPDATE `vendor_stocks`               SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `vendor_stock_managment`      SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `stock_batches_items`         SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `stocks`                      SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `vendor_stocks` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `vendor_stock_managment` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `stock_batches_items` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `stocks` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
 
-UPDATE `customer_ledger`             SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `vendor_ledger`               SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `customer_ledger` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `vendor_ledger` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
 
-UPDATE `admin_sale_close`            SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `admin_sale_close` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
 
-UPDATE `organization`                SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `organization_location`       SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `access_rights`               SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `organization` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `organization_location` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `access_rights` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
 
-UPDATE `customer_transactions`       SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `vendor_transactions`         SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `customer_transactions` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `vendor_transactions` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `integrations` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
 
--- integrations table ho to:
-UPDATE `integrations`                SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `backup_logs` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `user_backup_mail_settings` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
 
-UPDATE `backup_logs`                 SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-UPDATE `user_backup_mail_settings`   SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
-
--- SAB SE AAKHIR: login user ko tenant assign — iske baad app tenant filter ON
-UPDATE `users`                       SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
+UPDATE `users` SET `tenant_id` = @t WHERE `tenant_id` IS NULL;
 
 
 -- =============================================================================
--- STEP 3 — OPTIONAL legacy system_code by known customer IDs
---          Sirf tab jab upar @sys_* variables set kiye hon
+-- STEP 3 — system_code on known IDs 5/6/7/8
 -- =============================================================================
 
--- UPDATE `customers` SET `system_code` = 'EXPENSE'              WHERE `id` = @sys_expense_id             AND `tenant_id` = @t;
--- UPDATE `customers` SET `system_code` = 'NET_PURCHASE_RETURN'  WHERE `id` = @sys_net_purchase_return_id AND `tenant_id` = @t;
--- UPDATE `customers` SET `system_code` = 'NET_PURCHASE'         WHERE `id` = @sys_net_purchase_id        AND `tenant_id` = @t;
--- UPDATE `customers` SET `system_code` = 'COUNTER_SALE'         WHERE `id` = @sys_counter_sale_id        AND `tenant_id` = @t;
+UPDATE `customers` SET `system_code` = 'EXPENSE'
+WHERE `id` = 5 AND `tenant_id` = @t AND (`system_code` IS NULL OR `system_code` = '');
+
+UPDATE `customers` SET `system_code` = 'NET_PURCHASE_RETURN'
+WHERE `id` = 6 AND `tenant_id` = @t AND (`system_code` IS NULL OR `system_code` = '');
+
+UPDATE `customers` SET `system_code` = 'NET_PURCHASE'
+WHERE `id` = 7 AND `tenant_id` = @t AND (`system_code` IS NULL OR `system_code` = '');
+
+UPDATE `customers` SET `system_code` = 'COUNTER_SALE'
+WHERE `id` = 8 AND `tenant_id` = @t AND (`system_code` IS NULL OR `system_code` = '');
 
 
 -- =============================================================================
--- STEP 4 — System customers auto-provision (har tenant ke 4 accounts)
---          Jo pehle se system_code ke sath mojood hon unhe chhedta nahi
+-- STEP 4 — Auto-provision + name backfill
 -- =============================================================================
 
 INSERT INTO `customers` (`tenant_id`, `customer_name`, `customer_type`, `system_code`, `created_by`, `created_at`, `updated_at`)
@@ -242,26 +348,32 @@ SELECT @t, 'NET PURCHASE RETURN', 1, 'NET_PURCHASE_RETURN', @admin_user_id, NOW(
 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM `customers` WHERE `tenant_id` = @t AND `system_code` = 'NET_PURCHASE_RETURN');
 
--- Agar purane customers same naam se hain lekin system_code khali:
 UPDATE `customers` SET `system_code` = 'EXPENSE'
-WHERE `tenant_id` = @t AND `system_code` IS NULL AND UPPER(TRIM(`customer_name`)) = 'EXPENSE';
+WHERE `tenant_id` = @t AND (`system_code` IS NULL OR `system_code` = '')
+  AND UPPER(TRIM(`customer_name`)) = 'EXPENSE';
 
 UPDATE `customers` SET `system_code` = 'COUNTER_SALE'
-WHERE `tenant_id` = @t AND `system_code` IS NULL AND UPPER(TRIM(`customer_name`)) IN ('COUNTER SALE', 'COUNTERSALE');
+WHERE `tenant_id` = @t AND (`system_code` IS NULL OR `system_code` = '')
+  AND UPPER(TRIM(`customer_name`)) IN ('COUNTER SALE', 'COUNTERSALE');
 
 UPDATE `customers` SET `system_code` = 'NET_PURCHASE'
-WHERE `tenant_id` = @t AND `system_code` IS NULL AND UPPER(TRIM(`customer_name`)) = 'NET PURCHASE';
+WHERE `tenant_id` = @t AND (`system_code` IS NULL OR `system_code` = '')
+  AND UPPER(TRIM(`customer_name`)) = 'NET PURCHASE';
 
 UPDATE `customers` SET `system_code` = 'NET_PURCHASE_RETURN'
-WHERE `tenant_id` = @t AND `system_code` IS NULL AND UPPER(TRIM(`customer_name`)) = 'NET PURCHASE RETURN';
+WHERE `tenant_id` = @t AND (`system_code` IS NULL OR `system_code` = '')
+  AND UPPER(TRIM(`customer_name`)) = 'NET PURCHASE RETURN';
 
 
 -- =============================================================================
--- STEP 5 — VERIFY (ideal: missing_tenant = 0)
+-- STEP 5 — VERIFY
 -- =============================================================================
 
-SELECT 'users missing tenant_id' AS `check`, COUNT(*) AS `missing`
-FROM `users` WHERE `tenant_id` IS NULL
+SELECT 'config tenant (@t)' AS `check`, @t AS `value`
+UNION ALL
+SELECT 'config admin_user_id', @admin_user_id
+UNION ALL
+SELECT 'users missing tenant_id', COUNT(*) FROM `users` WHERE `tenant_id` IS NULL
 UNION ALL
 SELECT 'products missing tenant_id', COUNT(*) FROM `products` WHERE `tenant_id` IS NULL
 UNION ALL
@@ -269,22 +381,14 @@ SELECT 'customers missing tenant_id', COUNT(*) FROM `customers` WHERE `tenant_id
 UNION ALL
 SELECT 'sale_invoices missing tenant_id', COUNT(*) FROM `sale_invoices` WHERE `tenant_id` IS NULL
 UNION ALL
-SELECT 'system customers for tenant @t', COUNT(*)
-FROM `customers` WHERE `tenant_id` = @t AND `system_code` IN ('EXPENSE','COUNTER_SALE','NET_PURCHASE','NET_PURCHASE_RETURN');
+SELECT 'stock_batches_items missing tenant_id', COUNT(*) FROM `stock_batches_items` WHERE `tenant_id` IS NULL
+UNION ALL
+SELECT 'system customers for tenant', COUNT(*)
+FROM `customers`
+WHERE `tenant_id` = @t
+  AND `system_code` IN ('EXPENSE','COUNTER_SALE','NET_PURCHASE','NET_PURCHASE_RETURN');
 
+DROP PROCEDURE IF EXISTS `pos_add_column_if_missing`;
+DROP PROCEDURE IF EXISTS `pos_add_index_if_missing`;
 
--- =============================================================================
--- NAYA TENANT (misal: tenant 2) — alag script / manual
--- =============================================================================
---   SET @t := 2;
---   SET @admin_user_id := <naya user ki id>;
---
---   INSERT INTO `users` (`tenant_id`, `name`, `email`, `password`, `created_at`, `updated_at`)
---   VALUES (@t, 'Shop 2 Admin', 'shop2@example.com', '<bcrypt-hash>', NOW(), NOW());
---   SET @admin_user_id := LAST_INSERT_ID();
---
---   Phir sirf STEP 4 (system customers INSERT) dubara @t = 2 ke sath chalayein,
---   ya login ke baad browser se:  /seed-system-customers
---
---   Tenant 2 ka data hataane ke liye (optional): tenant_2_purge.sql
--- =====================================================================
+SET SESSION sql_mode = IFNULL(@pos_old_sql_mode, @@SESSION.sql_mode);

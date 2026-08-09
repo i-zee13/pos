@@ -47,38 +47,49 @@ class ReportsController extends Controller
          $query      .= " AND vs.product_id = " . (int) $request->product_id . " ";
       }
       $query .= tenant_and('vs');
-      // Always show open batches (balance > 0). Optional "Expiry In Month" narrows to near-expiry only.
-      $query .= " AND batch_wise_balance > 0 ";
-      if (isset($request->expiry) && (int) $request->expiry > 0) {
-         $expiry_month         =   (int) $request->expiry;
-         $dateTime             =   new DateTime($current_date);
-         $expiry_limit_date    =   $dateTime->modify('+ ' . $expiry_month . ' month')->format('Y-m-d');
-         $query               .=  " AND vs.expiry_date BETWEEN '$current_date' AND '$expiry_limit_date'";
+
+      // Near-expiry filter → batch rows. Default stock list → VSM (old-server totals).
+      // Dump stock_batches_items can be out of sync; do not use it for total stock in hand.
+      $expiryMonths = isset($request->expiry) ? (int) $request->expiry : 0;
+      if ($expiryMonths > 0) {
+         $dateTime          = new DateTime($current_date);
+         $expiry_limit_date = $dateTime->modify('+ ' . $expiryMonths . ' month')->format('Y-m-d');
+         $batchQuery        = $query . " AND batch_wise_balance > 0 AND vs.expiry_date BETWEEN '$current_date' AND '$expiry_limit_date'";
+         $records = DB::select("
+            SELECT
+               vs.batch_wise_balance AS balance,
+               vs.vs_id,
+               IFNULL((SELECT company_name FROM companies WHERE id = vs.company_id), '') AS company_name,
+               IFNULL((SELECT product_name FROM products WHERE id = vs.product_id), '') AS product_name,
+               IFNULL((SELECT sale_price FROM products WHERE id = vs.product_id), '') AS sale_price,
+               vs.product_id,
+               DATE_FORMAT(vs.expiry_date, '%d %b %Y') AS expiry_date
+            FROM stock_batches_items vs
+            WHERE $batchQuery
+            ORDER BY vs.expiry_date ASC, vs.id ASC
+         ");
+      } else {
+         $vsmQuery = $query . " AND vs.balance > 0";
+         $records = DB::select("
+            SELECT
+               vs.balance AS balance,
+               vs.vs_id,
+               IFNULL((SELECT company_name FROM companies WHERE id = vs.company_id), '') AS company_name,
+               IFNULL((SELECT product_name FROM products WHERE id = vs.product_id), '') AS product_name,
+               IFNULL((SELECT sale_price FROM products WHERE id = vs.product_id), '') AS sale_price,
+               vs.product_id,
+               NULL AS expiry_date
+            FROM vendor_stock_managment vs
+            INNER JOIN (
+               SELECT product_id, MAX(id) AS mid
+               FROM vendor_stock_managment
+               GROUP BY product_id
+            ) latest ON latest.mid = vs.id
+            WHERE $vsmQuery
+            ORDER BY vs.company_id ASC, vs.product_id ASC
+         ");
       }
-      $records    = DB::select("
-                                 SELECT
-                                     vs.batch_wise_balance AS balance,
-                                     vs.vs_id,
-                                     IFNULL(
-                                         (SELECT company_name FROM companies WHERE id = vs.company_id),
-                                         ''
-                                     ) AS company_name,
-                                     IFNULL(
-                                         (SELECT product_name FROM products WHERE id = vs.product_id),
-                                         ''
-                                     ) AS product_name,
-                                     IFNULL(
-                                         (SELECT sale_price FROM products WHERE id = vs.product_id),
-                                         ''
-                                     ) AS sale_price,
-                                     vs.product_id,
-                                     DATE_FORMAT(vs.expiry_date, '%d %b %Y') AS expiry_date
-                                 FROM
-                                   stock_batches_items vs
-                                 WHERE
-                                     $query
-                                 ORDER BY vs.expiry_date ASC, vs.id ASC
-                             ");
+
       return response()->json([
          'msg'     =>   'Stock reports list fetched',
          'status'  =>   'success',
