@@ -1,6 +1,214 @@
                         <div class="col-md-8" id="contentToPrint" style="direction: rtl;display: contents;">
 
                             <div class="col-md-6 report" style="direction: rtl;">
+                                <div class="c-address-info">
+                                    <div class="openning_balance_div" style="display: none;">
+                                        <span> نقد دکان : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit openning_balance">Loading...</strong>
+                                    </div>
+                                    <div class="abdul_shakoor_exchange_jama_div" style="display: none;">
+                                        <span>نقد رقم شہر دکان </span>
+                                        <strong class="digit"></strong>
+
+                                        <strong class="digit abdul_shakoor_exchange_jama">Loading...</strong>
+                                    </div>
+                                       <div class="karaya_dokan_receive_div" style="display: none;">
+                                        <span>کرایہ دکان: </span>
+                                        <strong class="digit"></strong> 
+                                        <strong class="digit karaya_dokan_receive">Loading...</strong>
+                                    </div>
+                                    <div class="mutafirq_udhar_receive_div" style="display: none;">
+                                        <span>متفرق ادھار : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit mutafirq_udhar_receive">Loading...</strong>
+                                    </div>
+                                     <div class="mcb_ka_jama_div" style="display: none;">
+                                        <span>MCB کوٹ ادو: </span>
+                                        <strong class="digit"></strong>
+
+                                        <strong class="digit mcb_ka_jama">Loading...</strong>
+                                    </div>
+                                    <div class="meezan_bank_jama_div" style="display: none;">
+                                        <span>میزان بینک عبدالشکور</span>
+                                        <strong class="digit"></strong>
+
+                                        <strong class="digit meezan_bank_jama">Loading...</strong>
+                                    </div>
+                                    <div class="hbl_m_waqas_jama_div" style="display: none;">
+                                        <span>HBL وقاص : </span>
+                                        <strong class="digit"></strong>
+
+                                        <strong class="digit hbl_m_waqas_jama">Loading...</strong>
+                                    </div>
+                                    <div class="ubl_m_waqas_jama_div" style="display: none;">
+                                        <span>UBL وقاص : </span>
+                                        <strong class="digit"></strong>
+
+                                        <strong class="digit ubl_m_waqas_jama">Loading...</strong>
+                                    </div>
+                                    <div class="ilyas_bakhtawar_div" style="display: none;">
+                                        <span>الیاس بختاور : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit ilyas_bakhtawar">Loading...</strong>
+                                    </div>
+                                    <div class="fazul_qadir_recive_div" style="display: none;">
+                                        <span>فضل القادر : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit fazul_qadir_recive">Loading...</strong>
+                                    </div>
+                                    <div class="shafiq_karyana_receive_div" style="display: none;">
+                                        <span>شفیق کریانہ : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit shafiq_karyana_receive">Loading...</strong>
+                                    </div>
+                                    <div class="abdul_ghaffar_ghar_receive_div" style="display: none;">
+                                        <span>عبدالغفار گھر : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit abdul_ghaffar_ghar_receive">Loading...</strong>
+                                    </div>
+                                    <div class="ammar_abdullah_ghar_receive_div" style="display: none;">
+                                        <span>عمار عبداللہ گھر : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit ammar_abdullah_ghar_receive">Loading...</strong>
+                                    </div>
+                                    <div class="imdad_khata_receive_div" style="display: none;">
+                                        <span>امداد کھاتہ : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit imdad_khata_receive">Loading...</strong>
+                                    </div>
+                                    <div class="imran_niazi_receive_div" style="display: none;">
+                                        <span>عمران نیازی : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit imran_niazi_receive">Loading...</strong>
+                                    </div>
+                                    <div class="sir_murtaza_sahib_receive_div" style="display: none;">
+                                        <span>سر مرتضیٰ صاحب : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit sir_murtaza_sahib_receive">Loading...</strong>
+                                    </div>
+                                    <div class="master_khalid_faroq_shah_receive_div" style="display: none;">
+                                        <span>ماسٹر خالد فاروق شاہ : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit master_khalid_faroq_shah_receive">Loading...</strong>
+                                    </div>
+
+                                    <div class="mutafirq_sody_div" style="display: none;">
+                                        <span>متفرق سودے</span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit mutafirq_sody">Loading...</strong>
+                                    </div>
+                                     <div class="ubl_aftab_jama_div" style="display: none;">
+                                        <span>UBL آفتاب : </span>
+                                        <strong class="digit"></strong>
+
+                                        <strong class="digit ubl_aftab_jama">Loading...</strong>
+                                    </div>
+                                    <div class="dawai_div" style="display: none;">
+
+                                        <span> دوائی: </span>
+                                        <strong class="digit dawai_qty">Loading...</strong>
+                                        <strong class="digit dawai">Loading...</strong>
+                                    </div>
+                                    <div class="beej_div" style="display: none;">
+                                        <span> بیج: </span>
+                                        <strong class="digit beej_qty">Loading...</strong>
+                                        <strong class="digit beej">Loading...</strong>
+                                    </div>
+                                    <div class="gandom_div" style="display: none;">
+                                        <span>گندم : </span>
+                                        <strong class="digit gandom_qty">Loading...</strong>
+                                        <strong class="digit gandom">Loading...</strong>
+                                    </div>
+                                    <div class="gandum_khareed_khata_receive_div" style="display: none;">
+                                        <span>گندم خرید کھاتہ : </span>
+                                        <strong class="digit"></strong>
+                                        <strong class="digit gandum_khareed_khata_receive">Loading...</strong>
+                                    </div>
+                                    <div class="kapas_div" style="display: none;">
+                                        <span>بنولہ </span>
+                                        <strong class="digit kapas_qty">Loading...</strong>
+                                        <strong class="digit kapas">Loading...</strong>
+                                    </div>
+                                    <div class="dhaan_div" style="display: none;">
+                                        <span>دھان : </span>
+                                        <strong class="digit dhaan_qty">Loading...</strong>
+                                        <strong class="digit dhaan">Loading...</strong>
+                                    </div>
+                                    <div class="dap_25kg_div" style="display: none;">
+                                        <span>ڈی اے پی 25 کلو :</span>
+                                        <strong class="digit dap_25kg_qty">Loading...</strong>
+                                        <strong class="digit dap_25kg">Loading...</strong>
+                                    </div>
+                                    <div class="dap_div" style="display: none;">
+                                        <span>ڈی اے پی :</span>
+                                        <strong class="digit dap_qty">Loading...</strong>
+                                        <strong class="digit dap">Loading...</strong>
+                                    </div>
+                                    <div class="urea_div" style="display: none;">
+                                        <span>یوریا : </span>
+                                        <strong class="digit urea_qty">Loading...</strong>
+                                        <strong class="digit urea">Loading...</strong>
+                                    </div>
+                                     <div class="tsp_div" style="display: none;">
+                                        <span>ٹی ایس پی </span>
+                                        <strong class="digit tsp_qty">Loading...</strong>
+                                        <strong class="digit tsp">Loading...</strong>
+                                    </div>
+                                    <div class="can_div" style="display: none;">
+                                        <span>گوارہ : </span>
+                                        <strong class="digit can_qty">Loading...</strong>
+                                        <strong class="digit can">Loading...</strong>
+                                    </div>
+                                    <div class="np_div" style="display: none;">
+                                        <span>نائیڑوفاس : </span>
+                                        <strong class="digit np_qty">Loading...</strong>
+                                        <strong class="digit np">Loading...</strong>
+                                    </div>
+                                    <div class="ssp_div" style="display: none;">
+                                        <span>ایس ایس پی :</span>
+                                        <strong class="digit ssp_qty">Loading...</strong>
+                                        <strong class="digit ssp">Loading...</strong>
+                                    </div>
+                                    <div class="zarkhez_div" style="display: none;">
+                                        <span>زرخیز : </span>
+                                        <strong class="digit zarkhez_qty">Loading...</strong>
+                                        <strong class="digit zarkhez">Loading...</strong>
+                                    </div>
+                                    <div class="sop_div" style="display: none;">
+                                        <span>ایس او پی : </span>
+                                        <strong class="digit sop_qty">Loading...</strong>
+                                        <strong class="digit sop">Loading...</strong>
+                                    </div>
+                                    <div class="jimsam_div" style="display: none;">
+                                        <span>جپسم : </span>
+                                        <strong class="digit jimsam_qty">Loading...</strong>
+                                        <strong class="digit jimsam">Loading...</strong>
+                                    </div>
+                                    <div class="mop_div" style="display: none;">
+                                        <span>ایم او پی : </span>
+                                        <strong class="digit mop_qty">Loading...</strong>
+                                        <strong class="digit mop">Loading...</strong>
+                                    </div>
+                                 
+                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #152e4d;">
+                                        <span> <b> کل آمد : </b> </span>
+                                        <strong class="digit ttl_in f-17"></strong>
+                                    </div>
+                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #152e4d;">
+                                        <span> <b> کل نکاس : </b> </span>
+                                        <strong class="digit ttl_out f-17"></strong>
+                                    </div>
+                                    <div class="total_meezan_div purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #152e4d;">
+                                        <span> کل میزان : </span>
+                                        <strong class="digit total_meezan f-17"></strong>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                            <div class="col-md-6 report" style="direction: rtl;">
                                 <div class="c-address-info ">
                                     <div class="mutafariq_udhar_banam_div" style="display: none;">
                                         <span>متفرق ادھار : </span>
@@ -300,213 +508,5 @@
                                         <strong class="digit ttl_out f-17"></strong>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6 report" style="direction: rtl;">
-                                <div class="c-address-info">
-                                    <div class="openning_balance_div" style="display: none;">
-                                        <span> نقد دکان : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit openning_balance">Loading...</strong>
-                                    </div>
-                                    <div class="abdul_shakoor_exchange_jama_div" style="display: none;">
-                                        <span>نقد رقم شہر دکان </span>
-                                        <strong class="digit"></strong>
-
-                                        <strong class="digit abdul_shakoor_exchange_jama">Loading...</strong>
-                                    </div>
-                                       <div class="karaya_dokan_receive_div" style="display: none;">
-                                        <span>کرایہ دکان: </span>
-                                        <strong class="digit"></strong> 
-                                        <strong class="digit karaya_dokan_receive">Loading...</strong>
-                                    </div>
-                                    <div class="mutafirq_udhar_receive_div" style="display: none;">
-                                        <span>متفرق ادھار : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit mutafirq_udhar_receive">Loading...</strong>
-                                    </div>
-                                     <div class="mcb_ka_jama_div" style="display: none;">
-                                        <span>MCB کوٹ ادو: </span>
-                                        <strong class="digit"></strong>
-
-                                        <strong class="digit mcb_ka_jama">Loading...</strong>
-                                    </div>
-                                    <div class="meezan_bank_jama_div" style="display: none;">
-                                        <span>میزان بینک عبدالشکور</span>
-                                        <strong class="digit"></strong>
-
-                                        <strong class="digit meezan_bank_jama">Loading...</strong>
-                                    </div>
-                                    <div class="hbl_m_waqas_jama_div" style="display: none;">
-                                        <span>HBL وقاص : </span>
-                                        <strong class="digit"></strong>
-
-                                        <strong class="digit hbl_m_waqas_jama">Loading...</strong>
-                                    </div>
-                                    <div class="ubl_m_waqas_jama_div" style="display: none;">
-                                        <span>UBL وقاص : </span>
-                                        <strong class="digit"></strong>
-
-                                        <strong class="digit ubl_m_waqas_jama">Loading...</strong>
-                                    </div>
-                                    <div class="ilyas_bakhtawar_div" style="display: none;">
-                                        <span>الیاس بختاور : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit ilyas_bakhtawar">Loading...</strong>
-                                    </div>
-                                    <div class="fazul_qadir_recive_div" style="display: none;">
-                                        <span>فضل القادر : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit fazul_qadir_recive">Loading...</strong>
-                                    </div>
-                                    <div class="shafiq_karyana_receive_div" style="display: none;">
-                                        <span>شفیق کریانہ : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit shafiq_karyana_receive">Loading...</strong>
-                                    </div>
-                                    <div class="abdul_ghaffar_ghar_receive_div" style="display: none;">
-                                        <span>عبدالغفار گھر : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit abdul_ghaffar_ghar_receive">Loading...</strong>
-                                    </div>
-                                    <div class="ammar_abdullah_ghar_receive_div" style="display: none;">
-                                        <span>عمار عبداللہ گھر : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit ammar_abdullah_ghar_receive">Loading...</strong>
-                                    </div>
-                                    <div class="imdad_khata_receive_div" style="display: none;">
-                                        <span>امداد کھاتہ : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit imdad_khata_receive">Loading...</strong>
-                                    </div>
-                                    <div class="imran_niazi_receive_div" style="display: none;">
-                                        <span>عمران نیازی : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit imran_niazi_receive">Loading...</strong>
-                                    </div>
-                                    <div class="sir_murtaza_sahib_receive_div" style="display: none;">
-                                        <span>سر مرتضیٰ صاحب : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit sir_murtaza_sahib_receive">Loading...</strong>
-                                    </div>
-                                    <div class="master_khalid_faroq_shah_receive_div" style="display: none;">
-                                        <span>ماسٹر خالد فاروق شاہ : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit master_khalid_faroq_shah_receive">Loading...</strong>
-                                    </div>
-
-                                    <div class="mutafirq_sody_div" style="display: none;">
-                                        <span>متفرق سودے</span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit mutafirq_sody">Loading...</strong>
-                                    </div>
-                                     <div class="ubl_aftab_jama_div" style="display: none;">
-                                        <span>UBL آفتاب : </span>
-                                        <strong class="digit"></strong>
-
-                                        <strong class="digit ubl_aftab_jama">Loading...</strong>
-                                    </div>
-                                    <div class="dawai_div" style="display: none;">
-
-                                        <span> دوائی: </span>
-                                        <strong class="digit dawai_qty">Loading...</strong>
-                                        <strong class="digit dawai">Loading...</strong>
-                                    </div>
-                                    <div class="beej_div" style="display: none;">
-                                        <span> بیج: </span>
-                                        <strong class="digit beej_qty">Loading...</strong>
-                                        <strong class="digit beej">Loading...</strong>
-                                    </div>
-                                    <div class="gandom_div" style="display: none;">
-                                        <span>گندم : </span>
-                                        <strong class="digit gandom_qty">Loading...</strong>
-                                        <strong class="digit gandom">Loading...</strong>
-                                    </div>
-                                    <div class="gandum_khareed_khata_receive_div" style="display: none;">
-                                        <span>گندم خرید کھاتہ : </span>
-                                        <strong class="digit"></strong>
-                                        <strong class="digit gandum_khareed_khata_receive">Loading...</strong>
-                                    </div>
-                                    <div class="kapas_div" style="display: none;">
-                                        <span>بنولہ </span>
-                                        <strong class="digit kapas_qty">Loading...</strong>
-                                        <strong class="digit kapas">Loading...</strong>
-                                    </div>
-                                    <div class="dhaan_div" style="display: none;">
-                                        <span>دھان : </span>
-                                        <strong class="digit dhaan_qty">Loading...</strong>
-                                        <strong class="digit dhaan">Loading...</strong>
-                                    </div>
-                                    <div class="dap_25kg_div" style="display: none;">
-                                        <span>ڈی اے پی 25 کلو :</span>
-                                        <strong class="digit dap_25kg_qty">Loading...</strong>
-                                        <strong class="digit dap_25kg">Loading...</strong>
-                                    </div>
-                                    <div class="dap_div" style="display: none;">
-                                        <span>ڈی اے پی :</span>
-                                        <strong class="digit dap_qty">Loading...</strong>
-                                        <strong class="digit dap">Loading...</strong>
-                                    </div>
-                                    <div class="urea_div" style="display: none;">
-                                        <span>یوریا : </span>
-                                        <strong class="digit urea_qty">Loading...</strong>
-                                        <strong class="digit urea">Loading...</strong>
-                                    </div>
-                                     <div class="tsp_div" style="display: none;">
-                                        <span>ٹی ایس پی </span>
-                                        <strong class="digit tsp_qty">Loading...</strong>
-                                        <strong class="digit tsp">Loading...</strong>
-                                    </div>
-                                    <div class="can_div" style="display: none;">
-                                        <span>گوارہ : </span>
-                                        <strong class="digit can_qty">Loading...</strong>
-                                        <strong class="digit can">Loading...</strong>
-                                    </div>
-                                    <div class="np_div" style="display: none;">
-                                        <span>نائیڑوفاس : </span>
-                                        <strong class="digit np_qty">Loading...</strong>
-                                        <strong class="digit np">Loading...</strong>
-                                    </div>
-                                    <div class="ssp_div" style="display: none;">
-                                        <span>ایس ایس پی :</span>
-                                        <strong class="digit ssp_qty">Loading...</strong>
-                                        <strong class="digit ssp">Loading...</strong>
-                                    </div>
-                                    <div class="zarkhez_div" style="display: none;">
-                                        <span>زرخیز : </span>
-                                        <strong class="digit zarkhez_qty">Loading...</strong>
-                                        <strong class="digit zarkhez">Loading...</strong>
-                                    </div>
-                                    <div class="sop_div" style="display: none;">
-                                        <span>ایس او پی : </span>
-                                        <strong class="digit sop_qty">Loading...</strong>
-                                        <strong class="digit sop">Loading...</strong>
-                                    </div>
-                                    <div class="jimsam_div" style="display: none;">
-                                        <span>جپسم : </span>
-                                        <strong class="digit jimsam_qty">Loading...</strong>
-                                        <strong class="digit jimsam">Loading...</strong>
-                                    </div>
-                                    <div class="mop_div" style="display: none;">
-                                        <span>ایم او پی : </span>
-                                        <strong class="digit mop_qty">Loading...</strong>
-                                        <strong class="digit mop">Loading...</strong>
-                                    </div>
-                                 
-                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #152e4d;">
-                                        <span> <b> کل آمد : </b> </span>
-                                        <strong class="digit ttl_in f-17"></strong>
-                                    </div>
-                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #152e4d;">
-                                        <span> <b> کل نکاس : </b> </span>
-                                        <strong class="digit ttl_out f-17"></strong>
-                                    </div>
-                                    <div class="total_meezan_div purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #152e4d;">
-                                        <span> کل میزان : </span>
-                                        <strong class="digit total_meezan f-17"></strong>
-                                    </div>
-                                </div>
-
-
-
                             </div>
                         </div>
