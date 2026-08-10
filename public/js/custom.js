@@ -27,6 +27,32 @@
  */
 window.invoiceBalanceLoading = false;
 window.invoiceBalanceLoadedFor = null;
+
+/** Focus the product ID / barcode box used for scanning on invoice create pages. */
+function focusInvoiceBarcodeInput() {
+    var $el = $('#designationsTable input.bar-code:visible, #table-container input.bar-code:visible').first();
+    if (!$el.length) {
+        $el = $('input.bar-code:visible, input#bar-code.inputSale:visible').first();
+    }
+    if (!$el.length) {
+        $el = $('#designationsTable input.bar-code, input.bar-code.inputSale, input#bar-code').first();
+    }
+    if (!$el.length) {
+        return;
+    }
+    setTimeout(function () {
+        $el.trigger('focus');
+        var node = $el.get(0);
+        if (node && typeof node.focus === 'function') {
+            try {
+                node.focus({ preventScroll: true });
+            } catch (e) {
+                node.focus();
+            }
+        }
+    }, 50);
+}
+
 function toggleInvoiceBalanceLoader(isLoading) {
     window.invoiceBalanceLoading = !!isLoading;
     if (isLoading) {
@@ -38,6 +64,8 @@ function toggleInvoiceBalanceLoader(isLoading) {
         $('#tblLoader').hide();
         $('.parent-div').show();
         $('#save, #print-invoice').prop('disabled', false);
+        // Form was hidden during balance load — refocus barcode after it is visible again
+        focusInvoiceBarcodeInput();
     }
 }
 

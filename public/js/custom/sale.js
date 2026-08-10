@@ -17367,7 +17367,12 @@ $(document).ready(function () {
     $('#tblLoader').hide();
   }
   // Counter Sale is selected after getvendors() loads options (avoid race with empty dropdown / val(0))
-  $('#bar-code').focus();
+  // Early focus often fails while balance loader hides .parent-div; toggleInvoiceBalanceLoader(false) re-focuses.
+  if (typeof focusInvoiceBarcodeInput === 'function') {
+    focusInvoiceBarcodeInput();
+  } else {
+    $('#designationsTable #bar-code, #bar-code').first().focus();
+  }
   stock_products = JSON.parse($('#stock_products').val());
   customer_ledger = JSON.parse($('#customer_ledger').val());
   getProducts();
@@ -17479,7 +17484,11 @@ $('#add-product').on('click', function () {
   $('#new_purchase_price').val('');
   $('#retail_price').val('');
   $('#discount').val('');
-  $('#bar-code').focus();
+  if (typeof focusInvoiceBarcodeInput === 'function') {
+    focusInvoiceBarcodeInput();
+  } else {
+    $('#designationsTable #bar-code, #bar-code').first().focus();
+  }
   data_variable = '';
   qty = '';
   expiry_date = '';
