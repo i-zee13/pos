@@ -736,10 +736,11 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td style="width:140px">
-                                                <select id="expiry_date" class="inputSale expiry_date" name="expiry_date" style="width:100%;">
-                                                    <option value="">Select Batch</option>
+                                            <td style="width:160px">
+                                                <select id="expiry_date" class="inputSale expiry_date" name="expiry_date" style="width:100%;" title="Batch optional — or enter custom expiry below">
+                                                    <option value="">Batch (optional)</option>
                                                 </select>
+                                                <input type="date" id="custom_expiry_date" class="inputSale custom_expiry_date" name="custom_expiry_date" style="width:100%;margin-top:3px;" title="Custom expiry (optional)" placeholder="Custom expiry">
                                             </td>
                                             <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
                                             <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px" readonly></td>

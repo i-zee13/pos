@@ -697,11 +697,8 @@ function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stoc
             $strategy = 'fifo';
             continue;
         }
-        // Sale return selected expiry miss → FEFO putback
-        if (!$s && $strategy === 'expiry_in') {
-            $strategy = 'putback';
-            continue;
-        }
+        // Sale return custom/selected expiry miss → create that expiry batch below
+        // (do NOT FEFO into another month's open batch — e.g. Ali's Feb return when Feb is depleted)
 
         if (!$s) {
             if (!$isIn) {

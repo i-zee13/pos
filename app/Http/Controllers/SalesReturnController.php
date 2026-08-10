@@ -305,12 +305,13 @@ class SalesReturnController extends Controller
     }
 
     /**
-     * Open batches for sale-return Exp. Date dropdown (balance > 0).
+     * Batches for sale-return Exp. Date dropdown.
+     * Includes zero-balance batches so a depleted expiry (e.g. Feb sold out) can still be selected on return.
      */
     public function openBatches($product_id)
     {
         $batches = BatchStockMgt::where('product_id', (int) $product_id)
-            ->where('batch_wise_balance', '>', 0)
+            ->orderByRaw("CASE WHEN IFNULL(batch_wise_balance,0) > 0 THEN 0 ELSE 1 END ASC")
             ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
             ->orderBy('expiry_date', 'ASC')
             ->orderBy('id', 'ASC')

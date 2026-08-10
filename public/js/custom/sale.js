@@ -17366,7 +17366,7 @@ $(document).ready(function () {
     $('.parent-div').show();
     $('#tblLoader').hide();
   }
-  // Counter Sale selected in getvendors() after options load (avoids race with val(0) / empty dropdown)
+  // Counter Sale is selected after getvendors() loads options (avoid race with empty dropdown / val(0))
   $('#bar-code').focus();
   stock_products = JSON.parse($('#stock_products').val());
   customer_ledger = JSON.parse($('#customer_ledger').val());
@@ -18175,6 +18175,7 @@ function getvendors() {
       if (segments[3] == 'sale-add' && (!selectCustomerId || selectCustomerId == 0)) {
         selectCustomerId = window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE || 8;
       }
+      // Select2 may init slightly later — set native value then refresh plugin if present
       $("#customer_id").val(String(selectCustomerId));
       if ($("#customer_id").hasClass('select2-hidden-accessible')) {
         $("#customer_id").trigger('change.select2');
@@ -18266,7 +18267,6 @@ $('#customer_id').change(function () {
     toggleInvoiceBalanceLoader(false);
   }
 });
-
 function grandSum() {
   var previous_payable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
   var service_charges = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;

@@ -54,9 +54,13 @@ function isCounterSaleCustomer(customerId) {
 
 function loadOpenBatches(productId, selectedExpiry = '', selectedBatchId = '') {
     const $sel = $('#expiry_date');
-    $sel.empty().append(`<option value="">Select Batch</option>`);
+    const $custom = $('#custom_expiry_date');
+    $sel.empty().append(`<option value="">Batch (optional)</option>`);
     selected_batch_row_id = '';
     expiry_date = '';
+    if ($custom.length) {
+        $custom.val(selectedExpiry ? String(selectedExpiry).substring(0, 10) : '');
+    }
     if (!productId || productId <= 0) {
         return;
     }
@@ -65,13 +69,10 @@ function loadOpenBatches(productId, selectedExpiry = '', selectedBatchId = '') {
         type: 'get',
         success: function (response) {
             const batches = response.batches || [];
-            if (batches.length === 0) {
-                $sel.append(`<option value="" disabled>No open batches</option>`);
-                return;
-            }
             batches.forEach(function (b) {
                 const exp = (b.expiry_date || '').substring(0, 10);
-                const label = formatBatchExpiryLabel(exp) + ' (bal: ' + parseFloat(b.batch_wise_balance).toFixed(0) + ')';
+                const bal = parseFloat(b.batch_wise_balance) || 0;
+                const label = formatBatchExpiryLabel(exp) + ' (bal: ' + bal.toFixed(0) + ')';
                 const selected = (selectedBatchId && String(b.id) === String(selectedBatchId))
                     || (!selectedBatchId && selectedExpiry && exp === String(selectedExpiry).substring(0, 10));
                 $sel.append(`<option value="${exp}" data-batch-id="${b.id}" ${selected ? 'selected' : ''}>${label}</option>`);
@@ -79,9 +80,32 @@ function loadOpenBatches(productId, selectedExpiry = '', selectedBatchId = '') {
             if ($sel.val()) {
                 selected_batch_row_id = $sel.find('option:selected').data('batch-id') || '';
                 expiry_date = $sel.val();
+                if ($custom.length) {
+                    $custom.val(expiry_date);
+                }
+            } else if (selectedExpiry && $custom.length) {
+                // Saved/custom expiry not in list — keep date only (no forced batch)
+                $custom.val(String(selectedExpiry).substring(0, 10));
+                expiry_date = $custom.val();
+                selected_batch_row_id = '';
             }
         }
     });
+}
+
+function resolveAddRowExpiry() {
+    const $sel = $('#expiry_date');
+    const $custom = $('#custom_expiry_date');
+    const selectedExp = ($sel.val() || '').trim();
+    const customExp = ($custom.val() || '').trim();
+    if (selectedExp) {
+        selected_batch_row_id = $sel.find('option:selected').data('batch-id') || '';
+        expiry_date = selectedExp;
+        return expiry_date;
+    }
+    selected_batch_row_id = '';
+    expiry_date = customExp || '';
+    return expiry_date;
 }
 
 $(document).ready(function () {
@@ -148,7 +172,10 @@ $(document).ready(function () {
                         <tr id='tr-${product.product_id}'>
                             <td>${product.product_id}</td>
                             <td>${product.p_name}</td>
-                            <td><select class="inputSale expiry_input" data-id="${product.product_id}" style="font-size: 13px;width:140px;"></select></td>
+                            <td style="width:160px;">
+                                <select class="inputSale expiry_input" data-id="${product.product_id}" style="font-size: 13px;width:100%;" title="Batch optional"></select>
+                                <input type="date" value="${product.expiry_date ? String(product.expiry_date).substring(0, 10) : ''}" class="inputSale custom_expiry_input" data-id="${product.product_id}" style="font-size: 13px;width:100%;margin-top:3px;" title="Custom expiry (optional)">
+                            </td>
                             <td><input type="number" value="${product.qty}"  data-retail="${product.retail_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product.product_id}" data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
                             <td><input type="number" value="${product.retail_price}"  data-retail="${product.retail_price}" data-purchase="${product.purchased_price}" data-stock="${product.stock_in_hand}" class="inputSale price-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  min="0"></td>
                             <td><input type="number" value="${product.prod_discount}"  class="inputSale discount-input add-stock-input td-${product.product_id}"  data-id="${product.product_id}" data-value="${product.amount}" data-quantity="${product.qty}"  style="font-size: 13px" min="0"></td>
@@ -157,6 +184,8 @@ $(document).ready(function () {
                         `);
                     fillRowBatchSelect(product.product_id, product.expiry_date, product.batch_row_id || '');
                 })
+                previous_payable = parseFloat($('.previous_payable').first().text()) || 0;
+                grandSum(previous_payable, service_charges, invoice_discount);
             }
         })
     }
@@ -189,25 +218,15 @@ $('#add-product').on('click', function () {
             $('#qty').css('border-color', ''); // Reset the border color
         }
         var prod_discount = $('#discount').val();
-        expiry_date = $('#expiry_date').val();
-        selected_batch_row_id = $('#expiry_date option:selected').data('batch-id') || '';
-        if (!expiry_date) {
-            $('#expiry_date').css('border-color', 'red');
-            $('#notifDiv').fadeIn();
-            $('#notifDiv').css('background', 'red');
-            $('#notifDiv').text('Please select batch / expiry');
-            setTimeout(() => {
-                $('#notifDiv').fadeOut();
-            }, 3000);
-            return;
-        }
+        resolveAddRowExpiry();
         $('#expiry_date').css('border-color', '');
+        $('#custom_expiry_date').css('border-color', '');
         sales_product_array.push({
             'sale_return_nvoice_id': '',
             'prod_discount': prod_discount ? prod_discount : 0,
             'product_id': `${product_id}`,
-            'expiry_date': `${expiry_date}`,
-            'batch_row_id': `${selected_batch_row_id}`,
+            'expiry_date': `${expiry_date || ''}`,
+            'batch_row_id': `${selected_batch_row_id || ''}`,
             'qty': `${qty}`,
             'amount': `${amount-prod_discount}`,
             'retail_price': `${retail_price}`,
@@ -241,6 +260,7 @@ $('#add-product').on('click', function () {
     $('#new_purchase_price').val('');
     $('#retail_price').val('');
     $('#discount').val('');
+    $('#custom_expiry_date').val('');
     $('#bar-code').focus();
     data_variable = '';
     selected_batch_row_id = '';
@@ -415,24 +435,70 @@ $('.products').change(function () {
 $(document).on('change', '#expiry_date', function () {
     expiry_date = $(this).val() || '';
     selected_batch_row_id = $(this).find('option:selected').data('batch-id') || '';
+    if (expiry_date) {
+        $('#custom_expiry_date').val(expiry_date);
+    }
+});
+$(document).on('change input', '#custom_expiry_date', function () {
+    const customExp = ($(this).val() || '').trim();
+    expiry_date = customExp;
+    // Manual date → detach from batch unless an option still matches this date
+    const $match = $('#expiry_date option').filter(function () {
+        return $(this).val() && $(this).val() === customExp;
+    }).first();
+    if ($match.length) {
+        $('#expiry_date').val($match.val());
+        selected_batch_row_id = $match.data('batch-id') || '';
+    } else {
+        $('#expiry_date').val('');
+        selected_batch_row_id = '';
+    }
 });
 $(document).on('change', '.expiry_input', function () {
     const pid = $(this).data('id');
     const exp = $(this).val() || '';
     const batchId = $(this).find('option:selected').data('batch-id') || '';
+    const $rowCustom = $(`.custom_expiry_input[data-id="${pid}"]`);
+    if (exp) {
+        $rowCustom.val(exp);
+    }
     sales_product_array.forEach(function (row) {
         if (String(row.product_id) === String(pid)) {
-            row.expiry_date = exp;
+            row.expiry_date = exp || ($rowCustom.val() || '');
+            row.batch_row_id = exp ? batchId : '';
+        }
+    });
+});
+$(document).on('change input', '.custom_expiry_input', function () {
+    const pid = $(this).data('id');
+    const customExp = ($(this).val() || '').trim();
+    const $sel = $(`.expiry_input[data-id="${pid}"]`);
+    const $match = $sel.find('option').filter(function () {
+        return $(this).val() && $(this).val() === customExp;
+    }).first();
+    if ($match.length) {
+        $sel.val($match.val());
+    } else {
+        $sel.val('');
+    }
+    const batchId = $match.length ? ($match.data('batch-id') || '') : '';
+    sales_product_array.forEach(function (row) {
+        if (String(row.product_id) === String(pid)) {
+            row.expiry_date = customExp;
             row.batch_row_id = batchId;
         }
     });
 });
 function fillRowBatchSelect(productId, selectedExpiry = '', selectedBatchId = '') {
     const $sel = $(`.expiry_input[data-id="${productId}"]`);
+    const $custom = $(`.custom_expiry_input[data-id="${productId}"]`);
     if (!$sel.length) {
         return;
     }
-    $sel.empty().append(`<option value="">Select Batch</option>`);
+    $sel.empty().append(`<option value="">Batch (optional)</option>`);
+    if ($custom.length) {
+        $custom.val(selectedExpiry ? String(selectedExpiry).substring(0, 10) : '');
+    }
     $.ajax({
         url: '/open-batches/' + productId,
         type: 'get',
@@ -440,14 +506,22 @@ function fillRowBatchSelect(productId, selectedExpiry = '', selectedBatchId = ''
             const batches = response.batches || [];
             batches.forEach(function (b) {
                 const exp = (b.expiry_date || '').substring(0, 10);
-                const label = formatBatchExpiryLabel(exp) + ' (bal: ' + parseFloat(b.batch_wise_balance).toFixed(0) + ')';
+                const bal = parseFloat(b.batch_wise_balance) || 0;
+                const label = formatBatchExpiryLabel(exp) + ' (bal: ' + bal.toFixed(0) + ')';
                 const selected = (selectedBatchId && String(b.id) === String(selectedBatchId))
                     || (!selectedBatchId && selectedExpiry && exp === String(selectedExpiry).substring(0, 10));
                 $sel.append(`<option value="${exp}" data-batch-id="${b.id}" ${selected ? 'selected' : ''}>${label}</option>`);
             });
-            // Keep previously saved expiry even if batch now empty
-            if (selectedExpiry && !$sel.val()) {
-                $sel.append(`<option value="${String(selectedExpiry).substring(0, 10)}" selected>${formatBatchExpiryLabel(selectedExpiry)}</option>`);
+            // Keep previously saved / custom expiry even if batch now empty or missing
+            if (selectedExpiry) {
+                const exp = String(selectedExpiry).substring(0, 10);
+                if ($custom.length) {
+                    $custom.val(exp);
+                }
+                if (!$sel.val()) {
+                    // leave select empty; custom date carries the value
+                    $sel.val('');
+                }
             }
         }
     });
@@ -948,11 +1022,15 @@ $(document).on('mouseenter', '.show_purchase', function () {
 });
 
 function tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0, batch_row_id = '') {
+    const expVal = expiry_date ? String(expiry_date).substring(0, 10) : '';
     $('#designationsTable tbody').append(`
     <tr class='tr-${product_id}' data-prod_id ="${product_id}">
         <td>${product_id}</td>
         <td>${p_name}</td> 
-        <td><select class="inputSale expiry_input" data-id="${product_id}" style="font-size: 13px;width:140px;"></select></td>
+        <td style="width:160px;">
+            <select class="inputSale expiry_input" data-id="${product_id}" style="font-size: 13px;width:100%;" title="Batch optional"></select>
+            <input type="date" value="${expVal}" class="inputSale custom_expiry_input" data-id="${product_id}" style="font-size: 13px;width:100%;margin-top:3px;" title="Custom expiry (optional)">
+        </td>
         <td ><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}"  class="inputSale qty-input add-stock-input td-input-qty${product_id}"   data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
         <td><input type="number" value="${retail_price}" data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
         <td style="width:80px;"><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${prod_discount}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"    style="font-size: 13px;width:100%" min="0"></td>
