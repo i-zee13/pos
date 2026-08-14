@@ -15,8 +15,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-        $schedule->command('backup:databases --scheduled')->dailyAt('00:30');
+        // Daily DB backup at 2:00 PM Pakistan Time (Asia/Karachi),
+        // independent of the server's OS clock timezone.
+        $schedule->command('backup:databases --scheduled')
+            ->dailyAt(config('backup.schedule_time', '14:00'))
+            ->timezone(config('backup.schedule_timezone', 'Asia/Karachi'));
+
         // Keep connected Google Drive tokens warm so backups never fail on expiry.
         $schedule->command('backup:refresh-drive-tokens')->twiceDaily(6, 18);
     }

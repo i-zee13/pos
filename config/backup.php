@@ -14,6 +14,14 @@ return [
     'retention_days' => (int) env('BACKUP_RETENTION_DAYS', 4),
 
     /*
+    | Daily automatic backup (Laravel scheduler).
+    | Time is interpreted in schedule_timezone (default Pakistan).
+    | Requires server cron: * * * * * php /path/to/artisan schedule:run
+    */
+    'schedule_time' => env('BACKUP_SCHEDULE_TIME', '14:00'),
+    'schedule_timezone' => env('BACKUP_SCHEDULE_TIMEZONE', 'Asia/Karachi'),
+
+    /*
     | Tenant backup import mode (manual + admin close):
     | merge  = safe inject into existing multi-tenant DB (default)
     | fresh  = DROP + CREATE for empty database restore only
