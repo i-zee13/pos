@@ -11,7 +11,7 @@ class BackupDatabasesCommand extends Command
 {
     protected $signature = 'backup:databases {--scheduled : Log as schedule-triggered} {--sync : Run in-process (no queue worker)}';
 
-    protected $description = 'Queue (or run) a multi-database mysqldump zip; optional rclone to Google Drive.';
+    protected $description = 'Queue (or run) a multi-database mysqldump zip; upload to connected user Google Drives (or rclone/.env Drive).';
 
     public function handle(): int
     {

@@ -14,7 +14,7 @@
                                 <div class="card p-20 top_border mb-3" style="width: 100%">
                                     <h2 class="_head03">Drive <span>connection</span></h2>
                                     <p class="font12 text-muted mb-3" style="line-height: 1.5;">
-                                        Connect the Google account where manual database backups should be uploaded. Google will generate the OAuth token; this app stores the refresh token encrypted.
+                                        Connect the Google account where database backups should be uploaded (manual and daily scheduled). Every user who connects Drive gets a copy on their own Drive. Google generates the OAuth token; this app stores the refresh token encrypted.
                                     </p>
                                     @if($mailSetting && $mailSetting->hasConnectedGoogleDrive())
                                         <div class="alert alert-success mb-3">

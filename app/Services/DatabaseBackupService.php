@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BackupLog;
 use App\Models\User;
+use App\Models\UserBackupMailSetting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -130,36 +131,11 @@ class DatabaseBackupService
             $this->deleteDirectory($tmpAbs);
 
             $size = @filesize($zipAbs) ?: 0;
-            $gdriveOk = false;
-            $gdrivePath = null;
-
             $uploader = app(GoogleDriveApiBackupUploader::class);
-            $driveUserId = $backupLog->user_id ? (int) $backupLog->user_id : null;
-            $useDriveApi = $uploader->isConfigured($driveUserId);
-
-            if ($useDriveApi) {
-                try {
-                    $gdrivePath = $uploader->uploadZip($zipAbs, $zipFilename, $driveUserId);
-                    $gdriveOk = true;
-                } catch (\Throwable $e) {
-                    Log::warning('backup.google_drive_api_failed', ['message' => $e->getMessage(), 'log_id' => $backupLog->id]);
-                }
-            } elseif (config('backup.rclone.enabled')) {
-                try {
-                    $gdrivePath = $this->uploadWithRclone($zipAbs, $zipFilename);
-                    $gdriveOk = true;
-                } catch (\Throwable $e) {
-                    Log::warning('backup.rclone_failed', ['message' => $e->getMessage(), 'log_id' => $backupLog->id]);
-                }
-            }
-
-            $uploadExpected = $useDriveApi || config('backup.rclone.enabled');
-            $errorMessage = null;
-            if (! $gdriveOk && $uploadExpected) {
-                $errorMessage = $useDriveApi
-                    ? 'Local backup OK; Google Drive API upload failed (see laravel.log).'
-                    : 'Local backup OK; Google Drive upload failed (see laravel.log).';
-            }
+            $upload = $this->uploadBackupZip($uploader, $backupLog, $zipAbs, $zipFilename);
+            $gdriveOk = $upload['ok'];
+            $gdrivePath = $upload['path'];
+            $errorMessage = $upload['error'];
 
             $backupLog->update([
                 'zip_filename' => $zipFilename,
@@ -498,6 +474,128 @@ SQL;
                 @unlink($zipFile);
             }
         }
+    }
+
+    /**
+     * Manual backups go to that user's connected Drive.
+     * Scheduled / artisan backups fan-out to every user who connected Google Drive,
+     * then fall back to .env Drive API or rclone if nobody is connected.
+     *
+     * @return array{ok: bool, path: ?string, error: ?string}
+     */
+    protected function uploadBackupZip(GoogleDriveApiBackupUploader $uploader, BackupLog $backupLog, string $zipAbs, string $zipFilename): array
+    {
+        if ($backupLog->user_id) {
+            return $this->uploadToSingleDrive($uploader, (int) $backupLog->user_id, $zipAbs, $zipFilename, $backupLog->id);
+        }
+
+        $fanOut = $this->uploadToAllConnectedDrives($uploader, $zipAbs, $zipFilename, $backupLog->id);
+        if ($fanOut['attempted'] > 0) {
+            $error = null;
+            if (! $fanOut['ok']) {
+                $error = 'Local backup OK; Google Drive upload failed for all connected users (see laravel.log).';
+            } elseif ($fanOut['failed'] > 0) {
+                $error = 'Local backup OK; Drive upload succeeded for '.$fanOut['ok_count']
+                    .' user(s), failed for '.$fanOut['failed'].' (see laravel.log).';
+            }
+
+            return [
+                'ok' => $fanOut['ok'],
+                'path' => $fanOut['path'],
+                'error' => $error,
+            ];
+        }
+
+        // No per-user Drive connections — keep legacy .env / rclone behaviour.
+        return $this->uploadToSingleDrive($uploader, null, $zipAbs, $zipFilename, $backupLog->id);
+    }
+
+    /**
+     * @return array{ok: bool, path: ?string, error: ?string}
+     */
+    protected function uploadToSingleDrive(GoogleDriveApiBackupUploader $uploader, ?int $driveUserId, string $zipAbs, string $zipFilename, int $logId): array
+    {
+        $useDriveApi = $uploader->isConfigured($driveUserId);
+        $gdriveOk = false;
+        $gdrivePath = null;
+
+        if ($useDriveApi) {
+            try {
+                $gdrivePath = $uploader->uploadZip($zipAbs, $zipFilename, $driveUserId);
+                $gdriveOk = true;
+            } catch (\Throwable $e) {
+                Log::warning('backup.google_drive_api_failed', [
+                    'message' => $e->getMessage(),
+                    'log_id' => $logId,
+                    'user_id' => $driveUserId,
+                ]);
+            }
+        } elseif (config('backup.rclone.enabled')) {
+            try {
+                $gdrivePath = $this->uploadWithRclone($zipAbs, $zipFilename);
+                $gdriveOk = true;
+            } catch (\Throwable $e) {
+                Log::warning('backup.rclone_failed', ['message' => $e->getMessage(), 'log_id' => $logId]);
+            }
+        }
+
+        $uploadExpected = $useDriveApi || (bool) config('backup.rclone.enabled');
+        $error = null;
+        if (! $gdriveOk && $uploadExpected) {
+            $error = $useDriveApi
+                ? 'Local backup OK; Google Drive API upload failed (see laravel.log).'
+                : 'Local backup OK; Google Drive upload failed (see laravel.log).';
+        }
+
+        return ['ok' => $gdriveOk, 'path' => $gdrivePath, 'error' => $error];
+    }
+
+    /**
+     * @return array{attempted: int, ok: bool, ok_count: int, failed: int, path: ?string}
+     */
+    protected function uploadToAllConnectedDrives(GoogleDriveApiBackupUploader $uploader, string $zipAbs, string $zipFilename, int $logId): array
+    {
+        $userIds = UserBackupMailSetting::query()
+            ->whereNotNull('google_drive_refresh_token_encrypted')
+            ->where('google_drive_refresh_token_encrypted', '!=', '')
+            ->pluck('user_id')
+            ->unique()
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $paths = [];
+        $okCount = 0;
+        $failed = 0;
+
+        foreach ($userIds as $userId) {
+            if (! $uploader->isConfigured($userId)) {
+                continue;
+            }
+
+            try {
+                $paths[] = 'user:'.$userId.' => '.$uploader->uploadZip($zipAbs, $zipFilename, $userId);
+                $okCount++;
+            } catch (\Throwable $e) {
+                $failed++;
+                Log::warning('backup.google_drive_api_failed', [
+                    'message' => $e->getMessage(),
+                    'log_id' => $logId,
+                    'user_id' => $userId,
+                ]);
+            }
+        }
+
+        $attempted = $okCount + $failed;
+
+        return [
+            'attempted' => $attempted,
+            'ok' => $okCount > 0,
+            'ok_count' => $okCount,
+            'failed' => $failed,
+            'path' => $paths === [] ? null : implode(' || ', $paths),
+        ];
     }
 
     protected function uploadWithRclone(string $zipAbsolutePath, string $zipFilename): string
