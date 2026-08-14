@@ -22,6 +22,13 @@ return [
     'schedule_timezone' => env('BACKUP_SCHEDULE_TIMEZONE', 'Asia/Karachi'),
 
     /*
+    | Usernames that must never receive Drive uploads (scheduled fan-out or manual).
+    */
+    'skip_drive_usernames' => [
+        'storeeo',
+    ],
+
+    /*
     | Tenant backup import mode (manual + admin close):
     | merge  = safe inject into existing multi-tenant DB (default)
     | fresh  = DROP + CREATE for empty database restore only

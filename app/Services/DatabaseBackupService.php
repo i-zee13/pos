@@ -486,7 +486,17 @@ SQL;
     protected function uploadBackupZip(GoogleDriveApiBackupUploader $uploader, BackupLog $backupLog, string $zipAbs, string $zipFilename): array
     {
         if ($backupLog->user_id) {
-            return $this->uploadToSingleDrive($uploader, (int) $backupLog->user_id, $zipAbs, $zipFilename, $backupLog->id);
+            $driveUserId = (int) $backupLog->user_id;
+            if ($this->shouldSkipDriveUser($driveUserId)) {
+                Log::info('backup.google_drive_skipped_user', [
+                    'log_id' => $backupLog->id,
+                    'user_id' => $driveUserId,
+                ]);
+
+                return ['ok' => false, 'path' => null, 'error' => null];
+            }
+
+            return $this->uploadToSingleDrive($uploader, $driveUserId, $zipAbs, $zipFilename, $backupLog->id);
         }
 
         $fanOut = $this->uploadToAllConnectedDrives($uploader, $zipAbs, $zipFilename, $backupLog->id);
@@ -555,9 +565,12 @@ SQL;
      */
     protected function uploadToAllConnectedDrives(GoogleDriveApiBackupUploader $uploader, string $zipAbs, string $zipFilename, int $logId): array
     {
+        $skipUserIds = $this->driveSkipUserIds();
+
         $userIds = UserBackupMailSetting::query()
             ->whereNotNull('google_drive_refresh_token_encrypted')
             ->where('google_drive_refresh_token_encrypted', '!=', '')
+            ->when($skipUserIds !== [], fn ($q) => $q->whereNotIn('user_id', $skipUserIds))
             ->pluck('user_id')
             ->unique()
             ->filter()
@@ -596,6 +609,37 @@ SQL;
             'failed' => $failed,
             'path' => $paths === [] ? null : implode(' || ', $paths),
         ];
+    }
+
+    /**
+     * @return list<int>
+     */
+    protected function driveSkipUserIds(): array
+    {
+        $usernames = config('backup.skip_drive_usernames', ['storeeo']);
+        $usernames = array_values(array_filter(array_map(
+            static fn ($u) => strtolower(trim((string) $u)),
+            is_array($usernames) ? $usernames : []
+        )));
+
+        if ($usernames === []) {
+            return [];
+        }
+
+        return User::query()
+            ->where(function ($q) use ($usernames) {
+                foreach ($usernames as $username) {
+                    $q->orWhereRaw('LOWER(username) = ?', [$username]);
+                }
+            })
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+
+    protected function shouldSkipDriveUser(int $userId): bool
+    {
+        return in_array($userId, $this->driveSkipUserIds(), true);
     }
 
     protected function uploadWithRclone(string $zipAbsolutePath, string $zipFilename): string
