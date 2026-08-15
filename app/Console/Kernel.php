@@ -15,11 +15,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // Daily DB backup at 2:00 PM Pakistan Time (Asia/Karachi),
-        // independent of the server's OS clock timezone.
+        // DB backup every N hours (Pakistan time). withoutOverlapping avoids stacked runs.
+        $hours = max(1, (int) config('backup.schedule_interval_hours', 3));
         $schedule->command('backup:databases --scheduled')
-            ->dailyAt(config('backup.schedule_time', '14:00'))
-            ->timezone(config('backup.schedule_timezone', 'Asia/Karachi'));
+            ->cron('0 */'.$hours.' * * *')
+            ->timezone(config('backup.schedule_timezone', 'Asia/Karachi'))
+            ->withoutOverlapping(120);
 
         // Keep connected Google Drive tokens warm so backups never fail on expiry.
         $schedule->command('backup:refresh-drive-tokens')->twiceDaily(6, 18);

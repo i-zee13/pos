@@ -14,12 +14,13 @@ return [
     'retention_days' => (int) env('BACKUP_RETENTION_DAYS', 4),
 
     /*
-    | Daily automatic backup (Laravel scheduler).
-    | Time is interpreted in schedule_timezone (default Pakistan).
+    | Automatic backup interval (Laravel scheduler).
+    | Runs at :00 every N hours in schedule_timezone (default Pakistan).
+    | Example with 3: 12AM, 3AM, 6AM, 9AM, 12PM, 3PM, 6PM, 9PM.
     | Requires server cron: * * * * * php /path/to/artisan schedule:run
     */
-    'schedule_time' => env('BACKUP_SCHEDULE_TIME', '14:00'),
-    'schedule_timezone' => env('BACKUP_SCHEDULE_TIMEZONE', 'Asia/Karachi'),
+    'schedule_interval_hours' => 3,
+    'schedule_timezone' => 'Asia/Karachi',
 
     /*
     | Usernames that must never receive Drive uploads (scheduled fan-out or manual).
