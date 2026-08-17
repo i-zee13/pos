@@ -9,18 +9,19 @@ use Illuminate\Support\Facades\Schema;
  *
  * After migrate, set SESSION_DRIVER=database in .env (or rely on config default).
  * Redis is better if available: SESSION_DRIVER=redis
+ *
+ * id length 191: utf8mb4 PK limit on older MySQL/MariaDB (255*4 > 1000 bytes).
  */
 class CreateSessionsTable extends Migration
 {
     public function up()
     {
-        if (Schema::hasTable('sessions')) {
-            return;
-        }
+        // Drop partial table left by a failed migrate (e.g. key-too-long on varchar 255).
+        Schema::dropIfExists('sessions');
 
         Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            $table->string('id', 191)->primary();
+            $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->text('payload');

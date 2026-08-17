@@ -1,10 +1,12 @@
 -- =====================================================================
 --  Laravel sessions table (for SESSION_DRIVER=database)
---  Idempotent — safe if table already exists.
+--  id varchar(191) — utf8mb4 PK safe on older MySQL/MariaDB
 -- =====================================================================
 
-CREATE TABLE IF NOT EXISTS `sessions` (
-  `id` varchar(255) NOT NULL,
+DROP TABLE IF EXISTS `sessions`;
+
+CREATE TABLE `sessions` (
+  `id` varchar(191) NOT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
   `user_agent` text,
