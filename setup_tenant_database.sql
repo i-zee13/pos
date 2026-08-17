@@ -366,6 +366,36 @@ WHERE `tenant_id` = @t AND (`system_code` IS NULL OR `system_code` = '')
 
 
 -- =============================================================================
+-- STEP 4b — SALE/STOCK PERFORMANCE INDEXES (reads only; no behaviour change)
+-- =============================================================================
+
+CALL pos_add_index_if_missing('vendor_stocks', 'vendor_stocks_tenant_product_id_index', '`tenant_id`,`product_id`,`id`');
+CALL pos_add_index_if_missing('vendor_stocks', 'vendor_stocks_product_id_id_index', '`product_id`,`id`');
+CALL pos_add_index_if_missing('vendor_stocks', 'vendor_stocks_sale_invoice_product_index', '`sale_invoice_id`,`product_id`');
+CALL pos_add_index_if_missing('customer_ledger', 'customer_ledger_tenant_customer_id_index', '`tenant_id`,`customer_id`,`id`');
+CALL pos_add_index_if_missing('customer_ledger', 'customer_ledger_customer_id_id_index', '`customer_id`,`id`');
+CALL pos_add_index_if_missing('customer_ledger', 'customer_ledger_sale_invoice_id_index', '`sale_invoice_id`');
+CALL pos_add_index_if_missing('customer_ledger', 'customer_ledger_tenant_customer_editable_index', '`tenant_id`,`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('vendor_ledger', 'vendor_ledger_tenant_customer_editable_index', '`tenant_id`,`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('vendor_ledger', 'vendor_ledger_customer_editable_index', '`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('sale_invoices', 'sale_invoices_tenant_date_index', '`tenant_id`,`date`');
+CALL pos_add_index_if_missing('sale_invoices', 'sale_invoices_date_index', '`date`');
+CALL pos_add_index_if_missing('sale_invoices', 'sale_invoices_tenant_customer_editable_index', '`tenant_id`,`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('sale_invoices', 'sale_invoices_customer_editable_index', '`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('sale_return_invoices', 'sale_return_invoices_tenant_customer_editable_index', '`tenant_id`,`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('sale_return_invoices', 'sale_return_invoices_customer_editable_index', '`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('purchase_invoices', 'purchase_invoices_tenant_customer_editable_index', '`tenant_id`,`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('purchase_invoices', 'purchase_invoices_customer_editable_index', '`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('purchase_return_invoices', 'purchase_return_invoices_tenant_customer_editable_index', '`tenant_id`,`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('purchase_return_invoices', 'purchase_return_invoices_customer_editable_index', '`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('product_replacment_invoices', 'product_replacment_invoices_tenant_customer_editable_index', '`tenant_id`,`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('product_replacment_invoices', 'product_replacment_invoices_customer_editable_index', '`customer_id`,`is_editable`');
+CALL pos_add_index_if_missing('products_sales', 'products_sales_sale_invoice_id_index', '`sale_invoice_id`');
+CALL pos_add_index_if_missing('stock_batches_items', 'stock_batches_items_tenant_product_company_expiry_index', '`tenant_id`,`product_id`,`company_id`,`expiry_date`');
+CALL pos_add_index_if_missing('stock_batches_items', 'stock_batches_items_product_expiry_index', '`product_id`,`expiry_date`');
+
+
+-- =============================================================================
 -- STEP 5 — VERIFY
 -- =============================================================================
 
