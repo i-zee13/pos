@@ -41,7 +41,11 @@
       <div class="col-12 col-md-5 col-lg-6 col-xl-4 px-lg-6 my-5 align-self-center">
 
         <!-- Heading -->
-        <img src="/storage/{{$organization->logo_img}}" class="mb-3" alt="..." style="height:100px;margin-left:125px;">
+        @if(!empty(optional($organization)->logo_img))
+        <img src="/storage/{{ $organization->logo_img }}" class="mb-3" alt="..." style="height:100px;margin-left:125px;">
+        @else
+        <h1 class="text-white text-center mb-3">Storeeo POS</h1>
+        @endif
 
         <!-- Subheading -->
         <p class="text-muted text-center mb-5">

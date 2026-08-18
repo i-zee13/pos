@@ -1480,7 +1480,7 @@ function vendorLedger($request,$column){
     ]);
 }
 
-function SaleReportRecords($request = null, $current_date, $is_admin_close = null)
+function SaleReportRecords($request = null, $current_date = null, $is_admin_close = null)
    {
 
       $query = " 1=1";

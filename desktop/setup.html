@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Storeeo POS — Setup</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Georgia, "Times New Roman", serif;
+      background: linear-gradient(160deg, #1a2332 0%, #2c3e50 55%, #1a2332 100%);
+      color: #f5f0e8;
+      padding: 1.5rem;
+    }
+    .box {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(245,240,232,0.15);
+      padding: 2rem;
+    }
+    h1 { margin: 0 0 0.5rem; font-size: 1.75rem; font-weight: 600; }
+    p { margin: 0 0 1.25rem; line-height: 1.5; opacity: 0.9; font-size: 0.95rem; }
+    label { display: block; font-size: 0.85rem; margin-bottom: 0.4rem; opacity: 0.85; }
+    input {
+      width: 100%;
+      padding: 0.75rem 0.85rem;
+      border: 1px solid rgba(245,240,232,0.25);
+      background: rgba(0,0,0,0.25);
+      color: #f5f0e8;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    input:focus { outline: 1px solid #c4a574; }
+    button {
+      width: 100%;
+      padding: 0.85rem;
+      border: 0;
+      background: #c4a574;
+      color: #1a2332;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    button:disabled { opacity: 0.6; cursor: wait; }
+    .err { color: #ffb4b4; font-size: 0.85rem; min-height: 1.2rem; margin: 0 0 0.75rem; }
+    .hint { font-size: 0.8rem; opacity: 0.65; margin-top: 1rem; font-family: ui-monospace, monospace; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Storeeo POS</h1>
+    <p>Apna live POS website URL likho (jaise browser mein kholte ho). AppData edit ki zaroorat nahi.</p>
+    <label for="url">POS URL</label>
+    <input id="url" type="url" placeholder="https://your-pos-domain.com" autocomplete="off" />
+    <div class="err" id="err"></div>
+    <button id="save" type="button">Save &amp; Open POS</button>
+    <p class="hint" id="hint"></p>
+  </div>
+  <script>
+    (async () => {
+      const input = document.getElementById('url');
+      const err = document.getElementById('err');
+      const hint = document.getElementById('hint');
+      const btn = document.getElementById('save');
+
+      try {
+        const info = await window.posDesktop.getInfo();
+        if (info.posUrl && !/example\.com/i.test(info.posUrl)) {
+          input.value = info.posUrl;
+        }
+        hint.textContent = 'Config: ' + (info.configPath || '');
+      } catch (e) {}
+
+      btn.addEventListener('click', async () => {
+        err.textContent = '';
+        let url = (input.value || '').trim();
+        if (!url) {
+          err.textContent = 'URL required';
+          return;
+        }
+        if (!/^https?:\/\//i.test(url)) {
+          url = 'https://' + url;
+        }
+        try {
+          new URL(url);
+        } catch (e) {
+          err.textContent = 'Invalid URL';
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Opening…';
+        try {
+          await window.posDesktop.savePosUrl(url);
+        } catch (e) {
+          err.textContent = e.message || 'Save failed';
+          btn.disabled = false;
+          btn.textContent = 'Save & Open POS';
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') btn.click();
+      });
+    })();
+  </script>
+</body>
+</html>

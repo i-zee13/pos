@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Storeeo POS — Offline</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Georgia, "Times New Roman", serif;
+      background: linear-gradient(160deg, #1a2332 0%, #2c3e50 50%, #1a2332 100%);
+      color: #f5f0e8;
+      padding: 1.5rem;
+    }
+    .box { max-width: 520px; text-align: center; }
+    h1 { font-size: 1.75rem; margin: 0 0 0.75rem; font-weight: 600; }
+    p { line-height: 1.5; opacity: 0.9; margin: 0 0 1rem; }
+    .meta { font-size: 0.8rem; opacity: 0.65; font-family: ui-monospace, monospace; word-break: break-word; }
+    .msg { background: rgba(0,0,0,0.25); padding: 0.85rem; margin: 1rem 0; font-size: 0.9rem; text-align: left; }
+    button {
+      margin: 0.35rem;
+      padding: 0.7rem 1.1rem;
+      border: 0;
+      background: #c4a574;
+      color: #1a2332;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    button.secondary { background: transparent; color: #f5f0e8; border: 1px solid rgba(245,240,232,0.35); }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Storeeo POS</h1>
+    <p id="blurb">
+      Cloud server reach nahi ho raha. Phase 1 local engine try hoti hai —
+      agar PHP + app-local package mein hon to bina net sale yahan chalegi.
+    </p>
+    <div class="msg" id="msg" hidden></div>
+    <div>
+      <button type="button" id="retry">Retry (net / local)</button>
+      <button type="button" class="secondary" id="local">Start local POS</button>
+    </div>
+    <p class="meta" id="info">Loading…</p>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const msg = params.get('msg');
+    if (msg) {
+      const el = document.getElementById('msg');
+      el.hidden = false;
+      el.textContent = msg;
+    }
+
+    (async () => {
+      try {
+        const info = await window.posDesktop.getInfo();
+        document.getElementById('info').textContent =
+          'v' + info.version + ' · ' + info.mode +
+          ' · online=' + info.online +
+          ' · localReady=' + (info.local && info.local.ready) +
+          ' · ' + (info.posUrl || '');
+      } catch (e) {
+        document.getElementById('info').textContent = 'Desktop shell ready';
+      }
+    })();
+
+    document.getElementById('retry').onclick = async () => {
+      document.getElementById('info').textContent = 'Retrying…';
+      try {
+        await window.posDesktop.retryBoot();
+      } catch (e) {
+        document.getElementById('msg').hidden = false;
+        document.getElementById('msg').textContent = e.message || String(e);
+      }
+    };
+
+    document.getElementById('local').onclick = async () => {
+      const btn = document.getElementById('local');
+      const retry = document.getElementById('retry');
+      btn.disabled = true;
+      retry.disabled = true;
+      document.getElementById('info').textContent = 'Starting local… wait (pehli dafa 30–60s)';
+      document.getElementById('msg').hidden = false;
+      document.getElementById('msg').textContent =
+        'Local engine start ho rahi hai. Window band na karein — yeh message yahin rahega, app close nahi ho rahi.';
+      try {
+        await window.posDesktop.startLocal();
+      } catch (e) {
+        document.getElementById('msg').hidden = false;
+        document.getElementById('msg').textContent = e.message || String(e);
+        document.getElementById('info').textContent = 'Local start failed';
+        btn.disabled = false;
+        retry.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>

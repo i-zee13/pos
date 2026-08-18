@@ -1,0 +1,68 @@
+{
+  "name": "pos-desktop",
+  "version": "0.2.8",
+  "private": true,
+  "description": "Storeeo POS Windows desktop — Phase 1 local engine + cloud shell",
+  "author": "Storeeo",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "fetch:php-win": "node scripts/fetch-php-win.js",
+    "prepare:app-local": "node scripts/prepare-app-local.js",
+    "pack:win": "electron-builder --win --x64",
+    "dist": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.storeeo.pos",
+    "productName": "Storeeo POS",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "offline.html",
+      "setup.html",
+      "lib/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "runtime/php",
+        "to": "php",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "app-local",
+        "to": "app-local",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "StoreeoPOS-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "perMachine": false,
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Storeeo POS",
+      "include": "nsis/installer.nsh"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
+  }
+}
