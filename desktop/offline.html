@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Storeeo POS — Offline</title>
+  <title>Storeeo POS — Local</title>
   <style>
     body {
       margin: 0;
@@ -36,15 +36,19 @@
 </head>
 <body>
   <div class="box">
-    <h1>Storeeo POS</h1>
+    <h1>Storeeo POS — Local</h1>
     <p id="blurb">
-      Cloud server reach nahi ho raha. Phase 1 local engine try hoti hai —
-      agar PHP + app-local package mein hon to bina net sale yahan chalegi.
+      Local POS start nahi hui. Neeche se dubara try karein, ya pehle backup le lein.
     </p>
     <div class="msg" id="msg" hidden></div>
     <div>
-      <button type="button" id="retry">Retry (net / local)</button>
-      <button type="button" class="secondary" id="local">Start local POS</button>
+      <button type="button" id="local">Start local POS</button>
+      <button type="button" class="secondary" id="retry">Retry</button>
+    </div>
+    <p style="margin-top:1.25rem;font-size:0.95rem;opacity:0.85;">Backup (secure copy)</p>
+    <div>
+      <button type="button" class="secondary" id="backup">Download to PC / USB</button>
+      <button type="button" class="secondary" id="backupDrive">Google Drive (after login)</button>
     </div>
     <p class="meta" id="info">Loading…</p>
   </div>
@@ -63,12 +67,35 @@
         document.getElementById('info').textContent =
           'v' + info.version + ' · ' + info.mode +
           ' · online=' + info.online +
-          ' · localReady=' + (info.local && info.local.ready) +
-          ' · ' + (info.posUrl || '');
+          ' · localReady=' + (info.local && info.local.ready);
       } catch (e) {
         document.getElementById('info').textContent = 'Desktop shell ready';
       }
     })();
+
+    document.getElementById('backup').addEventListener('click', async () => {
+      const el = document.getElementById('msg');
+      try {
+        const res = await window.posDesktop.backupLocalDb();
+        if (res && res.canceled) return;
+        el.hidden = false;
+        el.textContent = 'Backup zip saved: ' + (res.path || '');
+      } catch (e) {
+        el.hidden = false;
+        el.textContent = e.message || String(e);
+      }
+    });
+
+    document.getElementById('backupDrive').addEventListener('click', async () => {
+      const el = document.getElementById('msg');
+      el.hidden = false;
+      el.textContent = 'Local POS open — login karke Backups → Connect Google Drive, phir Take backup.';
+      try {
+        await window.posDesktop.openBackupsPage();
+      } catch (e) {
+        el.textContent = e.message || String(e);
+      }
+    });
 
     document.getElementById('retry').onclick = async () => {
       document.getElementById('info').textContent = 'Retrying…';
@@ -88,7 +115,7 @@
       document.getElementById('info').textContent = 'Starting local… wait (pehli dafa 30–60s)';
       document.getElementById('msg').hidden = false;
       document.getElementById('msg').textContent =
-        'Local engine start ho rahi hai. Window band na karein — yeh message yahin rahega, app close nahi ho rahi.';
+        'Local engine start ho rahi hai. Window band na karein.';
       try {
         await window.posDesktop.startLocal();
       } catch (e) {

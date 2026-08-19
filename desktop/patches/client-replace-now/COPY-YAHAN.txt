@@ -1,0 +1,23 @@
+App BAND karke yeh 4 files overwrite karo.
+
+BASE = 
+C:\Users\<USER>\AppData\Local\Programs\Storeeo POS\resources\app-local
+
+1) ProfileController.php
+   → BASE\app\Http\Controllers\ProfileController.php
+
+2) ForceLocalPasswordChange.php
+   → BASE\app\Http\Middleware\ForceLocalPasswordChange.php
+
+3) SqliteMysqlPolyfills.php
+   → BASE\app\Support\SqliteMysqlPolyfills.php
+   (Support folder na ho to banao)
+
+4) AppServiceProvider.php
+   → BASE\app\Providers\AppServiceProvider.php
+
+.env check (zarori):
+GOOGLE_DRIVE_FOLDER_NAME="POS DBs Backups"
+(quotes ke sath)
+
+Phir app open → admin / admin123

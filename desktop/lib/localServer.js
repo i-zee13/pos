@@ -49,6 +49,83 @@ function findPhp(phpCandidates) {
   return null;
 }
 
+/** OAuth client for /backups Google Drive connect (no user refresh token here). */
+function loadGoogleOAuthEnv() {
+  const candidates = [];
+  try {
+    if (app.isPackaged) {
+      candidates.push(path.join(process.resourcesPath, 'google-oauth.env'));
+    }
+  } catch (e) {
+    // ignore
+  }
+  candidates.push(path.join(__dirname, '..', 'runtime', 'google-oauth.env'));
+
+  const out = {};
+  for (const file of candidates) {
+    if (!fs.existsSync(file)) continue;
+    const text = fs.readFileSync(file, 'utf8');
+    for (const line of text.split(/\r?\n/)) {
+      const m = line.match(/^(BACKUP_GOOGLE_DRIVE_API_ENABLED|GOOGLE_DRIVE_CLIENT_ID|GOOGLE_DRIVE_CLIENT_SECRET|GOOGLE_DRIVE_FOLDER_NAME)=(.*)$/);
+      if (!m) continue;
+      let v = m[2].trim();
+      if (
+        (v.startsWith('"') && v.endsWith('"')) ||
+        (v.startsWith("'") && v.endsWith("'"))
+      ) {
+        v = v.slice(1, -1);
+      }
+      if (v !== '') out[m[1]] = v;
+    }
+    break;
+  }
+  return out;
+}
+
+function ensurePublicStorage(laravelRoot) {
+  const target = path.join(laravelRoot, 'storage', 'app', 'public');
+  const link = path.join(laravelRoot, 'public', 'storage');
+  fs.mkdirSync(target, { recursive: true });
+  fs.mkdirSync(path.join(target, 'images'), { recursive: true });
+
+  // Seed default logo into storage if missing
+  const defaultName = 'storeeo-default-logo.png';
+  const destLogo = path.join(target, 'images', defaultName);
+  if (!fs.existsSync(destLogo)) {
+    const candidates = [
+      path.join(laravelRoot, 'public', 'images', 'print-logo.png'),
+      path.join(laravelRoot, 'public', 'images', 'Shama-logo.png'),
+    ];
+    for (const src of candidates) {
+      if (fs.existsSync(src)) {
+        fs.copyFileSync(src, destLogo);
+        break;
+      }
+    }
+  }
+
+  // Mirror into public/storage (Windows packaged installs often can't symlink)
+  const pubImages = path.join(laravelRoot, 'public', 'storage', 'images');
+  fs.mkdirSync(pubImages, { recursive: true });
+  if (fs.existsSync(destLogo)) {
+    const pubLogo = path.join(pubImages, defaultName);
+    if (!fs.existsSync(pubLogo)) {
+      try {
+        fs.copyFileSync(destLogo, pubLogo);
+      } catch (e) {
+        // read-only resources — ignore
+      }
+    }
+  }
+
+  if (fs.existsSync(link)) return;
+  try {
+    fs.symlinkSync(target, link, process.platform === 'win32' ? 'junction' : 'dir');
+  } catch (e) {
+    // Fallback already mirrored files under public/storage
+  }
+}
+
 function ensureSqliteAndEnv(laravelRoot, dbPathOverride) {
   const dirs = [
     'storage/app/public',
@@ -62,6 +139,8 @@ function ensureSqliteAndEnv(laravelRoot, dbPathOverride) {
   for (const d of dirs) {
     fs.mkdirSync(path.join(laravelRoot, d), { recursive: true });
   }
+
+  ensurePublicStorage(laravelRoot);
 
   // Mac pe config:cache absolute paths likh deta hai — Windows pe crash.
   const cacheDir = path.join(laravelRoot, 'bootstrap', 'cache');
@@ -96,6 +175,24 @@ function ensureSqliteAndEnv(laravelRoot, dbPathOverride) {
   // Force sqlite absolute path for Windows portable runs
   if (fs.existsSync(envPath)) {
     let env = fs.readFileSync(envPath, 'utf8');
+    // Fix broken dotenv lines with unquoted spaces (e.g. POS DBs Backups)
+    env = env.replace(
+      /^GOOGLE_DRIVE_FOLDER_NAME\s*=\s*(?!["'])(.+)$/gm,
+      (full, val) => {
+        const v = String(val).trim();
+        if (!v || (/^["']/.test(v) && /["']$/.test(v))) return full;
+        return 'GOOGLE_DRIVE_FOLDER_NAME="' + v.replace(/"/g, '') + '"';
+      }
+    );
+    // Also quote APP_NAME if needed
+    env = env.replace(
+      /^APP_NAME\s*=\s*(?!["'])(.+)$/gm,
+      (full, val) => {
+        const v = String(val).trim();
+        if (!/\s/.test(v)) return full;
+        return 'APP_NAME="' + v.replace(/"/g, '') + '"';
+      }
+    );
     const absDb = dbPath.replace(/\\/g, '/');
     if (/^DB_DATABASE=/m.test(env)) {
       env = env.replace(/^DB_DATABASE=.*$/m, 'DB_DATABASE="' + absDb + '"');
@@ -117,7 +214,7 @@ function ensureSqliteAndEnv(laravelRoot, dbPathOverride) {
     try {
       fs.writeFileSync(envPath, env);
     } catch (e) {
-      // Packaged resources may be read-only — APP_KEY/DB still set via process env below.
+      // Packaged resources may be read-only — try userData overlay below.
     }
   }
 
@@ -227,8 +324,37 @@ function waitForHttp(url, timeoutMs = 15000) {
   return new Promise((resolve, reject) => {
     const tryOnce = () => {
       const req = http.get(url, (res) => {
-        res.resume();
-        resolve(true);
+        const chunks = [];
+        res.on('data', (c) => chunks.push(c));
+        res.on('end', () => {
+          const body = Buffer.concat(chunks).toString('utf8');
+          const code = res.statusCode || 0;
+          const okHtml =
+            code > 0 &&
+            code < 500 &&
+            body.length > 80 &&
+            /<!doctype html|<html|login|storeeo|sign in|csrf/i.test(body);
+
+          if (okHtml) {
+            resolve({ ok: true, status: code, bodyPreview: body.slice(0, 200) });
+            return;
+          }
+
+          if (Date.now() - start > timeoutMs) {
+            reject(
+              new Error(
+                'Local POS HTML nahi aaya (HTTP ' +
+                  code +
+                  ', ' +
+                  body.length +
+                  ' bytes). ' +
+                  body.replace(/\s+/g, ' ').slice(0, 220)
+              )
+            );
+            return;
+          }
+          setTimeout(tryOnce, 400);
+        });
       });
       req.on('error', () => {
         if (Date.now() - start > timeoutMs) {
@@ -237,7 +363,7 @@ function waitForHttp(url, timeoutMs = 15000) {
         }
         setTimeout(tryOnce, 350);
       });
-      req.setTimeout(1200, () => req.destroy());
+      req.setTimeout(2500, () => req.destroy());
     };
     tryOnce();
   });
@@ -356,6 +482,24 @@ async function prepareLocalDatabase(laravelRoot, phpBin, env) {
   return dbPath;
 }
 
+function ensureDesktopStorageDirs(storageRoot) {
+  const dirs = [
+    '',
+    'app',
+    'app/public',
+    'app/public/images',
+    'framework',
+    'framework/cache',
+    'framework/cache/data',
+    'framework/sessions',
+    'framework/views',
+    'logs',
+  ];
+  for (const d of dirs) {
+    fs.mkdirSync(path.join(storageRoot, d), { recursive: true });
+  }
+}
+
 async function startLocalServer() {
   lastError = '';
   const status = localStatus();
@@ -368,41 +512,78 @@ async function startLocalServer() {
     throw new Error(lastError);
   }
 
+  // Always restart PHP — reused process often serves a blank/broken page after upgrades.
   if (phpProcess) {
-    try {
-      await waitForHttp(status.url, 2500);
-      return status.url;
-    } catch (e) {
-      stopLocalServer();
-    }
+    stopLocalServer();
+    await new Promise((r) => setTimeout(r, 400));
   }
 
   await killPortWindows(LOCAL_PORT);
 
   const env = Object.assign({}, process.env, {
     APP_ENV: 'local',
-    // Keep debug off in UI — deprecations/notices break login CSS when printed
     APP_DEBUG: 'false',
     APP_KEY: resolveOrCreateAppKey(),
   });
-  // Point PHP at portable php.ini when present
+  Object.assign(env, loadGoogleOAuthEnv());
   const ini = path.join(status.phpDir || path.dirname(status.phpBin), 'php.ini');
   if (fs.existsSync(ini)) {
     env.PHPRC = path.dirname(ini);
   }
 
-  // DB env BEFORE bootstrap/migrate so artisan hits the same sqlite file
   const dbPath = path.join(app.getPath('userData'), 'database', 'pos-local.sqlite');
   env.DB_CONNECTION = 'sqlite';
   env.DB_DATABASE = dbPath.replace(/\\/g, '/');
   env.APP_URL = `http://${LOCAL_HOST}:${LOCAL_PORT}`;
+  env.QUEUE_CONNECTION = 'sync';
+  env.APP_DEBUG = 'false';
+  if (!env.BACKUP_GOOGLE_DRIVE_API_ENABLED) {
+    env.BACKUP_GOOGLE_DRIVE_API_ENABLED = 'true';
+  }
+
+  // Writable storage outside Program Files (fixes blank white screen on Windows)
+  const desktopStorage = path.join(app.getPath('userData'), 'laravel-storage');
+  ensureDesktopStorageDirs(desktopStorage);
+  env.DESKTOP_STORAGE_PATH = desktopStorage.replace(/\\/g, '/');
+
+  try {
+    const cfgPath = path.join(app.getPath('userData'), 'desktop-config.json');
+    if (fs.existsSync(cfgPath)) {
+      const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+      if (cfg.shopName) {
+        env.DESKTOP_SHOP_NAME = String(cfg.shopName).slice(0, 120);
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // Mirror default logo into writable storage public disk
+  try {
+    ensurePublicStorage(status.laravelRoot);
+    const srcLogo = path.join(status.laravelRoot, 'public', 'images', 'print-logo.png');
+    const destLogo = path.join(desktopStorage, 'app', 'public', 'images', 'storeeo-default-logo.png');
+    if (fs.existsSync(srcLogo) && !fs.existsSync(destLogo)) {
+      fs.copyFileSync(srcLogo, destLogo);
+    }
+    const pubLogo = path.join(status.laravelRoot, 'public', 'storage', 'images', 'storeeo-default-logo.png');
+    if (fs.existsSync(destLogo)) {
+      fs.mkdirSync(path.dirname(pubLogo), { recursive: true });
+      try {
+        fs.copyFileSync(destLogo, pubLogo);
+      } catch (e) {
+        // install dir may be read-only
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
 
   await prepareLocalDatabase(status.laravelRoot, status.phpBin, env);
 
   const router = writeRouter(status.laravelRoot);
   const publicDir = path.join(status.laravelRoot, 'public');
 
-  // Built-in server: hide PHP notices so they don't corrupt HTML/CSS
   const args = [
     '-d',
     'display_errors=0',
@@ -447,17 +628,22 @@ async function startLocalServer() {
   });
 
   try {
-    await waitForHttp(status.url, 15000);
+    await waitForHttp(status.url + '/login', 20000);
   } catch (e) {
-    const raw = [e.message, exitedEarly, stderr.trim(), stdout.trim()]
-      .filter(Boolean)
-      .join(' | ');
-    lastError = humanizePhpCrash(raw);
-    stopLocalServer();
-    throw new Error(lastError);
+    // Fallback: try root URL once more for older routes
+    try {
+      await waitForHttp(status.url, 8000);
+    } catch (e2) {
+      const raw = [e.message, e2.message, exitedEarly, stderr.trim(), stdout.trim()]
+        .filter(Boolean)
+        .join(' | ');
+      lastError = humanizePhpCrash(raw);
+      stopLocalServer();
+      throw new Error(lastError);
+    }
   }
 
-  return status.url;
+  return status.url + '/login';
 }
 
 function humanizePhpCrash(raw) {

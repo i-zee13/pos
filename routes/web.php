@@ -73,7 +73,7 @@ Route::get('/', function () {
     return redirect('/home');
 });
 Auth::routes();
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth', 'local.password']], function () {
     Route::Resource('/company', CompanyController::class);
     Route::Resource('/customer', CustomerController::class);
     Route::Resource('/vendors', CustomerController::class);

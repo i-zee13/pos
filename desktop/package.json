@@ -1,6 +1,6 @@
 {
   "name": "pos-desktop",
-  "version": "0.2.8",
+  "version": "0.3.3",
   "private": true,
   "description": "Storeeo POS Windows desktop — Phase 1 local engine + cloud shell",
   "author": "Storeeo",
@@ -15,6 +15,7 @@
   "build": {
     "appId": "com.storeeo.pos",
     "productName": "Storeeo POS",
+    "asar": false,
     "directories": {
       "output": "dist"
     },
@@ -40,6 +41,10 @@
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "runtime/google-oauth.env",
+        "to": "google-oauth.env"
       }
     ],
     "win": {

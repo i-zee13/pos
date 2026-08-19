@@ -130,6 +130,41 @@ if (!function_exists('sys_customer_id')) {
         return $map[$code] ?? null;
     }
 }
+if (!function_exists('org_logo_url')) {
+    /**
+     * Organization navbar/login logo. Falls back to bundled public image when
+     * storage file is missing (common on fresh local desktop SQLite).
+     */
+    function org_logo_url($organization = null): string
+    {
+        $path = trim((string) optional($organization)->logo_img);
+        if ($path !== '' && (
+            is_file(storage_path('app/public/'.$path)) ||
+            is_file(public_path('storage/'.$path))
+        )) {
+            return asset('storage/'.$path);
+        }
+
+        return asset('images/print-logo.png');
+    }
+}
+if (!function_exists('org_print_logo_url')) {
+    function org_print_logo_url($organization = null): string
+    {
+        $path = trim((string) optional($organization)->print_logo);
+        if ($path === '') {
+            $path = trim((string) optional($organization)->logo_img);
+        }
+        if ($path !== '' && (
+            is_file(storage_path('app/public/'.$path)) ||
+            is_file(public_path('storage/'.$path))
+        )) {
+            return asset('storage/'.$path);
+        }
+
+        return asset('images/print-logo.png');
+    }
+}
 if (!function_exists('provision_system_customers')) {
     /**
      * Logged-in user ke tenant ke liye 4 system customers ensure karein:

@@ -435,11 +435,21 @@ $(document).ready(function () {
         }
       },
       error: function error(err) {
-        if (err.status == 422) {
+        $('#saveProduct').removeAttr('disabled');
+        $('#cancelSubCat').removeAttr('disabled');
+        $('#saveProduct').text('Save');
+        if (err.status == 422 && err.responseJSON && err.responseJSON.errors) {
           $.each(err.responseJSON.errors, function (i, error) {
             var el = $(document).find('[name="' + i + '"]');
             el.after($('<small style="color: red; position: absolute; width:100%; text-align: right; margin-left: -30px">' + error[0] + '</small>'));
           });
+        } else {
+          $('#notifDiv').fadeIn();
+          $('#notifDiv').css('background', 'red');
+          $('#notifDiv').text('Product save failed. Please try again.');
+          setTimeout(function () {
+            $('#notifDiv').fadeOut();
+          }, 3000);
         }
       }
     });

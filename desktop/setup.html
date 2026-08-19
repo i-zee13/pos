@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Storeeo POS — Setup</title>
+  <title>Storeeo POS — Shop Setup</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -50,63 +50,58 @@
     }
     button:disabled { opacity: 0.6; cursor: wait; }
     .err { color: #ffb4b4; font-size: 0.85rem; min-height: 1.2rem; margin: 0 0 0.75rem; }
-    .hint { font-size: 0.8rem; opacity: 0.65; margin-top: 1rem; font-family: ui-monospace, monospace; }
+    .hint { font-size: 0.8rem; opacity: 0.65; margin-top: 1rem; line-height: 1.45; }
+    ul { margin: 0 0 1rem; padding-left: 1.2rem; opacity: 0.9; font-size: 0.9rem; line-height: 1.5; }
   </style>
 </head>
 <body>
   <div class="box">
-    <h1>Storeeo POS</h1>
-    <p>Apna live POS website URL likho (jaise browser mein kholte ho). AppData edit ki zaroorat nahi.</p>
-    <label for="url">POS URL</label>
-    <input id="url" type="url" placeholder="https://your-pos-domain.com" autocomplete="off" />
+    <h1>Storeeo POS — Local</h1>
+    <p>Yeh app shop pe <strong>hamesha local</strong> chalegi (net ho ya na ho). Data is PC pe safe rehta hai.</p>
+    <ul>
+      <li>Login: <strong>admin</strong> / <strong>admin123</strong> (pehli dafa password change zaroori)</li>
+      <li>Backup: app ke andar Backups, ya yahan se USB/Drive</li>
+    </ul>
+    <label for="shopName">Shop name</label>
+    <input id="shopName" type="text" placeholder="e.g. Ali Traders" autocomplete="organization" />
     <div class="err" id="err"></div>
-    <button id="save" type="button">Save &amp; Open POS</button>
-    <p class="hint" id="hint"></p>
+    <button id="save" type="button">Start Local POS</button>
+    <p class="hint" id="hint">Pehli dafa 30–60 sec lag sakte hain.</p>
   </div>
   <script>
     (async () => {
-      const input = document.getElementById('url');
+      const shopName = document.getElementById('shopName');
       const err = document.getElementById('err');
       const hint = document.getElementById('hint');
       const btn = document.getElementById('save');
 
       try {
         const info = await window.posDesktop.getInfo();
-        if (info.posUrl && !/example\.com/i.test(info.posUrl)) {
-          input.value = info.posUrl;
-        }
-        hint.textContent = 'Config: ' + (info.configPath || '');
+        if (info.shopName) shopName.value = info.shopName;
+        hint.textContent = 'v' + info.version + ' · local-only shopkeeper build';
       } catch (e) {}
 
       btn.addEventListener('click', async () => {
         err.textContent = '';
-        let url = (input.value || '').trim();
-        if (!url) {
-          err.textContent = 'URL required';
-          return;
-        }
-        if (!/^https?:\/\//i.test(url)) {
-          url = 'https://' + url;
-        }
-        try {
-          new URL(url);
-        } catch (e) {
-          err.textContent = 'Invalid URL';
-          return;
-        }
         btn.disabled = true;
-        btn.textContent = 'Opening…';
+        btn.textContent = 'Starting local…';
         try {
-          await window.posDesktop.savePosUrl(url);
+          if (window.posDesktop.completeShopSetup) {
+            await window.posDesktop.completeShopSetup({
+              shopName: (shopName.value || '').trim() || 'My Shop',
+            });
+          } else {
+            await window.posDesktop.savePosUrl({
+              shopName: (shopName.value || '').trim() || 'My Shop',
+              posUrl: 'https://pos.storeeo.app',
+              forceLocalMode: true,
+            });
+          }
         } catch (e) {
-          err.textContent = e.message || 'Save failed';
+          err.textContent = e.message || String(e);
           btn.disabled = false;
-          btn.textContent = 'Save & Open POS';
+          btn.textContent = 'Start Local POS';
         }
-      });
-
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') btn.click();
       });
     })();
   </script>

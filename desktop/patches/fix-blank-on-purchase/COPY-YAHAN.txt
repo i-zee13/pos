@@ -1,0 +1,19 @@
+Purchase / Sale open karte hi "Blank page detect" screen aa jati thi.
+
+Wajah: Electron galat check — page pe preloader (display:none) hota hai,
+innerText ~0 hota hai, app sochti thi page khali hai.
+
+FIX (build nahi):
+
+1) Storeeo POS BAND karo
+
+2) Yeh file overwrite karo:
+   SOURCE:  main.js  (is folder se)
+
+   DESTINATION (0.3.2 / asar:false builds):
+   C:\Users\<USER>\AppData\Local\Programs\Storeeo POS\resources\app\main.js
+
+   Agar "app" folder na mile aur sirf app.asar ho:
+   to yeh patch us pe kaam nahi karega — tab bolo, alag tarika denge.
+
+3) App dubara open → Purchase Add try karo.

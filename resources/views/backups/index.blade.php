@@ -139,9 +139,15 @@
                 <div>
                     <h2 class="mb-1">Take backup</h2>
                     <p class="text-muted mb-0" style="font-size: 13px;">
-                        Tenant backup (merge mode): only your shop data — safe to inject into existing DB without touching other tenants.
-                        Tenant {{ current_tenant_id() ?? '—' }} · databases: <strong>{{ implode(', ', $databases) }}</strong>.
-                        Nightly schedule without a tenant still dumps the full database.
+                        @if(config('database.default') === 'sqlite' || config('database.connections.'.config('database.default').'.driver') === 'sqlite')
+                            Local desktop backup: zips your SQLite DB.
+                            Connect <strong>Google Drive</strong> (sidebar) to upload, or use <strong>Download</strong> to save on this PC.
+                            Database: <strong>{{ implode(', ', $databases) }}</strong>.
+                        @else
+                            Tenant backup (merge mode): only your shop data — safe to inject into existing DB without touching other tenants.
+                            Tenant {{ current_tenant_id() ?? '—' }} · databases: <strong>{{ implode(', ', $databases) }}</strong>.
+                            Nightly schedule without a tenant still dumps the full database.
+                        @endif
                     </p>
                 </div>
                 <div class="d-flex flex-wrap align-items-center" style="gap: 8px;">

@@ -41,10 +41,15 @@
       <div class="col-12 col-md-5 col-lg-6 col-xl-4 px-lg-6 my-5 align-self-center">
 
         <!-- Heading -->
-        @if(!empty(optional($organization)->logo_img))
-        <img src="/storage/{{ $organization->logo_img }}" class="mb-3" alt="..." style="height:100px;margin-left:125px;">
-        @else
-        <h1 class="text-white text-center mb-3">Storeeo POS</h1>
+        <img src="{{ org_logo_url($organization ?? null) }}" class="mb-3" alt="Storeeo POS" style="height:100px;margin-left:125px;">
+        @php
+          $isLocalDesktop = request()->getHost() === '127.0.0.1' || request()->getHost() === 'localhost';
+        @endphp
+        @if($isLocalDesktop)
+        <p class="text-center mb-2" style="color:#c4a574;font-size:13px;">
+          LOCAL SHOP MODE — pehli login: <strong>admin</strong> / <strong>admin123</strong><br>
+          Phir Profile se password change karein (zaroori).
+        </p>
         @endif
 
         <!-- Subheading -->

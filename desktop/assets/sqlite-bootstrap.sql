@@ -427,7 +427,7 @@ CREATE TABLE IF NOT EXISTS "products" (
   "new_purchase_price" REAL DEFAULT NULL,
   "sale_price" REAL NOT NULL,
   "expiry_date" TEXT DEFAULT NULL,
-  "stock_balance" REAL NOT NULL,
+  "stock_balance" REAL NOT NULL DEFAULT 0,
   "deleted_at" TEXT DEFAULT NULL,
   "created_at" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "created_by" INTEGER NOT NULL,

@@ -1,0 +1,15 @@
+# Client pe ABHI (bina naya installer):
+
+1) Storeeo POS BAND karo
+2) Notepad se yeh file kholo:
+   %LOCALAPPDATA%\Programs\Storeeo POS\resources\app-local\.env
+
+3) Yeh line dhoondo:
+   GOOGLE_DRIVE_FOLDER_NAME=POS DBs Backups
+
+4) Isko aise banao (quotes zaroori):
+   GOOGLE_DRIVE_FOLDER_NAME="POS DBs Backups"
+
+5) Save → app dubara open → Start local POS
+
+Yeh dotenv parse error fix hai. 0.3.3 installer mein yeh auto-fix hai.

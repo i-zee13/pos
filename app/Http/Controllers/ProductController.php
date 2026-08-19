@@ -22,13 +22,18 @@ class ProductController extends Controller
         // $barcodeArray = explode(',', $request->barcode);
 
 
+        $barcodes = $request->barcode;
+        if (!is_array($barcodes)) {
+            $barcodes = array_values(array_filter(array_map('trim', explode(',', (string) ($request->barcode_span ?? '')))));
+        }
+
         if (Product::where('company_id', $request->company_id)
             ->where('product_name', $request->hidden_product_name)
             ->where('id', '!=', $request->hidden_product_id)
             ->exists()
         ) {
             $duplicateField = 'Product Name with same  Company already Exist';
-        } elseif (Product::whereIn('barcode', $request->barcode)
+        } elseif (!empty($barcodes) && Product::whereIn('barcode', $barcodes)
             ->where('id', '!=', $request->hidden_product_id)
             ->exists()
         ) {
@@ -50,8 +55,9 @@ class ProductController extends Controller
                 $product    =   Product::where('id', $request->hidden_product_id)->first();
             } else {
                 $product     =   new Product();
+                $product->stock_balance = 0;
             }
-            $product->barcode            =  isset($request->barcode) ? implode(',', $request->barcode) : $request->barcode_span;
+            $product->barcode            =  !empty($barcodes) ? implode(',', $barcodes) : $request->barcode_span;
             $product->product_name       =  $request->hidden_product_name;
             $product->size               =  $request->size;
             $product->old_purchase_price =  $request->purchase_price;

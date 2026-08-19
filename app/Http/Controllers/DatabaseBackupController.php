@@ -197,12 +197,33 @@ class DatabaseBackupController extends Controller
 
         $log = BackupLog::create([
             'user_id' => Auth::id(),
+            'tenant_id' => current_tenant_id(),
             'databases' => $databases,
             'status' => 'pending',
             'triggered_by' => 'manual',
         ]);
 
+        // Desktop SQLite uses QUEUE_CONNECTION=sync — backup finishes before redirect.
         RunDatabaseBackupJob::dispatch($log->id);
+
+        $fresh = $log->fresh();
+        if ($fresh && $fresh->status === 'completed') {
+            $msg = 'Backup ready.';
+            if ($fresh->gdrive_uploaded) {
+                $msg .= ' Also uploaded to Google Drive.';
+            } else {
+                $msg .= ' Download the zip below (Drive optional — connect Google first if you want cloud copy).';
+            }
+
+            return redirect()->route('backups.index')->with('success', $msg);
+        }
+
+        if ($fresh && $fresh->status === 'failed') {
+            return redirect()->route('backups.index')->with(
+                'error',
+                'Backup failed: '.($fresh->error_message ?: 'unknown error')
+            );
+        }
 
         return redirect()->route('backups.index')->with('success', 'Backup queued. Wait a few seconds and refresh to see status. For async runs, keep `php artisan queue:work` running on the server.');
     }

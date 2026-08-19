@@ -23,6 +23,15 @@ class DatabaseBackupService
 
         $backupLog->update(['status' => 'processing']);
 
+        $connName = config('database.default');
+        $driver = (string) config("database.connections.{$connName}.driver", '');
+
+        if ($driver === 'sqlite') {
+            $this->runSqliteBackup($backupLog);
+
+            return;
+        }
+
         $databases = $backupLog->databases;
         if (empty($databases)) {
             $this->fail($backupLog, 'No databases configured for backup.');
@@ -30,7 +39,6 @@ class DatabaseBackupService
             return;
         }
 
-        $connName = config('database.default');
         $conn = config("database.connections.{$connName}");
         $host = $conn['host'] ?? '127.0.0.1';
         $port = (string) ($conn['port'] ?? '3306');
@@ -158,15 +166,98 @@ class DatabaseBackupService
 
     public static function resolveDatabaseNamesFromConfig(): array
     {
+        $conn = config('database.default');
+        $driver = (string) config("database.connections.{$conn}.driver", '');
+
+        if ($driver === 'sqlite') {
+            $db = config("database.connections.{$conn}.database");
+            if (! $db) {
+                return [];
+            }
+
+            $base = basename((string) $db);
+
+            return [$base !== '' ? $base : 'pos-local.sqlite'];
+        }
+
         $list = config('backup.databases', []);
         $list = array_values(array_filter(array_map('trim', $list)));
         if (! empty($list)) {
             return $list;
         }
-        $conn = config('database.default');
         $db = config("database.connections.{$conn}.database");
 
         return $db ? [(string) $db] : [];
+    }
+
+    /**
+     * Desktop / offline POS: zip the SQLite file (no mysqldump).
+     * Same Google Drive upload + local download path as MySQL backups.
+     */
+    protected function runSqliteBackup(BackupLog $backupLog): void
+    {
+        $connName = config('database.default');
+        $dbPath = (string) config("database.connections.{$connName}.database", '');
+
+        if ($dbPath === '' || ! is_file($dbPath)) {
+            $this->fail($backupLog, 'SQLite database file not found at: '.($dbPath !== '' ? $dbPath : '(empty)'));
+
+            return;
+        }
+
+        Storage::disk('local')->makeDirectory('db-backups');
+
+        $zipBase = 'storeeo_local_'.date('Ymd_His');
+        $zipFilename = $zipBase.'.zip';
+        $zipRel = 'db-backups/'.$zipFilename;
+        $zipAbs = storage_path('app/'.$zipRel);
+
+        if (file_exists($zipAbs)) {
+            $zipFilename = $zipBase.'_'.date('His').'.zip';
+            $zipRel = 'db-backups/'.$zipFilename;
+            $zipAbs = storage_path('app/'.$zipRel);
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipAbs, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            $this->fail($backupLog, 'Could not create zip file.');
+
+            return;
+        }
+
+        $zip->addFile($dbPath, 'pos-local.sqlite');
+        $zip->addFromString(
+            'RESTORE.txt',
+            "Storeeo POS — local (SQLite) backup\n".
+            "===================================\n\n".
+            "1. Close Storeeo POS desktop app.\n".
+            "2. Extract pos-local.sqlite from this zip.\n".
+            "3. Replace the file at:\n".
+            "   Windows: %APPDATA%\\StoreeoPOS\\database\\pos-local.sqlite\n".
+            "4. Start Storeeo POS again.\n\n".
+            "Created: ".date('c')."\n"
+        );
+        $zip->close();
+
+        $size = @filesize($zipAbs) ?: 0;
+        $uploader = app(GoogleDriveApiBackupUploader::class);
+        $upload = $this->uploadBackupZip($uploader, $backupLog, $zipAbs, $zipFilename);
+        $gdriveOk = $upload['ok'];
+        $gdrivePath = $upload['path'];
+        $errorMessage = $upload['error'];
+
+        $backupLog->update([
+            'zip_filename' => $zipFilename,
+            'local_relative_path' => $zipRel,
+            'status' => 'completed',
+            'size_bytes' => $size,
+            'gdrive_uploaded' => $gdriveOk,
+            'gdrive_remote_path' => $gdrivePath,
+            'error_message' => $errorMessage,
+            'completed_at' => now(),
+        ]);
+
+        $this->pruneLocalBackups();
     }
 
     protected function tenantImportMode(): string

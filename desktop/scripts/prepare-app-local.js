@@ -85,6 +85,13 @@ function main() {
   }
 
   // Offline SQLite env template
+  const googleKeys = readEnvKeys(path.join(repoRoot, '.env'), [
+    'BACKUP_GOOGLE_DRIVE_API_ENABLED',
+    'GOOGLE_DRIVE_CLIENT_ID',
+    'GOOGLE_DRIVE_CLIENT_SECRET',
+    'GOOGLE_DRIVE_FOLDER_NAME',
+  ]);
+
   const envLocal = `APP_NAME="Storeeo POS Local"
 APP_ENV=local
 APP_KEY=
@@ -103,6 +110,12 @@ FILESYSTEM_DRIVER=local
 QUEUE_CONNECTION=sync
 SESSION_DRIVER=file
 SESSION_LIFETIME=120
+
+# Google Drive OAuth (user connects their own Gmail on /backups)
+BACKUP_GOOGLE_DRIVE_API_ENABLED=${googleKeys.BACKUP_GOOGLE_DRIVE_API_ENABLED || 'true'}
+GOOGLE_DRIVE_CLIENT_ID=${googleKeys.GOOGLE_DRIVE_CLIENT_ID || ''}
+GOOGLE_DRIVE_CLIENT_SECRET=${googleKeys.GOOGLE_DRIVE_CLIENT_SECRET || ''}
+GOOGLE_DRIVE_FOLDER_NAME=${quoteEnvValue(googleKeys.GOOGLE_DRIVE_FOLDER_NAME || 'POS DBs Backups')}
 `;
 
   fs.writeFileSync(path.join(dest, '.env.example.local'), envLocal);
@@ -116,7 +129,31 @@ SESSION_LIFETIME=120
   // Copy .env.example.local → .env if no .env
   if (!fs.existsSync(path.join(dest, '.env'))) {
     fs.copyFileSync(path.join(dest, '.env.example.local'), path.join(dest, '.env'));
+  } else {
+    // Refresh Google Drive OAuth client keys into existing .env (no refresh_token — users connect themselves)
+    mergeEnvKeys(path.join(dest, '.env'), {
+      BACKUP_GOOGLE_DRIVE_API_ENABLED: googleKeys.BACKUP_GOOGLE_DRIVE_API_ENABLED || 'true',
+      GOOGLE_DRIVE_CLIENT_ID: googleKeys.GOOGLE_DRIVE_CLIENT_ID || '',
+      GOOGLE_DRIVE_CLIENT_SECRET: googleKeys.GOOGLE_DRIVE_CLIENT_SECRET || '',
+      GOOGLE_DRIVE_FOLDER_NAME: googleKeys.GOOGLE_DRIVE_FOLDER_NAME || 'POS DBs Backups',
+      QUEUE_CONNECTION: 'sync',
+      APP_URL: 'http://127.0.0.1:8787',
+    });
   }
+
+  // Sidecar for Electron to inject into PHP process when packaged .env is read-only
+  const oauthSidecar = path.join(desktopDir, 'runtime', 'google-oauth.env');
+  fs.mkdirSync(path.dirname(oauthSidecar), { recursive: true });
+  fs.writeFileSync(
+    oauthSidecar,
+    [
+      `BACKUP_GOOGLE_DRIVE_API_ENABLED=${quoteEnvValue(googleKeys.BACKUP_GOOGLE_DRIVE_API_ENABLED || 'true')}`,
+      `GOOGLE_DRIVE_CLIENT_ID=${quoteEnvValue(googleKeys.GOOGLE_DRIVE_CLIENT_ID || '')}`,
+      `GOOGLE_DRIVE_CLIENT_SECRET=${quoteEnvValue(googleKeys.GOOGLE_DRIVE_CLIENT_SECRET || '')}`,
+      `GOOGLE_DRIVE_FOLDER_NAME=${quoteEnvValue(googleKeys.GOOGLE_DRIVE_FOLDER_NAME || 'POS DBs Backups')}`,
+      '',
+    ].join('\n')
+  );
 
   // SQLite bootstrap (schema + local admin seed) for first offline run
   const bootstrapSrc = path.join(desktopDir, 'assets', 'sqlite-bootstrap.sql');
@@ -155,6 +192,49 @@ function copyRecursive(src, dst, skipNames) {
       fs.copyFileSync(s, d);
     }
   }
+}
+
+function readEnvKeys(envPath, keys) {
+  const out = {};
+  if (!fs.existsSync(envPath)) return out;
+  const text = fs.readFileSync(envPath, 'utf8');
+  for (const key of keys) {
+    const m = text.match(new RegExp('^' + key + '=(.*)$', 'm'));
+    if (!m) continue;
+    let v = m[1].trim();
+    if (
+      (v.startsWith('"') && v.endsWith('"')) ||
+      (v.startsWith("'") && v.endsWith("'"))
+    ) {
+      v = v.slice(1, -1);
+    }
+    out[key] = v;
+  }
+  return out;
+}
+
+/** Quote .env values that contain spaces / special chars. */
+function quoteEnvValue(value) {
+  const v = String(value ?? '');
+  if (v === '') return '""';
+  if (/[\s#"']/.test(v) || v.includes('=')) {
+    return '"' + v.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+  }
+  return v;
+}
+
+function mergeEnvKeys(envPath, kv) {
+  let env = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : '';
+  for (const [key, value] of Object.entries(kv)) {
+    if (value === undefined || value === null) continue;
+    const line = `${key}=${quoteEnvValue(value)}`;
+    if (new RegExp('^' + key + '=', 'm').test(env)) {
+      env = env.replace(new RegExp('^' + key + '=.*$', 'm'), line);
+    } else {
+      env = env.replace(/\s*$/, '\n') + line + '\n';
+    }
+  }
+  fs.writeFileSync(envPath, env);
 }
 
 main();
