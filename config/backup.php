@@ -14,12 +14,28 @@ return [
     'retention_days' => (int) env('BACKUP_RETENTION_DAYS', 4),
 
     /*
-    |--------------------------------------------------------------------------
-    | Tenant-scoped backup (manual + admin close)
-    |--------------------------------------------------------------------------
-    | Tables without tenant_id but needed for FK restore (organization locations).
-    | Scheduled backups (no tenant) still dump the full database.
+    | Automatic backup interval (Laravel scheduler).
+    | Runs at :00 every N hours in schedule_timezone (default Pakistan).
+    | Example with 3: 12AM, 3AM, 6AM, 9AM, 12PM, 3PM, 6PM, 9PM.
+    | Requires server cron: * * * * * php /path/to/artisan schedule:run
     */
+    'schedule_interval_hours' => 3,
+    'schedule_timezone' => 'Asia/Karachi',
+
+    /*
+    | Usernames that must never receive Drive uploads (scheduled fan-out or manual).
+    */
+    'skip_drive_usernames' => [
+        'storeeo',
+    ],
+
+    /*
+    | Tenant backup import mode (manual + admin close):
+    | merge  = safe inject into existing multi-tenant DB (default)
+    | fresh  = DROP + CREATE for empty database restore only
+    */
+    'tenant_import_mode' => env('BACKUP_TENANT_IMPORT_MODE', 'merge'),
+
     'reference_tables' => array_values(array_filter(array_map('trim', explode(',', env(
         'BACKUP_REFERENCE_TABLES',
         'countries,states,cities,postal_codes,designations'

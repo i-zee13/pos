@@ -54,14 +54,28 @@ class SaleController extends Controller
     }
     public function saleInvoice(Request $request)
     {  
+         
+           $sales_product_array = $request->input('sales_product_array');
+            if (is_string($sales_product_array)) {
+                $decoded = json_decode($sales_product_array, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $sales_product_array = $decoded;
+                }
+            } 
         if ($request->hidden_invoice_id) {
             $invoice                    = SaleInvoice::where('id', $request->hidden_invoice_id)->first();
             $invoice->invoice_no        = $request->invoice_no;
+             $invoice->updated_at       = Carbon::now()->addMinutes(1);
+            $invoice->updated_by        = Auth::id();
         } else {
             $invoice      = new SaleInvoice();
             isEditable($request->customer_id);
             $invoice_no   =   getInvoice();
-            $invoice->invoice_no       = $invoice_no;
+            $invoice->invoice_no        = $invoice_no;
+            $invoice->updated_at        = Null;
+            $invoice->updated_by        = Null;
+            $invoice->created_by        = Auth::id(); 
+            $invoice->created_at = Carbon::now()->addMinutes(1);
         }
         $invoice->amount_received      = $request->amount_received;
         $invoice->date                 = $request->invoice_date; 
@@ -82,19 +96,12 @@ class SaleController extends Controller
         $invoice->is_editable          = 1;
         $invoice->status               = $request->invoice_type;
         $invoice->description          = $request->description;
-        $invoice->created_by           = Auth::id(); 
+       
         if ($invoice->save()) {
-            // Normalize sales_product_array: it may arrive as a JSON string; decode if needed
-            $sales_product_array = $request->input('sales_product_array');
-            if (is_string($sales_product_array)) {
-                $decoded = json_decode($sales_product_array, true);
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $sales_product_array = $decoded;
-                }
-            }
-            if (is_array($sales_product_array) && count($sales_product_array) > 0) {
+            if (count($sales_product_array) > 0) {
+                
                 $old_ids        = $request->existing_product_ids;
-                $new_ids        = [];
+              
                 foreach ($sales_product_array as $key => $sale_product) {
                     $flag = true;
                     $new_ids[]  = $sale_product['product_id'];
@@ -106,33 +113,32 @@ class SaleController extends Controller
                     } else {
                         $sale          =  new ProductSale();
                     }
-                    // dd(BatchStockMgt::where('product_id', $sale_product['product_id'])->whereNotNull('batch_wise_balance')->orderBy('expiry_date', 'ASC')->value('expiry_date'));
-                    $sale->sale_price           = $sale_product['retail_price'];
-                    $sale->sale_invoice_id      = $invoice->id;
-                    $sale->invoice_no           = $invoice->invoice_no;
-                    $sale->company_id           = Product::where('id', $sale_product['product_id'])->value('company_id');
-                    $sale->product_id           = $sale_product['product_id'];
-                    $sale->qty                  = $sale_product['qty'];
-                    $sale->sale_total_amount    = $sale_product['amount'];
-                    $sale->product_discount     = $sale_product['prod_discount'];
-                    $sale->expiry_date          = BatchStockMgt::where('product_id', $sale_product['product_id'])->whereNotNull('batch_wise_balance')->orderBy('expiry_date', 'ASC')->value('expiry_date');
-                    $sale->created_by           = Auth::id();
-                    $sale->purchase_price       = $sale_product['purchased_price'];
-                    $previous_qty               = ProductSale::where('sale_invoice_id', $request->hidden_invoice_id)
+                    $sale->sale_price          = $sale_product['retail_price'];
+                    $sale->sale_invoice_id     = $invoice->id;
+                    $sale->invoice_no          = $invoice->invoice_no;
+                    $sale->company_id          = Product::where('id', $sale_product['product_id'])->value('company_id');
+                    $sale->product_id          = $sale_product['product_id'];
+                    $sale->qty                 = $sale_product['qty'];
+                    $sale->sale_total_amount   = $sale_product['amount'];
+                    $sale->product_discount    = $sale_product['prod_discount'];
+                    $sale->expiry_date         = BatchStockMgt::where('product_id', $sale_product['product_id'])->whereNotNull('batch_wise_balance')->orderBy('expiry_date', 'ASC')->value('expiry_date');
+                    $sale->created_by          = Auth::id();
+                    $sale->purchase_price      = $sale_product['purchased_price'];
+                    $previous_qty              = ProductSale::where('sale_invoice_id', $request->hidden_invoice_id)
                                                             ->where('product_id', $sale->product_id)
                                                             ->orderBy('id', 'Desc')
                                                             ->value('qty');
                     if ($sale->save()) {
-                        $sale_products_array[]  = $sale->id;
+                        $sale_products_array[] = $sale->id;
                         $balance = 0;
-                        $check_stock            =  VendorStock::where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
+                        $check_stock           =  VendorStock::where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
                         if ($check_stock) {
-                            $vendor_id          =  $check_stock->vendor_id;
-                            $balance            =  $check_stock->balance;
+                            $vendor_id         =  $check_stock->vendor_id;
+                            $balance           =  $check_stock->balance;
                         }
-                        $change_qty_value       =   $sale->qty;
-                        $In_out_status          =   2;
-                        $vs_id                  =   0;
+                        $change_qty_value   =   $sale->qty;
+                        $In_out_status      =   2;
+                        $vs_id              =   0;
                         if ($flag) {
                             if ($request->hidden_invoice_id) {
                                 if ($previous_qty != 0) {
@@ -170,6 +176,7 @@ class SaleController extends Controller
                                     );
                                 }
                             }
+                            // Only when qty actually changed (same as stock update)
                             BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, 2, $request->hidden_invoice_id);
                         }
                     }
@@ -370,13 +377,12 @@ class SaleController extends Controller
             $soldProduct =  ProductSale::where('sale_invoice_id', $request->sale_invoice_id)
                                         ->where('product_id', $request->product_id)->where('qty', $request->qty)
                                         ->first();
-            // Reverse this sale item from vendor/global stock & batch-wise stock
             $v_stock = updateStock($vs, $current_balance, $request->qty, 1, 'sale', 5);
             BatchWiseDeleteProduct($request->sale_invoice_id, $soldProduct, $request->qty, 1, 5);
             StockManagment($v_stock->id, $vs, $request->qty, 1, 'sale');
 
             if ($v_stock) {
-                // 1) Keep SHOP godown stock in sync (godowns_stocks)
+                // Keep SHOP godown stock in sync (godowns_stocks)
                 $shopGodownId = \App\Models\Godown::where('type', 'shop')->orderBy('id')->value('id');
                 $companyId = $vs->company_id;
                 if ($shopGodownId && $companyId) {
@@ -389,9 +395,6 @@ class SaleController extends Controller
                         1 // IN
                     );
                 }
-
-                // 2) Mirror SHOP stock into products.stock_balance using delta (do NOT use VendorStock balance)
-               
 
                 $soldProduct->delete();
                 return response()->json([
@@ -419,7 +422,6 @@ class SaleController extends Controller
                 if ($vs) {
                     $vs->actual_qty   = $product->qty; 
                     $current_balance =  VendorStock::where('product_id', $product->product_id)->orderBy('id', 'DESC')->value('balance');
-                    // Reverse this sale line from vendor/global stock & batch-wise stock
                     $v_stock = updateStock($vs, $current_balance, $product->qty, 1, 'sale', 5);
                     BatchWiseDeleteProduct($product->sale_invoice_id, $product, $product->qty, 1, 5);
                     StockManagment($v_stock->id, $vs, $product->qty, 1, 'sale');

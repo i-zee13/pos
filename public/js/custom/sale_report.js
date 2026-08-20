@@ -8,6 +8,21 @@ var batches = [];
 var sessions = [];
 var CurrentRef = '';
 var segments = location.href.split('/');
+
+/** Local number helper — works even if master.js toNum is missing on live. */
+function num(value) {
+  if (typeof toNum === 'function') {
+    return toNum(value);
+  }
+  if (value === null || value === undefined || value === '') {
+    return 0;
+  }
+  if (typeof value === 'string') {
+    value = value.replace(/,/g, '').trim();
+  }
+  var n = parseFloat(value);
+  return isNaN(n) || !isFinite(n) ? 0 : n;
+}
 $('.search-btn').on('click', function () {
   var start_date = $('.start_date').val();
   var end_date = $('.end_date').val();
@@ -63,16 +78,16 @@ $('.search-btn').on('click', function () {
       var total_sales = 0;
       var ttl_quantity = 0;
       var ttl_product_discount = 0;
-      var ttl_invoice_discount = response.stocks.sale_invoice_record['invoice_discount'];
+      var ttl_invoice_discount = num(response.stocks.sale_invoice_record && response.stocks.sale_invoice_record['invoice_discount']);
       //Sale Return Variables
       var total_returns = 0;
       var ttl_return_quantity = 0;
       var ttl_return_product_discount = 0;
       var ttl_return_invoice_discount = 0;
-      response.stocks.sales.forEach(function (element, key) {
-        total_sales += element['sale_total_amount'] ? element['sale_total_amount'] : 0;
-        ttl_quantity += element['qty'] ? element['qty'] : 0;
-        ttl_product_discount += element['product_discount'] ? element['product_discount'] : 0;
+      (response.stocks.sales || []).forEach(function (element, key) {
+        total_sales += num(element['sale_total_amount']);
+        ttl_quantity += num(element['qty']);
+        ttl_product_discount += num(element['product_discount']);
         var date = new Date(element.expire_date);
         var formattedDate = date.toDateString();
         var invoice_no = "";
@@ -81,24 +96,25 @@ $('.search-btn').on('click', function () {
       });
       $('.TeacherAttendanceListTable').fadeIn();
       sale_return_total(ttl_quantity, ttl_product_discount, total_sales, 'Sale');
-      if (response.stocks.sale_returns.length > 0) {
+      if (response.stocks.sale_returns && response.stocks.sale_returns.length > 0) {
         //Sale Returns
         response.stocks.sale_returns.forEach(function (element, key) {
-          total_returns += element['return_total_amount'] ? element['return_total_amount'] : 0;
-          ttl_return_quantity += element['qty'] ? element['qty'] : 0;
-          ttl_return_product_discount += element['product_discount'] ? element['product_discount'] : 0;
-          ttl_return_invoice_discount += element['invoice_discount'] ? element['invoice_discount'] : 0;
+          total_returns += num(element['return_total_amount']);
+          ttl_return_quantity += num(element['qty']);
+          ttl_return_product_discount += num(element['product_discount']);
+          ttl_return_invoice_discount += num(element['invoice_discount']);
           var invoice_no = "";
           invoice_no = element.invoice_no.split('-');
           reportTable(invoice_no[0], element);
         });
         sale_return_total(ttl_return_quantity, ttl_return_product_discount, total_returns, 'Return');
       }
-      var grand_total_discount = parseInt(ttl_invoice_discount + ttl_return_invoice_discount);
-      var grand_qty = parseInt(ttl_quantity - ttl_return_quantity);
+      var grand_total_discount = num(ttl_invoice_discount) + num(ttl_return_invoice_discount);
+      var grand_qty = num(ttl_quantity) - num(ttl_return_quantity);
+      var grand_amount = num(total_sales) - num(total_returns);
       //Grand Total
-      $('.TeacherAttendanceListTable tfoot').append("\n            <tr style=\"background: #152e4d;border: solid 1px #dbdbdb;color: white\">\n                <td colspan=\"3\"></td> \n                <td class=\"font18\">Grand Total :</td>\n                <td class=\"totalNo\"   style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\"> ".concat(addCommas(parseInt(ttl_quantity - ttl_return_quantity)), " </td>\n                <td class=\"totalNo\"  style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">  ").concat(addCommas(parseInt(ttl_product_discount - ttl_return_product_discount)), " </td>\n                <td class=\"totalNo\" colspan=\"2\">\n                    <span class=\"grand-total\" style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(addCommas(parseInt(total_sales - total_returns)), "</span>\n                </td>\n            </tr>\n        "));
-      $('.ttl_sales').html('<span>Rs.</span>' + addCommas(total_sales - total_returns - grand_total_discount));
+      $('.TeacherAttendanceListTable tfoot').append("\n            <tr style=\"background: #152e4d;border: solid 1px #dbdbdb;color: white\">\n                <td colspan=\"3\"></td> \n                <td class=\"font18\">Grand Total :</td>\n                <td class=\"totalNo\"   style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\"> ".concat(addCommas(grand_qty), " </td>\n                <td class=\"totalNo\"  style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">  ").concat(addCommas(num(ttl_product_discount) - num(ttl_return_product_discount)), " </td>\n                <td class=\"totalNo\" colspan=\"2\">\n                    <span class=\"grand-total\" style=\"font-family: 'Rationale', sans-serif !important;font-size: 25px;\">").concat(addCommas(grand_amount), "</span>\n                </td>\n            </tr>\n        "));
+      $('.ttl_sales').html('<span>Rs.</span>' + addCommas(grand_amount - grand_total_discount));
       // $('.ttl_payment').html(total_sales ? addCommas(addCommas(parseInt(total_sales + ttl_invoice_discount + ttl_product_discount))) : 0);
       $('.ttl_payment').html(total_sales ? addCommas(total_sales) : 0);
       $('.ttl_quantity').html(grand_qty ? addCommas(grand_qty) : 0);
@@ -285,6 +301,8 @@ $('.reset-btn').on('click', function () {
   $('.teacher_attendance_list').append("\n            <div class=\"col-12 pb-10\">\n            <div class=\"no-info\">\n                <div class=\"m-auto\"><strong>Please Filter Your Sale Record !</strong></div>\n            </div>\n        </div>\n        ");
 });
 function addCommas(nStr) {
+  nStr = num(nStr);
+  nStr = Math.round(nStr * 10000) / 10000;
   nStr += "";
   x = nStr.split(".");
   x1 = x[0];

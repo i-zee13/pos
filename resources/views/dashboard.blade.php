@@ -73,37 +73,124 @@
         font-family: 'Rationale', sans-serif !important; font-size: 28px; color: #0038ba; margin-left: 6px;
     }
     .mix-bars { margin-top: 8px; }
-    .mix-bar-row { margin-bottom: 14px; }
     .mix-bar-head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #243447; margin-bottom: 5px; }
     .mix-bar-head .pct { color: #0038ba; }
     .mix-bar-track { height: 7px; background: #eef1f5; border-radius: 6px; overflow: hidden; }
     .mix-bar-fill { height: 100%; background: linear-gradient(90deg, #0038ba, #1e54d3); border-radius: 6px; width: 0; transition: width .5s ease; }
     .mix-bar-meta { display: flex; justify-content: space-between; font-size: 11px; color: #8896a8; margin-top: 4px; }
+    .mix-chart-wrap {
+        position: relative;
+        margin-top: 12px;
+        max-width: 260px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .mix-chart-center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        pointer-events: none;
+        width: 55%;
+        z-index: 2;
+    }
+    .mix-center-label {
+        font-size: 11px;
+        color: #8896a8;
+        font-weight: 600;
+        line-height: 1.2;
+        max-height: 28px;
+        overflow: hidden;
+    }
+    .mix-center-value {
+        font-family: 'Rationale', sans-serif !important;
+        font-size: 18px;
+        color: #0038ba;
+        line-height: 1.15;
+        margin-top: 2px;
+        word-break: break-word;
+    }
+    .mix-center-sub {
+        font-size: 11px;
+        color: #6b7a90;
+        margin-top: 2px;
+        font-weight: 600;
+    }
     .product-cards {
-        display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        max-height: 340px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 6px;
+        scrollbar-width: thin;
+        scrollbar-color: #152e4d #eef1f5;
+    }
+    .product-cards::-webkit-scrollbar { width: 4px; }
+    .product-cards::-webkit-scrollbar-track { background: #eef1f5; border-radius: 4px; }
+    .product-cards::-webkit-scrollbar-thumb {
+        background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
+        border-radius: 4px;
     }
     .product-card-an {
-        min-width: 160px; max-width: 180px; flex: 0 0 160px;
-        border: 1px solid #e8ecf1; border-radius: 10px; padding: 12px 14px;
+        min-width: 0;
+        border: 1px solid #e8ecf1; border-radius: 10px; padding: 10px 12px 10px 14px;
         position: relative; background: #fff;
-        transition: transform .2s ease, box-shadow .2s ease;
+        border-bottom: solid 1px #e8ecf1;
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        cursor: default;
     }
     .product-card-an:hover {
-        transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,.08);
+        background-color: #ffffff;
+        box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
+        border-bottom: solid 1px #0038ba;
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+        -ms-transform: scale(1.02);
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
+        z-index: 1;
     }
     .product-card-an:before {
         content: ''; position: absolute; left: 0; top: 12px; width: 3px; height: 28px; background: #0038ba; border-radius: 0 2px 2px 0;
     }
     .product-card-an .pc-name {
-        font-size: 13px; font-weight: 700; color: #243447; height: 38px; overflow: hidden; line-height: 1.3; margin-bottom: 10px;
+        font-size: 12px; font-weight: 700; color: #243447; height: 32px; overflow: hidden; line-height: 1.25; margin-bottom: 8px;
     }
     .product-card-an .pc-amount {
-        font-family: 'Rationale', sans-serif !important; font-size: 22px; color: #0038ba; line-height: 1;
+        font-family: 'Rationale', sans-serif !important; font-size: 20px; color: #0038ba; line-height: 1;
     }
-    .product-card-an .pc-qty { font-size: 12px; color: #8896a8; margin-top: 4px; }
+    .product-card-an .pc-qty { font-size: 11px; color: #8896a8; margin-top: 3px; }
+    @media (max-width: 767px) {
+        .product-cards { grid-template-columns: 1fr; max-height: 280px; }
+    }
     .split-pill {
         display: flex; justify-content: space-between; background: #f4f6f9; border-radius: 8px;
         padding: 10px 12px; margin-bottom: 8px; font-size: 13px;
+        border-bottom: solid 1px transparent;
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        cursor: default;
+    }
+    .split-pill:hover {
+        background-color: #ffffff;
+        box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
+        border-bottom: solid 1px #0038ba;
+        -ms-transform: scale(1.02);
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
     }
     .split-pill span:last-child { font-family: 'Rationale', sans-serif !important; font-size: 18px; color: #152e4d; }
     .analytics-table { width: 100%; font-size: 13px; }
@@ -113,7 +200,51 @@
     .analytics-table td {
         padding: 8px 6px; border-bottom: 1px solid #f3f5f8; font-weight: 600; color: #243447;
     }
+    .analytics-table tbody tr {
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        background-color: #fbfbfb;
+    }
+    .analytics-table tbody tr:hover {
+        background-color: #ffffff;
+        box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
+        -ms-transform: scale(1.02);
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
+    }
+    .analytics-table tbody tr:hover td {
+        border-bottom-color: #0038ba;
+    }
     .analytics-table td.num, .analytics-table th.num { text-align: right; font-family: 'Rationale', sans-serif !important; font-size: 16px; }
+    .mix-bar-row {
+        border-bottom: solid 1px #eef1f5;
+        padding: 6px 4px 10px;
+        margin-bottom: 14px;
+        border-radius: 6px;
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+        -ms-transform: scale(1);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        cursor: default;
+    }
+    .mix-bar-row:hover {
+        background-color: #ffffff;
+        box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
+        border-bottom: solid 1px #0038ba;
+        -ms-transform: scale(1.02);
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
+    }
+    .hero-secondary .hs-item .hs-label { font-size: 12px; color: #8896a8; font-weight: 600; }
+    .hero-secondary .hs-item .hs-value {
+        font-family: 'Rationale', sans-serif !important; font-size: 22px; color: #243447; margin-top: 2px;
+    }
     @media (max-width: 991px) {
         .hero-grid { grid-template-columns: repeat(2, 1fr); }
         .hero-grid .hg-cell:nth-child(2n) { border-right: none; }
@@ -138,42 +269,42 @@
       <div class="bar bar7"></div>
       <div class="bar bar8"></div>
     </div>
-  </div>
+</div>
 
 <div class="parent-div analytics-page" id="analyticsPage" style="display:none">
     <div class="analytics-toolbar">
-        <div>
+<div>
             <h2 class="_head01 mb-1" style="font-size:22px;">Monthly / Daily <span>Analytics</span></h2>
             <div class="analytics-meta">
                 <span>Company:</span> <strong id="metaCompany">-</strong>
                 &nbsp;·&nbsp;
                 <span>User:</span> <strong id="metaUser">-</strong>
-            </div>
-        </div>
+                        </div>
+                    </div>
         <div class="d-flex flex-wrap align-items-center gap-2">
             <div class="btn-group analytics-modes" role="group">
                 <button type="button" class="btn btn-outline-primary active" data-mode="daily">Daily</button>
                 <button type="button" class="btn btn-outline-primary" data-mode="monthly">Monthly</button>
-            </div>
+                            </div>
             <div class="analytics-pickers">
                 <div id="dailyPickerWrap">
                     <input type="date" id="analyticsDate" class="form-control" value="{{ date('Y-m-d') }}">
-                </div>
+                        </div>
                 <div id="monthlyPickerWrap" style="display:none;">
                     <input type="month" id="analyticsMonth" class="form-control" value="{{ date('Y-m') }}">
-                </div>
+                        </div>
                 <span class="analytics-meta" id="periodLabel"></span>
             </div>
         </div>
     </div>
 
-    {{-- Hero Gross / Net Sales --}}
+    {{-- Hero Gross / Net Sales (Total Sale = Admin Close Total Sale) --}}
     <div class="an-section hero-sales">
-        <h3 class="an-section-title">Net Sales</h3>
+        <h3 class="an-section-title">Total Sale</h3>
         <div>
             <span class="hero-amount" data-kpi="net_sales">0</span>
             <span class="hero-change" data-kpi-change="sales_change_pct"></span>
-        </div>
+                </div>
         <div class="hero-secondary">
             <div class="hs-item">
                 <div class="hs-label">Invoices</div>
@@ -182,51 +313,51 @@
             <div class="hs-item">
                 <div class="hs-label">Total Units</div>
                 <div class="hs-value" data-kpi="units_qty">0</div>
-            </div>
+        </div>
             <div class="hs-item">
                 <div class="hs-label">Gross Profit</div>
                 <div class="hs-value" data-kpi="gross_profit">0</div>
-            </div>
+    </div>
             <div class="hs-item">
                 <div class="hs-label">AOV</div>
                 <div class="hs-value" data-kpi="aov">0</div>
-            </div>
-        </div>
+                                    </div>
+                                    </div>
         <div class="hero-grid">
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="sale_returns">0</div>
                 <div class="hg-label">Sale Returns</div>
-            </div>
+                                </div>
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="purchases">0</div>
-                <div class="hg-label">Purchases</div>
-            </div>
+                <div class="hg-label">Purchase Paid</div>
+                            </div>
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="expense">0</div>
                 <div class="hg-label">Expense</div>
-            </div>
+                                    </div>
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="cash_in_hand">0</div>
                 <div class="hg-label">Cash In Hand</div>
-            </div>
+                                    </div>
             <div class="hg-cell">
                 <div class="hg-value" data-kpi="cash_recoveries">0</div>
                 <div class="hg-label">Cash Recoveries</div>
-            </div>
+                                </div>
             <div class="hg-cell">
                 <div class="hg-value" data-split="cash_sales">0</div>
                 <div class="hg-label">Cash Sales</div>
-            </div>
+                            </div>
             <div class="hg-cell">
                 <div class="hg-value" data-split="credit_sales_received">0</div>
                 <div class="hg-label">Credit Received</div>
-            </div>
+                                    </div>
             <div class="hg-cell">
                 <div class="hg-value" data-snap="receivables">0</div>
                 <div class="hg-label">Receivables</div>
-            </div>
-        </div>
-    </div>
+                                    </div>
+                                </div>
+                            </div>
 
     {{-- Key Performance Metrics (gauges) --}}
     <div class="an-section">
@@ -236,58 +367,69 @@
                 <div class="gauge-chart" id="gaugeProfit"></div>
                 <div class="gauge-label">Profit Margin</div>
                 <div class="gauge-hint">Gross profit / net sales</div>
-            </div>
+                                    </div>
             <div class="gauge-card">
                 <div class="gauge-chart" id="gaugeCash"></div>
                 <div class="gauge-label">Cash Sales Share</div>
                 <div class="gauge-hint">Cash sales vs net sales</div>
-            </div>
+                                    </div>
             <div class="gauge-card">
                 <div class="gauge-chart" id="gaugeCollection"></div>
                 <div class="gauge-label">Collection Strength</div>
                 <div class="gauge-hint">Recoveries vs outstanding</div>
-            </div>
+                                </div>
             <div class="gauge-card">
                 <div class="gauge-chart" id="gaugeReturns"></div>
                 <div class="gauge-label">Return Control</div>
                 <div class="gauge-hint">Lower returns = higher score</div>
-            </div>
+                            </div>
         </div>
     </div>
 
-    <div class="row">
+            <div class="row">
         <div class="col-lg-8">
             <div class="an-section">
                 <h3 class="an-section-title" id="trendTitle">Daily Sale Trend</h3>
                 <div class="trend-avg">AVG. Sale/Day <strong data-kpi="avg_daily_sales">0</strong></div>
                 <div id="trendChart" style="height:280px;"></div>
-            </div>
+                                            </div>
             <div class="an-section">
                 <h3 class="an-section-title">In vs Out</h3>
                 <div class="trend-avg mb-2" style="font-size:12px;">Sales &amp; recoveries vs purchases, expense &amp; returns</div>
                 <div id="flowChart" style="height:260px;"></div>
-            </div>
+                                        </div>
             <div class="an-section">
                 <h3 class="an-section-title">Top Customers</h3>
                 <table class="analytics-table">
                     <thead><tr><th>Customer</th><th class="num">Invoices</th><th class="num">Amount</th></tr></thead>
                     <tbody id="topCustomersBody"><tr><td colspan="3">Loading…</td></tr></tbody>
                 </table>
-            </div>
-        </div>
+                                            </div>
+            <div class="an-section">
+                <h3 class="an-section-title">Top Products</h3>
+                <div class="product-cards" id="topProductCards"></div>
+                                        </div>
+                                    </div>
         <div class="col-lg-4">
             <div class="an-section">
                 <h3 class="an-section-title">Top Categories</h3>
                 <div id="mixBars" class="mix-bars"></div>
-                <canvas id="mixChart" height="180" style="margin-top:12px;"></canvas>
-            </div>
+                <div class="mix-chart-wrap">
+                    <canvas id="mixChart" height="180"></canvas>
+                    <div class="mix-chart-center" id="mixChartCenter">
+                        <div class="mix-center-label" id="mixCenterLabel">Gross Sales</div>
+                        <div class="mix-center-value" id="mixCenterValue">Rs. 0</div>
+                        <div class="mix-center-sub" id="mixCenterSub"></div>
+                                </div>
+                                                </div>
+                                            </div>
             <div class="an-section">
                 <h3 class="an-section-title">Top Receivables</h3>
                 <table class="analytics-table">
                     <thead><tr><th>Customer</th><th class="num">Balance</th></tr></thead>
                     <tbody id="topReceivablesBody"><tr><td colspan="2">Loading…</td></tr></tbody>
                 </table>
-            </div>
+                                        </div>
             <div class="an-section">
                 <h3 class="an-section-title">Cash Split</h3>
                 <div class="split-pill"><span>Cash Sales</span><span data-split="cash_sales">0</span></div>
@@ -295,14 +437,9 @@
                 <div class="split-pill"><span>Customer Receipts</span><span data-split="customer_receipts">0</span></div>
                 <div class="split-pill"><span>Vendor Payments</span><span data-split="vendor_payments">0</span></div>
                 <div class="split-pill"><span>Payables</span><span data-snap="payables">0</span></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="an-section">
-        <h3 class="an-section-title">Top Products</h3>
-        <div class="product-cards" id="topProductCards"></div>
-    </div>
+                                    </div>
+                                </div>
+                                            </div>
 </div>
 @endsection
 
@@ -311,5 +448,5 @@
 <script src="https://code.highcharts.com/highcharts-more.js"></script>
 <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-<script src="{{ asset('js/custom/analytics.js') }}?v=4"></script>
+<script src="{{ asset('js/custom/analytics.js') }}?v={{ time() }}"></script>
 @endpush

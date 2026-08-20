@@ -41,6 +41,7 @@ class AdminSaleCloseController extends Controller
                 DB::statement("UPDATE purchase_return_invoices SET is_editable = 0 WHERE is_editable = 1{$tenantClause};");
                 DB::statement("UPDATE product_replacment_invoices SET is_editable = 0 WHERE is_editable = 1{$tenantClause};");
 
+                // Auto queue a DB backup on Admin Close without blocking close operation.
                 try {
                     $databases = DatabaseBackupService::resolveDatabaseNamesFromConfig();
                     if (! empty($databases) && current_tenant_id() !== null) {

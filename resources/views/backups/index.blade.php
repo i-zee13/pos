@@ -14,57 +14,38 @@
                                 <div class="card p-20 top_border mb-3" style="width: 100%">
                                     <h2 class="_head03">Drive <span>connection</span></h2>
                                     <p class="font12 text-muted mb-3" style="line-height: 1.5;">
-                                        Connect the Google account where manual database backups should be uploaded. Google will generate the OAuth token; this app stores the refresh token encrypted.
+                                        Connect the Google account where database backups should be uploaded (manual and daily scheduled). Every user who connects Drive gets a copy on their own Drive. Google generates the OAuth token; this app stores the refresh token encrypted.
                                     </p>
-                                    @if(isset($driveStatus) && !($mailSetting && $mailSetting->hasConnectedGoogleDrive()) && !($driveStatus['ok'] ?? false) && str_contains($driveStatus['message'] ?? '', 'not connected'))
-                                        <div class="alert alert-warning mb-3">
-                                            Google Drive is not connected. Connect below so backups upload to Drive.
-                                        </div>
-                                    @endif
                                     @if($mailSetting && $mailSetting->hasConnectedGoogleDrive())
-                                        @if(isset($driveStatus) && !($driveStatus['ok'] ?? true))
-                                            <div class="alert alert-danger mb-3">
-                                                <strong>Token expired or invalid.</strong>
-                                                {{ $driveStatus['message'] }}
-                                                <br><small class="mt-2 d-block">Disconnect and connect again. For a permanent token, publish your Google OAuth app to <strong>Production</strong> (Testing mode tokens expire in ~7 days).</small>
-                                            </div>
-                                        @else
-                                            <div class="alert alert-success mb-3">
-                                                Connected as <strong>{{ $mailSetting->gmail }}</strong>
-                                                @if($mailSetting->google_drive_connected_at)
-                                                    <br><small>Connected {{ $mailSetting->google_drive_connected_at->format('d M Y h:i A') }}</small>
-                                                @endif
-                                                @if(isset($driveStatus) && ($driveStatus['ok'] ?? false))
-                                                    <br><small class="text-success">Token verified OK.</small>
-                                                @endif
-                                            </div>
-                                        @endif
-                                        <div class="d-flex flex-wrap mb-3" style="gap: 8px;">
-                                            <form method="post" action="{{ route('backups.google.test') }}" class="m-0">
+                                        <div class="alert alert-success mb-3">
+                                            Connected as <strong>{{ $mailSetting->gmail }}</strong>
+                                            @if($mailSetting->google_drive_connected_at)
+                                                <br><small>Connected {{ $mailSetting->google_drive_connected_at->format('d M Y h:i A') }}</small>
+                                            @endif
+                                        </div>
+                                        <div class="d-flex flex-wrap mb-2" style="gap: 8px;">
+                                            <form method="post" action="{{ route('backups.google.refresh') }}" class="m-0">
                                                 @csrf
-                                                <button type="submit" class="btn btn-default btn-line">Test connection</button>
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fa fa-sync"></i> Refresh Token
+                                                </button>
                                             </form>
                                             <form method="post" action="{{ route('backups.google.disconnect') }}" class="m-0">
                                                 @csrf
                                                 <button type="submit" class="btn btn-default btn-line">Disconnect</button>
                                             </form>
-                                            <a href="{{ route('backups.google.connect') }}" class="btn btn-primary">
-                                                <i class="fa fa-refresh"></i> Reconnect
+                                            <a href="{{ route('backups.google.connect') }}" class="btn btn-default btn-line">
+                                                Reconnect
                                             </a>
                                         </div>
+                                        <p class="font12 text-muted mb-0" style="line-height: 1.4;">
+                                            Use <strong>Refresh Token</strong> if Drive upload fails. If refresh fails, use <strong>Reconnect</strong>.
+                                        </p>
                                     @else
                                         <a href="{{ route('backups.google.connect') }}" class="btn btn-primary">
                                             <i class="fa fa-google"></i> Connect Google Drive
                                         </a>
                                     @endif
-                                    <div class="alert alert-light border mt-3 mb-0 font12" style="line-height: 1.5;">
-                                        <strong>Permanent token (recommended):</strong>
-                                        <ol class="mb-0 pl-3">
-                                            <li>Google Cloud Console → APIs &amp; Services → OAuth consent screen → <strong>Publish app</strong> (Production).</li>
-                                            <li>Add redirect URI: <code>{{ route('backups.google.callback') }}</code></li>
-                                            <li>Server cron must run <code>php artisan schedule:run</code> every minute (keeps token alive).</li>
-                                        </ol>
-                                    </div>
                                 </div>
 
                                 <form id="backupGmailForm" method="post" action="{{ route('backups.mail-settings.store') }}">
@@ -158,16 +139,23 @@
                 <div>
                     <h2 class="mb-1">Take backup</h2>
                     <p class="text-muted mb-0" style="font-size: 13px;">
-                        Tenant backup: only your shop data (structure + rows for tenant {{ current_tenant_id() ?? '—' }}).
-                        Databases in this run:
-                        <strong>{{ implode(', ', $databases) }}</strong>
-                        — nightly schedule without a tenant still dumps the full database for server admin.
+                        Tenant backup (merge mode): only your shop data — safe to inject into existing DB without touching other tenants.
+                        Tenant {{ current_tenant_id() ?? '—' }} · databases: <strong>{{ implode(', ', $databases) }}</strong>.
+                        Nightly schedule without a tenant still dumps the full database.
                     </p>
                 </div>
                 <div class="d-flex flex-wrap align-items-center" style="gap: 8px;">
                     <button type="button" class="btn btn-default btn-line" onclick="openSidebar('#product-cl-sec'); return false;">
                         <i class="fa fa-google"></i> Google Drive
                     </button>
+                    @if($mailSetting && $mailSetting->hasConnectedGoogleDrive())
+                    <form action="{{ route('backups.google.refresh') }}" method="post" class="m-0">
+                        @csrf
+                        <button type="submit" class="btn btn-default btn-line" style="font-size: 13px; padding: 8px 14px;" title="Refresh Google Drive token">
+                            <i class="fa fa-sync"></i> Refresh Token
+                        </button>
+                    </form>
+                    @endif
                     <form action="{{ route('backups.store') }}" method="post" class="m-0">
                         @csrf
                         <button type="submit" class="btn btn-primary" style="font-size: 13px; padding: 8px 14px;">

@@ -11,7 +11,6 @@ use App\Models\ReturnInvoice;
 use App\Models\Sale as SaleInvoice;
 use App\Models\SaleReturn;
 use App\Models\SaleReturnProduct;
-use Illuminate\Support\Facades\DB;
 
 if (!function_exists('getSaleInv')) {
    function getSaleInv($id)
@@ -119,6 +118,7 @@ if (!function_exists('PurchaseReportRecords')) {
       } else {
          $query         =  $where;
       }
+      $query .= tenant_and('pp');
       $records          =  DB::select("
                                 SELECT 
                                    DATE_FORMAT(pp.created_at,'%d-%m-%Y %h:%i %p') as created,
@@ -151,27 +151,38 @@ if (!function_exists('PurchaseReportRecords')) {
 if (!function_exists('StockProfitReport')) {
    function StockProfitReport($request, $current_date)
    {
-      $query = " 1=1";
+      $query = " 1=1 AND IFNULL(ps.batch_wise_balance, 0) > 0";
       if (isset($request->company_id)) {
          $query .= " AND ps.company_id = $request->company_id";
       }
       if (isset($request->product_id)) {
          $query .= " AND ps.product_id = $request->product_id";
       }
-      
-    
-      $sales          =  DB::select("
+      $query .= tenant_and('ps');
+
+      // Batch-wise stock profit: each open batch bucket with its own unit cost.
+      $sales = DB::select("
                               SELECT
-                                 DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created, 
-                                 ps.*,
-                                 IFNULL(ps.sale_price,0) AS sale_price,
-                                 IFNULL(ps.purchase_price,0) AS purchase_price,
-                                 IFNULL(ps.balance,0) AS balance
+                                 DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
+                                 ps.id,
+                                 ps.company_id,
+                                 ps.product_id,
+                                 IFNULL(ps.company_name, (SELECT company_name FROM companies WHERE id = ps.company_id)) AS company_name,
+                                 IFNULL(ps.product_name, (SELECT product_name FROM products WHERE id = ps.product_id)) AS product_name,
+                                 IFNULL(ps.batch_wise_balance, 0) AS balance,
+                                 IFNULL(ps.batch_wise_balance, 0) AS qty,
+                                 IFNULL(NULLIF(ps.unit_cost_price, 0), IFNULL(ps.avg_cost_price_per_unit, 0)) AS purchase_price,
+                                 IFNULL(ps.avg_cost_price_per_unit, 0) AS avg_cost_price_per_unit,
+                                 IFNULL(ps.ttl_cost_price, 0) AS ttl_cost_price,
+                                 IFNULL((SELECT sale_price FROM products WHERE id = ps.product_id), 0) AS sale_price,
+                                 ps.expiry_date,
+                                 DATE_FORMAT(ps.expiry_date, '%d %b %Y') AS expiry_label
                               FROM
-                              vendor_stock_managment as ps  
-                              WHERE  
-                              $query AND balance > 0 
-                        "); 
+                              stock_batches_items as ps
+                              WHERE
+                              $query
+                              ORDER BY ps.company_id ASC, ps.product_id ASC, ps.expiry_date ASC, ps.id ASC
+                        ");
 
       return $sales;
    }
@@ -198,6 +209,7 @@ if (!function_exists('ProfitReportRecords')) {
          $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
       }
      
+      $query .= tenant_and('ps');
       // IFNULL(si.invoice_discount/sum(ps.qty),0) AS divide_invoice_discount,
       $sales          =  DB::select("
                               SELECT
@@ -269,6 +281,7 @@ if (!function_exists('PurchaseReportList')) {
          $query       .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
       }
 
+      $query .= tenant_and('ps');
       $purchases          =  DB::select("
                               SELECT
                                  DATE_FORMAT(ps.created_at,'%d-%m-%Y %h:%i %p') as created,
@@ -296,7 +309,7 @@ if (!function_exists('PurchaseReportList')) {
                               LEFT JOIN companies co ON co.id = ps.company_id
                               WHERE
                               $query 
-                              ORDER BY ps.created_at ASC
+                              ORDER BY si.invoice_no ASC
                         ");
                         // dd($purchases);
       $returns        =  DB::select("
@@ -326,7 +339,7 @@ if (!function_exists('PurchaseReportList')) {
                               LEFT JOIN companies co ON co.id = ps.company_id
                               WHERE
                               $query 
-                              ORDER BY ps.created_at ASC
+                              ORDER BY si.invoice_no ASC
                   ");
       $report = [];
       if ($request->report_type == 1) {
@@ -362,6 +375,7 @@ if (!function_exists('ProductReportList')) {
            $query .=  " AND SUBSTRING_INDEX(si.invoice_no, '-', 1) = '$request->bill_no'";
        }
    
+       $query .= tenant_and('ps');
        // Main query
        $reports = DB::select("
                               SELECT
@@ -403,11 +417,11 @@ if (!function_exists('ProductReportList')) {
                                      ps.balance AS p_balance,
                                      ps.actual_status AS p_status
                                   FROM
-                                    vendor_stocks as ps
+                                     vendor_stocks as ps
                                   JOIN products pr ON pr.id = ps.product_id
                                   JOIN companies co ON co.id = ps.company_id
-                                  WHERE ps.product_id = $request->product_id
-                                  ORDER BY p_id ASC
+                                  WHERE ".tenant_where('ps')."
+                                  ORDER BY ps.created_at DESC
                                   LIMIT 5
                                 ");
        }

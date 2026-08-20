@@ -43,9 +43,9 @@ $(document).ready(function () {
                 $('#transactionTable tbody').empty();
                 $('.customer_balnce').val(response.customer.balance);
                 response.transactions.forEach(data => {
-                    balance_sum += data.balance;
-                    cr_sum += data.cr;
-                    dr_sum += data.dr;
+                    balance_sum += parseFloat(data.balance) || 0;
+                    cr_sum += parseFloat(data.cr) || 0;
+                    dr_sum += parseFloat(data.dr) || 0;
 
                     if (action == operation + '-ledger-banam' && data.dr > 0) {
                         console.log(data.cr)

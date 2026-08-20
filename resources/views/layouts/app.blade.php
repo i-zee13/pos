@@ -5,38 +5,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Storeeo.app | The Ultimate POS & Business Management Software</title>
-    <meta name="title" content="Storeeo.app | The Ultimate POS & Business Management Software">
-    <meta name="description" content="Storeeo.app is a powerful cloud-based POS software that helps businesses manage sales, inventory, invoices, and customer data efficiently. Boost your retail or restaurant business with real-time insights and automation.">
-    <meta name="keywords" content="Storeeo.app, POS software, cloud-based POS, inventory management, business automation, sales tracking, best POS system, online invoicing, retail POS, restaurant POS">
-    <meta name="author" content="Storeeo.app">
-    <meta name="robots" content="index, follow">
-    <meta name="revisit-after" content="7 days">
-    <meta name="language" content="English">
-
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://storeeo.app/">
-  <meta property="og:title" content="Storeeo.app | The Ultimate POS & Business Management Software">
-  <meta property="og:description" content="Simplify your business operations with Storeeo.app. A cloud-based POS system that enables seamless sales, invoicing, and inventory tracking. Try it now!">
-  <meta property="og:image" content="https://storeeo.app/files/logo-blue.png">
-  <meta property="og:site_name" content="Storeeo.app">
-  
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://storeeo.app/">
-  <meta property="twitter:title" content="Storeeo.app | The Ultimate POS & Business Management Software">
-  <meta property="twitter:description" content="Manage your business efficiently with Storeeo.app, the all-in-one cloud POS software for sales, invoicing, and inventory tracking.">
-  <meta property="twitter:image" content="https://storeeo.app/files/logo-blue.png">
-  <meta property="twitter:site" content="@StoreeoApp">
-  
-  <!-- Favicon -->
-  <link rel="icon" href="https://storeeo.app/favicon.ico" type="image/x-icon">
-
-
-
-    <meta name="distribution" content="global"> <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf_token" content="{{ csrf_token() }}">
+    {{-- Logged-in tenant ke system customers (Counter Sale / Expense / Net Purchase ...).
+         JS me numeric id hardcode karne ke bajaye window.SYS_CUSTOMERS.<CODE> use karein. --}}
     <script>window.SYS_CUSTOMERS = {!! json_encode((object) sys_customers()) !!};</script>
     <script>
         window.EXPORT_META = {
@@ -46,7 +19,6 @@
             userName: @json(optional(Auth::user())->name ?? '')
         };
     </script>
-    <meta name="csrf_token" content="{{ csrf_token() }}">
     <!-- Favicon -->
     <link rel="shortcut icon" href="https://dashkit.goodthemes.co/assets/favicon/favicon.ico" type="image/x-icon">
     {{ seo()->render() }}
@@ -146,7 +118,10 @@
             opacity: 0;
         }
 
-      
+        /* .select2 {
+            width: 100% !important;
+            z-index: 999
+        } */
 
         .dz-image img {
             width: 100%;
@@ -159,6 +134,19 @@
 
         .datepicker-dropdown {
             z-index: 1060 !important;
+        }
+
+        /* Ensure top profile dropdown stays above report headers/cards */
+        nav.navbar.static-top {
+            position: relative;
+            z-index: 20000;
+        }
+        nav.navbar.static-top .dropdown-menu {
+            z-index: 20001 !important;
+        }
+        /* Sidebar user dropdown (bottom avatar) */
+        #sidebarUser .dropdown-menu {
+            z-index: 20001 !important;
         }
 
         #repDelayBtn:hover,
@@ -178,11 +166,7 @@
             background-color: hsl(0, 0%, 90%);
         }
 
-        .smBTN:hover {
-            background: linear-gradient(90deg, green 0%, green 100%) !important;
-        }
-
-        .smBTN:focus,#save:focus,#print-invoice:focus {
+       .smBTN:focus,#save:focus,#print-invoice:focus {
             background: white !important;
             color: #040725 !important;
             border: 1px solid #040725 !important;
@@ -192,7 +176,6 @@
             color: #040725 !important;
             border: 1px solid #040725 !important;
         }
-
 
         .btn-product-add:focus {
             background: green !important;
@@ -249,24 +232,24 @@
             left: 0;right: 0;top: 0;bottom: 0;}
 
             @-webkit-keyframes wcLoading {
-                0% {
-                    -webkit-transform: scaleY(0.1);
-                    transform: scaleY(0.1);
-                    background: var(--white);
-                }
+    0% {
+        -webkit-transform: scaleY(0.1);
+        transform: scaleY(0.1);
+        background: var(--white);
+    }
 
-                50% {
-                    -webkit-transform: scaleY(1);
-                    transform: scaleY(1);
-                    background: #001e35;
-                }
+    50% {
+        -webkit-transform: scaleY(1);
+        transform: scaleY(1);
+        background: #001e35;
+    }
 
-                100% {
-                    -webkit-transform: scaleY(0.1);
-                    transform: scaleY(0.1);
-                    background: transparent;
-                }
-            }
+    100% {
+        -webkit-transform: scaleY(0.1);
+        transform: scaleY(0.1);
+        background: transparent;
+    }
+}
 
 @keyframes wcLoading {
     0% {
@@ -371,20 +354,6 @@
      .navbar-brand-img{ 
             height: 50px !important;
      }
-      .left-sidebox{
-          max-width: 320px !important;
-     }
-     div#btns_div{
-        padding:5px !important;
-     }
-     table.totalValues {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    span.select2-dropdown.select2-dropdown--below{
-            width: 170px !important;
-    }
  }
  .select2-container--open .select2-dropdown--above, .select2-container--open .select2-dropdown--below {
     font-weight: bolder;}
@@ -396,13 +365,6 @@
 </head>
 
 <body style="display: block;font-family: system-ui !important;">
-    <!-- Sticky Notification Bar -->
-    @php
-        $today = \Carbon\Carbon::now();
-        $showSticky = $today->day >= 1 && $today->day <= 8;
-        $currentMonth = $today->format('F');
-    @endphp
-    
     @php $close_routes = closeRoute() @endphp
     @php $is_close = isClose();
     $is_container = 0;
@@ -410,7 +372,7 @@
     <div id="notifDiv">
     </div>
 
-    @if(request()->segment(1) != 'stock-add' && request()->segment(1) != 'purchase-edit' && request()->segment(1) != 'sale-add' && request()->segment(1) != 'test-sale'
+    @if(request()->segment(1) != 'stock-add' && request()->segment(1) != 'purchase-edit' && request()->segment(1) != 'sale-add'
     && request()->segment(1) != 'sale-edit' && request()->segment(1) != 'sale-return' && request()->segment(1) != 'add-return'
     && request()->segment(1) != 'edit-sale-return' && request()->segment(1) != 'product-replacement-create' && request()->segment(1) != 'product-replacement-edit'
     && request()->segment(1) != 'detail' && request()->segment(1) != 'purchase-return-edit' && request()->segment(1) != 'sale-detail')
@@ -469,7 +431,12 @@
         var segments = location.href.split('/');
         var action = segments[3];
         $(document).ready(function() {
-            setTimeout(() => { 
+            setTimeout(() => {
+                // Analytics page owns its own loader until /analytics/summary returns
+                // Invoice pages keep loader while previous balance is still loading
+                if ($('#analyticsPage').length || window.invoiceBalanceLoading) {
+                    return;
+                }
                 $('#tblLoader').hide();
                 $('.parent-div').show();
             }, 1500);
@@ -562,6 +529,7 @@
             $("#product-cl-sec").removeClass("active");
             $("#product-add").removeClass("active");
             $("#performaPreferences").removeClass("active");
+            $("#backup-gmail-sidebar").removeClass("active");
             $(".overlay").removeClass("active");
             //$("body").toggleClass("no-scroll");
             $("#contentContainerDiv").removeClass("blur-div");

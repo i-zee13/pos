@@ -47,13 +47,14 @@ $('.search-btn').on('click', function () {
             CurrentRef.attr('disabled', false);
             $('.loader').show();
             $('.teacher_attendance_list').empty();
+            var isStockProfit = String($('.report_type').val()) === '2';
             $('.teacher_attendance_list').append(`
                 <table class="table table-hover dt-responsive nowrap TeacherAttendanceListTable" style="width:100%;">
                     <thead>
                         <tr>
-                            
                             <th>Company Name</th>
                             <th>Product Name</th>
+                            ${isStockProfit ? '<th>Expiry / Batch</th>' : ''}
                             <th>Qty</th>
                             <th>Cost Price</th>
                             <th>Sale Price</th>
@@ -64,7 +65,7 @@ $('.search-btn').on('click', function () {
                 </table>`);
 
             $('.TeacherAttendanceListTable tbody').empty();
-            if (response.sales.length == 0) {
+            if (!response.sales || response.sales.length == 0) {
                 $('#notifDiv').fadeIn();
                 $('#notifDiv').css('background', 'green');
                 $('#notifDiv').text('No data available');
@@ -79,42 +80,39 @@ $('.search-btn').on('click', function () {
             var ttl_invoice_discount  = 0;
             var ttl_cost_product      = 0;
             var ttl_sale_product      = 0;
-            var purchase_price        = 0;
-            response.sales.forEach((element, key) => {
+            (response.sales || []).forEach((element, key) => {
                 var purchase_price = 0;
+                // Batch / sale line cost first, then product master fallbacks
                 if (element['purchase_price']) {
                     purchase_price = element['purchase_price'];
+                } else if (element['product_purchased_price']) {
+                    purchase_price = element['product_purchased_price'];
                 } else if (element['new_purchase_price']) {
                     purchase_price = element['new_purchase_price'];
                 } else {
                     purchase_price = element['old_purchase_price'];
-                }  
-                if(element['qty']){
-                  qty = element['qty'];
-                }else{
-                  qty = element['balance']
                 }
-                var avg_profit        =  ((element['sale_price'] - purchase_price) / purchase_price) * 100;
-                total_avg_profit      += avg_profit;
-                ttl_quantity          += qty ? qty : 0; 
-                var sale_price        =  (element['sale_price'] ? element['sale_price'] : 0);
-                total_profit          += (element['sale_price'] - purchase_price) * qty;
-                console.log(total_profit,element.id);
-                ttl_cost_product      += purchase_price * qty;
-                ttl_sale_product      += sale_price * qty; 
-                ttl_invoice_discount  += element['invoice_discount'] ? element['invoice_discount'] : 0;
-                ttl_product_discount  += element['product_discount'] ? element['product_discount'] : 0;
-                var date               =  new Date(element.expire_date);
-                var formattedDate      = date.toDateString();
-                var invoice_no         = key;
-                if(element.invoice_no){
+                purchase_price = (typeof toNum === 'function' ? toNum(purchase_price) : (parseFloat(purchase_price) || 0));
+                var qty = (typeof toNum === 'function' ? toNum(element['qty'] != null ? element['qty'] : element['balance']) : (parseFloat(element['qty'] != null ? element['qty'] : element['balance']) || 0));
+                var saleUnit = (typeof toNum === 'function' ? toNum(element['sale_price']) : (parseFloat(element['sale_price']) || 0));
+                // Per-batch / per-line markup %
+                var avg_profit = purchase_price > 0 ? ((saleUnit - purchase_price) / purchase_price) * 100 : 0;
+                ttl_quantity += qty;
+                total_profit += (saleUnit - purchase_price) * qty;
+                ttl_cost_product += purchase_price * qty;
+                ttl_sale_product += saleUnit * qty;
+                ttl_invoice_discount += (typeof toNum === 'function' ? toNum(element['invoice_discount']) : (parseFloat(element['invoice_discount']) || 0));
+                ttl_product_discount += (typeof toNum === 'function' ? toNum(element['product_discount']) : (parseFloat(element['product_discount']) || 0));
+                var invoice_no = key;
+                if (element.invoice_no) {
                   invoice_no = element.invoice_no.split('-');
-                  invoice_no = invoice_no[0]
-                }  
-                reportTable(invoice_no, element, purchase_price, avg_profit)
+                  invoice_no = invoice_no[0];
+                }
+                reportTable(invoice_no, element, purchase_price, avg_profit, isStockProfit)
             });
+            // Weighted average profit % across all batches/lines: (Total Profit / Total Cost) * 100
+            total_avg_profit = ttl_cost_product > 0 ? (total_profit / ttl_cost_product) * 100 : 0;
             $('.TeacherAttendanceListTable').fadeIn();
-            // sale_return_total(ttl_quantity,ttl_product_discount,total_profit,'Sale')
             $('.filter_name').empty();
             if ($('.product_id').val() != '') {
                 $('.filter_name').html('Product: <span>' + $('.product_id option:selected').text() + '</span>');
@@ -126,8 +124,8 @@ $('.search-btn').on('click', function () {
             $('.TeacherAttendanceListTable tbody').append(`
             <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
                 <td></td>
-                <td class="font18">Grand Total :</td>
-                <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${ttl_quantity}</td>
+                <td class="font18"${isStockProfit ? ' colspan="2"' : ''}>Grand Total :</td>
+                <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${addCommas(ttl_quantity)}</td>
                 <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${addCommas(ttl_cost_product)}</td>
                 <td class="totalNo"  style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> ${addCommas(ttl_sale_product)}</td>
                 <td class="totalNo" colspan="2">
@@ -137,13 +135,12 @@ $('.search-btn').on('click', function () {
         `);
 
 
-            $('.ttl_sales').html('<span>Rs.</span>' + addCommas(total_profit.toFixed(2)) + ` <span style="font-size: 28px"> ( <span style="color: ${total_avg_profit > 0 ? '#29f129' : 'red' };font-size: 25px">  ${total_avg_profit.toFixed(2)}% </span> )</span>`);
-            // $('.ttl_payment').html(total_profit ? addCommas(addCommas(parseInt(total_profit + ttl_invoice_discount + ttl_product_discount))) : 0);
-            $('.ttl_payment').html(ttl_cost_product ? addCommas(ttl_cost_product.toFixed(2)) : 0);
-            $('.ttl_quantity').html(ttl_quantity ? addCommas(ttl_quantity.toFixed(2)) : 0);
-            $('.ttl_product_discount').html(ttl_sale_product ? addCommas(ttl_sale_product.toFixed(2)) : 0);
-            $('.ttl_invoice_discount').html(ttl_invoice_discount ? addCommas(ttl_invoice_discount.toFixed(2)) : 0);
-            $('.ttl_discount').html(ttl_product_discount ? addCommas(ttl_product_discount.toFixed(2)) : 0);
+            $('.ttl_sales').html('<span>Rs.</span>' + addCommas(total_profit) + ` <span style="font-size: 28px"> ( <span style="color: ${total_avg_profit > 0 ? '#29f129' : 'red' };font-size: 25px">  ${total_avg_profit.toFixed(2)}% </span> )</span>`);
+            $('.ttl_payment').html(ttl_cost_product ? addCommas(ttl_cost_product) : 0);
+            $('.ttl_quantity').html(ttl_quantity ? addCommas(ttl_quantity) : 0);
+            $('.ttl_product_discount').html(ttl_sale_product ? addCommas(ttl_sale_product) : 0);
+            $('.ttl_invoice_discount').html(ttl_invoice_discount ? addCommas(ttl_invoice_discount) : 0);
+            $('.ttl_discount').html(ttl_product_discount ? addCommas(ttl_product_discount) : 0);
 
             $('.loader').hide();
             var title = 'Profit Report';
@@ -295,15 +292,22 @@ $('.search-btn').on('click', function () {
     });
 });
 
-function reportTable(invoice_no, element, purchase_price, avg_profit) {
+function reportTable(invoice_no, element, purchase_price, avg_profit, isStockProfit) {
+    var qty = (typeof toNum === 'function' ? toNum(element['qty'] != null ? element['qty'] : element['balance']) : (parseFloat(element['qty'] != null ? element['qty'] : element['balance']) || 0));
+    var saleUnit = (typeof toNum === 'function' ? toNum(element['sale_price']) : (parseFloat(element['sale_price']) || 0));
+    var lineProfit = (saleUnit - purchase_price) * qty;
+    var expiryCell = isStockProfit
+        ? `<td style="font-family: 'Rationale', sans-serif !important;font-size: 14px;">${element['expiry_label'] || element['expiry_date'] || 'NA'}</td>`
+        : '';
     $('.TeacherAttendanceListTable tbody').append(`
                     <tr> 
-                        <td>${element['company_name']}</td>
-                        <td>${element['product_name']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['qty'] ?? element['balance']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${purchase_price}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${element['sale_price']}</td>
-                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;"><i  class="${ (element['sale_price'] - purchase_price ) > 0 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger'}"></i>  <strong style="font-family: 'Rationale', sans-serif !important; font-size: 19px;" >${addCommas((element['sale_price'] - purchase_price) * (element['qty'] ?? element['balance']  ))}</strong> <span style="color: ${avg_profit > 0 ? 'green' : 'red' };">${avg_profit.toFixed(2)}% </span></td>
+                        <td>${element['company_name'] || ''}</td>
+                        <td>${element['product_name'] || ''}</td>
+                        ${expiryCell}
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(qty)}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(purchase_price)}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;">${addCommas(saleUnit)}</td>
+                        <td style="font-family: 'Rationale', sans-serif !important;font-size: 16px;"><i  class="${ lineProfit > 0 ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger'}"></i>  <strong style="font-family: 'Rationale', sans-serif !important; font-size: 19px;" >${addCommas(lineProfit)}</strong> <span style="color: ${avg_profit > 0 ? 'green' : 'red' };">${avg_profit.toFixed(2)}% </span></td>
                     </tr>`);
 }
 
@@ -363,6 +367,12 @@ $('.reset-btn').on('click', function () {
 })
 
 function addCommas(nStr) {
+    if (typeof toNum === 'function') {
+        nStr = toNum(nStr);
+    } else {
+        nStr = parseFloat(nStr) || 0;
+    }
+    nStr = Math.round(nStr * 10000) / 10000;
     nStr += "";
     x = nStr.split(".");
     x1 = x[0];

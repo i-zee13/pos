@@ -3564,7 +3564,7 @@
                                 <select class="form-control formselect report_type" name="report_type">
                                     <option value="">Report Type</option>
                                     <option value="1">Sale Profit</option>
-                                    <option value="2">Stock Profit</option>
+                                    <option value="2">Stock Profit (Batch-wise)</option>
                                 </select>
                             </div>
                         </div>

@@ -57,9 +57,18 @@ $('#add-product').on('focus', function () {
 $('#add-product').on('blur', function () {
     $(this).css('background', 'green');
 });
-$(document).on('mouseenter', '.show_purchase', function () {
+$(document).on('mouseenter', '.show_purchase', function () { 
     $('.pp').show();
 }).on('mouseleave', '.show_purchase', function () {
+    $('.pp').hide();
+});
+// Keyboard (example: ALT key)
+$(document).on('keydown', function (e) {
+   
+    $('.pp').show();
+});
+
+$(document).on('keyup', function () {
     $('.pp').hide();
 });
 $('body').on('mouseenter', '.ProductTable tr', function () {

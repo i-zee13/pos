@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BatchStockMgt;
 use App\Models\Customer;
 use App\Models\CustomerLedger;
+use App\Models\Godown;
 use App\Models\Product;
 use App\Models\ProductReturns;
 use App\Models\SaleReturn;
 use App\Models\SaleReturnProduct;
 use App\Models\Stock;
 use App\Models\VendorStock;
-use App\Models\Godown;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 // use Auth;
@@ -64,7 +65,14 @@ class SalesReturnController extends Controller
         $invoice->total_invoice_amount = ($request->product_net_total + $request->service_charges) - $request->invoice_discount;
         if ($request->invoice_type == 1 && $request->customer_id == sys_customer_id('COUNTER_SALE')) {
             $is_net_return = true;
-            $invoice->paid_amount      = $request->amount_to_pay;
+            // Counter Sale has no receivable — cash return = product net (± charges/discount)
+            $net_return = (float) $request->product_net_total + (float) $request->service_charges - (float) $request->invoice_discount;
+            $invoice->paid_amount      = $request->amount_to_pay !== null && $request->amount_to_pay !== ''
+                ? (float) $request->amount_to_pay
+                : $net_return;
+            if ((float) $invoice->paid_amount <= 0 && $net_return > 0) {
+                $invoice->paid_amount = $net_return;
+            }
             $total_cr                  = $invoice->paid_amount;
             $invoice->invoice_remaining_amount_after_pay  = 0;
         } else {
@@ -112,6 +120,8 @@ class SalesReturnController extends Controller
                         ->value('qty');
 
                     if ($sale->save()) {
+                        // Runtime only — not a DB column; used by BatchWiseStockManagment
+                        $sale->batch_row_id = $sale_product['batch_row_id'] ?? null;
                         $sale_products_array[] = $sale->id;
                         $check_stock           =  VendorStock::where('product_id', $sale->product_id)->orderBy('id', 'DESC')->first();
                         $vendor_id  = 0;
@@ -161,6 +171,7 @@ class SalesReturnController extends Controller
                                     );
                                 }
                             }
+                            // Only delta qty + correct IN/OUT; was wrongly always full qty as IN outside flag
                             BatchWiseStockManagment($vs_id, $invoice->id, $sale, $change_qty_value, $In_out_status, 4, $request->hidden_invoice_id);
                         }
                     }
@@ -302,6 +313,26 @@ class SalesReturnController extends Controller
             }
         }
     }
+
+    /**
+     * Batches for sale-return Exp. Date dropdown.
+     * Includes zero-balance batches so a depleted expiry (e.g. Feb sold out) can still be selected on return.
+     */
+    public function openBatches($product_id)
+    {
+        $batches = BatchStockMgt::where('product_id', (int) $product_id)
+            ->orderByRaw("CASE WHEN IFNULL(batch_wise_balance,0) > 0 THEN 0 ELSE 1 END ASC")
+            ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
+            ->orderBy('expiry_date', 'ASC')
+            ->orderBy('id', 'ASC')
+            ->get(['id', 'expiry_date', 'batch_wise_balance', 'unit_cost_price', 'company_id']);
+
+        return response()->json([
+            'status'  => 'success',
+            'batches' => $batches,
+        ]);
+    }
+
     public function deleteInvoice(Request $request)
     {
         $invoice_products   =  SaleReturnProduct::where('sale_return_invoice_id', $request->id)->get();

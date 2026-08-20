@@ -55,7 +55,8 @@
                         <tr>
                             <th>Invoice #</th>
                             <th>Vendor Name</th>
-                            <th>Description</th>
+                                                        <th>Description</th>
+
                             <th>Paid</th>
                             <th>Amount</th>
                             <th>Action</th>

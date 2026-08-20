@@ -3532,6 +3532,71 @@
         height: 31px !important;
     }
 
+    /* Stock Value Report filter row — aligned heights */
+    .Product-Filter #search-form > .row > .col-auto {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        float: none;
+    }
+    .Product-Filter .CL-Product.inputmonth {
+        width: 160px;
+        margin-left: 0;
+        padding-top: 0;
+        float: none;
+    }
+    .Product-Filter .CL-Product.inputmonth .fa {
+        display: none;
+    }
+    .Product-Filter .CL-Product.inputmonth input.form-control {
+        height: 32px !important;
+        padding: 4px 8px !important;
+        font-size: 13px;
+        line-height: 1.2;
+        border: 1px solid #dedede;
+        box-shadow: none;
+    }
+    .Product-Filter ._cust_filter {
+        width: 180px;
+        float: none;
+        padding: 0;
+        margin: 0;
+    }
+    .Product-Filter ._cust_filter .form-s2,
+    .Product-Filter ._cust_filter .select2-container {
+        width: 100% !important;
+    }
+    .Product-Filter ._cust_filter .select2-container .select2-selection--single {
+        height: 32px !important;
+        border: 1px solid #dedede !important;
+        border-radius: 2px;
+    }
+    .Product-Filter ._cust_filter .select2-container .select2-selection--single .select2-selection__rendered {
+        line-height: 30px !important;
+        font-size: 13px;
+        padding-left: 8px;
+    }
+    .Product-Filter ._cust_filter .select2-container .select2-selection--single .select2-selection__arrow {
+        height: 30px !important;
+    }
+    .Product-Filter .svr-filter-actions {
+        float: none !important;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 !important;
+    }
+    .Product-Filter .svr-filter-actions .btn-primary {
+        height: 32px;
+        padding: 0 18px !important;
+        font-size: 13px !important;
+        line-height: 30px;
+        margin: 0 !important;
+    }
+
     .reset-btn {
         box-shadow: none;
     }
@@ -3569,13 +3634,13 @@
             <form id="search-form">
                 <div class="row">
                     <div class="col-auto">
-                        <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
-                            <input type="date" autocomplete="off" class="form-control " placeholder="Start Date" name="start_date" value="{{date('Y-m-d')}}">
+                        <div class="CL-Product inputmonth">
+                            <input type="date" autocomplete="off" class="form-control" placeholder="Start Date" name="start_date" value="{{date('Y-m-d')}}">
                         </div>
-                        <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt"></i>
+                        <div class="CL-Product inputmonth">
                             <input type="date" autocomplete="off" class="form-control" placeholder="End Date" name="end_date" value="{{date('Y-m-d')}}">
                         </div>
-                        <div class="_cust_filter ">
+                        <div class="_cust_filter">
                             <div class="form-s2">
                                 <select class="form-control formselect company_id" name="company_id">
                                     <option value="">Select Company</option>
@@ -3585,33 +3650,31 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter ">
+                        <div class="_cust_filter">
                             <div class="form-s2">
                                 <select class="form-control formselect product_id" name="product_id">
-                                    <option value="">Select Product</option>
-                                    @foreach($products as $company)
-                                    <option value="{{$company->id}}">{{$company->id}}-{{$company->product_name}}</option>
+                                    <option value="">Select Product (all of company if empty)</option>
+                                    @foreach($products as $product)
+                                    <option value="{{$product->id}}" data-company-id="{{$product->company_id}}">{{$product->id}}-{{$product->product_name}}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
-                        <div class="_cust_filter ">
+                        <div class="_cust_filter">
                             <div class="form-s2">
-                                <select class="form-control formselect product_id filter_by_value" name="filter_by_value">
+                                <select class="form-control formselect filter_by_value" name="filter_by_value">
                                     <option value="">Select Value</option>
                                     <option value="1">By Average</option>
                                     <option value="2">By Last Price</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="col-auto" style="float:right;">
-                            <button type="button" class="btn btn-primary m-0 search-btn" style=" margin-right:10px !important"> Search</button>
-                            <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#152e4d !important"> Reset</button>
+                        <div class="svr-filter-actions">
+                            <button type="button" class="btn btn-primary search-btn">Search</button>
+                            <button type="button" class="btn btn-primary btn-line reset-btn" style="color:#152e4d !important">Reset</button>
                         </div>
                     </div>
-
                 </div>
-
             </form>
             <div class="clearfix"></div>
         </div>
@@ -3635,8 +3698,7 @@
                         <div class="col-12">
                             <div class="row top_three_units_div">
                                 <div class="col unit-v">Total Products<span class="ttl_products">0</span></div>
-                                {{-- <div class="col unit-v">Total Units<span class="ttl_units">0</span> </div>
-                                <div class="col unit-v">Total Net Revenue<span class="ttl_net_revenue">0.00</span></div> --}}
+                                <div class="col unit-v">Batch Count<span class="ttl_batches">0</span></div>
                             </div>
                         </div>
                     </div>
@@ -3677,7 +3739,127 @@
         </div>
     </div>
 </div>
+
+{{-- Average formula console (debugbar-style: black bg, green text, toggle + drag resize) --}}
+<button type="button" id="avgConsoleToggle" class="avg-console-toggle" title="Average price breakdown">AVG</button>
+<div id="avgFormulaConsole" class="avg-formula-console" aria-hidden="true">
+    <div class="avg-console-resize" id="avgConsoleResize" title="Drag up/down to resize"></div>
+    <div class="avg-console-bar">
+        <span class="avg-console-title">How Average Price is Calculated <small style="opacity:.7;font-weight:500">(top border drag karke upar/neeche karen)</small></span>
+        <button type="button" class="avg-console-close" id="avgConsoleClose">×</button>
+    </div>
+    <div id="avgConsoleBody" class="avg-console-body">
+        <p class="avg-hint">Company / Product select karke <strong>By Average</strong> + Search karen — yahan har product ka batch-wise hisaab table mein dikhega.</p>
+    </div>
+</div>
+<style>
+.avg-console-toggle {
+    position: fixed; right: 18px; bottom: 18px; z-index: 99998;
+    width: 48px; height: 48px; border-radius: 50%; border: 1px solid #1aff8c;
+    background: #0b0f0c; color: #1aff8c; font-weight: 700; font-size: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.35); cursor: pointer;
+}
+.avg-console-toggle.active { background: #1aff8c; color: #0b0f0c; }
+.avg-formula-console {
+    display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 99999;
+    height: 42vh; min-height: 160px; max-height: 92vh;
+    background: #0b0f0c; border-top: 2px solid #1aff8c;
+    font-family: Consolas, Monaco, "Courier New", monospace;
+}
+.avg-formula-console.open { display: flex; flex-direction: column; }
+.avg-formula-console.resizing { user-select: none; }
+.avg-console-resize {
+    position: absolute; top: -4px; left: 0; right: 0; height: 10px;
+    cursor: ns-resize; z-index: 2;
+}
+.avg-console-resize::before {
+    content: ''; display: block; width: 48px; height: 4px; margin: 3px auto 0;
+    border-radius: 2px; background: #1aff8c; opacity: .85;
+}
+.avg-console-resize:hover::before,
+.avg-formula-console.resizing .avg-console-resize::before {
+    opacity: 1; width: 72px; background: #7CFFB2;
+}
+.avg-console-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px; background: #111814; border-bottom: 1px solid #1e3d2c;
+    flex-shrink: 0;
+}
+.avg-console-title { color: #1aff8c; font-size: 14px; font-weight: 700; letter-spacing: .3px; }
+.avg-console-close {
+    background: transparent; border: 0; color: #1aff8c; font-size: 22px; line-height: 1; cursor: pointer;
+}
+.avg-console-body {
+    flex: 1; margin: 0; padding: 12px 16px; overflow: auto;
+    color: #7CFFB2; font-size: 13px; min-height: 0;
+}
+.avg-console-body .avg-hint { margin: 0 0 12px; color: #9ae6b4; }
+.avg-console-body .avg-summary {
+    margin: 0 0 14px; padding: 8px 12px; background: #111814; border-left: 3px solid #1aff8c;
+}
+.avg-console-body .avg-product-block {
+    margin-bottom: 18px; border: 1px solid #1e3d2c; border-radius: 4px; overflow: hidden;
+}
+.avg-console-body .avg-product-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 12px; background: #13251a; color: #1aff8c; font-weight: 700; font-size: 14px;
+}
+.avg-console-body .avg-product-title { flex: 1; min-width: 0; }
+.avg-console-body .avg-rate-badge {
+    flex-shrink: 0; text-align: right; padding: 6px 12px;
+    border: 2px solid #1aff8c; border-radius: 4px; background: #0b0f0c;
+    line-height: 1.15;
+}
+.avg-console-body .avg-rate-badge .avg-rate-label {
+    display: block; font-size: 11px; font-weight: 700; letter-spacing: .6px;
+    text-transform: uppercase; color: #9ae6b4; margin-bottom: 2px;
+}
+.avg-console-body .avg-rate-badge .avg-rate-value {
+    display: block; font-size: 22px; font-weight: 800; color: #1aff8c;
+}
+.avg-console-body .avg-rate-badge.large .avg-rate-value { font-size: 28px; }
+.avg-console-body .avg-result-flex {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.avg-console-body .avg-result-left { flex: 1; }
+.avg-console-body .avg-product-meta {
+    padding: 6px 12px; color: #9ae6b4; font-size: 12px; border-bottom: 1px solid #1e3d2c;
+}
+.avg-console-body .avg-formula-note {
+    padding: 6px 12px; color: #b8f5d0; font-size: 12px; background: #0e1611;
+}
+.avg-console-body .avg-formula-note strong { color: #1aff8c; }
+.avg-console-body table.avg-batch-table {
+    width: 100%; border-collapse: collapse; margin: 0;
+}
+.avg-console-body table.avg-batch-table th {
+    text-align: left; padding: 7px 10px; background: #163222; color: #1aff8c;
+    font-weight: 700; font-size: 12px; border-bottom: 1px solid #1aff8c;
+}
+.avg-console-body table.avg-batch-table td {
+    padding: 6px 10px; border-bottom: 1px solid #1e3d2c; color: #7CFFB2; font-size: 12px;
+}
+.avg-console-body table.avg-batch-table tr:last-child td { border-bottom: 0; }
+.avg-console-body table.avg-batch-table tfoot td {
+    background: #13251a; color: #1aff8c; font-weight: 700; border-top: 1px solid #1aff8c;
+}
+.avg-console-body .avg-result-box {
+    padding: 8px 12px; background: #0e1611; border-top: 1px solid #1e3d2c;
+}
+.avg-console-body .avg-result-box .avg-big {
+    color: #1aff8c; font-weight: 700; font-size: 15px;
+}
+.avg-console-body .avg-empty { color: #9ae6b4; padding: 8px 12px; }
+.avg-console-body .avg-mismatch {
+    margin: 0; padding: 10px 12px; background: #2a1510; border-top: 2px solid #ff6b4a;
+    color: #ffb4a2; font-size: 12px; line-height: 1.45;
+}
+.avg-console-body .avg-mismatch strong { color: #ff6b4a; }
+.avg-console-body .avg-mismatch code {
+    color: #1aff8c; background: #0b0f0c; padding: 1px 6px; border-radius: 3px;
+}
+</style>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/stock-value-report.js') }}"></script>
+<script src="{{asset('js/custom/stock-value-report.js') }}?v=8"></script>
 @endpush

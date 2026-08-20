@@ -17356,10 +17356,87 @@ var service_charges = 0;
 var invoice_discount = 0;
 var data_variable = '';
 var return_total = 0;
+var selected_batch_row_id = '';
+function formatBatchExpiryLabel(expiryDate) {
+  if (!expiryDate || expiryDate === '0000-00-00' || expiryDate === 'null') {
+    return 'No Expiry';
+  }
+  var parts = String(expiryDate).substring(0, 10).split('-');
+  if (parts.length !== 3) {
+    return expiryDate;
+  }
+  var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var day = parseInt(parts[2], 10);
+  var month = months[parseInt(parts[1], 10) - 1] || parts[1];
+  return "".concat(day, " ").concat(month, ", ").concat(parts[0]);
+}
+function isCounterSaleCustomer(customerId) {
+  var counterId = window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE || 8;
+  return String(customerId) === String(counterId);
+}
+function loadOpenBatches(productId) {
+  var selectedExpiry = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  var selectedBatchId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  var $sel = $('#expiry_date');
+  var $custom = $('#custom_expiry_date');
+  $sel.empty().append("<option value=\"\">Batch (optional)</option>");
+  selected_batch_row_id = '';
+  expiry_date = '';
+  if ($custom.length) {
+    $custom.val(selectedExpiry ? String(selectedExpiry).substring(0, 10) : '');
+  }
+  if (!productId || productId <= 0) {
+    return;
+  }
+  $.ajax({
+    url: '/open-batches/' + productId,
+    type: 'get',
+    success: function success(response) {
+      var batches = response.batches || [];
+      batches.forEach(function (b) {
+        var exp = (b.expiry_date || '').substring(0, 10);
+        var bal = parseFloat(b.batch_wise_balance) || 0;
+        var label = formatBatchExpiryLabel(exp) + ' (bal: ' + bal.toFixed(0) + ')';
+        var selected = selectedBatchId && String(b.id) === String(selectedBatchId) || !selectedBatchId && selectedExpiry && exp === String(selectedExpiry).substring(0, 10);
+        $sel.append("<option value=\"".concat(exp, "\" data-batch-id=\"").concat(b.id, "\" ").concat(selected ? 'selected' : '', ">").concat(label, "</option>"));
+      });
+      if ($sel.val()) {
+        selected_batch_row_id = $sel.find('option:selected').data('batch-id') || '';
+        expiry_date = $sel.val();
+        if ($custom.length) {
+          $custom.val(expiry_date);
+        }
+      } else if (selectedExpiry && $custom.length) {
+        // Saved/custom expiry not in list — keep date only (no forced batch)
+        $custom.val(String(selectedExpiry).substring(0, 10));
+        expiry_date = $custom.val();
+        selected_batch_row_id = '';
+      }
+    }
+  });
+}
+function resolveAddRowExpiry() {
+  var $sel = $('#expiry_date');
+  var $custom = $('#custom_expiry_date');
+  var selectedExp = ($sel.val() || '').trim();
+  var customExp = ($custom.val() || '').trim();
+  if (selectedExp) {
+    selected_batch_row_id = $sel.find('option:selected').data('batch-id') || '';
+    expiry_date = selectedExp;
+    return expiry_date;
+  }
+  selected_batch_row_id = '';
+  expiry_date = customExp || '';
+  return expiry_date;
+}
 $(document).ready(function () {
   $('.expiry_date').removeAttr('min');
-  $('.parent-div').show();
-  $('#tblLoader').hide();
+  if (segments[3] == "stock-add" || segments[3] == 'edit-sale-return') {
+    toggleInvoiceBalanceLoader(true);
+  } else {
+    $('.parent-div').show();
+    $('#tblLoader').hide();
+  }
   $('#bar-code').focus();
   stock_products = JSON.parse($('#stock_products').val());
   customer_ledger = JSON.parse($('#customer_ledger').val());
@@ -17410,8 +17487,11 @@ $(document).ready(function () {
           // tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, invoice_id = 0);
           // tableHtml(product.product_id, product.p_name, product.expiry_date, product.retail_price, product.purchased_price, product.stock_in_hand, product.amount, product.qty, product.prod_discount, product.return_invoice_id, product.return_invoice_prod_id)
 
-          $('#designationsTable tbody').append("\n                        <tr id='tr-".concat(product.product_id, "'>\n                            <td>").concat(product.product_id, "</td>\n                            <td>").concat(product.p_name, "</td>\n                            <td><input type=\"date\" value=\"").concat(product.expiry_date, "\" class=\"inputSale   expiry_input\"  data-id=\"").concat(product.product_id, "\" style=\"font-size: 13px;width:110;\" min=\"0\" ></td>\n                            <td><input type=\"number\" value=\"").concat(product.qty, "\"  data-retail=\"").concat(product.retail_price, "\" data-purchase=\"").concat(product.purchased_price, "\" data-stock=\"").concat(product.stock_in_hand, "\" class=\"inputSale qty-input add-stock-input td-input-qty").concat(product.product_id, "\" data-id=\"").concat(product.product_id, "\" data-value=\"").concat(product.amount, "\" data-quantity=\"").concat(product.qty, "\"  min=\"0\"></td>\n                            <td><input type=\"number\" value=\"").concat(product.retail_price, "\"  data-retail=\"").concat(product.retail_price, "\" data-purchase=\"").concat(product.purchased_price, "\" data-stock=\"").concat(product.stock_in_hand, "\" class=\"inputSale price-input add-stock-input td-").concat(product.product_id, "\"  data-id=\"").concat(product.product_id, "\" data-value=\"").concat(product.amount, "\" data-quantity=\"").concat(product.qty, "\"  min=\"0\"></td>\n                            <td><input type=\"number\" value=\"").concat(product.prod_discount, "\"  class=\"inputSale discount-input add-stock-input td-").concat(product.product_id, "\"  data-id=\"").concat(product.product_id, "\" data-value=\"").concat(product.amount, "\" data-quantity=\"").concat(product.qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n                            <td class='purchase-product-amount").concat(product.product_id, " add- S-input '>").concat(product.amount, "</td>\n                            <td style=\"width: 10%;\"><a type=\"button\" id=\"").concat(product.product_id, "\" data-id=\"").concat(product.sale_return_invoice_id, "\" data-product-invoice=\"").concat(product.id, "\" class=\"btn smBTN red-bg remove_btn\" data-index=\"\" data-quantity=\"").concat(product.qty, "\"  style=\"width: 100%;\">Remove</a></td>\n                        "));
+          $('#designationsTable tbody').append("\n                        <tr id='tr-".concat(product.product_id, "'>\n                            <td>").concat(product.product_id, "</td>\n                            <td>").concat(product.p_name, "</td>\n                            <td style=\"width:160px;\">\n                                <select class=\"inputSale expiry_input\" data-id=\"").concat(product.product_id, "\" style=\"font-size: 13px;width:100%;\" title=\"Batch optional\"></select>\n                                <input type=\"date\" value=\"").concat(product.expiry_date ? String(product.expiry_date).substring(0, 10) : '', "\" class=\"inputSale custom_expiry_input\" data-id=\"").concat(product.product_id, "\" style=\"font-size: 13px;width:100%;margin-top:3px;\" title=\"Custom expiry (optional)\">\n                            </td>\n                            <td><input type=\"number\" value=\"").concat(product.qty, "\"  data-retail=\"").concat(product.retail_price, "\" data-purchase=\"").concat(product.purchased_price, "\" data-stock=\"").concat(product.stock_in_hand, "\" class=\"inputSale qty-input add-stock-input td-input-qty").concat(product.product_id, "\" data-id=\"").concat(product.product_id, "\" data-value=\"").concat(product.amount, "\" data-quantity=\"").concat(product.qty, "\"  min=\"0\"></td>\n                            <td><input type=\"number\" value=\"").concat(product.retail_price, "\"  data-retail=\"").concat(product.retail_price, "\" data-purchase=\"").concat(product.purchased_price, "\" data-stock=\"").concat(product.stock_in_hand, "\" class=\"inputSale price-input add-stock-input td-").concat(product.product_id, "\"  data-id=\"").concat(product.product_id, "\" data-value=\"").concat(product.amount, "\" data-quantity=\"").concat(product.qty, "\"  min=\"0\"></td>\n                            <td><input type=\"number\" value=\"").concat(product.prod_discount, "\"  class=\"inputSale discount-input add-stock-input td-").concat(product.product_id, "\"  data-id=\"").concat(product.product_id, "\" data-value=\"").concat(product.amount, "\" data-quantity=\"").concat(product.qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n                            <td class='purchase-product-amount").concat(product.product_id, " add- S-input '>").concat(product.amount, "</td>\n                            <td style=\"width: 10%;\"><a type=\"button\" id=\"").concat(product.product_id, "\" data-id=\"").concat(product.sale_return_invoice_id, "\" data-product-invoice=\"").concat(product.id, "\" class=\"btn smBTN red-bg remove_btn\" data-index=\"\" data-quantity=\"").concat(product.qty, "\"  style=\"width: 100%;\">Remove</a></td>\n                        "));
+          fillRowBatchSelect(product.product_id, product.expiry_date, product.batch_row_id || '');
         });
+        previous_payable = parseFloat($('.previous_payable').first().text()) || 0;
+        grandSum(previous_payable, service_charges, invoice_discount);
       }
     });
   }
@@ -17447,12 +17527,15 @@ $('#add-product').on('click', function () {
     }
 
     var prod_discount = $('#discount').val();
-    expiry_date = $('#expiry_date').val();
+    resolveAddRowExpiry();
+    $('#expiry_date').css('border-color', '');
+    $('#custom_expiry_date').css('border-color', '');
     sales_product_array.push({
       'sale_return_nvoice_id': '',
       'prod_discount': prod_discount ? prod_discount : 0,
       'product_id': "".concat(product_id),
-      'expiry_date': "".concat(expiry_date),
+      'expiry_date': "".concat(expiry_date || ''),
+      'batch_row_id': "".concat(selected_batch_row_id || ''),
       'qty': "".concat(qty),
       'amount': "".concat(amount - prod_discount),
       'retail_price': "".concat(retail_price),
@@ -17467,7 +17550,7 @@ $('#add-product').on('click', function () {
     // $(".products").val('0');
     // $(".products").select2();
     var rowCount = $('#designationsTable tbody tr').length + 1;
-    tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount);
+    tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount, 0, selected_batch_row_id);
     grandSum(previous_payable, service_charges);
     $('.show_existing_div').show();
 
@@ -17483,14 +17566,17 @@ $('#add-product').on('click', function () {
   $('#new_purchase_price').val('');
   $('#retail_price').val('');
   $('#discount').val('');
+  $('#custom_expiry_date').val('');
   $('#bar-code').focus();
   data_variable = '';
+  selected_batch_row_id = '';
+  expiry_date = '';
 });
 
 // $('#invoice_type').change(function(){
 //     if($(this).val()==1){
 //         $('#customer_id').removeClass('required')
-//         $('#customer_id').val((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8).trigger('change');
+//         $('#customer_id').val('8').trigger('change');
 //     }else{
 //         $('#customer_id').addClass('required')
 //         $('#customer_id').val('0').trigger('change');
@@ -17621,6 +17707,8 @@ $('.products').change(function () {
   $('#amount').val('');
   $('.calculate_by_amount').val('');
   $('.calculate_by_amount_text').html('0');
+  selected_batch_row_id = '';
+  expiry_date = '';
   if (selected_product > 0) {
     var filter_product = product_list.filter(function (x) {
       return x.id == selected_product;
@@ -17640,10 +17728,107 @@ $('.products').change(function () {
     product_id = filter_product[0].id;
     stock_in_hand = filter_product[0].stock_balance;
     purchased_price = filter_product[0].old_purchase_price;
-    $('.expiry_date').val(filter_product[0].expiry_date);
     $('.bar-code').val(filter_product[0].barcode);
+    loadOpenBatches(product_id);
+  } else {
+    loadOpenBatches(0);
   }
 });
+$(document).on('change', '#expiry_date', function () {
+  expiry_date = $(this).val() || '';
+  selected_batch_row_id = $(this).find('option:selected').data('batch-id') || '';
+  if (expiry_date) {
+    $('#custom_expiry_date').val(expiry_date);
+  }
+});
+$(document).on('change input', '#custom_expiry_date', function () {
+  var customExp = ($(this).val() || '').trim();
+  expiry_date = customExp;
+  // Manual date → detach from batch unless an option still matches this date
+  var $match = $('#expiry_date option').filter(function () {
+    return $(this).val() && $(this).val() === customExp;
+  }).first();
+  if ($match.length) {
+    $('#expiry_date').val($match.val());
+    selected_batch_row_id = $match.data('batch-id') || '';
+  } else {
+    $('#expiry_date').val('');
+    selected_batch_row_id = '';
+  }
+});
+$(document).on('change', '.expiry_input', function () {
+  var pid = $(this).data('id');
+  var exp = $(this).val() || '';
+  var batchId = $(this).find('option:selected').data('batch-id') || '';
+  var $rowCustom = $(".custom_expiry_input[data-id=\"".concat(pid, "\"]"));
+  if (exp) {
+    $rowCustom.val(exp);
+  }
+  sales_product_array.forEach(function (row) {
+    if (String(row.product_id) === String(pid)) {
+      row.expiry_date = exp || $rowCustom.val() || '';
+      row.batch_row_id = exp ? batchId : '';
+    }
+  });
+});
+$(document).on('change input', '.custom_expiry_input', function () {
+  var pid = $(this).data('id');
+  var customExp = ($(this).val() || '').trim();
+  var $sel = $(".expiry_input[data-id=\"".concat(pid, "\"]"));
+  var $match = $sel.find('option').filter(function () {
+    return $(this).val() && $(this).val() === customExp;
+  }).first();
+  if ($match.length) {
+    $sel.val($match.val());
+  } else {
+    $sel.val('');
+  }
+  var batchId = $match.length ? $match.data('batch-id') || '' : '';
+  sales_product_array.forEach(function (row) {
+    if (String(row.product_id) === String(pid)) {
+      row.expiry_date = customExp;
+      row.batch_row_id = batchId;
+    }
+  });
+});
+function fillRowBatchSelect(productId) {
+  var selectedExpiry = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  var selectedBatchId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  var $sel = $(".expiry_input[data-id=\"".concat(productId, "\"]"));
+  var $custom = $(".custom_expiry_input[data-id=\"".concat(productId, "\"]"));
+  if (!$sel.length) {
+    return;
+  }
+  $sel.empty().append("<option value=\"\">Batch (optional)</option>");
+  if ($custom.length) {
+    $custom.val(selectedExpiry ? String(selectedExpiry).substring(0, 10) : '');
+  }
+  $.ajax({
+    url: '/open-batches/' + productId,
+    type: 'get',
+    success: function success(response) {
+      var batches = response.batches || [];
+      batches.forEach(function (b) {
+        var exp = (b.expiry_date || '').substring(0, 10);
+        var bal = parseFloat(b.batch_wise_balance) || 0;
+        var label = formatBatchExpiryLabel(exp) + ' (bal: ' + bal.toFixed(0) + ')';
+        var selected = selectedBatchId && String(b.id) === String(selectedBatchId) || !selectedBatchId && selectedExpiry && exp === String(selectedExpiry).substring(0, 10);
+        $sel.append("<option value=\"".concat(exp, "\" data-batch-id=\"").concat(b.id, "\" ").concat(selected ? 'selected' : '', ">").concat(label, "</option>"));
+      });
+      // Keep previously saved / custom expiry even if batch now empty or missing
+      if (selectedExpiry) {
+        var exp = String(selectedExpiry).substring(0, 10);
+        if ($custom.length) {
+          $custom.val(exp);
+        }
+        if (!$sel.val()) {
+          // leave select empty; custom date carries the value
+          $sel.val('');
+        }
+      }
+    }
+  });
+}
 $(document).on('focusout', '.bar-code', function () {
   data_variable = $(this).val();
   $('.purchase_price').val('');
@@ -17983,7 +18168,7 @@ function getvendors() {
 }
 $('#customer_id').change(function () {
   var total_paid_for_net_sale = 0;
-  if ($(this).val() == (window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE || 8)) {
+  if (isCounterSaleCustomer($(this).val())) {
     // $('#invoice_type').val('1').trigger('change');
     sales_product_array.forEach(function (data, key) {
       total_paid_for_net_sale += parseFloat(data.amount);
@@ -18006,6 +18191,9 @@ $('#customer_id').change(function () {
       data: {
         segment: segment
       },
+      beforeSend: function beforeSend() {
+        toggleInvoiceBalanceLoader(true);
+      },
       success: function success(response) {
         previous_payable = response.customer_balance;
         $('#previous_receivable').val(previous_payable);
@@ -18014,22 +18202,28 @@ $('#customer_id').change(function () {
         $('.previous_payable_heading').text(previous_payable >= 0 ? 'Previous Receivable' : 'Previous Payable');
         $('.previous_payable').text(previous_payable_text);
         $('.previous_payable').val(previous_payable);
-        grandSum(previous_payable, service_charges, invoice_discount);
+        // Counter Sale / Net return: do NOT subtract ledger balance from return total
+        var payableForSum = isCounterSaleCustomer(selected_index) ? 0 : previous_payable;
+        grandSum(payableForSum, service_charges, invoice_discount);
         if (segments[3] == "edit-sale-return") {
           $('.paid_amount').text(customer_ledger['dr']);
           // $('.remaning_amount').val(customer_ledger['balance']);
         }
 
         $('.display').css('display', '');
+      },
+      complete: function complete() {
+        toggleInvoiceBalanceLoader(false);
       }
     });
     var customer = vendors.filter(function (x) {
       return x.id == selected_index;
     });
     // $('#invoice_type').val('2').trigger('change');
+  } else {
+    toggleInvoiceBalanceLoader(false);
   }
 });
-
 function grandSum() {
   var previous_payable = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
   var service_charges = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -18046,9 +18240,12 @@ function grandSum() {
   $('#total_qtys').html(grandQty.toFixed(2));
   $('#total_items').html(productTotal);
   $('.product_net_total').val(sum);
-  // sum -= parseFloat(previous_payable)  // sum -= parseFloat(previous_payable ? previous_payable : 0);
-  // previous_payable >= 0 ? sum -= parseFloat(previous_payable ? previous_payable : 0) : sum += parseFloat(previous_payable);
-  sum = Math.abs(sum - parseFloat(previous_payable));
+  // Counter Sale / Net Sale return: return cash = product net only (no ledger offset)
+  var payable = parseFloat(previous_payable) || 0;
+  if (isCounterSaleCustomer($('#customer_id').val()) || String($('#invoice_type').val()) === '1') {
+    payable = 0;
+  }
+  sum = Math.abs(sum - payable);
   sum += parseFloat(service_charges ? service_charges : 0);
   return_total_amount = sum - invoice_discount;
   setTimeout(function () {
@@ -18107,7 +18304,10 @@ $(document).on('mouseenter', '.show_purchase', function () {
 });
 function tableHtml(product_id, p_name, expiry_date, retail_price, purchased_price, stock_in_hand, amount, qty, prod_discount) {
   var invoice_id = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : 0;
-  $('#designationsTable tbody').append("\n    <tr class='tr-".concat(product_id, "' data-prod_id =\"").concat(product_id, "\">\n        <td>").concat(product_id, "</td>\n        <td>").concat(p_name, "</td> \n        <td><input type=\"date\" value=\"").concat(expiry_date, "\" class=\"inputSale   expiry_input\"  data-id=\"").concat(product_id, "\" style=\"font-size: 13px;width:110;\" min=\"0\" ></td>\n        <td ><input type=\"number\" value=\"").concat(qty, "\"  data-retail=\"").concat(retail_price, "\" data-purchase=\"").concat(purchased_price, "\" data-stock=\"").concat(stock_in_hand, "\"  class=\"inputSale qty-input add-stock-input td-input-qty").concat(product_id, "\"   data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n        <td><input type=\"number\" value=\"").concat(retail_price, "\" data-retail=\"").concat(retail_price, "\" data-purchase=\"").concat(purchased_price, "\" data-stock=\"").concat(stock_in_hand, "\" class=\"inputSale price-input add-stock-input td-").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n        <td style=\"width:80px;\"><input type=\"number\" value=\"").concat(prod_discount, "\"  class=\"inputSale discount-input add-stock-input td-").concat(prod_discount, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"    style=\"font-size: 13px;width:100%\" min=\"0\"></td>\n        <td class='purchase-product-amount").concat(product_id, " add- S-input ' >").concat(amount - prod_discount, "</td>\n        <td style=\"width:80px;\"><button type=\"button\" id=\"").concat(product_id, "\" class=\"btn smBTN red-bg remove_btn\"   data-quantity=\"").concat(qty, "\" data-invoice-id=\"").concat(invoice_id, "\" style=\"width:100%;\">Remove</button></td>\n        </tr>"));
+  var batch_row_id = arguments.length > 10 && arguments[10] !== undefined ? arguments[10] : '';
+  var expVal = expiry_date ? String(expiry_date).substring(0, 10) : '';
+  $('#designationsTable tbody').append("\n    <tr class='tr-".concat(product_id, "' data-prod_id =\"").concat(product_id, "\">\n        <td>").concat(product_id, "</td>\n        <td>").concat(p_name, "</td> \n        <td style=\"width:160px;\">\n            <select class=\"inputSale expiry_input\" data-id=\"").concat(product_id, "\" style=\"font-size: 13px;width:100%;\" title=\"Batch optional\"></select>\n            <input type=\"date\" value=\"").concat(expVal, "\" class=\"inputSale custom_expiry_input\" data-id=\"").concat(product_id, "\" style=\"font-size: 13px;width:100%;margin-top:3px;\" title=\"Custom expiry (optional)\">\n        </td>\n        <td ><input type=\"number\" value=\"").concat(qty, "\"  data-retail=\"").concat(retail_price, "\" data-purchase=\"").concat(purchased_price, "\" data-stock=\"").concat(stock_in_hand, "\"  class=\"inputSale qty-input add-stock-input td-input-qty").concat(product_id, "\"   data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n        <td><input type=\"number\" value=\"").concat(retail_price, "\" data-retail=\"").concat(retail_price, "\" data-purchase=\"").concat(purchased_price, "\" data-stock=\"").concat(stock_in_hand, "\" class=\"inputSale price-input add-stock-input td-").concat(product_id, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"  style=\"font-size: 13px\" min=\"0\"></td>\n        <td style=\"width:80px;\"><input type=\"number\" value=\"").concat(prod_discount, "\"  class=\"inputSale discount-input add-stock-input td-").concat(prod_discount, "\"  data-id=\"").concat(product_id, "\" data-value=\"").concat(amount, "\" data-quantity=\"").concat(qty, "\"    style=\"font-size: 13px;width:100%\" min=\"0\"></td>\n        <td class='purchase-product-amount").concat(product_id, " add- S-input ' >").concat(amount - prod_discount, "</td>\n        <td style=\"width:80px;\"><button type=\"button\" id=\"").concat(product_id, "\" class=\"btn smBTN red-bg remove_btn\"   data-quantity=\"").concat(qty, "\" data-invoice-id=\"").concat(invoice_id, "\" style=\"width:100%;\">Remove</button></td>\n        </tr>"));
+  fillRowBatchSelect(product_id, expiry_date, batch_row_id);
 }
 })();
 

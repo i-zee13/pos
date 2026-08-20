@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BackupLog;
 use App\Models\User;
+use App\Models\UserBackupMailSetting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -68,6 +69,7 @@ class DatabaseBackupService
         Storage::disk('local')->makeDirectory($tmpRelative);
 
         $sqlFiles = [];
+        $importMode = $this->tenantImportMode();
 
         try {
             foreach ($databases as $dbName) {
@@ -83,12 +85,12 @@ class DatabaseBackupService
                 $sqlAbs = storage_path('app/'.$sqlRel);
 
                 if ($tenantScoped && $tenantId !== null) {
-                    $this->runTenantScopedMysqldump($mysqldump, $host, $port, $user, $password, $dbName, $sqlAbs, $tenantId);
+                    $this->runTenantScopedMysqldump($mysqldump, $host, $port, $user, $password, $dbName, $sqlAbs, $tenantId, $importMode);
                 } else {
                     $this->runFullMysqldump($mysqldump, $host, $port, $user, $password, $dbName, $sqlAbs);
                 }
 
-                $this->assertImportableSqlFile($sqlAbs, $tenantScoped);
+                $this->assertImportableSqlFile($sqlAbs, $tenantScoped, $importMode);
                 $sqlFiles[] = $sqlAbs;
             }
 
@@ -121,8 +123,7 @@ class DatabaseBackupService
             }
 
             if ($tenantScoped && $tenantId !== null) {
-                $readme = $this->buildRestoreReadme($database, $tenantId);
-                $zip->addFromString('RESTORE.txt', $readme);
+                $zip->addFromString('RESTORE.txt', $this->buildRestoreReadme($database, $tenantId, $importMode));
             }
 
             $zip->close();
@@ -130,42 +131,11 @@ class DatabaseBackupService
             $this->deleteDirectory($tmpAbs);
 
             $size = @filesize($zipAbs) ?: 0;
-            $gdriveOk = false;
-            $gdrivePath = null;
-            $driveError = null;
-
             $uploader = app(GoogleDriveApiBackupUploader::class);
-            $driveUserId = $backupLog->user_id ? (int) $backupLog->user_id : null;
-            $useDriveApi = $uploader->isConfigured($driveUserId);
-
-            if ($useDriveApi) {
-                try {
-                    $gdrivePath = $uploader->uploadZip($zipAbs, $zipFilename, $driveUserId);
-                    $gdriveOk = true;
-                } catch (\Throwable $e) {
-                    Log::warning('backup.google_drive_api_failed', ['message' => $e->getMessage(), 'log_id' => $backupLog->id]);
-                    $driveError = $e->getMessage();
-                }
-            } elseif (config('backup.rclone.enabled')) {
-                try {
-                    $gdrivePath = $this->uploadWithRclone($zipAbs, $zipFilename);
-                    $gdriveOk = true;
-                } catch (\Throwable $e) {
-                    Log::warning('backup.rclone_failed', ['message' => $e->getMessage(), 'log_id' => $backupLog->id]);
-                }
-            }
-
-            $uploadExpected = $useDriveApi || config('backup.rclone.enabled');
-            $errorMessage = null;
-            if (! $gdriveOk && $uploadExpected) {
-                if ($useDriveApi && ! empty($driveError)) {
-                    $errorMessage = 'Local backup OK; Google Drive failed: '.$driveError;
-                } else {
-                    $errorMessage = $useDriveApi
-                        ? 'Local backup OK; Google Drive API upload failed (see laravel.log).'
-                        : 'Local backup OK; Google Drive upload failed (see laravel.log).';
-                }
-            }
+            $upload = $this->uploadBackupZip($uploader, $backupLog, $zipAbs, $zipFilename);
+            $gdriveOk = $upload['ok'];
+            $gdrivePath = $upload['path'];
+            $errorMessage = $upload['error'];
 
             $backupLog->update([
                 'zip_filename' => $zipFilename,
@@ -197,6 +167,13 @@ class DatabaseBackupService
         $db = config("database.connections.{$conn}.database");
 
         return $db ? [(string) $db] : [];
+    }
+
+    protected function tenantImportMode(): string
+    {
+        $mode = strtolower(trim((string) config('backup.tenant_import_mode', 'merge')));
+
+        return $mode === 'fresh' ? 'fresh' : 'merge';
     }
 
     protected function resolveTenantIdForBackup(BackupLog $backupLog): ?int
@@ -252,14 +229,16 @@ class DatabaseBackupService
         string $password,
         string $database,
         string $outputFile,
-        int $tenantId
+        int $tenantId,
+        string $importMode
     ): void {
-        $this->writeTenantBackupHeader($outputFile, $database, $tenantId);
+        $this->writeTenantBackupHeader($outputFile, $database, $tenantId, $importMode);
 
         $skipTables = array_flip(array_map('strtolower', config('backup.skip_tables', [])));
         $referenceTables = array_flip(array_map('strtolower', config('backup.reference_tables', [])));
         $tables = $this->listDatabaseTables($database);
         $dumpedTables = 0;
+        $useDropTable = $importMode === 'fresh';
 
         foreach ($tables as $table) {
             $tableKey = strtolower($table);
@@ -267,17 +246,28 @@ class DatabaseBackupService
                 continue;
             }
 
-            $this->runMysqldumpTable($binary, $host, $port, $user, $password, $database, $table, $outputFile, [
-                '--no-data',
-            ], true);
+            $structureArgs = ['--no-data'];
+            if ($useDropTable) {
+                $structureArgs[] = '--add-drop-table';
+            }
+
+            $this->runMysqldumpTable($binary, $host, $port, $user, $password, $database, $table, $outputFile, $structureArgs, true, ! $useDropTable);
             $dumpedTables++;
 
             if ($this->tableHasColumn($table, 'tenant_id')) {
+                if ($importMode === 'merge') {
+                    file_put_contents(
+                        $outputFile,
+                        "\n-- Replace tenant {$tenantId} rows in `{$table}`\nDELETE FROM `{$table}` WHERE `tenant_id` = {$tenantId};\n",
+                        FILE_APPEND
+                    );
+                }
+
                 $this->runMysqldumpTable($binary, $host, $port, $user, $password, $database, $table, $outputFile, [
                     '--no-create-info',
                     '--where=tenant_id='.$tenantId,
                 ], true);
-            } elseif (isset($referenceTables[$tableKey])) {
+            } elseif (isset($referenceTables[$tableKey]) && $importMode === 'fresh') {
                 $this->runMysqldumpTable($binary, $host, $port, $user, $password, $database, $table, $outputFile, [
                     '--no-create-info',
                 ], true);
@@ -301,7 +291,8 @@ class DatabaseBackupService
         string $table,
         string $outputFile,
         array $extraArgs,
-        bool $append
+        bool $append,
+        bool $sanitizeStructureForMerge = false
     ): void {
         $partFile = $append ? $outputFile.'.part.tmp' : $outputFile;
 
@@ -314,7 +305,6 @@ class DatabaseBackupService
             '--quick',
             '--skip-lock-tables',
             '--default-character-set=utf8mb4',
-            '--add-drop-table',
             '--result-file='.$partFile,
         ], $extraArgs, [$database, $table]);
 
@@ -324,6 +314,10 @@ class DatabaseBackupService
             if (is_file($partFile)) {
                 $content = file_get_contents($partFile);
                 if ($content !== false && $content !== '') {
+                    if ($sanitizeStructureForMerge) {
+                        $content = preg_replace('/^DROP TABLE IF EXISTS .*;\s*\r?\n/m', '', $content) ?? $content;
+                        $content = preg_replace('/^CREATE TABLE `/m', 'CREATE TABLE IF NOT EXISTS `', $content) ?? $content;
+                    }
                     file_put_contents($outputFile, $content, FILE_APPEND);
                 }
                 @unlink($partFile);
@@ -344,15 +338,16 @@ class DatabaseBackupService
         }
     }
 
-    protected function writeTenantBackupHeader(string $outputFile, string $database, int $tenantId): void
+    protected function writeTenantBackupHeader(string $outputFile, string $database, int $tenantId, string $importMode): void
     {
         $now = now()->toDateTimeString();
+        $modeLabel = $importMode === 'fresh' ? 'fresh (empty DB restore)' : 'merge (inject into existing multi-tenant DB)';
         $header = <<<SQL
 -- POS tenant backup (import-ready)
 -- Database: {$database}
 -- Tenant ID: {$tenantId}
+-- Import mode: {$modeLabel}
 -- Generated: {$now}
--- Restore: CREATE DATABASE your_db; then: mysql -u USER -p your_db < this_file.sql
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS=0;
@@ -363,27 +358,42 @@ SQL;
         file_put_contents($outputFile, $header);
     }
 
-    protected function buildRestoreReadme(string $database, int $tenantId): string
+    protected function buildRestoreReadme(string $database, int $tenantId, string $importMode): string
     {
+        $sqlFile = preg_replace('/[^\w\-]/', '_', $database).'_tenant_'.$tenantId.'.sql';
+
+        if ($importMode === 'fresh') {
+            return implode("\r\n", [
+                'POS Tenant Backup — Fresh Restore',
+                '=================================',
+                '',
+                'Use on an EMPTY database only.',
+                'This file DROPs tables and recreates them with tenant '.$tenantId.' data.',
+                '',
+                '  mysql -u USER -p empty_db < '.$sqlFile,
+            ])."\r\n";
+        }
+
         return implode("\r\n", [
-            'POS Tenant Backup — Restore Instructions',
-            '========================================',
+            'POS Tenant Backup — Merge / Inject Restore',
+            '============================================',
             '',
-            'This zip contains ONLY tenant '.$tenantId.' data (plus shared reference tables).',
+            'Safe for a LIVE shared database with multiple tenants.',
             '',
-            '1. Create an empty MySQL database (or use a fresh one).',
-            '2. Import the .sql file:',
-            '   mysql -u USER -p '.$database.' < '.preg_replace('/[^\w\-]/', '_', $database).'_tenant_'.$tenantId.'.sql',
+            'What this file does:',
+            '- Does NOT drop tables or delete other tenants.',
+            '- Ensures tables exist (CREATE TABLE IF NOT EXISTS).',
+            '- For each tenant table: DELETE rows WHERE tenant_id='.$tenantId.' then INSERT backup rows.',
             '',
-            'Each table includes DROP TABLE + CREATE TABLE + INSERT rows.',
-            'FOREIGN_KEY_CHECKS is disabled during import.',
+            'Import into your existing POS database:',
+            '  mysql -u USER -p '.$database.' < '.$sqlFile,
             '',
-            'Do NOT import this file into a live shared DB with other tenants',
-            'unless you intend to replace that tenant\'s tables entirely.',
+            'Other tenants (different tenant_id) are not touched.',
+            'Shared reference tables (countries, cities, etc.) are not overwritten in merge mode.',
         ])."\r\n";
     }
 
-    protected function assertImportableSqlFile(string $path, bool $tenantScoped): void
+    protected function assertImportableSqlFile(string $path, bool $tenantScoped, string $importMode): void
     {
         if (! is_file($path)) {
             throw new \RuntimeException('Backup SQL file was not created.');
@@ -401,6 +411,10 @@ SQL;
 
         if ($tenantScoped && stripos($sample, 'FOREIGN_KEY_CHECKS=0') === false) {
             throw new \RuntimeException('Tenant backup SQL is missing import guards.');
+        }
+
+        if ($tenantScoped && $importMode === 'merge' && stripos($sample, 'DELETE FROM') === false) {
+            throw new \RuntimeException('Merge tenant backup is missing tenant DELETE statements.');
         }
     }
 
@@ -460,6 +474,172 @@ SQL;
                 @unlink($zipFile);
             }
         }
+    }
+
+    /**
+     * Manual backups go to that user's connected Drive.
+     * Scheduled / artisan backups fan-out to every user who connected Google Drive,
+     * then fall back to .env Drive API or rclone if nobody is connected.
+     *
+     * @return array{ok: bool, path: ?string, error: ?string}
+     */
+    protected function uploadBackupZip(GoogleDriveApiBackupUploader $uploader, BackupLog $backupLog, string $zipAbs, string $zipFilename): array
+    {
+        if ($backupLog->user_id) {
+            $driveUserId = (int) $backupLog->user_id;
+            if ($this->shouldSkipDriveUser($driveUserId)) {
+                Log::info('backup.google_drive_skipped_user', [
+                    'log_id' => $backupLog->id,
+                    'user_id' => $driveUserId,
+                ]);
+
+                return ['ok' => false, 'path' => null, 'error' => null];
+            }
+
+            return $this->uploadToSingleDrive($uploader, $driveUserId, $zipAbs, $zipFilename, $backupLog->id);
+        }
+
+        $fanOut = $this->uploadToAllConnectedDrives($uploader, $zipAbs, $zipFilename, $backupLog->id);
+        if ($fanOut['attempted'] > 0) {
+            $error = null;
+            if (! $fanOut['ok']) {
+                $error = 'Local backup OK; Google Drive upload failed for all connected users (see laravel.log).';
+            } elseif ($fanOut['failed'] > 0) {
+                $error = 'Local backup OK; Drive upload succeeded for '.$fanOut['ok_count']
+                    .' user(s), failed for '.$fanOut['failed'].' (see laravel.log).';
+            }
+
+            return [
+                'ok' => $fanOut['ok'],
+                'path' => $fanOut['path'],
+                'error' => $error,
+            ];
+        }
+
+        // No per-user Drive connections — keep legacy .env / rclone behaviour.
+        return $this->uploadToSingleDrive($uploader, null, $zipAbs, $zipFilename, $backupLog->id);
+    }
+
+    /**
+     * @return array{ok: bool, path: ?string, error: ?string}
+     */
+    protected function uploadToSingleDrive(GoogleDriveApiBackupUploader $uploader, ?int $driveUserId, string $zipAbs, string $zipFilename, int $logId): array
+    {
+        $useDriveApi = $uploader->isConfigured($driveUserId);
+        $gdriveOk = false;
+        $gdrivePath = null;
+
+        if ($useDriveApi) {
+            try {
+                $gdrivePath = $uploader->uploadZip($zipAbs, $zipFilename, $driveUserId);
+                $gdriveOk = true;
+            } catch (\Throwable $e) {
+                Log::warning('backup.google_drive_api_failed', [
+                    'message' => $e->getMessage(),
+                    'log_id' => $logId,
+                    'user_id' => $driveUserId,
+                ]);
+            }
+        } elseif (config('backup.rclone.enabled')) {
+            try {
+                $gdrivePath = $this->uploadWithRclone($zipAbs, $zipFilename);
+                $gdriveOk = true;
+            } catch (\Throwable $e) {
+                Log::warning('backup.rclone_failed', ['message' => $e->getMessage(), 'log_id' => $logId]);
+            }
+        }
+
+        $uploadExpected = $useDriveApi || (bool) config('backup.rclone.enabled');
+        $error = null;
+        if (! $gdriveOk && $uploadExpected) {
+            $error = $useDriveApi
+                ? 'Local backup OK; Google Drive API upload failed (see laravel.log).'
+                : 'Local backup OK; Google Drive upload failed (see laravel.log).';
+        }
+
+        return ['ok' => $gdriveOk, 'path' => $gdrivePath, 'error' => $error];
+    }
+
+    /**
+     * @return array{attempted: int, ok: bool, ok_count: int, failed: int, path: ?string}
+     */
+    protected function uploadToAllConnectedDrives(GoogleDriveApiBackupUploader $uploader, string $zipAbs, string $zipFilename, int $logId): array
+    {
+        $skipUserIds = $this->driveSkipUserIds();
+
+        $userIds = UserBackupMailSetting::query()
+            ->whereNotNull('google_drive_refresh_token_encrypted')
+            ->where('google_drive_refresh_token_encrypted', '!=', '')
+            ->when($skipUserIds !== [], fn ($q) => $q->whereNotIn('user_id', $skipUserIds))
+            ->pluck('user_id')
+            ->unique()
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $paths = [];
+        $okCount = 0;
+        $failed = 0;
+
+        foreach ($userIds as $userId) {
+            if (! $uploader->isConfigured($userId)) {
+                continue;
+            }
+
+            try {
+                $paths[] = 'user:'.$userId.' => '.$uploader->uploadZip($zipAbs, $zipFilename, $userId);
+                $okCount++;
+            } catch (\Throwable $e) {
+                $failed++;
+                Log::warning('backup.google_drive_api_failed', [
+                    'message' => $e->getMessage(),
+                    'log_id' => $logId,
+                    'user_id' => $userId,
+                ]);
+            }
+        }
+
+        $attempted = $okCount + $failed;
+
+        return [
+            'attempted' => $attempted,
+            'ok' => $okCount > 0,
+            'ok_count' => $okCount,
+            'failed' => $failed,
+            'path' => $paths === [] ? null : implode(' || ', $paths),
+        ];
+    }
+
+    /**
+     * @return list<int>
+     */
+    protected function driveSkipUserIds(): array
+    {
+        $usernames = config('backup.skip_drive_usernames', ['storeeo']);
+        $usernames = array_values(array_filter(array_map(
+            static fn ($u) => strtolower(trim((string) $u)),
+            is_array($usernames) ? $usernames : []
+        )));
+
+        if ($usernames === []) {
+            return [];
+        }
+
+        return User::query()
+            ->where(function ($q) use ($usernames) {
+                foreach ($usernames as $username) {
+                    $q->orWhereRaw('LOWER(username) = ?', [$username]);
+                }
+            })
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+
+    protected function shouldSkipDriveUser(int $userId): bool
+    {
+        return in_array($userId, $this->driveSkipUserIds(), true);
     }
 
     protected function uploadWithRclone(string $zipAbsolutePath, string $zipFilename): string

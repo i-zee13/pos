@@ -1,12 +1,12 @@
 ﻿.borderB2 {
-  border-bottom: solid 2px #0038ba
+  border-bottom: solid 2px #a1c95c
 }
 .Product-Filter {
   background-color: #f3f2f2;
   padding: 15px 15px 0px 15px;
   box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.2);
   margin-bottom: 15px;
-  border-bottom: solid 2px #0038ba
+  border-bottom: solid 2px #a1c95c
 }
 .Product-Filter .nav-link {
   padding: 6px 8px 0px 8px
@@ -96,7 +96,7 @@
   box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.15);
 }
 .Product-row:HOVER {
-  border-bottom: solid 2px #0038ba;
+  border-bottom: solid 2px #a1c95c;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
   transition: all 0.3s ease;
@@ -203,7 +203,7 @@
   color: #282828
 }
 ._product-card h2:before {
-  background: #0038ba;
+  background: #a1c95c;
   position: absolute;
   width: 2px;
   height: 32px;
@@ -236,7 +236,7 @@
   border-radius: 0;
   -khtml-border-radius: 0;
   text-transform: capitalize;
-  background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
+  background: linear-gradient(90deg, #1e54d3 0%, #a1c95c 100%);
   color: #fff;
   line-height: 1;
   letter-spacing: 1px;
@@ -260,7 +260,7 @@
 }
 ._product-card .dropdown .dropdown-item:HOVER, ._Action .dropdown .dropdown-item:HOVER {
   color: #fff;
-  background-color: #0038ba;
+  background-color: #a1c95c;
   outline: none !important;
 }
 .btn-addproduct {
@@ -294,7 +294,7 @@
   color: #797979
 }
 .Addpro-form .proTextarea:focus {
-  border: solid 1px #0038ba
+  border: solid 1px #a1c95c
 }
 .Addpro-form input {
   box-shadow: none;
@@ -335,11 +335,11 @@
   font-size: 14px;
   border-radius: 0;
   width: 100%;
-  border-color: #0038ba
+  border-color: #a1c95c
 }
 .addPO:HOVER {
   color: #fff;
-  background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
+  background: linear-gradient(90deg, #1e54d3 0%, #a1c95c 100%);
 }
 .PackagingOption {
   background-color: #fff;
@@ -353,10 +353,10 @@
 }
 .PackagingOption:HOVER {
   color: #fff;
-  background-color: #0038ba
+  background-color: #a1c95c
 }
 .PackagingOption strong {
-  color: #0038ba
+  color: #a1c95c
 }
 .PackagingOption:HOVER strong {
   color: #fff
@@ -415,7 +415,7 @@
 ._emp-D img {
   width: 35px;
   height: 35px;
-  border: solid 1px #0038ba;
+  border: solid 1px #a1c95c;
   margin-right: 15px;
   border-radius: 50%;
   background-color: #fff
@@ -423,7 +423,7 @@
 ._product-card h2 img {
   width: 30px;
   height: 30px;
-  border: solid 1px #0038ba;
+  border: solid 1px #a1c95c;
   border-radius: 50%;
   margin-right: 10px
 }
@@ -436,7 +436,7 @@
   height: 55px;
   border-radius: 50%;
   display: block;
-  border: solid 1px #0038ba;
+  border: solid 1px #a1c95c;
   box-shadow: 0 0px 0px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 56, 186, 0.2);
 }
 ._EMP-pr h2 {
@@ -687,7 +687,7 @@
 ._product-card img {
   width: 50px;
   height: 50px;
-  border: solid 1px #0038ba;
+  border: solid 1px #a1c95c;
   margin-right: 15px;
   border-radius: 50%;
   background-color: #fff;

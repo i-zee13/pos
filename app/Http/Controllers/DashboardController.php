@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Organization;
-use App\Models\PurchaseInvoice;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -149,6 +148,10 @@ class DashboardController extends Controller
         ];
     }
 
+    /**
+     * KPIs aligned with Admin Close (admin-sale-close.js) formulas so
+     * Cash In Hand / Recoveries / Sales / Returns match key-by-key.
+     */
     protected function buildPeriodMetrics(string $start, string $end, string $mode): array
     {
         $req = $this->dateRequest($start, $end);
@@ -157,76 +160,90 @@ class DashboardController extends Controller
         $sales = collect($saleRecords['sales'] ?? []);
         $returns = collect($saleRecords['sale_returns'] ?? []);
 
-        $totalSales = (float) $sales->sum('sale_total_amount');
-        $invoiceDiscount = (float) $sales->unique('invoice_no')->sum('invoice_discount');
-        $productDiscount = (float) $sales->sum('product_discount');
-        $serviceCharges = (float) $sales->unique('invoice_no')->sum('service_charges');
-        $saleReturnTotal = (float) $returns->unique('invoice_no')->sum('total_invoice_amount');
-        $netSales = ($totalSales + $serviceCharges) - ($productDiscount + $invoiceDiscount);
+        // Same field defs as ReportsController::adminSaleCloseRecord + admin-sale-close.js
+        $totalInvoiceDiscount = (float) sum_per_invoice($sales, 'invoice_discount');
+        $totalProductDiscount = (float) $sales->sum('product_discount');
+        $totalServiceCharges = (float) sum_per_invoice($sales, 'service_charges');
+        $totalNetSales = (float) $sales->where('invoice_type', 1)->sum('sale_total_amount');
+        $totalCreditSales = (float) $sales->where('invoice_type', 2)->sum('sale_total_amount');
+        $totalDiscount = $totalInvoiceDiscount + $totalProductDiscount;
+        // Admin Close "Total Sale"
+        $totalSales = ($totalNetSales + $totalCreditSales + $totalServiceCharges) - $totalDiscount;
 
-        $cashSales = (float) $sales->where('invoice_type', 1)->sum('sale_total_amount');
+        $totalNetSaleReturns = (float) $returns->where('invoice_type', 1)->sum('return_total_amount');
+        $totalCreditSaleReturns = (float) $returns->where('invoice_type', 2)->sum('return_total_amount');
+        $totalReturnServiceCharges = (float) $returns->sum('service_charges');
+        $totalReturnDiscount = (float) $returns->sum('invoice_discount') + (float) $returns->sum('product_discount');
+        // Admin Close "Total Returns"
+        $totalReturns = ($totalNetSaleReturns + $totalCreditSaleReturns + $totalReturnServiceCharges) - $totalReturnDiscount;
+
+        // Cash path inputs (same as Admin Close TTL IN HAND)
+        $cashSales = (float) $sales->where('invoice_type', 1)->sum('sale_total_amount'); // total_net_sale_invoice_amount
         $creditSalesReceived = (float) $sales->where('invoice_type', 2)->unique('invoice_no')->sum('paid_amount');
-        $netSaleReturnAmount = (float) $returns->where('invoice_type', 1)->unique('invoice_no')->sum('total_invoice_amount');
-        $creditSaleReturnPaid = (float) $returns->where('invoice_type', 2)->unique('invoice_no')->sum('paid_amount');
+        $creditSaleReturnPaid = (float) $returns->where('invoice_type', 2)->sum('paid_amount');
+        // Admin Close display uses product return_total_amount (not unique invoice amount)
+        $netSaleReturnAmount = $totalNetSaleReturns;
+        // Counter sale invoice discount only (hardcoded id 8 — same as Admin Close)
+        $netSaleDiscount = (float) sum_per_invoice(
+            $sales,
+            'invoice_discount',
+            fn ($row) => (int) ($row->customer_id ?? 0) === 8
+        );
 
         $tenantId = current_tenant_id();
-        $expenseId = sys_customer_id('EXPENSE') ?: 5;
-        $openingId = sys_customer_id('OPENING_BALANCE') ?: 170;
-        $counterId = sys_customer_id('COUNTER_SALE') ?: 8;
-        $excludeIds = array_values(array_filter([$expenseId, $counterId, 97, $openingId]));
-
-        $vendorLdgr = DB::table('vendor_ledger')
-            ->selectRaw('customer_id as vendor_id, IFNULL(cr,0) as cr, IFNULL(dr,0) as dr, trx_type')
-            ->when($tenantId, function ($q, $t) {
-                return $q->where('tenant_id', $t);
-            })
-            ->whereRaw('DATE(created_at) BETWEEN ? AND ? AND trx_type = 3 AND is_deleted = 0', [$start, $end])
-            ->get();
+        // Match Admin Close hardcoded system accounts: 5=expense, 8=counter, 97=?, 170=opening
+        $excludeIds = [5, 8, 97, 170];
 
         $customerLdgr = DB::table('customer_ledger')
             ->selectRaw('customer_id, IFNULL(cr,0) as cr, IFNULL(dr,0) as dr, trx_type')
             ->when($tenantId, function ($q, $t) {
                 return $q->where('tenant_id', $t);
             })
-            ->whereRaw('DATE(created_at) BETWEEN ? AND ?', [$start, $end])
+            ->whereRaw('DATE(created_at) BETWEEN ? AND ? AND is_deleted = 0', [$start, $end])
+            ->get();
+
+        // Same vendor filter as Admin Close (exclude purchase-return ledger rows)
+        $vendorLdgr = DB::table('vendor_ledger')
+            ->selectRaw('customer_id as vendor_id, IFNULL(cr,0) as cr, IFNULL(dr,0) as dr, trx_type')
+            ->whereNull('purchase_return_invoice_id')
+            ->when($tenantId, function ($q, $t) {
+                return $q->where('tenant_id', $t);
+            })
+            ->whereRaw('DATE(created_at) BETWEEN ? AND ? AND is_deleted = 0', [$start, $end])
             ->get();
 
         $prPaid = (float) collect($saleRecords['pr_paid_amount'] ?? [])->sum('paid_amount');
         $prInvc = (float) collect($saleRecords['pr_invc_amount'] ?? [])->sum('paid_amount');
-        $netSaleDiscount = (float) $sales->unique('invoice_no')->where('customer_id', $counterId)->sum('invoice_discount');
 
         $customerPayment = (float) collect($customerLdgr)->whereNotIn('customer_id', $excludeIds)->where('trx_type', 3)->sum('dr');
-        $expense = (float) collect($customerLdgr)->where('customer_id', $expenseId)->where('trx_type', 3)->sum('dr');
-        $vendorPayment = (float) collect($vendorLdgr)->sum('dr');
-        $openingBalance = (float) collect($customerLdgr)->where('customer_id', $openingId)->where('trx_type', 3)->sum('cr');
+        $expense = (float) collect($customerLdgr)->where('customer_id', 5)->where('trx_type', 3)->sum('dr');
+        $vendorPayment = (float) collect($vendorLdgr)->where('trx_type', 3)->sum('dr');
+        $openingBalance = (float) collect($customerLdgr)->where('customer_id', 170)->where('trx_type', 3)->sum('cr');
         $cashRecovery = (float) collect($customerLdgr)->whereNotIn('customer_id', $excludeIds)->where('trx_type', 3)->sum('cr');
         $vendorCashRecovery = (float) collect($vendorLdgr)->where('vendor_id', '!=', 7)->where('trx_type', 3)->sum('cr');
 
         $ttlCashRecovery = $cashRecovery + $vendorCashRecovery + $creditSalesReceived + $openingBalance;
         $ttlPayments = $vendorPayment + $customerPayment + $creditSaleReturnPaid + $prPaid + $prInvc + $expense;
-        $cashInHand = ($cashSales + $ttlCashRecovery) - $netSaleDiscount - $ttlPayments - $netSaleReturnAmount;
-
-        $purchasePaid = (float) PurchaseInvoice::query()
-            ->when($tenantId, function ($q, $t) {
-                return $q->where('tenant_id', $t);
-            })
-            ->whereBetween('date', [$start, $end])
-            ->sum('paid_amount');
+        // Admin Close: ((cash_sales + recoveries) - counter_discount - payments) - cash_returns
+        $cashInHand = (($cashSales + $ttlCashRecovery) - $netSaleDiscount - $ttlPayments) - $netSaleReturnAmount;
 
         $grossProfit = $this->grossProfit($start, $end);
         $unitsQty = (float) $sales->sum('qty');
 
         return [
             'kpis' => [
-                'net_sales' => round($netSales, 2),
-                'sale_returns' => round($saleReturnTotal, 2),
-                'purchases' => round($purchasePaid, 2),
+                'net_sales' => round($totalSales, 2),
+                'sale_returns' => round($totalReturns, 2),
+                'purchases' => round($prInvc, 2),
                 'expense' => round($expense, 2),
                 'cash_recoveries' => round($ttlCashRecovery, 2),
                 'cash_in_hand' => round($cashInHand, 2),
                 'gross_profit' => round($grossProfit, 2),
                 'invoice_count' => $sales->unique('invoice_no')->count(),
                 'units_qty' => round($unitsQty, 2),
+                'ttl_payments' => round($ttlPayments, 2),
+                'credit_sale' => round($totalCreditSales, 2),
+                'discount' => round($totalDiscount, 2),
             ],
             'split' => [
                 'cash_sales' => round($cashSales, 2),

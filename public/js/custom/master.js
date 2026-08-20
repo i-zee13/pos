@@ -71,10 +71,28 @@ $(document).on('mouseenter', '.show_purchase', function () {
     $('.pp').hide();
 });
 
-function addCommas(nStr) {
-    nStr = parseFloat(nStr); // Parse, but don't round yet
+/**
+ * Safe number for report totals.
+ * Production MySQL/PDO often returns DECIMAL as strings in JSON.
+ * Without this, JS `+=` concatenates ("4"+"8"="48") instead of summing.
+ */
+function toNum(value) {
+    if (value === null || value === undefined || value === '') {
+        return 0;
+    }
+    if (typeof value === 'string') {
+        value = value.replace(/,/g, '').trim();
+    }
+    var n = parseFloat(value);
+    return isNaN(n) || !isFinite(n) ? 0 : n;
+}
 
-    let x = nStr.toString().split('.'); // Convert to string and split
+function addCommas(nStr) {
+    var n = toNum(nStr);
+    // Keep money/qty readable (avoid long float tails like 0.914255049)
+    n = Math.round(n * 10000) / 10000;
+
+    let x = n.toString().split('.');
     let x1 = x[0];
     let x2 = x.length > 1 ? '.' + x[1] : '';
 
@@ -83,7 +101,6 @@ function addCommas(nStr) {
         x1 = x1.replace(rgx, '$1' + ',' + '$2');
     }
 
-    // Remove .00 if present
     if (x2 === '.00') {
       x2 = '';
     }
@@ -313,29 +330,6 @@ function ledgerExportButtons(title, options) {
             }
         }
     ];
-}
-
-/** Round qty/stock to max 4 decimals; collapse float dust (e.g. 8e-15) to 0. */
-function roundQty(value, decimals) {
-    decimals = (decimals === undefined || decimals === null) ? 4 : decimals;
-    var n = parseFloat(value);
-    if (isNaN(n) || !isFinite(n)) {
-        return 0;
-    }
-    if (Math.abs(n) < Math.pow(10, -(decimals + 1))) {
-        return 0;
-    }
-    return parseFloat(n.toFixed(decimals));
-}
-
-/** Format qty for UI — trims trailing zeros after decimal. */
-function formatQty(value, decimals) {
-    var n = roundQty(value, decimals);
-    var s = String(n);
-    if (s.indexOf('.') !== -1) {
-        s = s.replace(/\.?0+$/, '');
-    }
-    return s === '' ? '0' : s;
 }
  
 

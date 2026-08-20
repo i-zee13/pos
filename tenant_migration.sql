@@ -1,12 +1,22 @@
 -- =====================================================================
---  MULTI-TENANT MIGRATION (single code + single DB) — GODOWNS BRANCH
+--  MULTI-TENANT MIGRATION (single code + single DB)
 --  -------------------------------------------------------------------
---  Pehle poora STEP 1 (ALTER), phir poora STEP 2 (UPDATE).
---  Mojooda live shop = tenant_id 1. Jab tak users.tenant_id set nahi,
---  app pehle ki tarah (bina filter) chalti rahegi.
+--  Pehle poora STEP 1 (ALTER) chalayein, phir poora STEP 2 (UPDATE).
+--  Mojooda shop ka saara data tenant_id = 1 set ho jata hai taki
+--  pehle se add kiya hua data disturb na ho.
+--
+--  NOTE: jab tak users.tenant_id set nahi hota, app pehle ki tarah
+--        (bina filter ke) chalta rahega. Isliye STEP 2 poora chalayein
+--        aur users wali line sab se aakhir mein.
+--
+--  NAYI / COMPLETE SETUP: setup_tenant_database.sql (top par @t variable)
 -- =====================================================================
 
--- STEP 1: ADD tenant_id (+ index)
+
+-- ---------------------------------------------------------------------
+-- STEP 1: ADD tenant_id COLUMN (+ index) TO ALL TENANT TABLES
+-- ---------------------------------------------------------------------
+
 ALTER TABLE `users`                       ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `users_tenant_id_index` (`tenant_id`);
 
 ALTER TABLE `products`                    ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `products_tenant_id_index` (`tenant_id`);
@@ -45,14 +55,23 @@ ALTER TABLE `customer_transactions`       ADD COLUMN `tenant_id` BIGINT UNSIGNED
 ALTER TABLE `vendor_transactions`         ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `vendor_transactions_tenant_id_index` (`tenant_id`);
 ALTER TABLE `integrations`                ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `integrations_tenant_id_index` (`tenant_id`);
 
--- Godowns branch tables
-ALTER TABLE `godowns`                     ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `godowns_tenant_id_index` (`tenant_id`);
-ALTER TABLE `godowns_stocks`              ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `godowns_stocks_tenant_id_index` (`tenant_id`);
-ALTER TABLE `stock_transfers`             ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `stock_transfers_tenant_id_index` (`tenant_id`);
-ALTER TABLE `stock_transfer_items`        ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `stock_transfer_items_tenant_id_index` (`tenant_id`);
+ALTER TABLE `backup_logs`                 ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `backup_logs_tenant_id_index` (`tenant_id`);
+ALTER TABLE `user_backup_mail_settings`   ADD COLUMN `tenant_id` BIGINT UNSIGNED NULL AFTER `id`, ADD INDEX `user_backup_mail_settings_tenant_id_index` (`tenant_id`);
 
 
--- STEP 2: BACKFILL tenant_id = 1 (existing live data)
+-- ---------------------------------------------------------------------
+-- STEP 1b: GOOGLE DRIVE TOKEN AUTO-RENEW KE LIYE EXTRA COLUMNS
+-- ---------------------------------------------------------------------
+ALTER TABLE `user_backup_mail_settings`
+    ADD COLUMN `google_drive_access_token_encrypted` TEXT NULL AFTER `google_drive_refresh_token_encrypted`,
+    ADD COLUMN `google_drive_token_expires_at` TIMESTAMP NULL AFTER `google_drive_access_token_encrypted`;
+
+
+-- ---------------------------------------------------------------------
+-- STEP 2: BACKFILL EXISTING RECORDS  (purana shop = tenant_id 1)
+--         Pehle saara data update karein, sab se aakhir mein users.
+-- ---------------------------------------------------------------------
+
 UPDATE `products`                    SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
 UPDATE `companies`                   SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
 UPDATE `customers`                   SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
@@ -89,10 +108,19 @@ UPDATE `customer_transactions`       SET `tenant_id` = 1 WHERE `tenant_id` IS NU
 UPDATE `vendor_transactions`         SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
 UPDATE `integrations`                SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
 
-UPDATE `godowns`                     SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
-UPDATE `godowns_stocks`              SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
-UPDATE `stock_transfers`             SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
-UPDATE `stock_transfer_items`        SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
+UPDATE `backup_logs`                 SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
+UPDATE `user_backup_mail_settings`   SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
 
--- SAB SE AAKHIR: users
+-- SAB SE AAKHIR MEIN: users ko tenant assign karein.
 UPDATE `users`                       SET `tenant_id` = 1 WHERE `tenant_id` IS NULL;
+
+
+-- =====================================================================
+-- NAYA TENANT BANANE KA TAREEQA (misal: tenant 2):
+--   1) Naya user banayein aur uska tenant_id = 2 set karein, e.g.
+--      INSERT INTO users (tenant_id, name, email, password, created_at, updated_at)
+--      VALUES (2, 'Shop 2 Admin', 'shop2@example.com', '<bcrypt-hash>', NOW(), NOW());
+--   2) Bas. Us user se login karte hi saara naya data automatically
+--      tenant_id = 2 ke sath save hoga aur reports/ledgers sirf tenant 2
+--      ka data dikhayengi.
+-- =====================================================================

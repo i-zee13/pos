@@ -30,39 +30,26 @@ import swal from 'sweetalert';
  let invoice_discount = 0;
  let data_variable = '';
  let grand_total = '';
-
- function normalizeStockBalance(value) {
-     if (typeof roundQty === 'function') {
-         return roundQty(value, 4);
-     }
-     var n = parseFloat(value);
-     if (isNaN(n) || !isFinite(n) || Math.abs(n) < 0.00001) {
-         return 0;
-     }
-     return parseFloat(n.toFixed(4));
- }
-
- function displayStockBalance(value) {
-     if (typeof formatQty === 'function') {
-         return formatQty(value, 4);
-     }
-     return String(normalizeStockBalance(value));
- }
-
+ let balanceRequestSeq = 0;
  $(document).ready(function () { 
     console.log(segments);
-    if (segments[3] == "sale-add") {
-         setTimeout(() => {
-             $('#customer_id').val((window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8).trigger('change');
-         }, 2000);
-     } 
-     $('.parent-div').show();
-     $('#tblLoader').hide();
-     $('#bar-code').focus();
-     stock_products = JSON.parse($('#stock_products').val());
-     customer_ledger = JSON.parse($('#customer_ledger').val());
-     getProducts();
-     $('.display').show();
+    if (segments[3] == "sale-add" || segments[3] == 'sale-edit') {
+         toggleInvoiceBalanceLoader(true);
+     } else {
+         $('.parent-div').show();
+         $('#tblLoader').hide();
+     }
+     // Counter Sale is selected after getvendors() loads options (avoid race with empty dropdown / val(0))
+     // Early focus often fails while balance loader hides .parent-div; toggleInvoiceBalanceLoader(false) re-focuses.
+     if (typeof focusInvoiceBarcodeInput === 'function') {
+         focusInvoiceBarcodeInput();
+     } else {
+         $('#designationsTable #bar-code, #bar-code').first().focus();
+     }
+    stock_products = JSON.parse($('#stock_products').val());
+    customer_ledger = JSON.parse($('#customer_ledger').val());
+    getProducts();
+    $('.display').show();
      
       if (segments[3] == 'sale-edit') {
          var is_removable = true;
@@ -171,7 +158,11 @@ import swal from 'sweetalert';
      $('#new_purchase_price').val('');
      $('#retail_price').val(''); 
      $('#discount').val('');
-     $('#bar-code').focus();
+     if (typeof focusInvoiceBarcodeInput === 'function') {
+         focusInvoiceBarcodeInput();
+     } else {
+         $('#designationsTable #bar-code, #bar-code').first().focus();
+     }
      data_variable = '';
      qty = '';
      expiry_date= '';
@@ -235,7 +226,7 @@ import swal from 'sweetalert';
                                  sales_product_array = sales_product_array.filter(x => x.product_id != product_id);
                                  grandSum(previous_payable, service_charges);
                                  var filter_product = product_list.filter(x => x.id == product_id);
-                                 filter_product[0].stock_balance = normalizeStockBalance(response.updated_stock);
+                                 filter_product[0].stock_balance = response.updated_stock;
                              } else {
                                  deleteRef.removeAttr('disabled');
                                  deleteRef.text('Delete');
@@ -278,7 +269,7 @@ import swal from 'sweetalert';
 
      $('#retail_price').val(filter_product[0].sale_price);
 
-     $('.stock_balance').text(displayStockBalance(filter_product[0].stock_balance));
+     $('.stock_balance').text(filter_product[0].stock_balance);
      if (filter_product[0].new_purchase_price > 0) {
          $('.pp').text(filter_product[0].new_purchase_price);
      } else {
@@ -308,10 +299,10 @@ import swal from 'sweetalert';
              $('.purchase_price').val(filter_product[0].old_purchase_price);
          }
          $('#retail_price').val(filter_product[0].sale_price);
-         $('.stock_balance').text(displayStockBalance(filter_product[0].stock_balance)); 
+         $('.stock_balance').text(filter_product[0].stock_balance); 
          p_name = filter_product[0].product_name;
          product_id = filter_product[0].id;
-         stock_in_hand = normalizeStockBalance(filter_product[0].stock_balance);
+         stock_in_hand = parseFloat(filter_product[0].stock_balance) || 0;
          purchased_price = filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price;
          $('.expiry_date').val(filter_product[0].expiry_date)
          expiry_date = filter_product[0].expiry_date;
@@ -366,14 +357,14 @@ import swal from 'sweetalert';
         $('#products').val(filter_product[0].id).trigger('change');
          $('.calculate_by_amount').attr('data-price', filter_product[0].sale_price);
          $('.purchase_price').val(filter_product[0].new_purchase_price ? filter_product[0].new_purchase_price : filter_product[0].old_purchase_price);
-         $('.stock_balance').text(displayStockBalance(filter_product[0].stock_balance));
+         $('.stock_balance').text(filter_product[0].stock_balance);
          p_name = filter_product[0].product_name;
          expiry_date = filter_product[0].expiry_date;
          product_id = filter_product[0].id; 
 
 
          if (data_variable.length > 5) {
-             if (normalizeStockBalance(filter_product[0].stock_balance) > 0) {
+             if (filter_product[0].stock_balance > 0) {
                  $('.qty').val(1).trigger('change');
                  $('#add-product').click();
              } else {
@@ -401,14 +392,23 @@ import swal from 'sweetalert';
      }
  }
  $(document).on('input change', '.qty', function () {
-     qty = $(this).val();
-     if (qty > stock_in_hand) {
+     // Must update module-level `qty` — productRetailAmount() uses it for Total
+     qty = parseFloat($(this).val());
+     var maxStock = parseFloat(stock_in_hand);
+     if (isNaN(qty)) {
+         return;
+     }
+     if (isNaN(maxStock)) {
+         maxStock = 0;
+     }
+     if (qty > maxStock) {
          $(this).val('')
+         qty = '';
          $('.qty').css('border-color', 'red');
          $(this).focus();
          $('#notifDiv').fadeIn();
          $('#notifDiv').css('background', 'red');
-         $('#notifDiv').text(`${stock_in_hand > 0 ? "Qty should be less than " + displayStockBalance(stock_in_hand) : 'Product is Out of Stock!'}`);
+         $('#notifDiv').text(`${maxStock > 0 ? "Qty should be less than " + maxStock : 'Product is Out of Stock!'}`);
          setTimeout(() => {
              $('#notifDiv').fadeOut();
          }, 3000);
@@ -437,6 +437,9 @@ import swal from 'sweetalert';
      current_action.text('Print')
  }) 
  function saleSave(current_action, type) {
+     if (typeof ensureInvoiceBalanceReady === 'function' && !ensureInvoiceBalanceReady()) {
+         return;
+     }
      let dirty = false;
      $('.required').each(function () {
          if (!$(this).val() || $(this).val() == 0) {
@@ -665,7 +668,7 @@ import swal from 'sweetalert';
         });
         console.log(filter_product);
         if (filter_product.length > 0) {  
-            filter_product[0].stock_balance = normalizeStockBalance(res.new_prod.stock_balance);
+            filter_product[0].stock_balance = res.new_prod.stock_balance;
         } else {
             console.log(res.new_prod);
             stock_products.push(res.new_prod);
@@ -801,7 +804,7 @@ $(document).on('input', '.qty-input', function () {
      $('.retail_price').text(r_price);
      $('.pp').text(purchase);
 
-     $('.stock_balance').text(displayStockBalance(stock));
+     $('.stock_balance').text(stock);
  });
  // $('body').on('mouseleave', '.ProductTable tr', function() {
  // $('.retail_price').text(0);
@@ -858,9 +861,6 @@ $(document).on('input', '.qty-input', function () {
      $("#products").append(`<option value="0">Select Product</option>`)
      stock_products.forEach(data => {
         console.log(data);
-         if (data.stock_balance !== undefined) {
-             data.stock_balance = normalizeStockBalance(data.stock_balance);
-         }
          $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name} Rs-${data.sale_price}</option>`)
          product_list.push(data);
      });
@@ -874,10 +874,24 @@ $(document).on('input', '.qty-input', function () {
          success: function (response) {
              $("#customer_id").append(`<option value="0">Select Customer</option>`)
              response.customers.forEach(data => {
-                 $("#customer_id").append(`<option value="${data.id}" data-name="${data.customer_name}" ${data.id == customer_id ? 'seleced' : ''}>${data.id}-${data.customer_name}</option>`)
+                 $("#customer_id").append(`<option value="${data.id}" data-name="${data.customer_name}" ${data.id == customer_id ? 'selected' : ''}>${data.id}-${data.customer_name}</option>`)
                  vendors.push(data);
              });
-             $("#customer_id").val(customer_id).trigger('change');
+             var selectCustomerId = customer_id;
+             if (segments[3] == 'sale-add' && (!selectCustomerId || selectCustomerId == 0)) {
+                 selectCustomerId = (window.SYS_CUSTOMERS && window.SYS_CUSTOMERS.COUNTER_SALE) || 8;
+             }
+             // Select2 may init slightly later — set native value then refresh plugin if present
+             $("#customer_id").val(String(selectCustomerId));
+             if ($("#customer_id").hasClass('select2-hidden-accessible')) {
+                 $("#customer_id").trigger('change.select2');
+             }
+             $("#customer_id").trigger('change');
+         },
+         error: function () {
+             toggleInvoiceBalanceLoader(false);
+             $('#notifDiv').fadeIn().css('background', 'red').text('Failed to load customers. Please refresh.');
+             setTimeout(() => { $('#notifDiv').fadeOut(); }, 3000);
          }
      })
  }
@@ -901,13 +915,20 @@ $(document).on('input', '.qty-input', function () {
      // $('.current_balance').text('0').trigger('change');
      var selected_index = $(this).val();
      if (selected_index > 0) {
+         var reqId = ++balanceRequestSeq;
          $.ajax({
              url: '/get-customer-balance/' + selected_index,
              type: 'get',
              data: {
                  segment: segment
              },
+             beforeSend: function () {
+                 toggleInvoiceBalanceLoader(true);
+             },
              success: function (response) {
+                 if (reqId !== balanceRequestSeq) {
+                     return;
+                 }
                  previous_payable = response.customer_balance;
                  $('#previous_receivable').val(previous_payable);
                  var previous_payable_text = previous_payable >= 0 ? previous_payable + " DR" : previous_payable < 0 ? (-previous_payable) + " CR" : previous_payable;
@@ -923,11 +944,29 @@ $(document).on('input', '.qty-input', function () {
                  }
 
                  $('.display').css('display', '');
+                 window.invoiceBalanceLoadedFor = String(selected_index);
+             },
+             complete: function () {
+                 if (reqId !== balanceRequestSeq) {
+                     return;
+                 }
+                 toggleInvoiceBalanceLoader(false);
+             },
+             error: function () {
+                 if (reqId !== balanceRequestSeq) {
+                     return;
+                 }
+                 window.invoiceBalanceLoadedFor = null;
+                 $('#notifDiv').fadeIn().css('background', 'red').text('Failed to load customer previous balance. Please try again.');
+                 setTimeout(() => { $('#notifDiv').fadeOut(); }, 3000);
              }
          })
          var customer = vendors.filter(x => x.id == selected_index);
          // $('#invoice_type').val('2').trigger('change');
 
+     } else {
+         window.invoiceBalanceLoadedFor = null;
+         toggleInvoiceBalanceLoader(false);
      }
  })
 
@@ -1035,8 +1074,8 @@ $(document).on('input', '.qty-input', function () {
     <tr id='tr-${product_id}' data-prod_id ="${product_id}">
         <td>${product_id}</td>
         <td>${p_name}</td>
-        <td><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${normalizeStockBalance(stock_in_hand)}" class="inputSale qty-input add-stock-input td-input-qty${product_id}" data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
-        <td><input type="number" value="${retail_price}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${normalizeStockBalance(stock_in_hand)}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
+        <td><input type="number" value="${qty}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale qty-input add-stock-input td-input-qty${product_id}" data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
+        <td><input type="number" value="${retail_price}"  data-retail="${retail_price}" data-purchase="${purchased_price}" data-stock="${stock_in_hand}" class="inputSale price-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  min="0"></td>
         <td><input type="number" value="${prod_discount}"  class="inputSale discount-input add-stock-input td-${product_id}"  data-id="${product_id}" data-value="${amount}" data-quantity="${qty}"  style="font-size: 13px" min="0"></td>
         <td class='purchase-product-amount${product_id} add- S-input '>${amount}</td>
         <td  style="width:80px;"><a type="button" id="${product_id}" data-id="${invoice_id}" class="btn smBTN red-bg remove_btn" data-product-invoice="${sale_prod_id}" data-index="" data-quantity="${qty}" style="width:100%; ${!is_removable ? 'display:none' : ''}" >Remove</a></td>

@@ -18,7 +18,9 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'file'),
+    // database = less painful locking than file under slow POS saves (shared hosting).
+    // Prefer redis when available: SESSION_DRIVER=redis
+    'driver' => env('SESSION_DRIVER', 'database'),
 
     /*
     |--------------------------------------------------------------------------

@@ -3635,6 +3635,21 @@
 @endsection
 @push('js')
 <script>
+    /** Safe number for expense totals (production returns DECIMAL as strings). */
+    function num(value) {
+        if (typeof toNum === 'function') {
+            return toNum(value);
+        }
+        if (value === null || value === undefined || value === '') {
+            return 0;
+        }
+        if (typeof value === 'string') {
+            value = value.replace(/,/g, '').trim();
+        }
+        var n = parseFloat(value);
+        return isNaN(n) || !isFinite(n) ? 0 : n;
+    }
+
     $(document).ready(function() {
         $('.search-btn').on('click', function() {
             var start_date = $('.start_date').val();
@@ -3701,15 +3716,13 @@
                     var ttl_expense = 0;
                     var ttl_sale_product = 0;
                     var purchase_price = 0;
-                    response.sales.forEach((element, key) => {
-
-                        ttl_expense += element['dr'];
+                    (response.sales || []).forEach((element, key) => {
+                        ttl_expense += num(element['dr']);
                         var date = new Date(element.created_at);
                         var formattedDate = date.toDateString();
-                        var invoice_no = "";
-                        invoice_no = 0;
                         reportTable(element, formattedDate, 22)
                     });
+                    ttl_expense = num(ttl_expense);
                     $('.TeacherAttendanceListTable').fadeIn();
                     // sale_return_total(ttl_quantity,ttl_product_discount,total_profit,'Sale')
                     $('.filter_name').empty();
@@ -3724,12 +3737,12 @@
                                 <td class="font18" colspan="2"></td> 
                                 <td class="font18">Grand Total :</td> 
                                 <td class="totalNo" >
-                                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(ttl_expense.toFixed(2)) } <span style="color: ${total_avg_profit > 0 ? '#29f129' : 'red' };font-size: 18px">${ttl_expense.toFixed(2)}% </span></span>
+                                    <span class="grand-total" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">${addCommas(ttl_expense)}</span>
                                 </td>
                             </tr>
                      `);
 
-                    $('.ttl_expenses').html('<span>Rs.</span>' + addCommas(ttl_expense.toFixed(2)) + ` <span style="font-size: 28px"> ( <span style="color: ${total_avg_profit > 0 ? '#29f129' : 'red' };font-size: 25px">  ${total_avg_profit.toFixed(2)}% </span> )</span>`);
+                    $('.ttl_expenses').html('<span>Rs.</span> ' + addCommas(ttl_expense));
                     $('.ttl_payment').html(ttl_expense ? addCommas(ttl_expense) : 0);
                     $('.ttl_quantity').html(ttl_quantity ? addCommas(ttl_quantity) : 0);
                     $('.ttl_product_discount').html(ttl_sale_product ? addCommas(ttl_sale_product) : 0);
@@ -3919,6 +3932,8 @@
 })
 
 function addCommas(nStr) {
+    nStr = num(nStr);
+    nStr = Math.round(nStr * 10000) / 10000;
     nStr += "";
     x = nStr.split(".");
     x1 = x[0];

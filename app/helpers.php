@@ -9,19 +9,25 @@ use App\Models\ProductReplacement;
 use App\Models\ProductReplacementInvoice;
 use App\Models\PurchaseInvoice;
 use App\Models\ReturnInvoice;
+use App\Models\GodownStock;
 use App\Models\Sale as SaleInvoice; 
 use App\Models\SaleReturn; 
 use App\Models\StockManagment;
 use App\Models\VendorLedger;
 use App\Models\VendorStock;
-use App\Models\GodownStock;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Stevebauman\Location\Facades\Location;
 
 
 if (!function_exists('current_tenant_id')) {
+    /**
+     * Resolve the tenant_id of the currently logged-in user.
+     * Returns null when nobody is authenticated (console, jobs, login screen).
+     */
     function current_tenant_id()
     {
         if (Auth::check()) {
@@ -34,6 +40,11 @@ if (!function_exists('current_tenant_id')) {
     }
 }
 if (!function_exists('tenant_and')) {
+    /**
+     * Build a raw SQL fragment ` AND <alias.>tenant_id = X ` for splicing into
+     * hand-written WHERE clauses. Returns an empty string when no tenant is
+     * resolvable so legacy/console queries keep working unchanged.
+     */
     function tenant_and($alias = null, $column = 'tenant_id')
     {
         $tenantId = current_tenant_id();
@@ -46,6 +57,10 @@ if (!function_exists('tenant_and')) {
     }
 }
 if (!function_exists('tenant_where')) {
+    /**
+     * Build a raw SQL condition `<alias.>tenant_id = X` for use right after WHERE.
+     * Returns `1=1` when no tenant is resolvable.
+     */
     function tenant_where($alias = null, $column = 'tenant_id')
     {
         $tenantId = current_tenant_id();
@@ -57,7 +72,34 @@ if (!function_exists('tenant_where')) {
         return " {$prefix}{$column} = ".(int) $tenantId.' ';
     }
 }
+if (!function_exists('sum_per_invoice')) {
+    /**
+     * Sum an invoice-level field once per invoice_no (max per group).
+     * Fixes under-count when product lines carry different invoice_discount values.
+     */
+    function sum_per_invoice($collection, string $field, ?callable $invoiceFilter = null): float
+    {
+        return (float) collect($collection)
+            ->groupBy('invoice_no')
+            ->reduce(function (float $sum, $rows) use ($field, $invoiceFilter) {
+                $row = $rows->first();
+                if ($invoiceFilter && !$invoiceFilter($row)) {
+                    return $sum;
+                }
+
+                return $sum + (float) $rows->max($field);
+            }, 0.0);
+    }
+}
 if (!function_exists('sys_customers')) {
+    /**
+     * Current tenant ke saare "system" customers ka map: [code => id].
+     * Ek hi query, per-request memoized. Agar `system_code` column abhi mojood
+     * nahi (SQL na chala ho) ya koi DB issue ho to khali array return hota hai
+     * taake site na ruke (JS purane literal id par fallback kar lega).
+     *
+     * Codes: COUNTER_SALE, EXPENSE, NET_PURCHASE, NET_PURCHASE_RETURN
+     */
     function sys_customers()
     {
         static $map = null;
@@ -77,6 +119,11 @@ if (!function_exists('sys_customers')) {
     }
 }
 if (!function_exists('sys_customer_id')) {
+    /**
+     * Resolve a "system" customer's id by its stable code for the current tenant.
+     * Numeric IDs (e.g. Counter Sale = 8, Expense = 5) hardcode na karein; in ki
+     * jagah yeh helper use karein taake har tenant apna apna system-customer use kare.
+     */
     function sys_customer_id($code)
     {
         $map = sys_customers();
@@ -85,6 +132,11 @@ if (!function_exists('sys_customer_id')) {
     }
 }
 if (!function_exists('provision_system_customers')) {
+    /**
+     * Logged-in user ke tenant ke liye 4 system customers ensure karein:
+     * EXPENSE, COUNTER_SALE, NET_PURCHASE, NET_PURCHASE_RETURN.
+     * Sab mojood hon to skip; jo missing hon sirf woh banayein.
+     */
     function provision_system_customers()
     {
         $tenantId = current_tenant_id();
@@ -153,6 +205,9 @@ if (!function_exists('provision_system_customers')) {
     }
 }
 if (!function_exists('system_accounts_ready')) {
+    /**
+     * Current tenant ke 4 system customers sab mojood hain ya nahi.
+     */
     function system_accounts_ready()
     {
         $required = ['EXPENSE', 'COUNTER_SALE', 'NET_PURCHASE', 'NET_PURCHASE_RETURN'];
@@ -168,6 +223,12 @@ if (!function_exists('system_accounts_ready')) {
     }
 }
 if (!function_exists('fix_invoice_helper_case')) {
+    /**
+     * Linux (case-sensitive) par lowercase `app/invoice_helper.php` shim banata
+     * hai jo asli `app/Invoice_helper.php` ko load karti hai. Composer/CMD ke
+     * baghair case-mismatch error theek karne ke liye. Windows (case-insensitive)
+     * par koi change nahi hota (capital file hi match ho jati hai).
+     */
     function fix_invoice_helper_case()
     {
         $upper = app_path('Invoice_helper.php');
@@ -187,7 +248,6 @@ if (!function_exists('fix_invoice_helper_case')) {
             : 'FAILED: could not write app/invoice_helper.php (check app/ folder permissions).';
     }
 }
-
 if (!function_exists('timeZoneList')) {
     function timeZoneList()
     {
@@ -308,15 +368,20 @@ if (!function_exists('getVendorCpvNo')) {
 }
 
 if (!function_exists('isEditable')) {
-    function isEditable($customer_id)
+     function isEditable($customer_id)
     {
         CustomerLedger::where('customer_id', $customer_id)
+            
+            ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         VendorLedger::where('customer_id', $customer_id)
             
+            ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         //Sales
         SaleInvoice::where('customer_id', $customer_id)
+            
+            ->where('is_editable', 1)
             ->update(['is_editable' => 0]);
         SaleReturn::where('customer_id', $customer_id)
             
@@ -474,149 +539,806 @@ function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type,
     $v->save();
     return $v;
 }
-function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stock_qty, $In_out_status, $transaction_type, $existing_inv_id =  null)
+/**
+ * Maintain expiry-aware batch layers + refresh avg cost on vendor_stock_managment.
+ * Does NOT change vendor_stocks / products.stock_balance / invoice totals —
+ * callers keep using updateStock() + StockManagment() for parent qty.
+ *
+ * transaction_type: 1 purchase, 2 sale, 3 purchase_return, 4 sale_return,
+ *                   5 product_delete, 6 replacement
+ * In_out_status: 1 = IN, 2 = OUT
+ */
+function BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $stock_qty, $In_out_status, $transaction_type, $existing_inv_id = null)
 {
-    // dd($purchase);
-    $purchase->expiry_date  = $purchase->expiry_date ? $purchase->expiry_date : '0000-00-00';
-    $query                  = BatchStockMgt::where('product_id', $purchase->product_id);
-    // if ($existing_inv_id) {
-    //     $query->where('invoice_id', $existing_inv_id)->orderBy('id', 'ASC');
-    // } else
-    if ($transaction_type == 1 || $transaction_type == 4 || $transaction_type == 3) {
-        $query->whereDate('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC');
-    } else if ($transaction_type == 2) {
-        $query->where('batch_wise_balance', '>', 0)->orderBy('expiry_date', 'ASC');
-    }
-    $s = $query->first(); 
-    if (!$s) {
-        $s = new BatchStockMgt(); 
-        $s->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
-        $s->product_name    = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
-    }
-    
-    $previous_qty     =  0;
-    if ($existing_inv_id) {
-        $previous_qty = $s->qty ?? 0;
-    }
-    if ($transaction_type != 2) {
-        $s->expiry_date     =   $purchase->expiry_date ?? null;
-    }
-    $balance = $stock_qty;
-    if($s->batch_wise_balance != 0){  
-  
-        $balance                = $In_out_status == 2 ? $s->batch_wise_balance - $stock_qty : $s->batch_wise_balance +  $stock_qty; 
-        // $balance                =   $In_out_status == 2  
-        //                                             ? ($s->batch_wise_balance - $previous_qty - $stock_qty) //OUT
-        //                                             : ($s->batch_wise_balance - $previous_qty + $stock_qty);//IN
-        $balance                =   $balance == 0  ? 1  : $balance;
-    }
-    $s->ttl_cost_price      =   ($s->unit_cost_price * $balance ) ;
-    if ($In_out_status == 1){
-        $new_cost_price = 0;
-        if($s->unit_cost_price !=   $purchase->purchase_price) {
-            $new_cost_price     =   $purchase->purchase_price * $stock_qty;
-        } 
-        $s->unit_cost_price     =   $purchase->purchase_price;
-        $s->ttl_cost_price      =   $s->ttl_cost_price + $new_cost_price;
-    }
-    $s->godown_id               =   $purchase->godown_id;
-    $s->company_id              =   $purchase->company_id;
-    $s->product_id              =   $purchase->product_id;
-    $s->invoice_id              =   $invoice_id;
-    $s->invoice_product_id      =   $purchase->id;
-    $s->actual_qty              =   $purchase->qty;
-    $s->actual_status           =   $In_out_status;
-    $s->qty                     =   $stock_qty;
-   
+    batch_ensure_allocations_table();
 
-    $query = BatchStockMgt::where('product_id', $purchase->product_id)
-        ->where('company_id', $purchase->company_id);
+    $remainingQty = (float) $stock_qty;
+    if ($remainingQty <= 0) {
+        return;
+    }
 
-    // FIFO (earliest expiry first) for stock leaving the business: sales, purchase returns, replacement OUT.
-    // Purchase invoice line decreases (edit) stay on this line's expiry bucket — not global FIFO.
-    $useFifoForOut = ($In_out_status == 2 && in_array((int) $transaction_type, [2, 3, 6], true));
+    $expiryDate = batch_normalize_expiry($purchase->expiry_date ?? null);
+    $companyId = (int) ($purchase->company_id ?? 0);
+    $productId = (int) ($purchase->product_id ?? 0);
+    $txType = (int) $transaction_type;
+    $isIn = ((int) $In_out_status === 1);
+    $unitCostIn = round((float) ($purchase->purchase_price ?? ($purchase->purchased_price ?? 0)), 6);
+    $trxEnum = batch_trx_enum($txType);
+    $lineId = (int) ($purchase->id ?? 0);
 
-    if ($In_out_status == 2) {
-        if ($useFifoForOut) {
+    // Sale delete / sale return / sale qty-reduce: restore to THE SAME batches that were consumed
+    $isSalePutBack = $isIn && in_array($txType, [2, 4, 5], true);
+
+    if ($isSalePutBack) {
+        $restored = batch_putback_from_allocations(
+            $productId,
+            $companyId,
+            (int) $vendor_stock_id,
+            (int) $invoice_id,
+            $lineId,
+            $remainingQty,
+            $trxEnum,
+            $unitCostIn,
+            $expiryDate
+        );
+        if ($restored) {
+            // Sale put-back must NOT change running avg (purchase-only rule)
+            return;
+        }
+        // Sale return with user-selected batch: put IN only into that batch
+        $batchRowId = (int) ($purchase->batch_row_id ?? 0);
+        if ($txType === 4 && $batchRowId > 0) {
+            $target = BatchStockMgt::where('id', $batchRowId)
+                ->where('product_id', $productId)
+                ->where('company_id', $companyId)
+                ->first();
+            if ($target) {
+                $existingBalance = (float) ($target->batch_wise_balance ?? 0);
+                $newBalance = round($existingBalance + $remainingQty, 6);
+                $unitCost = (float) ($target->unit_cost_price ?? 0);
+                if ($unitCost <= 0) {
+                    $unitCost = $unitCostIn;
+                    $target->unit_cost_price = $unitCost;
+                }
+                $target->batch_wise_balance = $newBalance;
+                $target->ttl_cost_price = round($unitCost * $newBalance, 6);
+                $target->actual_qty = (float) ($purchase->qty ?? $remainingQty);
+                $target->actual_status = (int) $In_out_status;
+                $target->qty = (int) max(1, (int) round($remainingQty));
+                $target->save();
+                return;
+            }
+        }
+        // fallback below: selected expiry, else FEFO putback (legacy)
+    }
+
+    // EDIT purchase/purchase-return only: adjust SAME invoice batch — never create a 2nd batch.
+    if (!$isSalePutBack && !empty($existing_inv_id) && !empty($invoice_id) && in_array($txType, [1, 3], true)) {
+        batch_adjust_existing_invoice_batch(
+            (int) $vendor_stock_id,
+            (int) $invoice_id,
+            $purchase,
+            $remainingQty,
+            $isIn,
+            $txType,
+            $trxEnum,
+            $expiryDate,
+            $companyId,
+            $productId,
+            $unitCostIn,
+            $lineId
+        );
+
+        return;
+    }
+
+    // OUT → FEFO (purchase return with expiry → that expiry first).
+    // Purchase IN → exact expiry + unit-cost.
+    // Sale return with selected expiry → put into that expiry batch only.
+    // Sale put-back fallback → FEFO restore.
+    if ($isSalePutBack) {
+        if ($txType === 4 && $expiryDate !== '0000-00-00' && $expiryDate !== '' && $expiryDate !== '0') {
+            $strategy = 'expiry_in';
+        } else {
+            $strategy = 'putback';
+        }
+    } elseif ($isIn) {
+        $strategy = 'exact';
+    } elseif ($txType === 3 && $expiryDate !== '0000-00-00') {
+        $strategy = 'expiry_out'; // purchase return: consume from mentioned expiry
+    } else {
+        $strategy = 'fifo';
+    }
+
+    $guard = 0;
+    while ($remainingQty > 0.000001 && $guard < 100) {
+        $guard++;
+
+        $query = BatchStockMgt::where('product_id', $productId)
+            ->where('company_id', $companyId);
+
+        if ($strategy === 'fifo' || $strategy === 'putback') {
             $query->where('batch_wise_balance', '>', 0)
+                ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
                 ->orderBy('expiry_date', 'ASC')
                 ->orderBy('id', 'ASC');
+        } elseif ($strategy === 'expiry_out') {
+            $query->where('batch_wise_balance', '>', 0)
+                ->whereDate('expiry_date', $expiryDate)
+                ->orderBy('id', 'ASC');
+        } elseif ($strategy === 'expiry_in') {
+            // Sale return: match selected expiry only (any unit cost)
+            $query->where(function ($q) use ($expiryDate) {
+                if ($expiryDate === '0000-00-00') {
+                    $q->where(function ($q2) {
+                        $q2->whereNull('expiry_date')->orWhere('expiry_date', '0000-00-00');
+                    });
+                } else {
+                    $q->whereDate('expiry_date', $expiryDate);
+                }
+            })->orderBy('id', 'ASC');
         } else {
-            $query->whereDate('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC');
+            $query->where(function ($q) use ($expiryDate) {
+                if ($expiryDate === '0000-00-00') {
+                    $q->where(function ($q2) {
+                        $q2->whereNull('expiry_date')->orWhere('expiry_date', '0000-00-00');
+                    });
+                } else {
+                    $q->whereDate('expiry_date', $expiryDate);
+                }
+            })
+                ->whereRaw('ABS(IFNULL(unit_cost_price,0) - ?) < 0.0001', [$unitCostIn])
+                ->orderBy('id', 'DESC');
         }
-    } else {
-        $query->whereDate('expiry_date', $purchase->expiry_date)->orderBy('id', 'DESC');
-    }
 
-    $s = $query->first();
-    if (!$s) {
-        $s = new BatchStockMgt();
-        $s->company_name = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
-        $s->product_name = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
-    }
+        $s = $query->first();
 
-    if ($In_out_status == 1) {
-        $s->expiry_date = $purchase->expiry_date ?? null;
-    }
-
-    $existingBalance = (float) ($s->batch_wise_balance ?? 0);
-    $balance = $In_out_status == 2
-        ? $existingBalance - $stock_qty
-        : $existingBalance + $stock_qty;
-
-    $unitCost = (float) ($s->unit_cost_price ?? 0);
-    $s->ttl_cost_price = $unitCost * $balance;
-    if ($In_out_status == 1) {
-        $new_cost_price = 0;
-        if ((float) $s->unit_cost_price != (float) $purchase->purchase_price) {
-            $new_cost_price = $purchase->purchase_price * $stock_qty;
+        // Purchase return expiry miss → fall back to FEFO once
+        if (!$s && $strategy === 'expiry_out') {
+            $strategy = 'fifo';
+            continue;
         }
-        $s->unit_cost_price = $purchase->purchase_price;
-        $s->ttl_cost_price = $s->ttl_cost_price + $new_cost_price;
-    }
+        // Sale return custom/selected expiry miss → create that expiry batch below
+        // (do NOT FEFO into another month's open batch — e.g. Ali's Feb return when Feb is depleted)
 
-    $s->company_id = $purchase->company_id;
-    $s->product_id = $purchase->product_id;
-    $s->invoice_id = $invoice_id;
-    $s->invoice_product_id = $purchase->id;
-    $s->actual_qty = $purchase->qty;
-    $s->actual_status = $In_out_status;
-    $s->qty = $stock_qty;
+        if (!$s) {
+            if (!$isIn) {
+                Log::warning('batch.out_without_available_batch', [
+                    'product_id' => $productId,
+                    'company_id' => $companyId,
+                    'requested_qty' => $remainingQty,
+                    'transaction_type' => $txType,
+                ]);
+                break;
+            }
+            $s = new BatchStockMgt();
+            $s->batch_id = 'B-'.$productId.'-'.uniqid();
+            $s->company_name = batch_ascii(DB::table('companies')->where('id', $companyId)->value('company_name'));
+            $s->product_name = batch_ascii(DB::table('products')->where('id', $productId)->value('product_name'));
+            $s->mfg_date = '0000-00-00';
+            $s->expiry_date = $expiryDate;
+            $s->batch_wise_balance = 0;
+            $s->unit_cost_price = $unitCostIn;
+            $s->ttl_cost_price = 0;
+            $s->created_by = (int) (Auth::id() ?? 0);
+        }
 
-    if ($In_out_status == 2 && $balance < 0 && $existingBalance > 0) {
-        $remaining_qty = abs($balance);
-        $drainQty = $existingBalance;
-        $s->qty = $drainQty;
-        $s->ttl_cost_price = $unitCost * $drainQty;
-        $s->batch_wise_balance = 0;
-        $s->avg_cost_price_per_unit = 0;
+        $existingBalance = (float) ($s->batch_wise_balance ?? 0);
+        $appliedQty = $remainingQty;
+        if (!$isIn) {
+            if ($existingBalance <= 0.000001) {
+                continue;
+            }
+            $appliedQty = min($remainingQty, $existingBalance);
+        }
+
+        $newBalance = $isIn
+            ? round($existingBalance + $appliedQty, 6)
+            : round($existingBalance - $appliedQty, 6);
+
+        $unitCost = (float) ($s->unit_cost_price ?? 0);
+        if ($isIn && $unitCost <= 0) {
+            $unitCost = $unitCostIn;
+        }
+        if ($isIn && !$s->exists) {
+            $unitCost = $unitCostIn;
+        }
+
+        $s->company_id = $companyId;
+        $s->product_id = $productId;
+        $s->actual_qty = (float) ($purchase->qty ?? $appliedQty);
+        $s->actual_status = (int) $In_out_status;
+        $s->qty = (int) max(1, (int) round($appliedQty));
+        $s->batch_wise_balance = $newBalance;
+        $s->total_balance = 0;
+        $s->vs_id = $vendor_stock_id;
+        $s->trx_type = $trxEnum;
+        $s->unit_cost_price = $unitCost;
+        $s->ttl_cost_price = round($unitCost * max(0, $newBalance), 6);
+        $s->avg_cost_price_per_unit = $newBalance > 0 ? $unitCost : 0;
+        if ($isIn && $txType === 1) {
+            $s->invoice_id = $invoice_id;
+            $s->invoice_product_id = $purchase->id ?? null;
+            if (empty($s->expiry_date) || $s->expiry_date === '0000-00-00') {
+                $s->expiry_date = $expiryDate;
+            }
+        }
         $s->save();
 
-        return BatchWiseStockManagment($vendor_stock_id, $invoice_id, $purchase, $remaining_qty, $In_out_status, $transaction_type, $existing_inv_id);
+        // Track sale OUT so delete/return can put back into the SAME batch rows
+        if (!$isIn && in_array($txType, [2, 4, 5, 6], true) && $appliedQty > 0 && $s->id) {
+            batch_record_allocation([
+                'product_id' => $productId,
+                'batch_row_id' => (int) $s->id,
+                'invoice_id' => (int) $invoice_id,
+                'invoice_product_id' => $lineId,
+                'trx_type' => $trxEnum,
+                'direction' => 'out',
+                'qty' => $appliedQty,
+                'unit_cost' => $unitCost,
+            ]);
+        }
+
+        if ($newBalance > 0.000001 && $newBalance < 1) {
+            $dustScrapped = $newBalance;
+            try {
+                $s->delete();
+            } catch (\Throwable $e) {
+                $s->batch_wise_balance = 0;
+                $s->ttl_cost_price = 0;
+                $s->save();
+            }
+            batch_scrap_dust_qty($productId, $companyId, $dustScrapped);
+        } elseif (!$isIn && $newBalance <= 0.000001) {
+            // Keep zero row if it has allocations pending; else delete
+            $hasAlloc = DB::table('stock_batch_allocations')
+                ->where('batch_row_id', $s->id)
+                ->where('direction', 'out')
+                ->where('reversed', 0)
+                ->exists();
+            if (!$hasAlloc) {
+                try {
+                    $s->delete();
+                } catch (\Throwable $e) {
+                }
+            }
+        }
+
+        $remainingQty = round($remainingQty - $appliedQty, 6);
     }
 
-    $s->batch_wise_balance = $balance;
-    $s->total_balance = null;
-    $s->vs_id = $vendor_stock_id;
-    $s->trx_type = $transaction_type;
-    $s->avg_cost_price_per_unit = $s->batch_wise_balance > 0
-        ? ($s->ttl_cost_price / $s->batch_wise_balance)
-        : 0;
+    // Running avg updates ONLY on purchase STOCK IN (not sale / return / put-back)
+    if ($isIn && $txType === 1) {
+        applyPurchaseWeightedAvg($productId, $companyId, (float) $stock_qty, $unitCostIn);
+    }
+}
 
-    $s->save();
+if (!function_exists('batch_ensure_allocations_table')) {
+    function batch_ensure_allocations_table(): void
+    {
+        static $ready = false;
+        if ($ready) {
+            return;
+        }
+        if (!Schema::hasTable('stock_batch_allocations')) {
+            Schema::create('stock_batch_allocations', function ($t) {
+                $t->bigIncrements('id');
+                $t->unsignedBigInteger('product_id')->index();
+                $t->unsignedBigInteger('batch_row_id')->index();
+                $t->unsignedBigInteger('invoice_id')->nullable()->index();
+                $t->unsignedBigInteger('invoice_product_id')->nullable()->index();
+                $t->string('trx_type', 32)->nullable();
+                $t->string('direction', 8)->default('out');
+                $t->decimal('qty', 18, 6)->default(0);
+                $t->decimal('unit_cost', 18, 6)->default(0);
+                $t->tinyInteger('reversed')->default(0)->index();
+                $t->timestamps();
+            });
+        }
+        $ready = true;
+    }
+}
 
-    $companyId = (int) $purchase->company_id;
-    $productId = (int) $purchase->product_id;
-    $stock = StockManagment::where('product_id', $productId)
-        ->where('company_id', $companyId)
-        ->orderBy('id', 'DESC')
-        ->first();
-    if ($stock) {
-        $stock->ttl_avg_cost = 0;
-        $stock->ttl_cost = 0;
-        $stock->purchase_price = $purchase->purchase_price;
-        $stock->sale_price = $purchase->sale_price;
+if (!function_exists('batch_record_allocation')) {
+    function batch_record_allocation(array $row): void
+    {
+        batch_ensure_allocations_table();
+        DB::table('stock_batch_allocations')->insert([
+            'product_id' => $row['product_id'],
+            'batch_row_id' => $row['batch_row_id'],
+            'invoice_id' => $row['invoice_id'] ?: null,
+            'invoice_product_id' => $row['invoice_product_id'] ?: null,
+            'trx_type' => $row['trx_type'] ?? null,
+            'direction' => $row['direction'] ?? 'out',
+            'qty' => $row['qty'],
+            'unit_cost' => $row['unit_cost'] ?? 0,
+            'reversed' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+}
+
+/**
+ * Put qty back into the exact batches that were consumed (allocations).
+ * Returns true if any allocation was applied.
+ */
+if (!function_exists('batch_putback_from_allocations')) {
+    function batch_putback_from_allocations(
+        int $productId,
+        int $companyId,
+        int $vendorStockId,
+        int $invoiceId,
+        int $lineId,
+        float $qtyNeeded,
+        string $trxEnum,
+        float $fallbackCost,
+        string $fallbackExpiry
+    ): bool {
+        batch_ensure_allocations_table();
+
+        $q = DB::table('stock_batch_allocations')
+            ->where('product_id', $productId)
+            ->where('direction', 'out')
+            ->where('reversed', 0)
+            ->orderByDesc('id'); // reverse of consumption order
+
+        if ($lineId > 0) {
+            $q->where('invoice_product_id', $lineId);
+        } elseif ($invoiceId > 0) {
+            $q->where('invoice_id', $invoiceId);
+        } else {
+            return false;
+        }
+
+        $rows = $q->get();
+        if ($rows->isEmpty()) {
+            return false;
+        }
+
+        $left = $qtyNeeded;
+        foreach ($rows as $row) {
+            if ($left <= 0.000001) {
+                break;
+            }
+            $give = min($left, (float) $row->qty);
+            if ($give <= 0) {
+                continue;
+            }
+
+            $s = BatchStockMgt::find($row->batch_row_id);
+            if (!$s) {
+                // Batch row was deleted — recreate with same cost identity
+                $s = new BatchStockMgt();
+                $s->batch_id = 'B-'.$productId.'-'.uniqid();
+                $s->company_id = $companyId;
+                $s->product_id = $productId;
+                $s->company_name = batch_ascii(DB::table('companies')->where('id', $companyId)->value('company_name'));
+                $s->product_name = batch_ascii(DB::table('products')->where('id', $productId)->value('product_name'));
+                $s->mfg_date = '0000-00-00';
+                $s->expiry_date = $fallbackExpiry;
+                $s->batch_wise_balance = 0;
+                $s->unit_cost_price = (float) ($row->unit_cost ?: $fallbackCost);
+                $s->created_by = (int) (Auth::id() ?? 0);
+            }
+
+            $bal = round(((float) $s->batch_wise_balance) + $give, 6);
+            $uc = (float) ($s->unit_cost_price ?: $row->unit_cost ?: $fallbackCost);
+            $s->company_id = $companyId;
+            $s->product_id = $productId;
+            $s->batch_wise_balance = $bal;
+            $s->unit_cost_price = $uc;
+            $s->ttl_cost_price = round($uc * $bal, 6);
+            $s->avg_cost_price_per_unit = $uc;
+            $s->actual_status = 1;
+            $s->trx_type = $trxEnum;
+            $s->vs_id = $vendorStockId;
+            $s->save();
+
+            DB::table('stock_batch_allocations')->where('id', $row->id)->update([
+                'reversed' => 1,
+                'updated_at' => now(),
+            ]);
+
+            $left = round($left - $give, 6);
+        }
+
+        // If still leftover (partial), FEFO putback for remainder
+        if ($left > 0.000001) {
+            $first = BatchStockMgt::where('product_id', $productId)
+                ->where('company_id', $companyId)
+                ->where('batch_wise_balance', '>', 0)
+                ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
+                ->orderBy('expiry_date', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->first();
+            if ($first) {
+                $bal = round(((float) $first->batch_wise_balance) + $left, 6);
+                $uc = (float) $first->unit_cost_price;
+                $first->batch_wise_balance = $bal;
+                $first->ttl_cost_price = round($uc * $bal, 6);
+                $first->save();
+            }
+        }
+
+        return true;
+    }
+}
+
+
+/**
+ * Edit-path: change qty on the existing batch for this invoice/line.
+ * Never creates a second batch for the same invoice.
+ */
+if (!function_exists('batch_adjust_existing_invoice_batch')) {
+    function batch_adjust_existing_invoice_batch(
+        int $vendorStockId,
+        int $invoiceId,
+        $purchase,
+        float $qty,
+        bool $isIn,
+        int $txType,
+        string $trxEnum,
+        string $expiryDate,
+        int $companyId,
+        int $productId,
+        float $unitCostIn,
+        int $lineId
+    ): void {
+        $s = null;
+
+        // 1) Prefer exact line link
+        if ($lineId > 0) {
+            $s = BatchStockMgt::where('product_id', $productId)
+                ->where('invoice_product_id', $lineId)
+                ->orderByDesc('id')
+                ->first();
+        }
+
+        // 2) Same invoice + product
+        if (!$s) {
+            $s = BatchStockMgt::where('product_id', $productId)
+                ->where('invoice_id', $invoiceId)
+                ->orderByDesc('id')
+                ->first();
+        }
+
+        // 3) Same expiry + unit cost open layer (merged historical rows / rebuild)
+        if (!$s) {
+            $q = BatchStockMgt::where('product_id', $productId)
+                ->where('company_id', $companyId)
+                ->where('batch_wise_balance', '>', 0)
+                ->whereRaw('ABS(IFNULL(unit_cost_price,0) - ?) < 0.0001', [$unitCostIn])
+                ->where(function ($q2) use ($expiryDate) {
+                    if ($expiryDate === '0000-00-00') {
+                        $q2->where(function ($q3) {
+                            $q3->whereNull('expiry_date')->orWhere('expiry_date', '0000-00-00');
+                        });
+                    } else {
+                        $q2->whereDate('expiry_date', $expiryDate);
+                    }
+                })
+                ->orderByDesc('id');
+            $s = $q->first();
+        }
+
+        // 4) OUT only: if this invoice batch already emptied by sales, FEFO from other open batches
+        if (!$s && !$isIn) {
+            $s = BatchStockMgt::where('product_id', $productId)
+                ->where('company_id', $companyId)
+                ->where('batch_wise_balance', '>=', 1)
+                ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
+                ->orderBy('expiry_date', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->first();
+        }
+
+        if (!$s) {
+            // Edit IN but no existing batch to attach — still must not invent a "second" invoice batch blindly.
+            // Create only once and stamp this invoice so further edits hit the same row.
+            if ($isIn) {
+                Log::warning('batch.edit_in_without_existing_batch_creating_once', [
+                    'invoice_id' => $invoiceId,
+                    'product_id' => $productId,
+                    'line_id' => $lineId,
+                    'qty' => $qty,
+                ]);
+                $s = new BatchStockMgt();
+                $s->batch_id = 'B-'.$productId.'-'.uniqid();
+                $s->company_name = batch_ascii(DB::table('companies')->where('id', $companyId)->value('company_name'));
+                $s->product_name = batch_ascii(DB::table('products')->where('id', $productId)->value('product_name'));
+                $s->mfg_date = '0000-00-00';
+                $s->expiry_date = $expiryDate;
+                $s->batch_wise_balance = 0;
+                $s->unit_cost_price = $unitCostIn;
+                $s->ttl_cost_price = 0;
+                $s->created_by = (int) (Auth::id() ?? 0);
+            } else {
+                Log::warning('batch.edit_out_without_available_batch', [
+                    'invoice_id' => $invoiceId,
+                    'product_id' => $productId,
+                    'qty' => $qty,
+                    'transaction_type' => $txType,
+                ]);
+
+                return;
+            }
+        }
+
+        $existingBalance = (float) ($s->batch_wise_balance ?? 0);
+        $appliedQty = $qty;
+        if (!$isIn) {
+            $appliedQty = min($qty, max(0, $existingBalance));
+        }
+
+        $newBalance = $isIn
+            ? round($existingBalance + $appliedQty, 6)
+            : round($existingBalance - $appliedQty, 6);
+
+        $unitCost = (float) ($s->unit_cost_price ?? 0);
+        if ($unitCost <= 0 || ($isIn && !$s->exists)) {
+            $unitCost = $unitCostIn;
+        }
+        // On purchase edit IN, keep / refresh cost from invoice line (same batch, not a new one)
+        if ($isIn && $txType === 1 && $unitCostIn > 0) {
+            $unitCost = $unitCostIn;
+        }
+
+        $s->company_id = $companyId;
+        $s->product_id = $productId;
+        $s->actual_qty = (float) ($purchase->qty ?? $appliedQty);
+        $s->actual_status = $isIn ? 1 : 2;
+        $s->qty = (int) max(1, (int) round($appliedQty));
+        $s->batch_wise_balance = $newBalance;
+        $s->total_balance = 0;
+        $s->vs_id = $vendorStockId;
+        $s->trx_type = $trxEnum;
+        $s->unit_cost_price = $unitCost;
+        $s->ttl_cost_price = round($unitCost * max(0, $newBalance), 6);
+        $s->avg_cost_price_per_unit = $newBalance > 0 ? $unitCost : 0;
+        $s->invoice_id = $invoiceId;
+        if ($lineId > 0) {
+            $s->invoice_product_id = $lineId;
+        }
+        if ($isIn) {
+            $s->expiry_date = $expiryDate;
+        } elseif (empty($s->expiry_date) || $s->expiry_date === '0000-00-00') {
+            $s->expiry_date = $expiryDate;
+        }
+        $s->save();
+
+        if ($newBalance > 0.000001 && $newBalance < 1) {
+            $dust = $newBalance;
+            try {
+                $s->delete();
+            } catch (\Throwable $e) {
+                $s->batch_wise_balance = 0;
+                $s->ttl_cost_price = 0;
+                $s->save();
+            }
+            batch_scrap_dust_qty($productId, $companyId, $dust);
+        } elseif ($newBalance <= 0.000001) {
+            try {
+                $s->delete();
+            } catch (\Throwable $e) {
+                // keep
+            }
+        }
+
+        // If OUT needed more than this invoice batch had, continue FEFO for leftover only (no new batch)
+        $left = round($qty - $appliedQty, 6);
+        if (!$isIn && $left > 0.000001) {
+            $guard = 0;
+            while ($left > 0.000001 && $guard < 50) {
+                $guard++;
+                $next = BatchStockMgt::where('product_id', $productId)
+                    ->where('company_id', $companyId)
+                    ->where('batch_wise_balance', '>=', 1)
+                    ->orderByRaw("CASE WHEN expiry_date IS NULL OR expiry_date = '0000-00-00' THEN 1 ELSE 0 END ASC")
+                    ->orderBy('expiry_date', 'ASC')
+                    ->orderBy('id', 'ASC')
+                    ->first();
+                if (!$next) {
+                    break;
+                }
+                $take = min($left, (float) $next->batch_wise_balance);
+                $nb = round(((float) $next->batch_wise_balance) - $take, 6);
+                $uc = (float) ($next->unit_cost_price ?? 0);
+                $next->batch_wise_balance = $nb;
+                $next->ttl_cost_price = round($uc * max(0, $nb), 6);
+                $next->actual_status = 2;
+                $next->trx_type = $trxEnum;
+                $next->save();
+                if ($nb <= 0.000001) {
+                    try {
+                        $next->delete();
+                    } catch (\Throwable $e) {
+                    }
+                } elseif ($nb < 1) {
+                    batch_scrap_dust_qty($productId, $companyId, $nb);
+                    try {
+                        $next->delete();
+                    } catch (\Throwable $e) {
+                    }
+                }
+                $left = round($left - $take, 6);
+            }
+        }
+
+        // Purchase edit IN only — running avg; OUT / purchase-return leave avg unchanged
+        if ($isIn && $txType === 1 && $qty > 0) {
+            applyPurchaseWeightedAvg($productId, $companyId, (float) $qty, $unitCostIn);
+        }
+    }
+}
+
+
+if (!function_exists('batch_normalize_expiry')) {
+    function batch_normalize_expiry($expiry): string
+    {
+        if ($expiry === null || $expiry === '' || $expiry === '0000-00-00' || $expiry === '0000-00-00 00:00:00') {
+            return '0000-00-00';
+        }
+
+        return substr((string) $expiry, 0, 10);
+    }
+}
+
+if (!function_exists('batch_trx_enum')) {
+    function batch_trx_enum(int $txType): string
+    {
+        $map = [
+            1 => 'purchase',
+            2 => 'sale',
+            3 => 'purchase_return',
+            4 => 'sale_return',
+            5 => 'product_delete',
+            6 => 'replacement',
+        ];
+
+        return $map[$txType] ?? 'purchase';
+    }
+}
+
+if (!function_exists('batch_ascii')) {
+    function batch_ascii($value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return preg_replace('/[^\x20-\x7E]/', '?', (string) $value);
+    }
+}
+
+/**
+ * Running weighted average — updates ONLY on purchase STOCK IN.
+ * new_avg = (old_avg × old_qty + unit_cost × in_qty) / (old_qty + in_qty)
+ * Sale / sale-return / purchase-return must NOT call this.
+ */
+if (!function_exists('applyPurchaseWeightedAvg')) {
+    function applyPurchaseWeightedAvg(int $productId, int $companyId, float $inQty, float $unitCost): void
+    {
+        $inQty = round($inQty, 6);
+        $unitCost = round($unitCost, 6);
+        if ($inQty <= 0.000001) {
+            return;
+        }
+
+        $stock = StockManagment::where('product_id', $productId)
+            ->where('company_id', $companyId)
+            ->orderBy('id', 'DESC')
+            ->first();
+        if (!$stock) {
+            return;
+        }
+
+        // Purchase controller calls StockManagment() BEFORE BatchWiseStockManagment(),
+        // so VSM.balance already includes this IN qty. Strip it to get pre-purchase qty.
+        $balanceNow = max(0, (float) ($stock->balance ?? 0));
+        $oldQty = max(0, round($balanceNow - $inQty, 6));
+        // If StockManagment has not run yet (balance still pre-IN), use balance as-is.
+        if ($balanceNow + 0.000001 < $inQty) {
+            $oldQty = $balanceNow;
+        }
+
+        $oldAvg = (float) ($stock->ttl_avg_cost ?? 0);
+        $newTotalQty = round($oldQty + $inQty, 6);
+
+        // Legacy rows: stock exists but ttl_avg_cost never saved — seed once from open batches
+        // (exclude this purchase's contribution so we don't circular-seed to unitCost).
+        if ($oldQty > 0.000001 && $oldAvg <= 0) {
+            $agg = BatchStockMgt::where('product_id', $productId)
+                ->where('company_id', $companyId)
+                ->where('batch_wise_balance', '>=', 1)
+                ->selectRaw('SUM(batch_wise_balance) AS qty, SUM(IFNULL(unit_cost_price,0) * batch_wise_balance) AS cost')
+                ->first();
+            $seedQty = max(0, round(((float) ($agg->qty ?? 0)) - $inQty, 6));
+            $seedCost = round(((float) ($agg->cost ?? 0)) - ($unitCost * $inQty), 6);
+            if ($seedQty >= 1 && $seedCost > 0) {
+                $oldAvg = round($seedCost / $seedQty, 6);
+            }
+        }
+
+        if ($oldQty <= 0.000001) {
+            $newAvg = $unitCost; // first STOCK IN
+        } elseif ($oldAvg <= 0) {
+            $newAvg = $unitCost;
+        } else {
+            $newAvg = round((($oldAvg * $oldQty) + ($unitCost * $inQty)) / $newTotalQty, 6);
+        }
+
+        $stock->ttl_avg_cost = $newAvg;
+        // Persist against actual on-hand balance after this purchase
+        $stock->ttl_cost = round($newAvg * max($balanceNow, $newTotalQty), 6);
         $stock->save();
+    }
+}
+
+/**
+ * Optional: recalc ttl_avg_cost from open batches (qty >= 1).
+ * Used by rebuild/scrub commands only — NOT by live sale/purchase invoice flow.
+ */
+if (!function_exists('refreshVendorStockAvgCost')) {
+    function refreshVendorStockAvgCost(int $productId, int $companyId): void
+    {
+        $agg = BatchStockMgt::where('product_id', $productId)
+            ->where('company_id', $companyId)
+            ->where('batch_wise_balance', '>=', 1)
+            ->selectRaw('SUM(batch_wise_balance) AS qty, SUM(IFNULL(unit_cost_price,0) * batch_wise_balance) AS cost')
+            ->first();
+
+        $stock = StockManagment::where('product_id', $productId)
+            ->where('company_id', $companyId)
+            ->orderBy('id', 'DESC')
+            ->first();
+        if (!$stock) {
+            return;
+        }
+
+        $qty = (float) ($agg->qty ?? 0);
+        if ($qty >= 1) {
+            $avg = round(((float) $agg->cost) / $qty, 6);
+            $stock->ttl_avg_cost = $avg;
+            $stock->ttl_cost = round($avg * (float) $stock->balance, 6);
+        } else {
+            $stock->ttl_avg_cost = 0;
+            $stock->ttl_cost = 0;
+        }
+        $stock->save();
+    }
+}
+
+/**
+ * Write off sub-1 batch dust from product + latest VSM balance (keeps stock in sync).
+ */
+if (!function_exists('batch_scrap_dust_qty')) {
+    function batch_scrap_dust_qty(int $productId, int $companyId, float $dustQty): void
+    {
+        $dustQty = round($dustQty, 6);
+        if ($dustQty <= 0.000001) {
+            return;
+        }
+
+        DB::update(
+            'UPDATE products SET stock_balance = GREATEST(0, ROUND(IFNULL(stock_balance,0) - ?, 6)) WHERE id = ?',
+            [$dustQty, $productId]
+        );
+
+        $vs = StockManagment::where('product_id', $productId)
+            ->where('company_id', $companyId)
+            ->orderBy('id', 'DESC')
+            ->first();
+        if ($vs) {
+            $vs->balance = max(0, round(((float) $vs->balance) - $dustQty, 6));
+            $vs->save();
+        }
+
+        Log::info('batch.scrap_fractional_dust', [
+            'product_id' => $productId,
+            'company_id' => $companyId,
+            'dust_qty' => $dustQty,
+        ]);
     }
 }
 
@@ -670,7 +1392,6 @@ function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
         $stock->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
         $stock->product_name    = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
     }
-    $stock->godown_id       = $purchase->godown_id;
     $stock->company_id      = $purchase->company_id;
     $stock->product_id      = $purchase->product_id;
     $stock->purchase_price  = $purchase->purchase_price;
@@ -682,7 +1403,6 @@ function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
     $stock->save();  
     return $stock;
 }
-
 /**
  * Update or create per-godown stock record.
  *
@@ -724,32 +1444,34 @@ function updateGodownStock($godown_id, $company_id, $product_id, $stock_qty, $In
     
     return $record;
 }
+
 function BatchWiseDeleteProduct($delete_for, $product, $qty, $in_out, $type)
 {
-    // $where      = "1=1 ";
-    $expiryDate = $product->expiry_date ?? '0000-00-00';
-    // $where       .= " AND product_id = $product->id AND expiry_date = $expiryDate";
-    // $batch      = DB::select("SELECT * FROM stock_batches_items where $where");
-    $batch  = BatchStockMgt::whereDate("expiry_date" , $expiryDate)->where('product_id', $product->product_id)->first(); 
-    if (!empty($batch)) {
-        
-        if ($in_out == 1) {
-            $balance =  $batch->batch_wise_balance + $qty;
-        } else if ($in_out == 2) { 
-            $balance =  $batch->batch_wise_balance - $qty;
-        }
-        $batch->batch_wise_balance  =  $balance;
-        $batch->qty                 =  $qty;
-        $batch->actual_status       =  $in_out;
-        $batch->trx_type            =  $type;
-        $batch->save();
+    if (empty($product)) {
+        return;
     }
+
+    $invoiceId = is_numeric($delete_for) ? (int) $delete_for : 0;
+
+    // Pass real invoice id so put-back can reverse exact batch allocations.
+    BatchWiseStockManagment(
+        0,
+        $invoiceId,
+        $product,
+        $qty,
+        $in_out,
+        (int) $type,
+        null
+    );
 }
 
 function customerLedger($request,$column){
     $balance                     =  CustomerLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->value('balance');
     
     $c                           =  CustomerLedger::where($column, $request->id)->orderBy('id', 'DESC')->first();
+    if (!$c) {
+        return;
+    }
     $bbalance                    =  $column == 'sale_return_invoice_id' ?  abs(((-$balance) + $c->dr) - $c->cr) :  ($balance + $c->cr) - $c->dr;
     $cust_ldr                    =  new  CustomerLedger();
     $cust_ldr->cr                =  0;
@@ -879,9 +1601,9 @@ function SaleReportRecords($request = null, $current_date, $is_admin_close = nul
                               ORDER BY si.invoice_no DESC
                         ");
       $sale_invoice_records                         =  new stdClass();
-      $sale_invoice_records->total_invoice_amount   =  collect($sales)->unique('invoice_no')->sum('total_invoice_amount'); 
-      $sale_invoice_records->invoice_discount       =  collect($sales)->unique('invoice_no')->sum('invoice_discount'); 
-      $sale_invoice_records->service_charges       =  collect($sales)->unique('invoice_no')->sum('service_charges');  
+      $sale_invoice_records->total_invoice_amount   =  sum_per_invoice($sales, 'total_invoice_amount');
+      $sale_invoice_records->invoice_discount       =  sum_per_invoice($sales, 'invoice_discount');
+      $sale_invoice_records->service_charges       =  sum_per_invoice($sales, 'service_charges');  
       
       $returns        =  DB::select("
                               SELECT
@@ -988,3 +1710,44 @@ function SaleReportRecords($request = null, $current_date, $is_admin_close = nul
       }
       return ['sales' => $sales, 'sale_returns' => $returns, 'pr_paid_amount' => $purchase_return_paid_amount, 'pr_invc_amount' => $purchase_inv_paid_amount,'sale_invoice_record' => $sale_invoice_records];
    }
+
+if (!function_exists('purchi_config')) {
+    /**
+     * Merged purchi layout config: organization.purchi_config JSON overrides config/admin_close_purchi.php
+     */
+    function purchi_config(): array
+    {
+        $defaults = config('admin_close_purchi', []);
+        try {
+            $org = \App\Models\Organization::first();
+            if (!$org || empty($org->purchi_config)) {
+                return $defaults;
+            }
+            $stored = $org->purchi_config;
+            if (is_string($stored)) {
+                $stored = json_decode($stored, true);
+            }
+            if (!is_array($stored)) {
+                return $defaults;
+            }
+
+            return array_replace_recursive($defaults, $stored);
+        } catch (\Throwable $e) {
+            return $defaults;
+        }
+    }
+}
+
+if (!function_exists('purchi_use_dynamic')) {
+    /** Revert: UPDATE organization SET purchi_use_dynamic = 0 */
+    function purchi_use_dynamic(): bool
+    {
+        try {
+            $org = \App\Models\Organization::first();
+
+            return $org && (int) ($org->purchi_use_dynamic ?? 0) === 1;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+}

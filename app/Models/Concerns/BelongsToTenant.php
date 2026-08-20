@@ -7,7 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Multi-tenant scoping for a single shared database.
- * Scope skips when no tenant is resolvable (console, login, tenant_id not set yet).
+ *
+ * - Adds a global scope so every read query is automatically filtered by the
+ *   logged-in user's tenant_id (when a tenant is resolvable).
+ * - Auto-fills tenant_id on insert from the logged-in user.
+ *
+ * When no tenant is resolvable (e.g. console commands, scheduled jobs, or the
+ * login screen before authentication) the scope is skipped so the framework
+ * keeps working as before.
  */
 trait BelongsToTenant
 {

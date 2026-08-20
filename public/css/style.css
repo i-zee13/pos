@@ -1436,7 +1436,7 @@ table.dataTable.nowrap td {
 	display: block;
 	opacity: 1;
 }
-#product-cl-sec, #product-add, #performaPreferences {
+#product-cl-sec, #product-add, #performaPreferences, #backup-gmail-sidebar {
 	width: 600px;
 	position: fixed;
 	top: 0;
@@ -1487,7 +1487,7 @@ table.dataTable.nowrap td {
 	color: black;
 	height: 100%;
 }
-#product-cl-sec.active, #product-add.active, #performaPreferences.active {
+#product-cl-sec.active, #product-add.active, #performaPreferences.active, #backup-gmail-sidebar.active {
 	right: 0px;
 	opacity: 1
 }
@@ -1572,7 +1572,7 @@ table.dataTable.nowrap td {
 }
 
 @media (max-width:480px) {
-#product-cl-sec,  #product-add,  #performaPreferences {
+#product-cl-sec,  #product-add,  #performaPreferences, #backup-gmail-sidebar {
 	width: 100%
 }
 .pro-header-text {

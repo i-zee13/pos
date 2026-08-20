@@ -6,12 +6,7 @@ $(document).ready(function () {
             });
         });
     })(jQuery);
-    var close_date = $('.close_date').val();
-    SaleCloseRecord(close_date);
-    $('.search-btn').on('click', function () {
-        var close_date = $('.selected_date').val();
-        SaleCloseRecord(close_date);
-    })
+    bindCloseDateAutoLoad(SaleCloseRecord);
 });
 
 function SaleCloseRecord(close_date) {
@@ -33,75 +28,7 @@ function SaleCloseRecord(close_date) {
     $.ajax({
         url: `/sale-close-record/${close_date}`,
          success: function (response) {
-            console.log(response.records)
-            var records = response.records; 
-            //TOTAL TURN OVER 
-            // Define all item names (including amounts and quantities)
-            var items = [
-                "mutafirq_udhar_receive", "mutafirq_sody", "mutafariq_udhar_banam", "gawara_khata",
-                "sody_khareed","beej_khareed", "bank_payments", "ttl_in", "ttl_out", "total_meezan","ilyas_bakhtawar",
-                    // All Banam (dr) Customers
-                    "fazul_qadir_banam", "shafiq_karyana_banam", "abdul_ghaffar_ghar_banam",
-                    "ammar_abdullah_ghar_banam", "imdad_khata_banam", "imran_niazi_banam",
-                    "sir_murtaza_sahib_banam", "master_khalid_faroq_shah_banam","karaya_dokan_banam","karaya_dokan_receive",
-                    // All Vendor Names
-                    "petrol_khata", "abdul_shakoor_exchange", "habib_bank_abdul_shakoor",'hbl_m_waqas_jama','ubl_m_waqas_jama','gandum_khareed_khata_receive',
-                    "dawaj_khareed", "angro_fertilizer", "fouji_fertilizer","np_khareed",
-                    "fatima_flink_ventilators", "wilkan_center_cotton", "tcs_tcs_wadha",
-                    "nmlf", "abl_ka", "ubl_waqas", "mcb_ka","mcb_ka_jama", "bank_al_habib_ka",
-                    "bop_card_loss", "hbl_m_waqas", "abdul_shakoor_habib_bank",
-                    "sarhad_punjab_cash", "alfalah_bank_card", "tameerat_khata",
-                    "tameerat_khata", "imported_pura_khata", "bop_bank",
-                    "sonehri_bank", "askari_bank", "amanat_bank", "baghban_chemical","salries_banam","gandum_khareed_khata",
-
-                    // Additional Vendors (Last Image)
-                    "wilkan_chemicals", "swat_agro_chemicals", "agro_lux",
-                    "kenzo_ag", "leader_ag", "arsta", "bayer", "fmc", "agro_mark",
-                    "advance_agro_tech",
- 
-                    // All Receiving (cr) Customers
-                    "fazul_qadir_receive", "shafiq_karyana_receive", "abdul_ghaffar_ghar_receive",
-                    "ammar_abdullah_ghar_receive", "imdad_khata_receive", "imran_niazi_receive",
-                    "sir_murta  a_sahib_receive", "master_khalid_faroq_shah_receive",
-                    
-                    "dawai", "dawai_qty", "beej", "beej_qty", "gandom", "gandom_qty",
-                    "kapas", "kapas_qty", "dhaan", "dhaan_qty", "dap_25kg", "dap_25kg_qty",
-                    "dap", "dap_qty", "urea", "urea_qty", "can", "can_qty", "np", "np_qty",
-                    "ssp", "ssp_qty", "zarkhez", "zarkhez_qty", "sop", "sop_qty",
-                    "jimsam", "jimsam_qty", "sm_urea", "sm_urea_qty", "mop", "mop_qty"
-                ];
-
-            // Declare variables dynamically
-            var recordsData = {}; // Object to store values
-
-            items.forEach(function(item) { 
-                recordsData[item] = records[item] || 0; // Get value from 'records' or default to 0
-            });
-
-            // Append values dynamically
-            items.forEach(function(item) {
-                $('.' + item).text(addCommas(parseFloat(Math.round(recordsData[item]))));
-
-                // Show div if value is greater than 0
-                if (recordsData[item] > 0) {
-                    console.warn(recordsData[item]);
-                    $('.' + item + '_div').show();
-                }else{
-                    $('.' + item + '_div').hide();
-                }
-            });
-
-            // Special case for total_meezan (difference calculation)
-            var totalMeezan = recordsData["ttl_in"] - recordsData["ttl_out"];
-            console.log(recordsData);
-            $('.total_meezan').text(addCommas(Math.round(totalMeezan)));
-
-            if (totalMeezan > 0) {
-                $('.total_meezan_div').show();
-            }
-
-
-
+            var records = response.records;
 
             var saleRecords = records.saleRecords;
             var credit_sale_receivings = records.total_credit_sales_amount_received;
@@ -144,14 +71,13 @@ function SaleCloseRecord(close_date) {
             var ttl_cash_recovery = records.ttl_cash_recovery + credit_sale_receivings + vendor_cash_recovery + (openning_balance);
             console.log(ttl_cash_recovery)
             var total_payments = vendor_payment + customer_payment + credit_return_payments + total_pr_paid_amount + total_pr_invc_amount + expense;
-            var ttl_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery) - total_net_sale_discount - total_payments) - total_net_sale_returns_invoice_amount; 
+            // console.log(total_net_sale_returns,'zeee');
+            var ttl_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery) - total_net_sale_discount - total_payments) - total_net_sale_returns; 
+            console.log(ttl_in_hand,'zee',ttl_cash_recovery)
 
+            var cash_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery)- total_net_sale_discount - total_payments) - total_net_sale_returns;
+            enableSaleCloseButton(records);
 
-            var cash_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery)- total_net_sale_discount - total_payments) - total_net_sale_returns_invoice_amount;
-            if (ttl_in_hand > 0) {
-                $('.sale-close-btn-modal').removeAttr('disabled');
-                $('.sale-close-btn-modal').attr('ttl_in_hand', ttl_in_hand);
-            }
             $('.ttl_sale').text(addCommas(parseFloat(total_sales - total_returns).toFixed(2)));
             $('.ttl_payments').text(addCommas(parseFloat(total_payments).toFixed(2)));
             $('.ttl_received').text(addCommas(parseFloat(ttl_cash_recovery).toFixed(2)));
@@ -217,8 +143,6 @@ function SaleCloseRecord(close_date) {
             total_pr_invc_amount > 0 ? $('.total_pr_invc_amount_div').show() : '';
             cash_in_hand > 0 ? $('.cash_in_hand_div').show() : '';
 
-
-
             $('.total_sale_table').empty();
             $('.total_sale_table').append(`
                 <table class="table table-hover dt-responsive nowrap" id="saleRecordTable" style="width:100%;">
@@ -257,114 +181,6 @@ function SaleCloseRecord(close_date) {
         }
     });
 }
-$(document).on('click', '.sale-close-btn-modal', function () {
-    var ttl_in_hand = $(this).attr('ttl_in_hand');
-    if (ttl_in_hand > 0) {
-        $('.cash_in_hand').val(ttl_in_hand).attr('readonly', true);
-        $('.ttl_cash_in_hand').val(ttl_in_hand);
-    }
-});
-$(document).on('input', '.closing_cash', function () {
-    var closing_cash = ($(this).val());
-    var ttl_cash_in_hand = ($('.ttl_cash_in_hand').val());
-    var cash_in_hand = ($('.cash_in_hand').val());
-    if (closing_cash) {
-        if (closing_cash <= ttl_cash_in_hand) {
-            cash_in_hand = ttl_cash_in_hand - closing_cash;
-            $('.cash_in_hand').val(cash_in_hand);
-        } else {
-            $('.cash_in_hand').val(ttl_cash_in_hand);
-            $(this).val("");
-            $('#notifDiv').fadeIn().css('background', 'red').text("Closing cash can't be greater than " + ttl_cash_in_hand);
-            $(this).focus();
-            setTimeout(() => {
-                $('#notifDiv').fadeOut();
-            }, 3000);
-            return
-        }
-    } else {
-        $('.cash_in_hand').val(ttl_cash_in_hand);
-    }
-});
-$(document).on('click', '.sale_open', function () {
-    var currentRef = $(this);
-    currentRef.text("Processing...");
-    currentRef.attr('disabled', true);
-    $.ajax({
-        type: 'POST',
-        url: '/update-closing-cash',
-        data: {
-            _token: $('[name="csrf_token"]').attr('content'),
-            close_date: $('.close_date').val(),
-        },
-        success: function (response) {
-            currentRef.text("Open Sale");
-            currentRef.attr('disabled', false);
-            if (response.status == "success") {
-                $('#notifDiv').fadeIn().css('background', 'green').text("Sale open successfully");
-                setTimeout(() => {
-                    window.location.reload();
-                    $('#notifDiv').fadeOut();
-                }, 3000);
-                $('.cancel_sale_close_modal').click();
-            } else {
-                $('#notifDiv').fadeIn().css('background', 'red').text("Sale not open at this moment");
-                setTimeout(() => {
-                    $('#notifDiv').fadeOut();
-                }, 3000);
-            }
-        }
-    });
-});
-$(document).on('click', '.sale_close', function () {
-    var ttl_cash_in_hand = $('.ttl_cash_in_hand').val();
-    var closing_cash = $('.closing_cash').val();
-    if (!closing_cash || closing_cash == "") {
-        $('#notifDiv').fadeIn().css('background', 'red').text("Please fill out closing cash");
-        $('.closing_cash').focus();
-        setTimeout(() => {
-            $('#notifDiv').fadeOut();
-        }, 3000);
-        return;
-    }
-    var currentRef = $(this);
-    currentRef.text("Processing...");
-    currentRef.attr('disabled', true);
-    $.ajax({
-        type: 'POST',
-        url: '/save-closing-cash',
-        data: {
-            _token: $('[name="csrf_token"]').attr('content'),
-            close_date: $('.close_date').val(),
-            ttl_cash_in_hand: $('.ttl_cash_in_hand').val(),
-            closing_cash: $('.closing_cash').val(),
-            closing_comment: $('.closing_comment').val(),
-        },
-        success: function (response) {
-            currentRef.text("Close Sale");
-            currentRef.attr('disabled', false);
-            if (response.status == "success") {
-                $('#notifDiv').fadeIn().css('background', 'green').text("Sale close successfully");
-                setTimeout(() => {
-                    $('#notifDiv').fadeOut();
-                    window.location.reload();
-                }, 3000);
-                $('.cancel_sale_close_modal').click();
-            } else if (response.closing_cash_null_0) {
-                $('#notifDiv').fadeIn().css('background', 'red').text("Closing cash can't be 0 or empty");
-                setTimeout(() => {
-                    $('#notifDiv').fadeOut();
-                }, 3000);
-            } else {
-                $('#notifDiv').fadeIn().css('background', 'red').text("Sale not close at this moment");
-                setTimeout(() => {
-                    $('#notifDiv').fadeOut();
-                }, 3000);
-            }
-        }
-    });
-
-});
 
 function addCommas(nStr) {
     nStr += "";

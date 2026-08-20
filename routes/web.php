@@ -19,9 +19,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SalesReturnController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\DatabaseBackupController;
 use App\Http\Controllers\GodownController;
 use App\Http\Controllers\StockTransferController;
-use App\Http\Controllers\DatabaseBackupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,14 +49,21 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/clear', function () {
     fix_invoice_helper_case();
-    Artisan::call('config:cache');
     Artisan::call('cache:clear');
     Artisan::call('route:clear');
     Artisan::call('optimize:clear');
+    Artisan::call('config:cache');
     Artisan::call('storage:link');
 
     return "All cache clear successfully";
 });
+
+/**
+ * Linux (case-sensitive) servers par lowercase `app/invoice_helper.php` shim bana
+ * deta hai jo asli `app/Invoice_helper.php` ko load karti hai. Isse composer
+ * autoload aur purane lowercase require dono chal jate hain. Composer/CMD ki
+ * zaroorat nahi - bas yeh route browser mein khol lein.
+ */
 Route::get('/fix-helper', function () {
     return fix_invoice_helper_case();
 });
@@ -70,7 +77,6 @@ Route::get('/', function () {
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
     Route::Resource('/company', CompanyController::class);
-    Route::resource('/godowns', GodownController::class)->names('godowns');
     Route::Resource('/customer', CustomerController::class);
     Route::Resource('/vendors', CustomerController::class);
     Route::Resource('/AccessRights',   AccessRights::class); 
@@ -84,18 +90,26 @@ Route::group(['middleware' => ['auth']], function () {
     Route::POST('/location-delete/{id}',        [OrganizationController::class, 'deleteLocation'])->name('admin.location-delete');
 
     /**End Organization  Routes */
+    /**
+     * Logged-in user ke tenant_id par 4 system customers (Expense, Counter Sale,
+     * Net Purchase, Net Purchase Return) check/create. Sab mojood hon to skip.
+     * Browser: /seed-system-customers (login zaroori)
+     */
     Route::get('/seed-system-customers', function () {
         $result = provision_system_customers();
         $result['ready'] = system_accounts_ready();
+
         if (request()->ajax() || request()->wantsJson()) {
             return response()->json($result);
         }
+
         if ($result['status'] === 'skipped') {
             return $result['message'];
         }
         if ($result['status'] === 'error') {
             return 'ERROR: '.$result['message'];
         }
+
         return $result['message'].' Created: '.implode(', ', $result['created']);
     });
     Route::get('/get-city-against-states/{id}',     [OrganizationController::class, 'getCityAgainst_States'])->name('admin.getCityAgainst_States');
@@ -107,6 +121,15 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/home', [HomeController::class,   'index'])->name('home');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/analytics/summary', [DashboardController::class, 'summary'])->name('analytics.summary');
+    Route::get('/backups', [DatabaseBackupController::class, 'index'])->name('backups.index');
+    Route::get('/backups/logs', [DatabaseBackupController::class, 'logs'])->name('backups.logs');
+    Route::get('/backups/google/connect', [DatabaseBackupController::class, 'connectGoogleDrive'])->name('backups.google.connect');
+    Route::get('/backups/google/callback', [DatabaseBackupController::class, 'googleDriveCallback'])->name('backups.google.callback');
+    Route::post('/backups/google/refresh', [DatabaseBackupController::class, 'refreshGoogleDrive'])->name('backups.google.refresh');
+    Route::post('/backups/google/disconnect', [DatabaseBackupController::class, 'disconnectGoogleDrive'])->name('backups.google.disconnect');
+    Route::post('/backups', [DatabaseBackupController::class, 'store'])->name('backups.store');
+    Route::post('/backups/mail-settings', [DatabaseBackupController::class, 'storeMailSettings'])->name('backups.mail-settings.store');
+    Route::get('/backups/{backup}/download', [DatabaseBackupController::class, 'download'])->name('backups.download');
     Route::get('/get-companies', [CompanyController::class, 'getCompanies'])->name('get-companies');
     Route::post('/get-customers', [CustomerController::class, 'getCustomers'])->name('get-customers');
     /** Product Routes */
@@ -124,12 +147,6 @@ Route::group(['middleware' => ['auth']], function () {
     //End Shahid
     /** Stock Routes */
     Route::get('/stock-add',                            [StockController::class, 'create'])->name('stock-add');
-    // Stock Transfers
-    Route::get('/stock-transfers',                      [StockTransferController::class, 'index'])->name('stock-transfers');
-    Route::get('/stock-transfers/create',               [StockTransferController::class, 'create'])->name('stock-transfers.create');
-    Route::post('/stock-transfers',                     [StockTransferController::class, 'store'])->name('stock-transfers.store');
-    Route::get('/print-stock-transfer/{transfer_id}',   [StockTransferController::class, 'printInvoice'])->name('print-stock-transfer');
-    Route::get('/godown-products/{godown}',             [StockTransferController::class, 'products'])->name('godown-products');
     Route::get('/get-vendors',                          [StockController::class, 'getVendors'])->name('get-vendors');
     // Route::post('/get-product'           ,[StockController::class, 'getProduct'])->name('get-product');
     Route::get('/get-vendor-balance/{id}',              [StockController::class, 'getVendorBalance'])->name('get-vendor-balance');
@@ -141,6 +158,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/delete-product-from-invoice',       [StockController::class, 'deleteProduct'])->name('delete-product');
     Route::delete('/delete-purchase-invoice',           [StockController::class, 'deleteInvoice'])->name('delete-purchase-invoice');
     Route::get('/print-purchase-invoice/{invoice_id}/{customer_id}/{received_amount}', [StockController::class, 'printInvoice'])->name('print-purchase-invoice');
+
+    Route::get('/stock-transfers',                      [StockTransferController::class, 'index'])->name('stock-transfers');
+    Route::get('/stock-transfers/create',               [StockTransferController::class, 'create'])->name('stock-transfers.create');
+    Route::post('/stock-transfers',                     [StockTransferController::class, 'store'])->name('stock-transfers.store');
+    Route::get('/print-stock-transfer/{transfer_id}',   [StockTransferController::class, 'printInvoice'])->name('print-stock-transfer');
+    Route::get('/godown-products/{godown}',             [StockTransferController::class, 'products'])->name('godown-products');
+
 
     // Purchase Returns /
     Route::get('/get-customer-balance-products/{id}',           [PurchaseReturnController::class, 'getVendorBalance'])->name('get-customer-balance');
@@ -174,6 +198,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/sale-returns',                 [SalesReturnController::class, 'index'])->name('salereturn.index');
     Route::get('/edit-sale-return/{id}',        [SalesReturnController::class, 'edit'])->name('salereturn-edit');
     Route::get('/get-sale-return-products/{id}',[SalesReturnController::class, 'getReturnProduct'])->name('get-salereturn-products');
+    Route::get('/open-batches/{product_id}',    [SalesReturnController::class, 'openBatches'])->name('salereturn.open-batches');
     Route::get('/print-salereturn-invoice/{invoice_id}/{customer_id}/{received_amount}', [SalesReturnController::class, 'printInvoice'])->name('print-salereturn-invoice');
     Route::delete('/delete-product-from-sale-return',[SalesReturnController::class, 'deleteProduct'])->name('sale-return-delete-product');
     Route::delete('/delete-sale-return-invoice',     [SalesReturnController::class, 'deleteInvoice'])->name('delete-purchase-invoice');
@@ -194,6 +219,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/transaction-store',       [TransactionController::class, 'store'])->name('transaction-store');
     Route::post('/get-customer-transactions',   [TransactionController::class, 'getCustomerTransactions'])->name('getCustomerTransactions');
     Route::get('/vendor-ledgers',           [TransactionController::class, 'customerLedger'])->name('vendor-ledgers');
+
+    //Godown Ledger
+    Route::get('/godown-ledger',            [LedgerDetailControlller::class, 'godownLedger'])->name('godown-ledger');
+    Route::post('/godown-ledger-list',      [LedgerDetailControlller::class, 'godownLedgerList'])->name('godown-ledger-list');
+
     Route::get('/customer-ledgers',         [TransactionController::class, 'customerLedger'])->name('customer-ledgers');
     Route::get('/print-transaction-invoice/{invoice_id}/{customer_id}/{operation}/{type}', [TransactionController::class, 'printInvoice'])->name('print-salereturn-invoice');
     //Multiple Transtaction of Customer
@@ -211,10 +241,6 @@ Route::group(['middleware' => ['auth']], function () {
     //Product Ledeger
     Route::get('/product-reports',          [LedgerDetailControlller::class, 'productReports'])->name('product-reports');
     Route::post('/product-list',            [LedgerDetailControlller::class, 'productList'])->name('product-list');
-    
-    //Godown Ledger
-    Route::get('/godown-ledger',            [LedgerDetailControlller::class, 'godownLedger'])->name('godown-ledger');
-    Route::post('/godown-ledger-list',      [LedgerDetailControlller::class, 'godownLedgerList'])->name('godown-ledger-list');
 
     Route::get('/stock-reports',            [ReportsController::class, 'stockReport'])->name('stock-reports');
     Route::post('/stocks',                  [ReportsController::class, 'stockReportList'])->name('stock-report-list');
@@ -262,20 +288,10 @@ Route::group(['middleware' => ['auth']], function () {
 
     // Admin Close Report Fakhar
     Route::get('/admin-sale-close',                     [ReportsController::class, 'adminSaleClose'])->name('admin-sale-close');
+    Route::get('/admin-sale-close-purchi',              [ReportsController::class, 'adminSaleClosePurchi'])->name('admin-sale-close-purchi');
     Route::get('/sale-close-record/{closing_date}',     [ReportsController::class, 'adminSaleCloseRecord'])->name('sale-close-record');
     Route::post('/save-closing-cash',                   [AdminSaleCloseController::class, 'saveAdminSaleCloseRecord'])->name('save-closing-cash');
     Route::post('/update-closing-cash',                 [AdminSaleCloseController::class, 'updateAdminSaleCloseRecord'])->name('update-closing-cash');
-
-    // Database backups
-    Route::get('/backups', [DatabaseBackupController::class, 'index'])->name('backups.index');
-    Route::get('/backups/logs', [DatabaseBackupController::class, 'logs'])->name('backups.logs');
-    Route::get('/backups/google/connect', [DatabaseBackupController::class, 'connectGoogleDrive'])->name('backups.google.connect');
-    Route::get('/backups/google/callback', [DatabaseBackupController::class, 'googleDriveCallback'])->name('backups.google.callback');
-    Route::post('/backups/google/test', [DatabaseBackupController::class, 'testGoogleDrive'])->name('backups.google.test');
-    Route::post('/backups/google/disconnect', [DatabaseBackupController::class, 'disconnectGoogleDrive'])->name('backups.google.disconnect');
-    Route::post('/backups', [DatabaseBackupController::class, 'store'])->name('backups.store');
-    Route::post('/backups/mail-settings', [DatabaseBackupController::class, 'storeMailSettings'])->name('backups.mail-settings.store');
-    Route::get('/backups/{backup}/download', [DatabaseBackupController::class, 'download'])->name('backups.download');
 
      // User Profile
   Route::get('/profile',                    [ProfileController::class, 'index'])->name('admin.profile');
@@ -287,3 +303,4 @@ Route::group(['middleware' => ['auth']], function () {
 
   
 });
+    Route::resource('/godowns', GodownController::class)->names('godowns');

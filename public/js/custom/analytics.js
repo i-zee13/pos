@@ -102,7 +102,8 @@
                 type: 'solidgauge',
                 backgroundColor: 'transparent',
                 height: 150,
-                margin: [0, 0, 0, 0]
+                margin: [0, 0, 0, 0],
+                animation: { duration: 1500 }
             },
             title: null,
             pane: {
@@ -136,6 +137,7 @@
             },
             plotOptions: {
                 solidgauge: {
+                    animation: { duration: 1500 },
                     dataLabels: {
                         y: -18,
                         borderWidth: 0,
@@ -149,9 +151,39 @@
             credits: { enabled: false },
             series: [{
                 name: 'Score',
-                data: [v]
+                data: [v],
+                animation: { duration: 1500 }
             }]
         };
+    }
+
+    /**
+     * 0 → 100% (full blue) → hold → settle to actual value.
+     * Slow on purpose so the fill is clearly visible.
+     */
+    function animateGaugeTo(chart, target, staggerMs) {
+        if (!chart || !chart.series || !chart.series[0] || !chart.series[0].points[0]) {
+            return;
+        }
+        var finalVal = Math.max(0, Math.min(100, Number(target) || 0));
+        var startDelay = staggerMs || 0;
+        var fillDuration = 1600;
+        var holdAtFull = 1200;
+        var settleDuration = 1800;
+
+        setTimeout(function () {
+            if (!chart.series || !chart.series[0] || !chart.series[0].points[0]) {
+                return;
+            }
+            chart.series[0].points[0].update(100, true, { duration: fillDuration });
+
+            setTimeout(function () {
+                if (!chart.series || !chart.series[0] || !chart.series[0].points[0]) {
+                    return;
+                }
+                chart.series[0].points[0].update(finalVal, true, { duration: settleDuration });
+            }, fillDuration + holdAtFull);
+        }, startDelay);
     }
 
     function renderGauges(performance) {
@@ -161,13 +193,21 @@
             collection: 'gaugeCollection',
             return_control: 'gaugeReturns'
         };
-        (performance || []).forEach(function (item) {
+        (performance || []).forEach(function (item, index) {
             var id = map[item.key];
             if (!id || !document.getElementById(id)) return;
+            var target = Math.max(0, Math.min(100, Number(item.value) || 0));
+            var stagger = index * 280;
+
             if (gaugeCharts[id]) {
-                gaugeCharts[id].series[0].points[0].update(Number(item.value) || 0, true);
+                try {
+                    gaugeCharts[id].series[0].points[0].update(0, false);
+                    gaugeCharts[id].redraw();
+                } catch (e) { /* ignore */ }
+                animateGaugeTo(gaugeCharts[id], target, stagger);
             } else {
-                gaugeCharts[id] = Highcharts.chart(id, gaugeOptions(item.value));
+                gaugeCharts[id] = Highcharts.chart(id, gaugeOptions(0));
+                animateGaugeTo(gaugeCharts[id], target, 300 + stagger);
             }
             var $card = $('#' + id).closest('.gauge-card');
             $card.find('.gauge-label').text(item.label || '');
@@ -283,6 +323,12 @@
         });
     }
 
+    function setMixCenter(label, value, sub) {
+        $('#mixCenterLabel').text(label || 'Gross Sales');
+        $('#mixCenterValue').text('Rs. ' + money(value || 0));
+        $('#mixCenterSub').text(sub || '');
+    }
+
     function renderMix(mix) {
         var rows = mix || [];
         var $bars = $('#mixBars');
@@ -300,12 +346,16 @@
 
         var labels = rows.map(function (m) { return m.name; });
         var values = rows.map(function (m) { return Number(m.value) || 0; });
+        var pcts = rows.map(function (m) { return m.pct || 0; });
+        var total = values.reduce(function (a, b) { return a + b; }, 0);
         var canvas = document.getElementById('mixChart');
         if (!canvas || typeof Chart === 'undefined') return;
 
         if (mixChart) {
             mixChart.destroy();
         }
+
+        setMixCenter('Gross Sales', total, '');
 
         mixChart = new Chart(canvas.getContext('2d'), {
             type: 'doughnut',
@@ -314,13 +364,15 @@
                 datasets: [{
                     data: values.length ? values : [1],
                     backgroundColor: ['#0038ba', '#1e54d3', '#3d7ea6', '#5aa6a0', '#c4a35a', '#d64545', '#6b7a90', '#243447'],
-                    borderWidth: 0
+                    borderWidth: 0,
+                    hoverOffset: 6
                 }]
             },
             options: {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
+                        enabled: true,
                         callbacks: {
                             label: function (ctx) {
                                 return ' ' + (ctx.label || '') + ': Rs. ' + money(ctx.raw);
@@ -328,9 +380,21 @@
                         }
                     }
                 },
-                cutout: '62%'
+                cutout: '68%',
+                onHover: function (event, elements) {
+                    if (elements && elements.length) {
+                        var i = elements[0].index;
+                        setMixCenter(labels[i] || 'Gross Sales', values[i], (pcts[i] || 0) + '%');
+                    } else {
+                        setMixCenter('Gross Sales', total, '');
+                    }
+                }
             }
         });
+
+        canvas.onmouseleave = function () {
+            setMixCenter('Gross Sales', total, '');
+        };
     }
 
     function renderProductCards(rows) {
@@ -416,12 +480,9 @@
         $('#analyticsMonth').on('change', function () {
             if (mode === 'monthly') loadSummary();
         });
+        // Keep page hidden until first summary response (layout no longer forces show at 1.5s)
+        $('#analyticsPage').hide();
+        $('#tblLoader').show();
         setMode('daily');
-        setTimeout(function () {
-            if (loading) {
-                $('#tblLoader').show();
-                $('#analyticsPage').addClass('blur-div');
-            }
-        }, 1600);
     });
 })();

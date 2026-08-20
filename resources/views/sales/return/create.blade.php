@@ -709,7 +709,7 @@
                             }
                         </style>
                         <div class="row">
-                            <div class="col-12 table-responsive" id="table-container">
+                            <div class="col-12" id="table-container">
                                 <table class="ProductTable table  " id="designationsTable" width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <thead>
                                         <tr>
@@ -736,7 +736,12 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <td style="width:80px"> <input type="date" id="expiry_date" class="inputSale expiry_date" placeholder="Expiry Date" name="expiry_date " style=" width: 100%;"></td>
+                                            <td style="width:160px">
+                                                <select id="expiry_date" class="inputSale expiry_date" name="expiry_date" style="width:100%;" title="Batch optional — or enter custom expiry below">
+                                                    <option value="">Batch (optional)</option>
+                                                </select>
+                                                <input type="date" id="custom_expiry_date" class="inputSale custom_expiry_date" name="custom_expiry_date" style="width:100%;margin-top:3px;" title="Custom expiry (optional)" placeholder="Custom expiry">
+                                            </td>
                                             <td> <input type="text" id="qty" class="inputSale only_numerics" placeholder="" name="qty" tabindex="3" min="0"></td>
                                             <td><input type="number" id="retail_price" class="inputSale" placeholder="" name="retail_price" style="font-size: 13px" readonly></td>
                                             <td style="width:80px"><input type="number" id="discount" class="inputSale" placeholder="" name="discount" style="font-size: 13px;width:100%;" tabindex="4" min="0"></td>

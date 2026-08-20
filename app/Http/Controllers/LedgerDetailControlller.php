@@ -160,6 +160,7 @@ class LedgerDetailControlller extends Controller
                   SUM(IFNULL(cr, 0)) as cr, 
                   SUM(IFNULL(dr, 0)) as dr
               ")
+         ->when(current_tenant_id(), function ($q, $t) { return $q->where('tenant_id', $t); })
          ->whereRaw("DATE(created_at) = ? AND is_deleted = 0 AND customer_id NOT IN (5,8,49,97,105,107,113,126,145,157,170,48,242,356)", [$req->date])
          ->groupBy("customer_id")
          ->get();
@@ -171,6 +172,7 @@ class LedgerDetailControlller extends Controller
           SUM(IFNULL(cr, 0)) as cr, 
           SUM(IFNULL(dr, 0)) as dr
       ")
+         ->when(current_tenant_id(), function ($q, $t) { return $q->where('tenant_id', $t); })
          ->whereNull('purchase_return_invoice_id')
          ->whereRaw("DATE(created_at) = ? AND is_deleted = 0 AND customer_id != 167", [$req->date])
          ->groupBy("customer_id")
@@ -231,82 +233,87 @@ class LedgerDetailControlller extends Controller
    {
 
       $customerLgr = DB::table("customer_ledger as cl")
-                        ->join("customers as c", "c.id", "=", "cl.customer_id")
-                        ->selectRaw("
-                                             cl.customer_id, 
-                                             (SELECT IFNULL(description, 'NA') FROM sale_invoices WHERE sale_invoices.id = cl.sale_invoice_id) as si_comment,
-                                             (SELECT invoice_no FROM sale_invoices WHERE sale_invoices.id = cl.sale_invoice_id) AS invoice_no,
-                                             cl.sale_invoice_id,
-                                             cl.cpv_no,
-                                             cl.crv_no,
-                                             cl.sale_return_invoice_id,
-                                             c.customer_name,
-                                             cl.id,
-                                             cl.comment,
-                                             IFNULL(cl.cr, 0) as cr,
-                                             IFNULL(cl.dr, 0) as dr
-                                          ")
-                        ->whereRaw("DATE(cl.created_at) = ? AND cl.is_deleted = 0", [$req->date]) 
-                        ->orderBy("cl.customer_id")
-                        ->get();
-                        // dd($customerLgr);
+         ->join("customers as c", "c.id", "=", "cl.customer_id")
+         ->when(current_tenant_id(), function ($q, $t) { return $q->where('cl.tenant_id', $t); })
+         ->selectRaw("
+                              cl.customer_id,
+                            
+(SELECT IFNULL(description, 'NA') FROM sale_invoices WHERE sale_invoices.id = cl.sale_invoice_id) as si_comment,
+                              (SELECT invoice_no FROM sale_invoices WHERE sale_invoices.id = cl.sale_invoice_id) AS invoice_no,
+                              cl.sale_invoice_id,
+                              cl.cpv_no,
+                              cl.crv_no,
+                              cl.sale_return_invoice_id,
+                              c.customer_name,
+                              cl.id,
+                              cl.comment,
+                              IFNULL(cl.cr, 0) as cr,
+                              IFNULL(cl.dr, 0) as dr
+                           ")
+         ->whereRaw("DATE(cl.created_at) = ? AND cl.is_deleted = 0", [$req->date])
+         ->whereNotIn("cl.customer_id", [5, 8, 49, 97, 105, 107, 115,113, 126, 145, 157, 170, 48, 242, 356])
+         ->orderBy("cl.customer_id")
+         ->get();
 
       // Transform data into the desired structure
       $formattedData = [];
-      $cr = [];
-      $dr = [];
+     $cr = [];
+$dr = [];
 
-      foreach ($customerLgr as $entry) {
-         $customerId = $entry->customer_id; 
-         // Process Credit (CR)
-         if ($entry->cr > 0) {
-            if (!isset($cr[$customerId])) {
-                  $cr[$customerId] = [
-                     'customer_name' => $entry->customer_name,
-                     'total_amount' => 0, // Total credits
-                     'status' => 'in',
-                     'detail' => []
-                  ];
-            }
-            $cr[$customerId]['total_amount'] += $entry->cr; // Add only credit amount
+foreach ($customerLgr as $entry) {
+    $customerId = $entry->customer_id;
 
-            // Store details
-            $cr[$customerId]['detail'][] = [
-                  'id' => $entry->id,
-                  'sale_invoice_id' => $entry->sale_invoice_id,
-                  'cpv_no' => $entry->cpv_no,
-                  'crv_no' => $entry->crv_no,
-                  'invoice_no' => $entry->invoice_no ? 'si-' . explode('-', $entry->invoice_no)[0] : null, 
-                  'comment' => $entry->sale_invoice_id > 0 ?  $entry->si_comment :  $entry->comment,
-                  'amount' => $entry->cr // Store credit amount
+    // Process Credit (CR)
+    if ($entry->cr > 0) {
+        if (!isset($cr[$customerId])) {
+            $cr[$customerId] = [
+                'customer_name' => $entry->customer_name,
+                'total_amount' => 0, // Total credits
+                'status' => 'in',
+                'detail' => []
             ];
-         }
+        }
+        $cr[$customerId]['total_amount'] += $entry->cr; // Add only credit amount
 
-         // Process Debit (DR)
-         if ($entry->dr > 0) {
-            if (!isset($dr[$customerId])) {
-                  $dr[$customerId] = [
-                     'customer_name' => $entry->customer_name,
-                     'total_amount' => 0, // Total debits
-                     'status' => 'out',
-                     'detail' => []
-                  ];
-            }
-            $dr[$customerId]['total_amount'] += $entry->dr; // Add only debit amount
+        // Store details
+        $cr[$customerId]['detail'][] = [
+            'id' => $entry->id,
+            'sale_invoice_id' => $entry->sale_invoice_id,
+            'cpv_no' => $entry->cpv_no,
+            'crv_no' => $entry->crv_no,
+            'invoice_no' => $entry->invoice_no ? 'si-' . explode('-', $entry->invoice_no)[0] : null,
 
-            // Store details
-            $dr[$customerId]['detail'][] = [
-                  'id' => $entry->id,
-                  'sale_invoice_id' => $entry->sale_invoice_id,
-                  'invoice_no' => $entry->invoice_no ? 'si-' . explode('-', $entry->invoice_no)[0] : null, 
-                  'cpv_no' => $entry->cpv_no,
-                  'crv_no' => $entry->crv_no,
-                  'comment' => $entry->sale_invoice_id > 0 ?  $entry->si_comment :  $entry->comment,
-                  'amount' => $entry->dr // Store debit amount
+             'comment' => $entry->sale_invoice_id > 0 ?  $entry->si_comment :  $entry->comment,
+            'amount' => $entry->cr // Store credit amount
+        ];
+    }
+
+    // Process Debit (DR)
+    if ($entry->dr > 0) {
+        if (!isset($dr[$customerId])) {
+            $dr[$customerId] = [
+                'customer_name' => $entry->customer_name,
+                'total_amount' => 0, // Total debits
+                'status' => 'out',
+                'detail' => []
             ];
-         }
-      }
-dd( $dr);
+        }
+        $dr[$customerId]['total_amount'] += $entry->dr; // Add only debit amount
+
+        // Store details
+        $dr[$customerId]['detail'][] = [
+            'id' => $entry->id,
+            'sale_invoice_id' => $entry->sale_invoice_id,
+            'invoice_no' => $entry->invoice_no ? 'si-' . explode('-', $entry->invoice_no)[0] : null,
+
+            'cpv_no' => $entry->cpv_no,
+            'crv_no' => $entry->crv_no,
+            'comment' => $entry->sale_invoice_id > 0 ?  $entry->si_comment :  $entry->comment,
+            'amount' => $entry->dr // Store debit amount
+        ];
+    }
+}
+
 
       return response()->json([
          'mutafriq_udhar_banam' => $dr,

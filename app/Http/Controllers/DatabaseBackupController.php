@@ -16,18 +16,15 @@ use Illuminate\Support\Str;
 
 class DatabaseBackupController extends Controller
 {
-    public function index(GoogleDriveApiBackupUploader $driveUploader)
+    public function index()
     {
-        $logs = BackupLog::orderByDesc('id')->limit(5)->get();
+        $logs = BackupLog::orderByDesc('id')->limit(5)->get(); 
 
         $databases = DatabaseBackupService::resolveDatabaseNamesFromConfig();
 
         $mailSetting = UserBackupMailSetting::where('user_id', Auth::id())->first();
-        $driveStatus = ($mailSetting && $mailSetting->hasConnectedGoogleDrive())
-            ? $driveUploader->connectionStatus(Auth::id())
-            : ['ok' => false, 'message' => 'Google Drive is not connected. Use Connect Google Drive in DB Backups.'];
 
-        return view('backups.index', compact('logs', 'databases', 'mailSetting', 'driveStatus'));
+        return view('backups.index', compact('logs', 'databases', 'mailSetting'));
     }
 
     public function logs()
@@ -84,7 +81,7 @@ class DatabaseBackupController extends Controller
         return redirect()->away('https://accounts.google.com/o/oauth2/v2/auth?'.$query);
     }
 
-    public function googleDriveCallback(Request $request, GoogleDriveApiBackupUploader $driveUploader)
+    public function googleDriveCallback(Request $request)
     {
         if ($request->filled('error')) {
             return redirect()->route('backups.index')->with('error', 'Google Drive connection cancelled: '.$request->input('error'));
@@ -142,23 +139,10 @@ class DatabaseBackupController extends Controller
         }
         $setting->save();
 
-        $driveUploader->persistConnectResponse((int) Auth::id(), $tokenResponse->json());
-        $driveUploader->clearConnectionStatusCache((int) Auth::id());
-
         return redirect()->route('backups.index')->with('success', 'Google Drive connected. Manual backups from your login will upload to this Drive account.');
     }
 
-    public function testGoogleDrive(GoogleDriveApiBackupUploader $driveUploader)
-    {
-        $status = $driveUploader->connectionStatus(Auth::id(), true);
-
-        return redirect()->route('backups.index')->with(
-            $status['ok'] ? 'success' : 'error',
-            $status['message']
-        );
-    }
-
-    public function disconnectGoogleDrive(GoogleDriveApiBackupUploader $driveUploader)
+    public function disconnectGoogleDrive()
     {
         $setting = UserBackupMailSetting::where('user_id', Auth::id())->first();
         if ($setting) {
@@ -170,9 +154,34 @@ class DatabaseBackupController extends Controller
             $setting->save();
         }
 
-        $driveUploader->clearConnectionStatusCache((int) Auth::id());
-
         return redirect()->route('backups.index')->with('success', 'Google Drive disconnected for your user.');
+    }
+
+    /**
+     * Manually refresh the Google Drive access token for the logged-in user.
+     */
+    public function refreshGoogleDrive(GoogleDriveApiBackupUploader $driveUploader)
+    {
+        $setting = UserBackupMailSetting::where('user_id', Auth::id())->first();
+        if (! $setting || ! $setting->hasConnectedGoogleDrive()) {
+            return redirect()->route('backups.index')->with('error', 'Google Drive is not connected. Connect first, then refresh the token.');
+        }
+
+        try {
+            $driveUploader->keepAlive((int) Auth::id());
+
+            return redirect()->route('backups.index')->with('success', 'Google Drive token refreshed successfully. Backups can upload to Drive.');
+        } catch (\Throwable $e) {
+            Log::warning('backup.google_drive_manual_refresh_failed', [
+                'user_id' => Auth::id(),
+                'message' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('backups.index')->with(
+                'error',
+                'Token refresh failed: '.$e->getMessage().' Disconnect and Connect Google Drive again.'
+            );
+        }
     }
 
     public function store(Request $request)

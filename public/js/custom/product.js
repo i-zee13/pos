@@ -167,20 +167,28 @@ $(document).ready(function () {
         $('input[name="size"]').focus();
         $('input[name="size"]').val(response.product.size);
         $('input[name="size"]').blur();
+        var purchaseRaw = response.product.new_purchase_price != null && response.product.new_purchase_price !== '' ? response.product.new_purchase_price : response.product.old_purchase_price;
+        var purchasePrice = parseFloat(purchaseRaw);
         $('input[name="purchase_price"]').focus();
-        $('input[name="purchase_price"]').val(response.product.new_purchase_price ? response.product.new_purchase_price : response.product.old_purchase_price.toFixed(2));
+        $('input[name="purchase_price"]').val(!isNaN(purchasePrice) ? purchasePrice.toFixed(2) : '');
         $('input[name="purchase_price"]').blur();
+        var salePrice = parseFloat(response.product.sale_price);
         $('input[name="sale_price"]').focus();
-        $('input[name="sale_price"]').val(response.product.sale_price.toFixed(2));
+        $('input[name="sale_price"]').val(!isNaN(salePrice) ? salePrice.toFixed(2) : '');
         $('input[name="sale_price"]').blur();
+        var selectedCompanyId = response.product.company_id;
         $.ajax({
           url: "/get-companies",
           success: function success(subcat) {
-            $('select[name="company_id"]').empty();
-            $('select[name="company_id"]').append("<option value=\"0\">Select Company</option>");
-            subcat.companies.forEach(function (data) {
-              $('select[name="company_id"]').append("<option value=\"".concat(data.id, "\" ").concat(response.product.company_id == data.id ? 'selected' : '', ">").concat(data.company_name, "</option>")).focus();
+            var $company = $('select[name="company_id"]');
+            $company.empty();
+            $company.append("<option value=\"0\">Select Company</option>");
+            (subcat.companies || []).forEach(function (data) {
+              $company.append("<option value=\"".concat(data.id, "\">").concat(data.company_name, "</option>"));
             });
+            if (selectedCompanyId != null && selectedCompanyId !== '') {
+              $company.val(String(selectedCompanyId)).trigger('change');
+            }
           }
         });
         var input = "<input type=\"hidden\"  name=\"hidden_product_icon\" value=\"".concat(response.product.product_icon, "\"/> \n                <input type=\"file\" id=\"input-file-now\" class=\"dropify\"  name=\"product_icon\" data-old_input=\"hidden_product_icon\"  data-default-file = \"/storage/").concat(response.product.product_icon, "\" value=\"").concat(response.product.product_icon, "\"  accept=\"image/*\" data-allowed-file-extensions=\"jpg png jpeg JPEG\"/>");
@@ -554,6 +562,39 @@ function fetchcompanies() {
     }
   });
 }
+function escapeProductHtml(str) {
+  return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function renderProductBarcodeCell(barcode, id) {
+  var full = barcode != null && String(barcode).trim() !== '' ? String(barcode).trim() : String(id == null ? '' : id);
+  var maxLen = 16;
+  var needsMore = full.length > maxLen;
+  var shortText = needsMore ? full.substring(0, maxLen) + '…' : full;
+  var moreBtn = needsMore ? " <button type=\"button\" class=\"btn btn-default btn-line show-all-barcodes\" data-barcodes=\"".concat(encodeURIComponent(full), "\" style=\"padding:1px 7px;font-size:11px;line-height:1.2;vertical-align:middle;\">more</button>") : '';
+  // Hidden haystack keeps full barcode searchable in DataTables even when truncated
+  return "<td style=\"max-width:170px;white-space:normal;position:relative;\">\n        <span class=\"barcode-search-haystack\" style=\"position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;\">".concat(escapeProductHtml(full), "</span>\n        <span class=\"barcode-preview\" title=\"").concat(escapeProductHtml(full), "\" style=\"display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle;\">").concat(escapeProductHtml(shortText), "</span>").concat(moreBtn, "\n    </td>");
+}
+$(document).on('click', '.show-all-barcodes', function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  var full = '';
+  try {
+    full = decodeURIComponent($(this).attr('data-barcodes') || '');
+  } catch (err) {
+    full = $(this).attr('data-barcodes') || '';
+  }
+  var list = full.split(',').map(function (c) {
+    return c.trim();
+  }).filter(Boolean);
+  if (!list.length) {
+    list = [full || 'N/A'];
+  }
+  sweetalert__WEBPACK_IMPORTED_MODULE_0___default()({
+    title: 'Barcodes (' + list.length + ')',
+    text: list.join('\n'),
+    button: 'Close'
+  });
+});
 function fetchproducts() {
   $.ajax({
     type: 'GET',
@@ -580,7 +621,7 @@ function fetchproducts() {
         } else {
           delet_status = "\n                                <button type=\"button\" id=\"".concat(element['id'], "\" class=\"btn btn-default btn-line delete_product\" name=\"Sub_cat\" title=\"Restore\" data-status=\"restore\">Restore</button>\n                                <button type=\"button\" id=\"").concat(element['id'], "\" class=\"btn btn-default red-bg delete_product\" name=\"Sub_cat\" title=\"Delete Forever\" data-status=\"purge\">Delete Forever</button>\n                             ");
         }
-        $('.subCatsListTable tbody').append("\n                        <tr> \n                            <td>".concat(element['barcode'] ? element['barcode'] : element['id'], " </td>\n                            <td> ").concat(element['company_name'], "</td>\n                            <td> <img src=\"").concat(element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                            <td>").concat(element['size'], " </td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                                ").concat(delet_status, "\n                            </td>\n                        </tr>"));
+        $('.subCatsListTable tbody').append("\n                        <tr> \n                            ".concat(renderProductBarcodeCell(element['barcode'], element['id']), "\n                            <td> ").concat(element['company_name'], "</td>\n                            <td> <img src=\"").concat(element['product_icon'] ? '/storage/'.element['product_icon'] : '/images/product.png', "\"  style=\"height:25px; width:25px;\"> ").concat(element['product_name'], "</td>\n                            <td>").concat(element['size'], " </td>\n                            <td>\n                                <button id=\"").concat(element['id'], "\" class=\"btn btn-default btn-line openDataSidebarForUpdateProduct\">Edit</button>\n                                ").concat(delet_status, "\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();

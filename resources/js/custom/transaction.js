@@ -45,9 +45,9 @@ $(document).ready(function () {
                 $('.customer_balnce').val(response.customer.balance);
                 response.transactions.forEach(data => {
                     console.log(data)
-                    balance_sum += data.balance;
-                    cr_sum += data.cr;
-                    dr_sum += data.dr;
+                    balance_sum += parseFloat(data.balance) || 0;
+                    cr_sum += parseFloat(data.cr) || 0;
+                    dr_sum += parseFloat(data.dr) || 0;
                     if (action == operation + '-ledger-jama' && data.cr > 0) {
                         $('#transactionTable tbody').append(`
                                 <tr id='tr-${data.id}'>
@@ -418,6 +418,9 @@ $('.customer_id').on('change', function () {
     if (customer_val > 0) {
         n++
         $('.customer_balnce').val(cust_bal)
+         $('#print-invoice').attr('tabindex', customer_val * 2 + 3);
+        $('#saveTransaction').attr('tabindex', customer_val * 2 + 4);
+        $('#cancelSubCat').attr('tabindex', customer_val * 2 + 5);
         $('.add-more').append(`
         <div class="row  remove_div" >
             <div class="row _head03">
