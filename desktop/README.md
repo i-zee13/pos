@@ -2,6 +2,8 @@
 
 Branch: `feature/offline-desktop-exe`
 
+**Continue on another laptop:** read [`HANDOFF.md`](./HANDOFF.md) first (paste into a new Cursor chat).
+
 Shop PC: **no XAMPP / Composer**. You ship a single `.exe`.
 
 ## Phases
