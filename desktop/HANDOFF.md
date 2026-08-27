@@ -34,8 +34,8 @@ cd desktop
 npm install
 ```
 
-Latest packaged version in `package.json`: **0.3.3**  
-Artifact name: `StoreeoPOS-Setup-0.3.3.exe` (under `desktop/dist/` when built; large binaries may not be on every clone).
+Latest packaged version in `package.json`: **0.3.4**  
+Artifact name: `StoreeoPOS-Setup-0.3.4.exe` (under `desktop/dist/` when built; large binaries may not be on every clone).
 
 ### Build installer (Windows or cross-pack as you already do)
 
