@@ -4,15 +4,49 @@
    Pages: Sale Add, Purchase Add, Sale Return Add, Purchase Return Add,
           Replacement (and their detail views).
 
-   In nakon pages par layout do fixed-pixel flex columns par bana hai:
-     .left-sidebox  (~420px)  +  .right-sidebox (~1056px)
-   Jis ki wajah se 1024px se choti screens (tablet/mobile) par horizontal
-   scroll aur tooti hui layout aati hai. Niche ke rules un columns ko
-   choti screens par full-width / stacked bana dete hain aur product
-   table ko horizontally scrollable rakhte hain.
+   Desktop Electron / tablet windows are often ~1000–1280px. Old layout used
+   fixed flex widths (.left-sidebox ~420px + .right-sidebox ~1056px) which
+   crushed the product table. These rules keep the table horizontally
+   scrollable and allow the invoice-details sidebar to collapse.
    ===================================================================== */
 
-/* Tablets & mobiles: stack the two side boxes full width */
+/* Always allow product table to scroll horizontally when columns don't fit */
+#table-container,
+.right_Info .table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+}
+
+.ProductTable {
+    min-width: 880px;
+}
+
+/* Prefer fluid right column when the shared class name is present */
+.right-sidebox {
+    min-width: 0;
+}
+
+/* Tablets & narrow laptop / Electron windows */
+@media (max-width: 1399.98px) {
+    .left-sidebox {
+        -ms-flex: 0 0 280px !important;
+        flex: 0 0 280px !important;
+        max-width: 280px !important;
+    }
+
+    .right-sidebox {
+        -ms-flex: 1 1 auto !important;
+        flex: 1 1 auto !important;
+        max-width: none !important;
+        width: auto !important;
+    }
+
+    .sidebox-content {
+        min-height: auto !important;
+    }
+}
+
 @media (max-width: 1023.98px) {
     .left-sidebox,
     .right-sidebox {
@@ -25,22 +59,6 @@
 
     .left-sidebox {
         margin-bottom: 15px;
-    }
-
-    /* Left panel forces full viewport height on desktop; relax on mobile */
-    .sidebox-content {
-        min-height: auto !important;
-    }
-
-    /* Keep wide product/entry tables usable via horizontal scroll */
-    #table-container,
-    .right_Info .table-responsive {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .ProductTable {
-        min-width: 620px;
     }
 }
 
@@ -61,7 +79,6 @@
         padding-top: 10px !important;
     }
 
-    /* The top action row (Get Stock / amount inputs) can overflow on phones */
     .right-sidebox > .row {
         margin-left: 0;
         margin-right: 0;
@@ -69,5 +86,9 @@
 
     .totalValues {
         font-size: 13px;
+    }
+
+    .ProductTable {
+        min-width: 720px;
     }
 }

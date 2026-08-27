@@ -232,11 +232,13 @@
         }
 
         .left-sidebox {
-            -ms-flex: 420px;
-            flex: 0 0 420px;
-            max-width: 420px;
+            -ms-flex: 0 0 32%;
+            flex: 0 0 32%;
+            max-width: 360px;
+            min-width: 240px;
             padding-top: 15px;
             padding-bottom: 15px;
+            transition: max-width 0.2s ease, flex-basis 0.2s ease, opacity 0.2s ease, padding 0.2s ease;
         }
 
         .sidebox-content {
@@ -262,9 +264,10 @@
             padding-top: 15px;
             padding-right: 15px;
             padding-left: 5px;
-            -ms-flex: 0 0 1056px;
-            flex: 0 0 1056px;
-            max-width: 1056px;
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            max-width: none;
+            min-width: 0; /* allow flex child to shrink for table scroll */
         }
 
         .right_Info {
@@ -465,8 +468,23 @@
 
         .totalNo {
             font-family: 'Rationale', sans-serif !important;
-            font-size: 24px;
-            line-height: 1
+            font-size: 22px;
+            line-height: 1.2;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .totalNo small {
+            display: inline-block;
+            margin-left: 6px;
+            font-size: 12px;
+            font-family: inherit;
+            vertical-align: middle;
+        }
+
+        .totalNo span {
+            display: inline-block;
+            vertical-align: middle;
         }
 
         .td-pn {
@@ -488,27 +506,76 @@
             padding-top: 8px
         }
 
-
-        @media (min-width: 1024px) {
-            .left-sidebox {
-                -ms-flex: 250px;
-                flex: 0 0 250px;
-                max-width: 250px;
-                letter-spacing: normal
-            }
-
-            .right-sidebox {
-                -ms-flex: 0 0 772px;
-                flex: 0 0 772px;
-                max-width: 772px;
-            }
-
-            .td-pn {
-                width: 100px;
-            }
+        /* Product table: always allow horizontal scroll on narrow Electron/tablet windows */
+        #table-container {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            max-width: 100%;
         }
 
-        @media (max-width: 1024px) {
+        #table-container .ProductTable {
+            min-width: 900px;
+            width: 100%;
+            margin-bottom: 0;
+        }
+
+        .purchase-layout-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .purchase-layout-toolbar .title {
+            margin-bottom: 0;
+            padding-top: 10px;
+        }
+
+        .btn-toggle-invoice-sidebar {
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #152e4d;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .btn-toggle-invoice-sidebar:hover {
+            background: #152e4d;
+            color: #fff;
+        }
+
+        /* Collapsed invoice details sidebar → full width for products */
+        .purchase-layout.sidebar-collapsed > .left-sidebox {
+            flex: 0 0 0 !important;
+            max-width: 0 !important;
+            min-width: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: hidden !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .purchase-layout.sidebar-collapsed > .right-sidebox {
+            flex: 1 1 100% !important;
+            max-width: 100% !important;
+            padding-left: 15px !important;
+        }
+
+        @media (max-width: 1100px) {
+            .left-sidebox {
+                flex: 0 0 260px !important;
+                max-width: 260px !important;
+                min-width: 200px !important;
+            }
+
             .CompanyInfo {
                 line-height: 18px;
                 font-size: 13px
@@ -523,65 +590,25 @@
             }
         }
 
-        @media (min-width: 1280px) {
-            .inputfileds-top {
-                font-size: 13px
+        @media (max-width: 900px) {
+            .purchase-layout > .left-sidebox,
+            .purchase-layout > .right-sidebox {
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
             }
 
-            .inputfileds-top .col-auto {
-                padding-left: 10px;
+            .purchase-layout > .left-sidebox {
+                margin-bottom: 10px;
             }
 
-            .left-sidebox {
-                -ms-flex: 330px;
-                flex: 0 0 330px;
-                max-width: 330px;
-                letter-spacing: normal
+            .sidebox-content {
+                min-height: auto !important;
             }
 
-            .right-sidebox {
-                -ms-flex: 0 0 947px;
-                flex: 0 0 947px;
-                max-width: 947px;
+            .purchase-layout.sidebar-collapsed > .left-sidebox {
+                display: none;
             }
-
-            .td-pn {
-                width: 160px;
-            }
-
-        }
-
-        @media (min-width: 1366px) {
-            .left-sidebox {
-                -ms-flex: 350px;
-                flex: 0 0 350px;
-                max-width: 250;
-            }
-
-            .right-sidebox {
-                -ms-flex: 0 0 999px;
-                flex: 0 0 999px;
-                max-width: 999px;
-            }
-
-            .td-pn {
-                width: 190px;
-            }
-        }
-
-        @media (min-width: 1440px) {
-            .left-sidebox {
-                -ms-flex: 380px;
-                flex: 0 0 380px;
-                max-width: 380px;
-            }
-
-            .right-sidebox {
-                -ms-flex: 0 0 1044px;
-                flex: 0 0 1044px;
-                max-width: 1044px;
-            }
-
         }
 
         .form-s2 .select2-container .select2-selection--single {
@@ -602,7 +629,7 @@
     <div class="container-fluid">
         <form id="form" enctype="multipart/form-data" class="">
             @csrf
-            <div class="row">
+            <div class="row purchase-layout" id="purchaseLayout">
 
                 <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
                 <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
@@ -682,12 +709,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-8 right-sid ebox">
+                <div class="col-md-8 right-sidebox">
                     <div class="row">
-                        <div class="col-6">
-                            <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Update' : 'New'}} Purchase <span>Invoice</span></h2>
+                        <div class="col-12">
+                            <div class="purchase-layout-toolbar">
+                                <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Update' : 'New'}} Purchase <span>Invoice</span></h2>
+                                <button type="button" class="btn-toggle-invoice-sidebar" id="togglePurchaseSidebar" title="Show/hide invoice details">
+                                    Hide details
+                                </button>
+                            </div>
                         </div>
-
                     </div>
 
                     <div class="right_Info">
@@ -906,7 +937,32 @@
 </div>
 @endsection
 @push('js')
-<script> 
+<script>
+(function () {
+    var layout = document.getElementById('purchaseLayout');
+    var btn = document.getElementById('togglePurchaseSidebar');
+    if (!layout || !btn) return;
+
+    var key = 'purchaseInvoiceSidebarCollapsed';
+    function apply(collapsed) {
+        layout.classList.toggle('sidebar-collapsed', collapsed);
+        btn.textContent = collapsed ? 'Show details' : 'Hide details';
+        try { localStorage.setItem(key, collapsed ? '1' : '0'); } catch (e) {}
+    }
+
+    // Default collapsed on narrow desktop windows so product table has room
+    var saved = null;
+    try { saved = localStorage.getItem(key); } catch (e) {}
+    if (saved === null) {
+        apply(window.innerWidth < 1200);
+    } else {
+        apply(saved === '1');
+    }
+
+    btn.addEventListener('click', function () {
+        apply(!layout.classList.contains('sidebar-collapsed'));
+    });
+})();
 </script>
 <script src="{{mix('js/custom/stock.js')}}"> </script>
 

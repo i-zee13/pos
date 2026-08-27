@@ -668,7 +668,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-8 right-sid ebox">
+                <div class="col-md-8 right-sidebox">
                     <div class="row">
                         <div class="col-md-6">
                             <h2 class="title font22 PT-10 mb-10">

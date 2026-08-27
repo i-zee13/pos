@@ -758,7 +758,7 @@
 
                     </div>
                 </div>
-                <div class="col-md-8 right-sid ebox">
+                <div class="col-md-8 right-sidebox">
 
                     <div class="row">
                         <div class="col-md-6">
