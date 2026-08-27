@@ -91,6 +91,7 @@ class StockController extends Controller
     }
     public function purchaseInvoice(Request $request)
     {
+        try {
         // dd($request->all());
         if ($request->hidden_invoice_id) {
             $invoice = PurchaseInvoice::where('id', $request->hidden_invoice_id)->first();
@@ -141,9 +142,11 @@ class StockController extends Controller
                     $purchased->purchase_invoice_id     = $invoice->id;
                     $purchased->product_id              = $purchase_product['product_id'];
                     $purchased->vendor_id               = $request->customer_id;
-                    $purchased->expiry_date             = $purchase_product['expiry_date'];
+                    $purchased->expiry_date             = !empty($purchase_product['expiry_date'])
+                        ? $purchase_product['expiry_date']
+                        : '0000-00-00';
                     $purchased->purchased_total_amount  = $purchase_product['amount'];
-                    $purchased->company_id              = Product::where('id', $purchase_product['product_id'])->value('company_id');
+                    $purchased->company_id              = Product::where('id', $purchase_product['product_id'])->value('company_id') ?: 0;
                     $purchased->qty                     = $purchase_product['qty'];
                     $purchased->product_discount        = $purchase_product['prod_discount'];
                     $purchased->sale_price              = $purchase_product['sale_price'];
@@ -259,6 +262,21 @@ class StockController extends Controller
                 'invoice_id'  =>  $invoice->id,
                 'customer_id' =>  $invoice->customer_id,
             ]);
+        }
+
+        return response()->json([
+            'msg'    => 'Invoice could not be saved',
+            'status' => 'failed',
+        ], 500);
+        } catch (\Throwable $e) {
+            \Log::error('purchaseInvoice failed: '.$e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return response()->json([
+                'msg'    => 'Purchase save failed: '.$e->getMessage(),
+                'status' => 'failed',
+            ], 500);
         }
     }
     public function getVendors()

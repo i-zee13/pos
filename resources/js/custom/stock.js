@@ -516,16 +516,31 @@ function saleSave(current_action, type) {
             }
         },
         error: function (e) {
+            var msg = 'Failed to save at the moment';
+            try {
+                if (e && e.responseJSON) {
+                    if (e.responseJSON.msg) {
+                        msg = e.responseJSON.msg;
+                    } else if (e.responseJSON.message) {
+                        msg = e.responseJSON.message;
+                    }
+                } else if (e && e.responseText) {
+                    var parsed = JSON.parse(e.responseText);
+                    if (parsed && (parsed.msg || parsed.message)) {
+                        msg = parsed.msg || parsed.message;
+                    }
+                }
+            } catch (err) {}
             $('#notifDiv').fadeIn();
             $('#notifDiv').css('background', 'red');
-            $('#notifDiv').text('Failed to save at the moment');
+            $('#notifDiv').text(msg);
             setTimeout(() => {
                 $('#notifDiv').fadeOut();
-            }, 3000);
+            }, 5000);
 
             current_action.removeAttr('disabled');;
             $('.btn-cancel').removeAttr('disabled');
-            $('#save').attr('disabled', 'disabled');
+            $('#save').removeAttr('disabled');
             current_action.text('Save')
         }
     })

@@ -533,43 +533,65 @@ function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type,
     $v->status               =  $In_out_status;
     $v->balance              =  $In_out_status  == 2 ? $balance - $qty_value : $balance +  $qty_value;
     $v->actual_qty           =  $sale->qty;
-    $v->invoice_no           =  $sale->invoice_no;
-    $v->company_id           =  $sale->company_id;
+    $v->invoice_no           =  $sale->invoice_no ?: 'N/A';
+    $v->company_id           =  $sale->company_id ?: 0;
     $v->product_id           =  $sale->product_id;
-    $v->date                 =  $sale->created_at;
-    $v->created_by           =  Auth::id();
+    $dateVal                 =  $sale->created_at ?? $sale->date ?? now();
+    $v->date                 =  $dateVal instanceof \Carbon\Carbon ? $dateVal->toDateString() : substr((string) $dateVal, 0, 10);
+    if ($v->date === '' || $v->date === '0000-00-00') {
+        $v->date = now()->toDateString();
+    }
+    $v->created_by           =  Auth::id() ?: 1;
+    // SQLite vendor_stocks.amount is NOT NULL (MySQL often defaulted) — always set.
+    $v->amount               =  $sale->purchased_total_amount
+        ?? $sale->sale_total_amount
+        ?? $sale->product_return_total_amount
+        ?? $sale->return_total_amount
+        ?? ((float) ($product_unit_price ?? 0) * (float) ($qty_value ?? 0));
     if ($transaction_type == 1) { //Purchase 
         $v->actual_status                   =  1; //IN
         $v->purchase_invoice_id             =  $sale->purchase_invoice_id;
-        $v->product_unit_price              =  $sale->purchase_price;
-        $v->total_purchase_amount           =  $sale->purchased_total_amount;
+        $v->product_unit_price              =  $sale->purchase_price ?? 0;
+        $v->total_purchase_amount           =  $sale->purchased_total_amount ?? $v->amount;
     } else if ($transaction_type == 2) {  //Sale
         $v->actual_status                   =  2; //OUT
         $v->sale_invoice_id                 =  $sale->sale_invoice_id;
-        $v->sale_unit_price                 =  $sale_price;
-        $v->total_sale_amount               =  $sale->sale_total_amount;
-        $v->product_unit_price              =  $sale->purchase_price;
+        $v->sale_unit_price                 =  $sale_price ?? 0;
+        $v->total_sale_amount               =  $sale->sale_total_amount ?? $v->amount;
+        $v->product_unit_price              =  $sale->purchase_price ?? 0;
     } else if ($transaction_type == 3) {  //Purchase Return
         $v->actual_status                   =  2; //OUT
         $v->purchase_return_invoice_id      =  $sale->purchase_return_invoice_id;
-        $v->product_unit_price              =  $sale->purchase_price;
-        $v->total_purchase_amount           =  $sale->product_return_total_amount;
+        $v->product_unit_price              =  $sale->purchase_price ?? 0;
+        $v->total_purchase_amount           =  $sale->product_return_total_amount ?? $v->amount;
     } else if ($transaction_type == 4) {  //Sale Return
         $v->actual_status                   =  1; //IN
         $v->sale_return_id                  =  $sale->sale_return_invoice_id;
-        $v->sale_unit_price                 =  $sale_price;
-        $v->total_sale_amount               =  $total_return_amount;
-        $v->product_unit_price              =  $product_unit_price;
+        $v->sale_unit_price                 =  $sale_price ?? 0;
+        $v->total_sale_amount               =  $total_return_amount ?? $v->amount;
+        $v->product_unit_price              =  $product_unit_price ?? 0;
     } else if ($transaction_type == 6) {  //Replacement
         $v->actual_status                   =   ($prod_type == 1) ? 1 : 2;
         $unit_prefix                        =   ($prod_type == 1) ? 'product' : 'sale';
         $total_prefix                       =   ($prod_type == 1) ? 'total_purchase' : 'total_sale';
-        $v->{$unit_prefix . '_unit_price'}  =   $sale_price;
-        $v->{$total_prefix . '_amount'}     =   $sale->sale_total_amount;
+        $v->{$unit_prefix . '_unit_price'}  =   $sale_price ?? 0;
+        $v->{$total_prefix . '_amount'}     =   $sale->sale_total_amount ?? $v->amount;
         $v->product_replacement_invoice_id  =   $sale->product_replacement_invoice_id;
     } else if ($transaction_type == 5) {  //Product Delete
         deleteProductFields($v, $sale, $invoice_type, $prod_type);
+        if (!isset($v->amount) || $v->amount === null) {
+            $v->amount = (float) ($sale->total_purchase_amount ?? $sale->total_sale_amount ?? 0);
+        }
+        if (!isset($v->product_unit_price) || $v->product_unit_price === null) {
+            $v->product_unit_price = (float) ($sale->product_unit_price ?? $sale->sale_unit_price ?? 0);
+        }
     }
+    // Ensure NOT NULL numerics always have values (desktop SQLite)
+    $v->product_unit_price = $v->product_unit_price ?? 0;
+    $v->total_purchase_amount = $v->total_purchase_amount ?? 0;
+    $v->sale_unit_price = $v->sale_unit_price ?? 0;
+    $v->total_sale_amount = $v->total_sale_amount ?? 0;
+    $v->amount = $v->amount ?? 0;
     $v->save();
     return $v;
 }
@@ -1421,17 +1443,30 @@ function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
     $stock = StockManagment::where('product_id', $purchase->product_id)
                             ->where('company_id', $purchase->company_id)
                             ->orderBy('id', 'DESC')->first();
+    $isNew = false;
     if (!$stock) {
+        $isNew = true;
         $stock                  = new StockManagment();  
         $stock->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
         $stock->product_name    = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
+        $stock->balance         = 0;
+        $stock->amount          = 0;
+        $stock->ttl_cost        = 0;
+        $stock->ttl_avg_cost    = 0;
+        $stock->created_by      = Auth::id() ?: 1;
     }
-    $stock->company_id      = $purchase->company_id;
+    $stock->company_id      = $purchase->company_id ?: 0;
     $stock->product_id      = $purchase->product_id;
     $stock->purchase_price  = $purchase->purchase_price;
-    $balance                = $In_out_status == 2 ? $stock->balance - $stock_qty : $stock->balance +  $stock_qty;
+    $balance                = $In_out_status == 2 ? ((float) $stock->balance) - $stock_qty : ((float) $stock->balance) +  $stock_qty;
     $stock->balance         = $balance;
     $stock->vs_id           = $vendor_stock_id;
+    $stock->amount          = $stock->amount ?? 0;
+    $stock->ttl_cost        = $stock->ttl_cost ?? 0;
+    $stock->ttl_avg_cost    = $stock->ttl_avg_cost ?? 0;
+    if (empty($stock->created_by)) {
+        $stock->created_by = Auth::id() ?: 1;
+    }
     
     // $stock->ttl_avg_cost = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
     $stock->save();  
