@@ -13,6 +13,7 @@ use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StockController extends Controller
 {
@@ -94,12 +95,12 @@ class StockController extends Controller
         // dd($request->all());
         if ($request->hidden_invoice_id) {
             $invoice = PurchaseInvoice::where('id', $request->hidden_invoice_id)->first();
+            $invoice->invoice_no = $request->invoice_no;
         } else {
             isEditable($request->customer_id);
             $invoice = new PurchaseInvoice();
         }
         $invoice->date                 = $request->invoice_date;
-        $invoice->invoice_no           = $request->invoice_no;
         $invoice->invoice_type         = $request->invoice_type;
         $invoice->customer_id          = $request->customer_id;
         if ($request->invoice_type == 1) {
@@ -120,7 +121,32 @@ class StockController extends Controller
         $invoice->status               = $request->invoice_type;
         $invoice->description          = $request->description;
         $invoice->created_by           = Auth::id();
-        if ($invoice->save()) {
+
+        $invoiceSaved = false;
+        if ($request->hidden_invoice_id) {
+            $invoiceSaved = (bool) $invoice->save();
+        } else {
+            $invoiceSaved = (bool) DB::transaction(function () use ($invoice, $request) {
+                $dateStr = Carbon::parse($request->invoice_date ?? Carbon::today())->toDateString();
+                $lockName = substr('pur_inv_' . (current_tenant_id() ?: 0) . '_' . $dateStr, 0, 64);
+                $locked = false;
+                try {
+                    if (DB::getDriverName() === 'mysql') {
+                        $row = DB::selectOne('SELECT GET_LOCK(?, 10) AS l', [$lockName]);
+                        $locked = isset($row->l) && (int) $row->l === 1;
+                    }
+                    $invoice->invoice_no = getPurchaseInvoice($request->invoice_date ?? null);
+
+                    return $invoice->save();
+                } finally {
+                    if ($locked) {
+                        DB::select('SELECT RELEASE_LOCK(?) AS r', [$lockName]);
+                    }
+                }
+            });
+        }
+
+        if ($invoiceSaved) {
             if (count($request->purchased_product_array) > 0) {
                 foreach ($request->purchased_product_array as $purchase_product) {
                     $flag = true;

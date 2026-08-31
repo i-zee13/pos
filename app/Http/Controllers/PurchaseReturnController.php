@@ -70,7 +70,7 @@ class PurchaseReturnController extends Controller
             $invoice_no = $invoice->invoice_no;
         } else {
             $invoice = new ReturnInvoice();
-            $invoice_no  =   getPurchaseReturnNo();
+            $invoice_no  =   getPurchaseReturnNo($request->invoice_date ?? null);
             isEditable($request->customer_id);
         }
         $invoice->date                 = $request->invoice_date;

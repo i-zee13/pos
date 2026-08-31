@@ -53,7 +53,7 @@ class SalesReturnController extends Controller
               $invoice_no = $invoice->invoice_no;
         } else {
             $invoice     = new SaleReturn();
-              $invoice_no  =   getSaleReturnNo();
+              $invoice_no  =   getSaleReturnNo($request->invoice_date ?? null);
             isEditable($request->customer_id);
         }
         $invoice->amount_received      = $request->amount_received;

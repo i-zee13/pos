@@ -13,6 +13,7 @@ use App\Models\VendorStock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
@@ -69,8 +70,6 @@ class SaleController extends Controller
         } else {
             $invoice      = new SaleInvoice();
             isEditable($request->customer_id);
-            $invoice_no   =   getInvoice();
-            $invoice->invoice_no        = $invoice_no;
             $invoice->updated_at        = Null;
             $invoice->updated_by        = Null;
             $invoice->created_by        = Auth::id(); 
@@ -95,8 +94,33 @@ class SaleController extends Controller
         $invoice->is_editable          = 1;
         $invoice->status               = $request->invoice_type;
         $invoice->description          = $request->description;
-       
-        if ($invoice->save()) {
+
+        // New invoice: allocate number + insert under one lock so parallel saves cannot share a serial
+        $invoiceSaved = false;
+        if ($request->hidden_invoice_id) {
+            $invoiceSaved = (bool) $invoice->save();
+        } else {
+            $invoiceSaved = (bool) DB::transaction(function () use ($invoice, $request) {
+                $dateStr = Carbon::parse($request->invoice_date ?? Carbon::today())->toDateString();
+                $lockName = substr('sale_inv_' . (current_tenant_id() ?: 0) . '_' . $dateStr, 0, 64);
+                $locked = false;
+                try {
+                    if (DB::getDriverName() === 'mysql') {
+                        $row = DB::selectOne('SELECT GET_LOCK(?, 10) AS l', [$lockName]);
+                        $locked = isset($row->l) && (int) $row->l === 1;
+                    }
+                    $invoice->invoice_no = getInvoice($request->invoice_date ?? null);
+
+                    return $invoice->save();
+                } finally {
+                    if ($locked) {
+                        DB::select('SELECT RELEASE_LOCK(?) AS r', [$lockName]);
+                    }
+                }
+            });
+        }
+
+        if ($invoiceSaved) {
             if (count($sales_product_array) > 0) {
                 
                 $old_ids        = $request->existing_product_ids;

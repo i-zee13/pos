@@ -47,7 +47,7 @@ class ProductReplacementController extends Controller
             // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received;
         } else {
             $invoice     = new ProductReplacementInvoice();
-             $invoice_no  =   getProductReplacementNo();
+             $invoice_no  =   getProductReplacementNo($request->invoice_date ?? null);
             isEditable($request->customer_id);
         }
 

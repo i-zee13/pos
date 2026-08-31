@@ -270,57 +270,94 @@ if (!function_exists('GetCurrentLocation')) {
         return Location::get($ip);
     }
 }
-if (!function_exists('getInvoice')) {
-    function getInvoice()
+if (!function_exists('nextDailyInvoiceNo')) {
+    /**
+     * Next bill serial for a calendar day: "{n}-{j}-{n}-{y}" e.g. 47-31-8-26.
+     * Uses MAX(prefix) including soft-deleted rows so numbers are never reused.
+     * Optional $date = invoice date (backdated bills stay on that day's sequence).
+     *
+     * When called inside DB::transaction(), today's rows are locked until commit
+     * so allocate + save cannot race. Outside a transaction (form preview only)
+     * it just returns the next candidate without locking.
+     */
+    function nextDailyInvoiceNo(string $eloquentClass, $date = null, string $dateColumn = 'date'): string
     {
-        $year           = date('y');
-        $invoice_no     = 1;
-        $lastinvoice    = SaleInvoice::where('date', Carbon::today())->count();
-        $invoice_no     = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
-        return $invoice_no;
+        $day = $date ? Carbon::parse($date)->startOfDay() : Carbon::today();
+        $suffix = $day->format('j-n-y');
+        $dateStr = $day->toDateString();
+
+        $maxPrefix = function () use ($eloquentClass, $dateColumn, $dateStr) {
+            $q = method_exists($eloquentClass, 'withTrashed')
+                ? $eloquentClass::withTrashed()
+                : $eloquentClass::query();
+
+            return (int) $q->whereDate($dateColumn, $dateStr)
+                ->selectRaw('MAX(CAST(SUBSTRING_INDEX(invoice_no, "-", 1) AS UNSIGNED)) as max_no')
+                ->value('max_no');
+        };
+
+        $allocate = function () use ($maxPrefix, $suffix, $eloquentClass) {
+            $next = $maxPrefix() + 1;
+            if ($next < 1) {
+                $next = 1;
+            }
+            for ($i = 0; $i < 25; $i++) {
+                $candidate = $next . '-' . $suffix;
+                $existsQ = method_exists($eloquentClass, 'withTrashed')
+                    ? $eloquentClass::withTrashed()
+                    : $eloquentClass::query();
+                if (!$existsQ->where('invoice_no', $candidate)->exists()) {
+                    return $candidate;
+                }
+                $next++;
+            }
+
+            return $next . '-' . $suffix;
+        };
+
+        // Hold row locks only when caller already opened a transaction (allocate+save together)
+        if (DB::transactionLevel() > 0) {
+            $lockQ = method_exists($eloquentClass, 'withTrashed')
+                ? $eloquentClass::withTrashed()
+                : $eloquentClass::query();
+            $lockQ->whereDate($dateColumn, $dateStr)->orderBy('id')->lockForUpdate()->get();
+
+            return $allocate();
+        }
+
+        return $allocate();
+    }
+}
+
+if (!function_exists('getInvoice')) {
+    function getInvoice($date = null)
+    {
+        return nextDailyInvoiceNo(SaleInvoice::class, $date);
     }
 }
 
 if (!function_exists('getPurchaseInvoice')) {
-    function getPurchaseInvoice()
+    function getPurchaseInvoice($date = null)
     {
-        $year        = date('y');
-        $invoice_no  = 1;
-        $lastinvoice = PurchaseInvoice::where('date', Carbon::today())->count();
-        $invoice_no  = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::now();
-
-        return $invoice_no;
+        return nextDailyInvoiceNo(PurchaseInvoice::class, $date);
     }
 }
 if (!function_exists('getProductReplacementNo')) {
-    function getProductReplacementNo()
+    function getProductReplacementNo($date = null)
     {
-        $invoice_no    = 1;
-        $lastinvoice   = ProductReplacementInvoice::where('date', Carbon::today())->count();
-
-        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' .Carbon::now();
-
-        return $invoice_no;
+        return nextDailyInvoiceNo(ProductReplacementInvoice::class, $date);
     }
 }
 if (!function_exists('getSaleReturnNo')) {
-    function getSaleReturnNo()
+    function getSaleReturnNo($date = null)
     {
-        $invoice_no    = 1;
-        $lastinvoice   = SaleReturn::where('date', Carbon::today())->count();
-
-        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::now();
-
-        return $invoice_no;
+        return nextDailyInvoiceNo(SaleReturn::class, $date);
     }
 }
 if (!function_exists('getPurchaseReturnNo')) {
-    function getPurchaseReturnNo()
+    function getPurchaseReturnNo($date = null)
     {
-        $invoice_no    = 1;
-        $lastinvoice   = ReturnInvoice::where('date', Carbon::today())->count();
-        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::now();
-        return $invoice_no;
+        return nextDailyInvoiceNo(ReturnInvoice::class, $date);
     }
 }
 if (!function_exists('getCrvNo')) {
