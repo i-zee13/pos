@@ -603,7 +603,7 @@
     <div class="container-fluid">
         <form id="form" enctype="multipart/form-data" class="">
             @csrf
-            <div class="row">
+            <div class="row invoice-layout">
 
                 <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
                 <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
@@ -611,7 +611,7 @@
                 <input type="hidden" name="customer_ledger" id="customer_ledger" value="{{json_encode(@$get_customer_ledger)}}">
                 <input type="hidden" id="" value="1" name="form_status">
                 <input type="hidden" id="stock_products"   value="{{json_encode($products)}}">
-                <div class="col-md-4 left-sidebox">
+                <div class="col-md-12 left-sidebox">
                     <div class="sidebox-content">
                         <div class="CT_sec">
                             <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
@@ -743,7 +743,7 @@
 
                     </div>
                 </div>
-                <div class="col-md-8 right-sid ebox">
+                <div class="col-md-12 right-sidebox">
 
                     <div class="row">
                         <div class="col-6">

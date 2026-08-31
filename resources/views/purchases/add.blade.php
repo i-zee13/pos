@@ -629,7 +629,7 @@
     <div class="container-fluid">
         <form id="form" enctype="multipart/form-data" class="">
             @csrf
-            <div class="row purchase-layout" id="purchaseLayout">
+            <div class="row purchase-layout invoice-layout" id="purchaseLayout">
 
                 <input type="hidden" id="hidden_invoice_id" class="form-control " value="{{@$invoice->id}}" name="hidden_invoice_id">
                 <input type="hidden" id="curren_customer_id" class="form-control " value="{{@$invoice->customer_id}}" name="customer_id">
@@ -639,7 +639,7 @@
 
                 <input type="hidden" id="" value="1" name="form_status">
                 <!-- <input type="hidden" id="stock_products"   value="{{json_encode($products)}}"> -->
-                <div class="col-md-4 left-sidebox ">
+                <div class="col-md-12 left-sidebox ">
                     <div class="sidebox-content text-white" style="background-color: #152e4d">
                         <div class="CT_sec">
                             <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
@@ -688,7 +688,7 @@
                                     <div class="col-md-12 mt-5">
                                         <label class="font13 mb-5">Description</label>
                                         <div class="form-s2">
-                                            <textarea rows="4" name="description" id="description">{{@$invoice->description}}</textarea>
+                                            <textarea rows="1" name="description" id="description" placeholder="Description">{{@$invoice->description}}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -709,14 +709,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-8 right-sidebox">
+                <div class="col-md-12 right-sidebox">
                     <div class="row">
                         <div class="col-12">
                             <div class="purchase-layout-toolbar">
                                 <h2 class="title font22 PT-10 mb-10">{{Route::currentRouteName() == 'purchase-edit' ? 'Update' : 'New'}} Purchase <span>Invoice</span></h2>
-                                <button type="button" class="btn-toggle-invoice-sidebar" id="togglePurchaseSidebar" title="Show/hide invoice details">
-                                    Hide details
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -937,33 +934,6 @@
 </div>
 @endsection
 @push('js')
-<script>
-(function () {
-    var layout = document.getElementById('purchaseLayout');
-    var btn = document.getElementById('togglePurchaseSidebar');
-    if (!layout || !btn) return;
-
-    var key = 'purchaseInvoiceSidebarCollapsed';
-    function apply(collapsed) {
-        layout.classList.toggle('sidebar-collapsed', collapsed);
-        btn.textContent = collapsed ? 'Show details' : 'Hide details';
-        try { localStorage.setItem(key, collapsed ? '1' : '0'); } catch (e) {}
-    }
-
-    // Default collapsed on narrow desktop windows so product table has room
-    var saved = null;
-    try { saved = localStorage.getItem(key); } catch (e) {}
-    if (saved === null) {
-        apply(window.innerWidth < 1200);
-    } else {
-        apply(saved === '1');
-    }
-
-    btn.addEventListener('click', function () {
-        apply(!layout.classList.contains('sidebar-collapsed'));
-    });
-})();
-</script>
 <script src="{{mix('js/custom/stock.js')}}"> </script>
 
 @endpush

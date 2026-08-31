@@ -47,7 +47,7 @@ class ProductReplacementController extends Controller
             // $invoice->amount_received      =  $invoice->total_invoice_amount != $request->grand_total ?  $invoice->amount_received+$request->amount_received : $request->amount_received;
         } else {
             $invoice     = new ProductReplacementInvoice();
-             $invoice_no  =   getProductReplacementNo();
+             $invoice_no  =   getProductReplacementNo($request->invoice_date);
             isEditable($request->customer_id);
         }
 
@@ -182,11 +182,14 @@ class ProductReplacementController extends Controller
                 $customer_ledger->customer_id = $request->customer_id;
                 $customer_ledger->trx_type    = 1;  //Sale
                 $customer_ledger->is_deleted  = 0;
+                $customer_ledger->is_editable = 1; // SQLite NOT NULL
                 $customer_ledger->comment     = '';
                 $customer_ledger->dr          = $invoice->total_invoice_amount -   ($request->hidden_invoice_id ? 0 :  $balance);
                 $customer_ledger->balance     = ($invoice->total_invoice_amount - $customer_ledger->cr); //balance
-                $customer_ledger->created_by  = Auth::id();
+                $customer_ledger->created_by  = Auth::id() ?: 1;
                 $customer_ledger->product_replacement_invoice_id = $invoice->id;
+                // SQLite: sale_invoice_id is NOT NULL
+                $customer_ledger->sale_invoice_id = (int) ($customer_ledger->sale_invoice_id ?? 0);
                 $customer_ledger->save();
                 Customer::where('id', $request->customer_id)->update([
                     'balance' => $customer_ledger->balance,

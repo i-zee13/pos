@@ -69,7 +69,7 @@ class SaleController extends Controller
         } else {
             $invoice      = new SaleInvoice();
             isEditable($request->customer_id);
-            $invoice_no   =   getInvoice();
+            $invoice_no   =   getInvoice($request->invoice_date);
             $invoice->invoice_no        = $invoice_no;
             $invoice->updated_at        = Null;
             $invoice->updated_by        = Null;
@@ -196,10 +196,11 @@ class SaleController extends Controller
                 $customer_ledger->customer_id = $request->customer_id;
                 $customer_ledger->trx_type    = 1;  //Sale
                 $customer_ledger->is_deleted  = 0;
+                $customer_ledger->is_editable = 1; // SQLite NOT NULL
                 $customer_ledger->comment     = '';
                 $customer_ledger->dr          =  $invoice->total_invoice_amount - $balance;
                 $customer_ledger->balance     = ($invoice->total_invoice_amount - $customer_ledger->cr); //balance
-                $customer_ledger->created_by  = Auth::id();
+                $customer_ledger->created_by  = Auth::id() ?: 1;
                 $customer_ledger->sale_invoice_id = $invoice->id;
                 $customer_ledger->save();
                 Customer::where('id', $request->customer_id)->update([

@@ -277,19 +277,29 @@ $(document).ready(function () {
                         $('#saveTransaction').text('Save');
                         $('#notifDiv').fadeIn();
                         $('#notifDiv').css('background', 'red');
-                        $('#notifDiv').text('Not Updated at this moment');
+                        $('#notifDiv').text(response.msg || 'Not Updated at this moment');
                         setTimeout(() => {
                             $('#notifDiv').fadeOut();
                         }, 3000);
                     }
                 },
                 error: function (err) {
-                    if (err.status == 422) {
+                    $('#saveTransaction').removeAttr('disabled').text('Save');
+                    $('#cancelSubCat').removeAttr('disabled');
+                    let msg = (err.responseJSON && err.responseJSON.msg)
+                        ? err.responseJSON.msg
+                        : 'Transaction save failed';
+                    if (err.status == 422 && err.responseJSON && err.responseJSON.errors) {
                         $.each(err.responseJSON.errors, function (i, error) {
                             var el = $(document).find('[name="' + i + '"]');
                             el.after($('<small style="color: red; position: absolute; width:100%; text-align: right; margin-left: -30px">' + error[0] + '</small>'));
                         });
+                        msg = 'Please fix form errors';
                     }
+                    $('#notifDiv').fadeIn().css('background', 'red').text(msg);
+                    setTimeout(() => {
+                        $('#notifDiv').fadeOut();
+                    }, 4000);
                 }
             });
         }

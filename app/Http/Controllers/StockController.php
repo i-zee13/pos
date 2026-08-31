@@ -80,13 +80,22 @@ class StockController extends Controller
 
         if (!$stock) {
             $stock = new StockManagment();
+            $stock->amount = 0;
+            $stock->ttl_cost = 0;
+            $stock->ttl_avg_cost = 0;
+            $stock->created_by = Auth::id() ?: 1;
         }
-        $stock->vendor_id   = $purchase->vendor_id;
-        $stock->company_id  = $purchase->company_id;
-        $stock->product_id  = $purchase->product_id;
-        $balance            = $In_out_status == 2 ? $stock->balance - $stock_qty : $stock->balance +  $stock_qty;
+        $stock->vendor_id   = (int) ($purchase->vendor_id ?? $purchase->customer_id ?? 0);
+        $stock->company_id  = (int) ($purchase->company_id ?? 0);
+        $stock->product_id  = (int) ($purchase->product_id ?? 0);
+        $balance            = $In_out_status == 2
+            ? ((float) ($stock->balance ?? 0)) - (float) $stock_qty
+            : ((float) ($stock->balance ?? 0)) + (float) $stock_qty;
         $stock->balance     = $balance;
-        $stock->vs_id       = $vendor_stock_id;
+        $stock->vs_id       = $vendor_stock_id ?: 0;
+        $stock->amount      = $stock->amount ?? 0;
+        $stock->ttl_cost    = $stock->ttl_cost ?? 0;
+        $stock->ttl_avg_cost = $stock->ttl_avg_cost ?? 0;
         $stock->save();
     }
     public function purchaseInvoice(Request $request)
@@ -95,12 +104,14 @@ class StockController extends Controller
         // dd($request->all());
         if ($request->hidden_invoice_id) {
             $invoice = PurchaseInvoice::where('id', $request->hidden_invoice_id)->first();
+            $invoice->invoice_no = $request->invoice_no ?: $invoice->invoice_no;
         } else {
             isEditable($request->customer_id);
             $invoice = new PurchaseInvoice();
+            // Always allocate next number on save (don't reuse stale form value)
+            $invoice->invoice_no = getPurchaseInvoice($request->invoice_date);
         }
         $invoice->date                 = $request->invoice_date;
-        $invoice->invoice_no           = $request->invoice_no;
         $invoice->invoice_type         = $request->invoice_type;
         $invoice->customer_id          = $request->customer_id;
         if ($request->invoice_type == 1) {

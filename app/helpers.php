@@ -305,99 +305,125 @@ if (!function_exists('GetCurrentLocation')) {
         return Location::get($ip);
     }
 }
-if (!function_exists('getInvoice')) {
-    function getInvoice()
+if (!function_exists('nextDailyInvoiceNo')) {
+    /**
+     * Next invoice number for a day: "{seq}-{j-n-y}" e.g. 3-27-8-26
+     * Uses MAX(numeric prefix) for that day (not row count) so deletes don't collide,
+     * includes soft-deleted rows, and compares dates as Y-m-d (SQLite-safe).
+     *
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
+     */
+    function nextDailyInvoiceNo(string $modelClass, string $dateColumn = 'date', string $invoiceColumn = 'invoice_no', $forDate = null): string
     {
-        $year           = date('y');
-        $invoice_no     = 1;
-        $lastinvoice    = SaleInvoice::where('date', Carbon::today())->count();
-        $invoice_no     = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
-        return $invoice_no;
+        $day = $forDate
+            ? Carbon::parse($forDate)->toDateString()
+            : Carbon::today()->toDateString();
+        $suffix = Carbon::parse($day)->format('j-n-y');
+
+        $usesSoftDeletes = in_array(
+            \Illuminate\Database\Eloquent\SoftDeletes::class,
+            class_uses_recursive($modelClass),
+            true
+        );
+        $query = $usesSoftDeletes ? $modelClass::withTrashed() : $modelClass::query();
+
+        $numbers = $query->whereDate($dateColumn, $day)->pluck($invoiceColumn);
+
+        $max = 0;
+        foreach ($numbers as $invoiceNo) {
+            $prefix = (int) explode('-', (string) $invoiceNo, 2)[0];
+            if ($prefix > $max) {
+                $max = $prefix;
+            }
+        }
+
+        return ($max + 1) . '-' . $suffix;
+    }
+}
+
+if (!function_exists('getInvoice')) {
+    function getInvoice($date = null)
+    {
+        return nextDailyInvoiceNo(SaleInvoice::class, 'date', 'invoice_no', $date);
     }
 }
 
 if (!function_exists('getPurchaseInvoice')) {
-    function getPurchaseInvoice()
+    function getPurchaseInvoice($date = null)
     {
-        $year        = date('y');
-        $invoice_no  = 1;
-        $lastinvoice = PurchaseInvoice::where('date', Carbon::today())->count();
-        $invoice_no  = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::now();
-
-        return $invoice_no;
+        return nextDailyInvoiceNo(PurchaseInvoice::class, 'date', 'invoice_no', $date);
     }
 }
 if (!function_exists('getProductReplacementNo')) {
-    function getProductReplacementNo()
+    function getProductReplacementNo($date = null)
     {
-        $invoice_no    = 1;
-        $lastinvoice   = ProductReplacementInvoice::where('date', Carbon::today())->count();
-
-        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' .Carbon::now();
-
-        return $invoice_no;
+        return nextDailyInvoiceNo(ProductReplacementInvoice::class, 'date', 'invoice_no', $date);
     }
 }
 if (!function_exists('getSaleReturnNo')) {
-    function getSaleReturnNo()
+    function getSaleReturnNo($date = null)
     {
-        $invoice_no    = 1;
-        $lastinvoice   = SaleReturn::where('date', Carbon::today())->count();
-
-        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::now();
-
-        return $invoice_no;
+        return nextDailyInvoiceNo(SaleReturn::class, 'date', 'invoice_no', $date);
     }
 }
 if (!function_exists('getPurchaseReturnNo')) {
-    function getPurchaseReturnNo()
+    function getPurchaseReturnNo($date = null)
     {
-        $invoice_no    = 1;
-        $lastinvoice   = ReturnInvoice::where('date', Carbon::today())->count();
-        $invoice_no    = ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::now();
-        return $invoice_no;
+        return nextDailyInvoiceNo(ReturnInvoice::class, 'date', 'invoice_no', $date);
     }
 }
 if (!function_exists('getCrvNo')) {
     function getCrvNo()
     {
-        $invoice_no    = 1;
-        $lastinvoice   = CustomerLedger::where('date', Carbon::today())->where('trx_type', 3)->where('cr', '>', 0)->count();
+        $today = Carbon::today()->toDateString();
+        $lastinvoice = CustomerLedger::whereDate('date', $today)
+            ->where('trx_type', 3)
+            ->where('cr', '>', 0)
+            ->count();
 
-        $invoice_no    = 'Crv -' . ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+        $seq = $lastinvoice ? $lastinvoice + 1 : 1;
 
-        return $invoice_no;
+        return 'Crv -' . $seq . '-' . Carbon::today()->format('j-n-y');
     }
 }
 if (!function_exists('getCpvNo')) {
     function getCpvNo()
     {
-        $invoice_no    = 1;
-        $lastinvoice   = CustomerLedger::where('date', Carbon::today())->where('trx_type', 3)->where('dr', '>', 0)->count();
+        $today = Carbon::today()->toDateString();
+        $lastinvoice = CustomerLedger::whereDate('date', $today)
+            ->where('trx_type', 3)
+            ->where('dr', '>', 0)
+            ->count();
 
-        $invoice_no    = 'Cpv -' . ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+        $seq = $lastinvoice ? $lastinvoice + 1 : 1;
 
-        return $invoice_no;
+        return 'Cpv -' . $seq . '-' . Carbon::today()->format('j-n-y');
     }
 }
 if (!function_exists('getVendorCrvNo')) {
     function getVendorCrvNo()
     {
-        $invoice_no    = 1;
-        $lastinvoice   = VendorLedger::where('date', Carbon::today())->where('trx_type', 3)->where('cr', '>', 0)->count();
-        $invoice_no    = 'Crv-' .  ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+        $today = Carbon::today()->toDateString();
+        $lastinvoice = VendorLedger::whereDate('date', $today)
+            ->where('trx_type', 3)
+            ->where('cr', '>', 0)
+            ->count();
+        $seq = $lastinvoice ? $lastinvoice + 1 : 1;
 
-        return $invoice_no;
+        return 'Crv-' . $seq . '-' . Carbon::today()->format('j-n-y');
     }
 }
 if (!function_exists('getVendorCpvNo')) {
     function getVendorCpvNo()
     {
-        $invoice_no    = 1;
-        $lastinvoice   = VendorLedger::where('date', Carbon::today())->where('trx_type', 3)->where('dr', '>', 0)->count();
-        $invoice_no    = 'Cpv -' . ($lastinvoice ? $lastinvoice + 1 : $invoice_no) . '-' . Carbon::today()->format('j-n-y');
+        $today = Carbon::today()->toDateString();
+        $lastinvoice = VendorLedger::whereDate('date', $today)
+            ->where('trx_type', 3)
+            ->where('dr', '>', 0)
+            ->count();
+        $seq = $lastinvoice ? $lastinvoice + 1 : 1;
 
-        return $invoice_no;
+        return 'Cpv -' . $seq . '-' . Carbon::today()->format('j-n-y');
     }
 }
 
@@ -524,15 +550,17 @@ function updateStock($sale, $balance, $qty_value, $In_out_status, $invoice_type,
     $product_unit_price     =  $sale->product_unit_price ?? $sale->purchase_price;
 
     $v                       =  new VendorStock();
-    $v->vendor_id            =  $sale->vendor_id;
+    $v->vendor_id            =  $sale->vendor_id ?? null;
     // if ($transaction_type !== 1 || $transaction_type !== 3) {
-    $v->customer_id          =  $sale->customer_id;
+    $v->customer_id          =  $sale->customer_id ?? null;
     // }
     $v->transaction_type     =  $transaction_type;
     $v->qty                  =  $qty_value;
     $v->status               =  $In_out_status;
-    $v->balance              =  $In_out_status  == 2 ? $balance - $qty_value : $balance +  $qty_value;
-    $v->actual_qty           =  $sale->qty;
+    $v->balance              =  $In_out_status  == 2
+        ? ((float) ($balance ?? 0)) - (float) $qty_value
+        : ((float) ($balance ?? 0)) + (float) $qty_value;
+    $v->actual_qty           =  $sale->actual_qty ?? $sale->qty ?? $qty_value ?? 0;
     $v->invoice_no           =  $sale->invoice_no ?: 'N/A';
     $v->company_id           =  $sale->company_id ?: 0;
     $v->product_id           =  $sale->product_id;
@@ -1434,42 +1462,57 @@ function deleteProductFields($v, $sale, $type, $prod_type = null)
 }
 function StockManagment($vendor_stock_id, $purchase, $stock_qty, $In_out_status)
 {
- 
-    // $prod   = DB::select("SELECT 
-    //                         IFNULL(SUM(batch_wise_balance), 0) AS ttl_balance,
-    //                         IFNULL(SUM(ttl_cost_price), 0) AS ttl_cost
-    //                     FROM stock_batches_items 
-    //                     WHERE product_id = $purchase->product_id")[0];   
-    $stock = StockManagment::where('product_id', $purchase->product_id)
-                            ->where('company_id', $purchase->company_id)
+    $companyId = (int) ($purchase->company_id ?? 0);
+    $productId = (int) ($purchase->product_id ?? 0);
+    // Desktop SQLite: vendor_stock_managment.vendor_id is NOT NULL
+    $vendorId = (int) ($purchase->vendor_id
+        ?? $purchase->customer_id
+        ?? 0);
+    // Delete/edit often pass VendorStock rows where vendor_id may be null —
+    // fall back to last known stock-management / purchase line vendor.
+    if ($vendorId <= 0 && $productId > 0) {
+        $vendorId = (int) (StockManagment::where('product_id', $productId)
+            ->where('company_id', $companyId)
+            ->orderBy('id', 'DESC')
+            ->value('vendor_id') ?: 0);
+    }
+    if ($vendorId <= 0 && $productId > 0) {
+        $vendorId = (int) (DB::table('products_purchases')
+            ->where('product_id', $productId)
+            ->orderBy('id', 'DESC')
+            ->value('vendor_id') ?: 0);
+    }
+
+    $stock = StockManagment::where('product_id', $productId)
+                            ->where('company_id', $companyId)
                             ->orderBy('id', 'DESC')->first();
-    $isNew = false;
     if (!$stock) {
-        $isNew = true;
-        $stock                  = new StockManagment();  
-        $stock->company_name    = DB::table('companies')->where('id', $purchase->company_id)->value('company_name');
-        $stock->product_name    = DB::table('products')->where('id', $purchase->product_id)->value('product_name');
+        $stock                  = new StockManagment();
+        $stock->company_name    = DB::table('companies')->where('id', $companyId)->value('company_name');
+        $stock->product_name    = DB::table('products')->where('id', $productId)->value('product_name');
         $stock->balance         = 0;
         $stock->amount          = 0;
         $stock->ttl_cost        = 0;
         $stock->ttl_avg_cost    = 0;
         $stock->created_by      = Auth::id() ?: 1;
     }
-    $stock->company_id      = $purchase->company_id ?: 0;
-    $stock->product_id      = $purchase->product_id;
-    $stock->purchase_price  = $purchase->purchase_price;
-    $balance                = $In_out_status == 2 ? ((float) $stock->balance) - $stock_qty : ((float) $stock->balance) +  $stock_qty;
+    $stock->vendor_id       = $vendorId ?: (int) ($stock->vendor_id ?? 0);
+    $stock->company_id      = $companyId;
+    $stock->product_id      = $productId;
+    $stock->purchase_price  = $purchase->purchase_price ?? 0;
+    $balance                = $In_out_status == 2
+        ? ((float) ($stock->balance ?? 0)) - (float) $stock_qty
+        : ((float) ($stock->balance ?? 0)) + (float) $stock_qty;
     $stock->balance         = $balance;
-    $stock->vs_id           = $vendor_stock_id;
+    $stock->vs_id           = $vendor_stock_id ?: 0;
     $stock->amount          = $stock->amount ?? 0;
     $stock->ttl_cost        = $stock->ttl_cost ?? 0;
     $stock->ttl_avg_cost    = $stock->ttl_avg_cost ?? 0;
     if (empty($stock->created_by)) {
         $stock->created_by = Auth::id() ?: 1;
     }
-    
-    // $stock->ttl_avg_cost = $prod->ttl_cost > 0 ? $prod->ttl_cost / $prod->ttl_balance : 0;
-    $stock->save();  
+
+    $stock->save();
     return $stock;
 }
 function BatchWiseDeleteProduct($delete_for, $product, $qty, $in_out, $type)
@@ -1502,14 +1545,21 @@ function customerLedger($request,$column){
     $bbalance                    =  $column == 'sale_return_invoice_id' ?  abs(((-$balance) + $c->dr) - $c->cr) :  ($balance + $c->cr) - $c->dr;
     $cust_ldr                    =  new  CustomerLedger();
     $cust_ldr->cr                =  0;
-    $cust_ldr->date              =  $c->invoice_date;
+    $cust_ldr->date              =  $c->date ?? $c->invoice_date ?? now()->toDateString();
     $cust_ldr->customer_id       =  $c->customer_id;
     $cust_ldr->trx_type          =  4; //Delete Invoice   
-    $cust_ldr->is_deleted        =  1; //Delete Invoice    
+    $cust_ldr->is_deleted        =  1; //Delete Invoice
+    $cust_ldr->is_editable       =  0;
     $cust_ldr->comment           =  'Sale Invoice Deleted '; 
-    $cust_ldr->cr                =  $c->dr;
-    $cust_ldr->balance           =  $bbalance; 
-    $cust_ldr->created_by        =  Auth::id(); 
+    $cust_ldr->cr                =  $c->dr ?? 0;
+    $cust_ldr->dr                =  0;
+    $cust_ldr->balance           =  $bbalance ?? 0;
+    // SQLite: sale_invoice_id is NOT NULL — keep original invoice id on reversing row
+    $cust_ldr->sale_invoice_id   =  (int) ($c->sale_invoice_id ?? $request->id ?? 0);
+    if (!empty($c->sale_return_invoice_id)) {
+        $cust_ldr->sale_return_invoice_id = $c->sale_return_invoice_id;
+    }
+    $cust_ldr->created_by        =  Auth::id() ?: 1;
     $cust_ldr->save();
     $c->is_deleted               =  1; //Delete Invoice    
     $c->save();
@@ -1522,26 +1572,32 @@ function customerLedger($request,$column){
 function vendorLedger($request,$column){
     $balance                     =      VendorLedger::where('customer_id', $request->customer_id)->orderBy('id', 'DESC')->value('balance');
     $c                           =      VendorLedger::where($column, $request->id)->orderBy('id', 'DESC')->first();
+    if (!$c) {
+        return;
+    }
     $cust_ldr                    =      new  VendorLedger();
     if($column == 'purchase_return_invoice_id'){
         $comment                 =      ($request->deleting_product == 1 ? 'Product' : 'Purchase Return Invoice') .' Deleted';
-        $cust_ldr->cr            =      $c->dr;
+        $cust_ldr->cr            =      $c->dr ?? 0;
         $cust_ldr->dr            =      0;
         $cust_ldr->purchase_return_invoice_id =  $c->purchase_return_invoice_id;
+        // SQLite: purchase_invoice_id is NOT NULL
+        $cust_ldr->purchase_invoice_id = (int) ($c->purchase_invoice_id ?? 0);
     }else{
         $comment                 =      ($request->deleting_product == 1 ? 'Product' : 'Purchase Invoice') .' Deleted';
-        $cust_ldr->dr            =      $c->cr;
+        $cust_ldr->dr            =      $c->cr ?? 0;
         $cust_ldr->cr            =      0;
-        $cust_ldr->purchase_invoice_id   =  $c->purchase_invoice_id;
+        $cust_ldr->purchase_invoice_id   =  (int) ($c->purchase_invoice_id ?? $request->id ?? 0);
     }
     
-    $cust_ldr->balance           = ($balance + $c->dr) - $c->cr;  
-    $cust_ldr->date              =  $c->invoice_date;
+    $cust_ldr->balance           = (($balance ?? 0) + ($c->dr ?? 0)) - ($c->cr ?? 0);
+    $cust_ldr->date              =  $c->date ?? $c->invoice_date ?? now()->toDateString();
     $cust_ldr->customer_id       =  $c->customer_id;
     $cust_ldr->trx_type          =  4; //Delete Invoice    
-    $cust_ldr->is_deleted        =  1; //Delete Invoice    
+    $cust_ldr->is_deleted        =  1; //Delete Invoice
+    $cust_ldr->is_editable       =  0;
     $cust_ldr->comment           =  $comment; 
-    $cust_ldr->created_by        =  Auth::id(); 
+    $cust_ldr->created_by        =  Auth::id() ?: 1;
     $cust_ldr->save();
     $c->is_deleted                =  1; //Delete Invoice    
     $c->save();

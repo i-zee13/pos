@@ -53,7 +53,7 @@ class SalesReturnController extends Controller
               $invoice_no = $invoice->invoice_no;
         } else {
             $invoice     = new SaleReturn();
-              $invoice_no  =   getSaleReturnNo();
+              $invoice_no  =   getSaleReturnNo($request->invoice_date);
             isEditable($request->customer_id);
         }
         $invoice->amount_received      = $request->amount_received;
@@ -187,6 +187,7 @@ class SalesReturnController extends Controller
                 $customer_ledger->date        = $request->invoice_date;
                 $customer_ledger->customer_id = $request->customer_id;
                 $customer_ledger->is_deleted  = 0;
+                $customer_ledger->is_editable = 1; // SQLite NOT NULL
                 $customer_ledger->comment     = '';
                 $customer_ledger->trx_type    = 2;
                 //Return
@@ -196,8 +197,10 @@ class SalesReturnController extends Controller
                     $customer_ledger->balance     =  $request->previous_receivable - $total_cr +  $customer_ledger->dr; //balance
                 }
 
-                $customer_ledger->created_by  = FacadesAuth::id();
+                $customer_ledger->created_by  = FacadesAuth::id() ?: 1;
                 $customer_ledger->sale_return_invoice_id = $invoice->id;
+                // SQLite: sale_invoice_id is NOT NULL
+                $customer_ledger->sale_invoice_id = (int) ($customer_ledger->sale_invoice_id ?? 0);
                 $customer_ledger->save();
                 Customer::where('id', $request->customer_id)->update([
                     'balance' => $customer_ledger->balance,

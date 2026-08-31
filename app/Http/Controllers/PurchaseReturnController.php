@@ -70,7 +70,7 @@ class PurchaseReturnController extends Controller
             $invoice_no = $invoice->invoice_no;
         } else {
             $invoice = new ReturnInvoice();
-            $invoice_no  =   getPurchaseReturnNo();
+            $invoice_no  =   getPurchaseReturnNo($request->invoice_date);
             isEditable($request->customer_id);
         }
         $invoice->date                 = $request->invoice_date;
@@ -196,15 +196,18 @@ class PurchaseReturnController extends Controller
                 $customer_ledger->dr            = $total_dr;
                 $customer_ledger->cr            = $request->service_charges +  $invoice->paid_amount ?? 0;
                 $customer_ledger->is_deleted    = 0;
+                $customer_ledger->is_editable   = 1; // SQLite NOT NULL
                 $customer_ledger->comment       = '';
                 $customer_ledger->paid_p_return_amount = $invoice->paid_amount;
                 $customer_ledger->purchase_return_invoice_id = $invoice->id;
+                // SQLite: purchase_invoice_id is NOT NULL
+                $customer_ledger->purchase_invoice_id = (int) ($customer_ledger->purchase_invoice_id ?? 0);
                 if ($invoice->invoice_type ==  1 && $invoice->invoice_remaining_amount_after_pay == $invoice->amount_received) {
                     $customer_ledger->balance   =  0; //balance
                 } else {
                     $customer_ledger->balance   =  $request->previous_receivable - $total_dr +  $customer_ledger->cr; //balance
                 }
-                $customer_ledger->created_by = Auth::id();
+                $customer_ledger->created_by = Auth::id() ?: 1;
                 $customer_ledger->save();
 
 

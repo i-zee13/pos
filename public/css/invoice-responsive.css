@@ -1,13 +1,6 @@
 /* =====================================================================
-   Invoice creation pages responsiveness
-   ---------------------------------------------------------------------
-   Pages: Sale Add, Purchase Add, Sale Return Add, Purchase Return Add,
-          Replacement (and their detail views).
-
-   Desktop Electron / tablet windows are often ~1000–1280px. Old layout used
-   fixed flex widths (.left-sidebox ~420px + .right-sidebox ~1056px) which
-   crushed the product table. These rules keep the table horizontally
-   scrollable and allow the invoice-details sidebar to collapse.
+   Invoice creation pages — horizontal details bar + fluid product area
+   Pages: Sale, Purchase, Sale Return, Purchase Return, Replacement
    ===================================================================== */
 
 /* Always allow product table to scroll horizontally when columns don't fit */
@@ -22,51 +15,197 @@
     min-width: 880px;
 }
 
-/* Prefer fluid right column when the shared class name is present */
 .right-sidebox {
     min-width: 0;
 }
 
-/* Tablets & narrow laptop / Electron windows */
-@media (max-width: 1399.98px) {
-    .left-sidebox {
-        -ms-flex: 0 0 280px !important;
-        flex: 0 0 280px !important;
-        max-width: 280px !important;
+/* ---------- Horizontal invoice-details bar (desktop / Electron) ---------- */
+.invoice-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.invoice-layout > .left-sidebox {
+    -ms-flex: 0 0 100% !important;
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 10px 15px 0 !important;
+}
+
+.invoice-layout > .right-sidebox {
+    -ms-flex: 0 0 100% !important;
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 8px 15px 15px !important;
+}
+
+.invoice-layout .sidebox-content {
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    flex-direction: column !important;
+    border-radius: 6px;
+}
+
+.invoice-layout .sidebox-content .CT_sec {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px 12px;
+    width: 100%;
+    padding: 10px 14px 12px;
+    box-sizing: border-box;
+}
+
+/* Main heading full width */
+.invoice-layout .sidebox-content .CT_sec > .title.pt-0,
+.invoice-layout .sidebox-content .CT_sec > h2.title.pt-0 {
+    flex: 0 0 100%;
+    width: 100%;
+    font-size: 16px !important;
+    margin: 0 0 2px !important;
+    padding: 0 0 6px !important;
+}
+
+/* Field groups in one horizontal row */
+.invoice-layout .sidebox-content .CT_sec > .col-md-12,
+.invoice-layout .sidebox-content .CT_sec > .form-wrap {
+    flex: 1 1 140px;
+    max-width: 210px;
+    width: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.invoice-layout .sidebox-content .CT_sec > .form-wrap .row,
+.invoice-layout .sidebox-content .CT_sec > .form-wrap [class*="col-"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    float: none;
+}
+
+.invoice-layout .sidebox-content .CT_sec > .form-wrap:has(textarea) {
+    flex: 1 1 200px;
+    max-width: 320px;
+}
+
+.invoice-layout .sidebox-content textarea {
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 80px;
+    resize: vertical;
+    padding: 4px 8px !important;
+    line-height: 1.3;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Secondary “Invoice Details / Vendor Ledger” + balances — compact trailing cluster */
+.invoice-layout .sidebox-content .CT_sec > h2.title.border-bottom:not(.pt-0) {
+    flex: 0 0 auto;
+    font-size: 13px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-bottom: none !important;
+    white-space: nowrap;
+    align-self: center;
+}
+
+.invoice-layout .sidebox-content .CT_sec > .row.CompanyInfo {
+    flex: 1 1 180px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 14px;
+    margin: 0 !important;
+    width: auto;
+    max-width: none;
+    line-height: 1.35;
+}
+
+.invoice-layout .sidebox-content .CT_sec > .row.CompanyInfo > [class*="col-"] {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
+}
+
+.invoice-layout .sidebox-content label.font13 {
+    display: block;
+    margin-bottom: 3px !important;
+    font-size: 11px !important;
+    white-space: nowrap;
+    opacity: 0.95;
+}
+
+.invoice-layout .sidebox-content .form-control,
+.invoice-layout .sidebox-content select.form-control {
+    height: 32px !important;
+    padding: 2px 8px !important;
+    font-size: 13px !important;
+}
+
+.invoice-layout .sidebox-content .select2-container {
+    width: 100% !important;
+}
+
+.invoice-layout .sidebox-content .select2-container .select2-selection--single {
+    height: 32px !important;
+}
+
+.invoice-layout .sidebox-content .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 30px !important;
+}
+
+.invoice-layout .sidebox-content .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 30px !important;
+}
+
+.invoice-layout .sidebox-content #fetch-customers {
+    float: none !important;
+    margin: 0 0 3px 4px !important;
+    padding: 1px 8px !important;
+    vertical-align: middle;
+}
+
+/* Purchase: hide old vertical-sidebar collapse control (bar is already compact) */
+.invoice-layout .btn-toggle-invoice-sidebar,
+.invoice-layout .purchase-layout-toolbar .btn-toggle-invoice-sidebar {
+    display: none !important;
+}
+
+/* Narrow windows: fields wrap; still full-width bar */
+@media (max-width: 900px) {
+    .invoice-layout .sidebox-content .CT_sec > .col-md-12,
+    .invoice-layout .sidebox-content .CT_sec > .form-wrap {
+        flex: 1 1 46%;
+        max-width: 100%;
     }
 
-    .right-sidebox {
-        -ms-flex: 1 1 auto !important;
-        flex: 1 1 auto !important;
-        max-width: none !important;
-        width: auto !important;
-    }
-
-    .sidebox-content {
-        min-height: auto !important;
+    .ProductTable {
+        min-width: 720px;
     }
 }
 
-@media (max-width: 1023.98px) {
-    .left-sidebox,
-    .right-sidebox {
-        -ms-flex: 0 0 100% !important;
-        flex: 0 0 100% !important;
-        max-width: 100% !important;
-        padding-left: 15px !important;
-        padding-right: 15px !important;
-    }
-
-    .left-sidebox {
-        margin-bottom: 15px;
-    }
-}
-
-/* Phones: tighten paddings and let the title/header wrap nicely */
 @media (max-width: 575.98px) {
-    .right-sidebox {
+    .invoice-layout > .left-sidebox,
+    .invoice-layout > .right-sidebox {
         padding-left: 10px !important;
         padding-right: 10px !important;
+    }
+
+    .invoice-layout .sidebox-content .CT_sec > .col-md-12,
+    .invoice-layout .sidebox-content .CT_sec > .form-wrap {
+        flex: 1 1 100%;
     }
 
     .right_Info {
@@ -76,19 +215,5 @@
     .title,
     .title.font22 {
         font-size: 18px !important;
-        padding-top: 10px !important;
-    }
-
-    .right-sidebox > .row {
-        margin-left: 0;
-        margin-right: 0;
-    }
-
-    .totalValues {
-        font-size: 13px;
-    }
-
-    .ProductTable {
-        min-width: 720px;
     }
 }

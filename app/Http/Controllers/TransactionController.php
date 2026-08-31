@@ -93,110 +93,192 @@ class TransactionController extends Controller
       ]);
    }
    public function store(Request $request)
-   { 
-        if ($request->operation == 'vendor') {
+   {
+      try {
+         if (empty($request->hidden_cust_id) || !is_array($request->hidden_cust_id)) {
+            return response()->json([
+               'msg'    => 'Please select a customer',
+               'status' => 'failed',
+            ], 422);
+         }
 
-         foreach ($request->hidden_cust_id as $key => $customer) {
-            $balance             =  VendorLedger::where('customer_id', $customer)->where('is_editable', '!=',1)->orderBy('id', 'desc')->value('balance'); 
-            if ($request->action == 'edit') {
-               $ledger           =   VendorLedger::where('customer_id', $customer)->where('is_editable', 1)->where('trx_type', 3)->orderBy('created_at', 'desc')->first();
-            } else {
-               $ledger           =   new VendorLedger();
-               isEditable($customer);
-               $balance          =  VendorLedger::where('customer_id', $customer)->where('is_editable', '!=',1)->orderBy('id', 'desc')->value('balance'); 
-            }
-            if ($request->amount_to == 1) {  //1 = CR Ledger-jama
-               $ledger->cpv_no   =  getVendorCpvNo();
-               $ledger->balance  =  $balance - $request->amount[$key]; // minus jo mny dena hy .
-               $ledger->dr       =  $request->amount[$key];
-            } else { // DR Ledger-banam  
-               $ledger->crv_no   =  getVendorCrvNo();
-               $ledger->balance  =  $balance + $request->amount[$key];  // plus jo mny lena hy
-               $ledger->cr       =  $request->amount[$key];
-            }
+         $ledger = null;
 
-            $ledger->customer_id    =   $customer;
-            $ledger->trx_type       =   3;
-            $ledger->is_editable    =   1;
-            $ledger->comment        =   $request->comment[$key];    //Remarks of Payment
-            $ledger->date           =   $request->transaction_date;
-            $ledger->created_by     =   Auth::user()->id;
-            $ledger->created_at     = Carbon::now()->addMinutes(1);
-            if ($ledger->save()) {
-               Customer::where('id', $customer)->update(['balance' => $ledger->balance]);
+         if ($request->operation == 'vendor') {
+            foreach ($request->hidden_cust_id as $key => $customer) {
+               $balance = (float) (VendorLedger::where('customer_id', $customer)
+                  ->where('is_editable', '!=', 1)
+                  ->orderBy('id', 'desc')
+                  ->value('balance') ?? 0);
+
+               if ($request->action == 'edit') {
+                  $ledger = VendorLedger::where('customer_id', $customer)
+                     ->where('is_editable', 1)
+                     ->where('trx_type', 3)
+                     ->orderBy('created_at', 'desc')
+                     ->first();
+                  if (!$ledger) {
+                     $ledger = new VendorLedger();
+                  }
+               } else {
+                  $ledger = new VendorLedger();
+                  isEditable($customer);
+                  $balance = (float) (VendorLedger::where('customer_id', $customer)
+                     ->where('is_editable', '!=', 1)
+                     ->orderBy('id', 'desc')
+                     ->value('balance') ?? 0);
+               }
+
+               $amount = (float) ($request->amount[$key] ?? 0);
+               if ($request->amount_to == 1) {  //1 = CR Ledger-jama (payment to vendor)
+                  $ledger->cpv_no  = getVendorCpvNo();
+                  $ledger->balance = $balance - $amount;
+                  $ledger->dr      = $amount;
+                  $ledger->cr      = 0;
+               } else { // DR Ledger-banam
+                  $ledger->crv_no  = getVendorCrvNo();
+                  $ledger->balance = $balance + $amount;
+                  $ledger->cr      = $amount;
+                  $ledger->dr      = 0;
+               }
+
+               $ledger->customer_id         = $customer;
+               $ledger->trx_type            = 3;
+               $ledger->is_editable         = 1;
+               $ledger->is_deleted          = 0;
+               // SQLite: purchase_invoice_id is NOT NULL
+               $ledger->purchase_invoice_id = (int) ($ledger->purchase_invoice_id ?? 0);
+               $ledger->comment             = $request->comment[$key] ?? '';
+               $ledger->date                = $request->transaction_date ?: now()->toDateString();
+               $ledger->created_by          = Auth::id() ?: 1;
+               $ledger->created_at          = Carbon::now()->addMinutes(1);
+
+               if ($ledger->save()) {
+                  Customer::where('id', $customer)->update(['balance' => $ledger->balance]);
+               }
+            }
+         } else {
+            foreach ($request->hidden_cust_id as $key => $customer) {
+               $balance = (float) (CustomerLedger::where('customer_id', $customer)
+                  ->where('is_editable', '!=', 1)
+                  ->orderBy('id', 'desc')
+                  ->value('balance') ?? 0);
+
+               if ($request->action == 'edit') {
+                  $ledger = CustomerLedger::where('customer_id', $customer)
+                     ->where('is_editable', 1)
+                     ->where('trx_type', 3)
+                     ->orderBy('created_at', 'desc')
+                     ->first();
+                  if (!$ledger) {
+                     $ledger = new CustomerLedger();
+                  }
+               } else {
+                  $ledger = new CustomerLedger();
+                  isEditable($customer);
+                  $balance = (float) (CustomerLedger::where('customer_id', $customer)
+                     ->where('is_editable', '!=', 1)
+                     ->orderBy('id', 'desc')
+                     ->value('balance') ?? 0);
+               }
+
+               $amount = (float) ($request->amount[$key] ?? 0);
+               if ($request->amount_to == 1) {     //1 = CR Ledger-jama (cash received)
+                  $ledger->crv_no  = getCrvNo();
+                  $ledger->balance = $balance - $amount;
+                  $ledger->cr      = $amount;
+                  $ledger->dr      = 0;
+               } else {                            // DR Ledger-Banam
+                  $ledger->cpv_no  = getCpvNo();
+                  $ledger->balance = $balance + $amount;
+                  $ledger->dr      = $amount;
+                  $ledger->cr      = 0;
+               }
+
+               $ledger->customer_id      = $customer;
+               $ledger->trx_type         = 3;
+               $ledger->is_editable      = 1;
+               $ledger->is_deleted       = 0;
+               // SQLite: sale_invoice_id is NOT NULL — cash trx has no sale invoice
+               $ledger->sale_invoice_id  = (int) ($ledger->sale_invoice_id ?? 0);
+               $ledger->comment          = $request->comment[$key] ?? '';
+               $ledger->date             = $request->transaction_date ?: now()->toDateString();
+               $ledger->created_by       = Auth::id() ?: 1;
+               $ledger->created_at       = Carbon::now()->addMinutes(1);
+
+               if ($ledger->save()) {
+                  Customer::where('id', $customer)->update(['balance' => $ledger->balance]);
+               }
             }
          }
-      } else {
 
-         foreach ($request->hidden_cust_id as $key => $customer) { 
-            $balance                =  CustomerLedger::where('customer_id', $customer)->where('is_editable', '!=',1)->orderBy('id', 'desc')->value('balance');
-            if ($request->action == 'edit') {
-               $ledger              =   CustomerLedger::where('customer_id', $customer)->where('is_editable', 1)->where('trx_type', 3)->orderBy('created_at', 'desc')->first();
-            } else {
-               $ledger              =   new CustomerLedger();
-               isEditable($customer);
-               $balance             =  CustomerLedger::where('customer_id', $customer)->where('is_editable', '!=',1)->orderBy('id', 'desc')->value('balance'); 
-            }
-            if ($request->amount_to == 1) {     //1 = CR Ledger-jama
-               $ledger->crv_no   =  getCrvNo();
-               $ledger->balance  =  $balance - $request->amount[$key];
-               $ledger->cr       =  $request->amount[$key];
-            } else {                            // DR Ledger-Banam
-               $ledger->cpv_no   =  getCpvNo();
-               $ledger->balance  =  $balance + $request->amount[$key];
-               $ledger->dr       =  $request->amount[$key];
-            }
-         } 
-         $ledger->customer_id =   $customer;
-         $ledger->trx_type    =   3;
-         $ledger->is_editable =   1;
-         $ledger->comment     =   $request->comment[$key];    //Remarks of Payment
-         $ledger->date        =   $request->transaction_date;
-         $ledger->created_by  =   Auth::user()->id;
-         $ledger->created_at     = Carbon::now()->addMinutes(1);
-         if ($ledger->save()) { 
-            Customer::where('id', $customer)->update(['balance' => $ledger->balance]);
+         if (!$ledger) {
+            return response()->json([
+               'msg'    => 'No transaction saved',
+               'status' => 'failed',
+            ], 500);
          }
+
+         return response()->json([
+            'msg'            => 'Ledger Updated',
+            'status'         => 'success',
+            'transaction_id' => $ledger->id,
+            'customer_id'    => $ledger->customer_id,
+         ]);
+      } catch (\Throwable $e) {
+         \Log::error('transaction-store failed: '.$e->getMessage(), [
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+         ]);
+         return response()->json([
+            'msg'    => 'Transaction save failed: '.$e->getMessage(),
+            'status' => 'failed',
+         ], 500);
       }
-      return response()->json([
-         'msg'            =>  'Ledger Updated',
-         'status'         =>  'success',
-         'transaction_id' =>  $ledger->id,
-         'customer_id'    =>  $ledger->customer_id,
-      ]);
    }
    public function saveTransaction(Request $request)
-   {  
-       if($request->type == 'print'){
-         $customers = $request->customers;
-         return response()->json([
-            'msg'            =>  'Ledger Updated',
-            'status'         =>  'success'
-         ]); 
-      }
-      foreach ($request->customers as $key => $customer) {
-         isEditable($customer['id']);
-         $balance             =     CustomerLedger::where('customer_id', $customer['id'])->orderBy('created_at', 'desc')->value('balance');
-         $ledger              =     new CustomerLedger();
-         $ledger->crv_no      =     getCrvNo();
-         $ledger->balance     =     $customer['balance'] - $customer['receiving_amount'];
-         $ledger->cr          =     $customer['receiving_amount'];
-         $ledger->customer_id =     $customer['id'];
-         $ledger->trx_type    =     3;
-         $ledger->is_editable =     1;
-         $ledger->comment     =     "Bulk";
-         $ledger->date        =     Carbon::now()->addMinutes(1);
-         $ledger->created_at  =     Carbon::now()->addMinutes(1);
-         
-         $ledger->created_by  =     Auth::user()->id;
-         if ($ledger->save()) {
-            Customer::where('id', $customer['id'])->update(['balance' => $ledger->balance]);
+   {
+      try {
+         if ($request->type == 'print') {
+            return response()->json([
+               'msg'    => 'Ledger Updated',
+               'status' => 'success',
+            ]);
          }
+         foreach ($request->customers as $key => $customer) {
+            isEditable($customer['id']);
+            $balance = (float) (CustomerLedger::where('customer_id', $customer['id'])
+               ->orderBy('created_at', 'desc')
+               ->value('balance') ?? 0);
+            $ledger = new CustomerLedger();
+            $ledger->crv_no = getCrvNo();
+            $ledger->balance = $balance - (float) $customer['receiving_amount'];
+            $ledger->cr = (float) $customer['receiving_amount'];
+            $ledger->dr = 0;
+            $ledger->customer_id = $customer['id'];
+            $ledger->trx_type = 3;
+            $ledger->is_editable = 1;
+            $ledger->is_deleted = 0;
+            $ledger->sale_invoice_id = 0; // SQLite NOT NULL
+            $ledger->comment = 'Bulk';
+            $ledger->date = now()->toDateString();
+            $ledger->created_at = Carbon::now()->addMinutes(1);
+            $ledger->created_by = Auth::id() ?: 1;
+            if ($ledger->save()) {
+               Customer::where('id', $customer['id'])->update(['balance' => $ledger->balance]);
+            }
+         }
+         return response()->json([
+            'msg'    => 'Ledger Updated',
+            'status' => 'success',
+         ]);
+      } catch (\Throwable $e) {
+         \Log::error('save-tranasctions failed: '.$e->getMessage());
+         return response()->json([
+            'msg'    => 'Transaction save failed: '.$e->getMessage(),
+            'status' => 'failed',
+         ], 500);
       }
-      return response()->json([
-         'msg'            =>  'Ledger Updated',
-         'status'         =>  'success'
-      ]);
    }
    public function getCustomerTransactions(Request $request)
    {
