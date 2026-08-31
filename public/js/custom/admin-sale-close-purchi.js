@@ -60,19 +60,9 @@ function renderStaticPurchi(records) {
         }
     });
 
-    // Always میزان = آمد − نکاس (never paste TTL IN HAND onto meezan)
+    // میزان = آمد − نکاس (same rounded figures the shop verifies by hand)
     var totalMeezan = recordsData["ttl_in"] - recordsData["ttl_out"];
-    if (records.total_meezan != null && records.total_meezan !== '') {
-        // Server already computed آمد−نکاس after any discount adjustment to ttl_in
-        totalMeezan = parseFloat(records.total_meezan);
-    }
-    $(".total_meezan").text(addCommas(parseFloat(totalMeezan).toFixed(2)));
-    if (records.ttl_in != null && records.ttl_in !== '') {
-        $(".ttl_in").text(addCommas(parseFloat(records.ttl_in).toFixed(2)));
-    }
-    if (records.ttl_out != null && records.ttl_out !== '') {
-        $(".ttl_out").text(addCommas(parseFloat(records.ttl_out).toFixed(2)));
-    }
+    $(".total_meezan").text(addCommas(parseFloat(Math.round(totalMeezan))));
     if (totalMeezan !== 0) {
         $(".total_meezan_div").show();
     } else {

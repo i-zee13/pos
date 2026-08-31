@@ -256,18 +256,6 @@ class AdminSaleClosePurchiService
             + ($values['ubl_aftab_banam'] ?? 0);
 
         $values['total_meezan'] = $values['ttl_in'] - $values['ttl_out'];
-        // Prefer controller-adjusted figures when present (آمد may already include discount fix)
-        if (isset($records->ttl_in)) {
-            $values['ttl_in'] = (float) $records->ttl_in;
-        }
-        if (isset($records->ttl_out)) {
-            $values['ttl_out'] = (float) $records->ttl_out;
-        }
-        if (isset($records->total_meezan)) {
-            $values['total_meezan'] = (float) $records->total_meezan;
-        } else {
-            $values['total_meezan'] = $values['ttl_in'] - $values['ttl_out'];
-        }
 
         foreach ($values as $slug => $amount) {
             $records->$slug = $amount;

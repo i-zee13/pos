@@ -762,12 +762,7 @@ class ReportsController extends Controller
       $records->total_pr_invc_amount   =  collect($saleRecords['pr_invc_amount'])->SUM('paid_amount');  //Purchase invoice payment
       $records->total_invoice_amount   =  sum_per_invoice($saleRecords['sales'], 'total_invoice_amount');
       $records->total_invoice_discount =  sum_per_invoice($saleRecords['sales'], 'invoice_discount');
-      $counterSaleId = (int) (sys_customer_id('COUNTER_SALE') ?: 8);
-      $records->total_net_sale_discount=  sum_per_invoice(
-         $saleRecords['sales'],
-         'invoice_discount',
-         fn ($row) => (int) ($row->customer_id ?? 0) === $counterSaleId
-      );
+      $records->total_net_sale_discount=  sum_per_invoice($saleRecords['sales'], 'invoice_discount', fn ($row) => (int) ($row->customer_id ?? 0) === 8);
       $records->total_service_charges  =  sum_per_invoice($saleRecords['sales'], 'service_charges');
       $records->total_product_discount =  collect($saleRecords['sales'])->SUM('product_discount');
       $records->total_net_sales        =  collect($saleRecords['sales'])->WHERE('invoice_type', 1)->SUM('sale_total_amount');
@@ -959,7 +954,8 @@ class ReportsController extends Controller
             $records->abdul_shakoor_habib_bank = $records->habib_bank_abdul_shakoor;
         }
 
-      // Same formula as admin-sale-close.js TTL IN HAND / Cash In Hand
+      // Display-only (left panel). Do NOT feed this into purchi آمد/میزان —
+      // purchi must stay the legacy آمد − نکاس sum the shop already verifies by hand.
       $ttlCashRecoveryForHand = (float) $records->ttl_cash_recovery
          + (float) $records->total_credit_sales_amount_received
          + (float) $records->ttl_vendor_cash_recovery
@@ -976,19 +972,7 @@ class ReportsController extends Controller
          - $totalPaymentsForHand
       ) - (float) $records->total_net_sale_returns;
 
-      // میزان MUST stay آمد − نکاس (never paste cash_in_hand onto meezan).
-      // Counter-Sale invoice discount is already in TTL IN HAND but was missing from
-      // purchi آمد — always reduce آمد by that discount when present.
-      $counterDiscount = (float) $records->total_net_sale_discount;
-      $records->meezan_aligned = 0;
-      $records->meezan_gap_before = round(
-         ((float) $records->ttl_in - (float) $records->ttl_out) - (float) $records->cash_in_hand,
-         2
-      );
-      if ($counterDiscount > 0.009) {
-         $records->ttl_in = (float) $records->ttl_in - $counterDiscount;
-         $records->meezan_aligned = 1;
-      }
+      // Purchi: میزان = آمد − نکاس only (no discount / cash_in_hand patching).
       $records->total_meezan = (float) $records->ttl_in - (float) $records->ttl_out;
 
       $purchiDynamic = purchi_use_dynamic();
@@ -999,25 +983,6 @@ class ReportsController extends Controller
             $records
          );
          $purchiLayout = $result['layout'];
-         // Keep dynamic footer values consistent with adjusted آمد / میزان
-         foreach (['outgoing', 'incoming'] as $side) {
-            if (empty($purchiLayout[$side]) || !is_array($purchiLayout[$side])) {
-               continue;
-            }
-            foreach ($purchiLayout[$side] as $idx => $row) {
-               $slug = $row['slug'] ?? '';
-               $formula = $row['formula'] ?? '';
-               if ($slug === 'ttl_in') {
-                  $purchiLayout[$side][$idx]['amount'] = $records->ttl_in;
-               }
-               if ($slug === 'ttl_out') {
-                  $purchiLayout[$side][$idx]['amount'] = $records->ttl_out;
-               }
-               if ($slug === 'total_meezan' || $formula === 'ttl_in_minus_ttl_out') {
-                  $purchiLayout[$side][$idx]['amount'] = $records->total_meezan;
-               }
-            }
-         }
       }
 
       return response()->JSON([
