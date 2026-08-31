@@ -977,14 +977,15 @@ class ReportsController extends Controller
       ) - (float) $records->total_net_sale_returns;
 
       // میزان MUST stay آمد − نکاس (never paste cash_in_hand onto meezan).
-      // Known bug: Counter-Sale invoice discount is in TTL IN HAND but missing from
-      // purchi آمد, so آمد−نکاس was higher by ~that discount. Fix by reducing آمد
-      // only when the gap matches that discount — other days stay unchanged.
-      $legacyMeezan = (float) $records->ttl_in - (float) $records->ttl_out;
+      // Counter-Sale invoice discount is already in TTL IN HAND but was missing from
+      // purchi آمد — always reduce آمد by that discount when present.
       $counterDiscount = (float) $records->total_net_sale_discount;
-      $gap = $legacyMeezan - (float) $records->cash_in_hand;
       $records->meezan_aligned = 0;
-      if ($counterDiscount > 0.009 && abs($gap - $counterDiscount) <= 1.0) {
+      $records->meezan_gap_before = round(
+         ((float) $records->ttl_in - (float) $records->ttl_out) - (float) $records->cash_in_hand,
+         2
+      );
+      if ($counterDiscount > 0.009) {
          $records->ttl_in = (float) $records->ttl_in - $counterDiscount;
          $records->meezan_aligned = 1;
       }

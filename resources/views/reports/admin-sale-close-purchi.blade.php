@@ -145,5 +145,5 @@
 @include('reports.partials.admin-sale-close-print-scripts')
 <script src="{{ asset('js/custom/admin-sale-close-date.js') }}"></script>
 <script src="{{ asset('js/custom/admin-sale-close-modal.js') }}"></script>
-<script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}"></script>
+<script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}?v=3"></script>
 @endpush

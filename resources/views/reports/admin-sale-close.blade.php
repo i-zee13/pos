@@ -620,12 +620,12 @@
         window.INLINE_PURCHI = {{ $inlinePurchi ? 'true' : 'false' }};
         window.CURRENT_TENANT_ID = {{ (int) (current_tenant_id() ?? 0) }};
     </script>
-    <script src="{{ asset('js/custom/admin-sale-close-date.js') }}?v=2"></script>
-    <script src="{{ asset('js/custom/admin-sale-close-modal.js') }}"></script>
-    <script src="{{ asset('js/custom/admin-sale-close.js') }}"></script>
+    <script src="{{ asset('js/custom/admin-sale-close-date.js') }}?v=3"></script>
+    <script src="{{ asset('js/custom/admin-sale-close-modal.js') }}?v=3"></script>
+    <script src="{{ asset('js/custom/admin-sale-close.js') }}?v=3"></script>
     @if($inlinePurchi)
     @include('reports.partials.admin-sale-close-print-scripts')
-    <script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}?v=2"></script>
+    <script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}?v=3"></script>
     <script>
         (function ($) {
             var purchiVisible = false;
