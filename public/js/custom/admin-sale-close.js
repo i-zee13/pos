@@ -71,11 +71,13 @@ function SaleCloseRecord(close_date) {
             var ttl_cash_recovery = records.ttl_cash_recovery + credit_sale_receivings + vendor_cash_recovery + (openning_balance);
             console.log(ttl_cash_recovery)
             var total_payments = vendor_payment + customer_payment + credit_return_payments + total_pr_paid_amount + total_pr_invc_amount + expense;
-            // console.log(total_net_sale_returns,'zeee');
-            var ttl_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery) - total_net_sale_discount - total_payments) - total_net_sale_returns; 
+            // Prefer server cash_in_hand so TTL IN HAND == purchi کل میزان
+            var ttl_in_hand = (records.cash_in_hand != null && records.cash_in_hand !== '')
+                ? parseFloat(records.cash_in_hand)
+                : (((total_net_sale_invoice_amount + ttl_cash_recovery) - total_net_sale_discount - total_payments) - total_net_sale_returns);
             console.log(ttl_in_hand,'zee',ttl_cash_recovery)
 
-            var cash_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery)- total_net_sale_discount - total_payments) - total_net_sale_returns;
+            var cash_in_hand = ttl_in_hand;
             enableSaleCloseButton(records);
 
             $('.ttl_sale').text(addCommas(parseFloat(total_sales - total_returns).toFixed(2)));

@@ -7,7 +7,7 @@ function enableSaleCloseButton(records) {
     var customer_payment = records.customer_payment;
     var openning_balance = records.openning_balance;
     var expense = records.expense;
-    var total_net_sale_returns_invoice_amount = records.total_net_sale_returns_invoice_amount;
+    var total_net_sale_returns = records.total_net_sale_returns;
     var total_net_sale_invoice_amount = records.total_net_sale_invoice_amount;
     var total_net_sale_discount = records.total_net_sale_discount;
     var total_pr_paid_amount = records.total_pr_paid_amount;
@@ -15,7 +15,9 @@ function enableSaleCloseButton(records) {
     var vendor_cash_recovery = records.ttl_vendor_cash_recovery;
     var ttl_cash_recovery = records.ttl_cash_recovery + credit_sale_receivings + vendor_cash_recovery + openning_balance;
     var total_payments = vendor_payment + customer_payment + credit_return_payments + total_pr_paid_amount + total_pr_invc_amount + expense;
-    var ttl_in_hand = ((total_net_sale_invoice_amount + ttl_cash_recovery) - total_net_sale_discount - total_payments) - total_net_sale_returns_invoice_amount;
+    var ttl_in_hand = (records.cash_in_hand != null && records.cash_in_hand !== '')
+        ? parseFloat(records.cash_in_hand)
+        : (((total_net_sale_invoice_amount + ttl_cash_recovery) - total_net_sale_discount - total_payments) - total_net_sale_returns);
 
     if (ttl_in_hand > 0) {
         $('.sale-close-btn-modal').removeAttr('disabled');
