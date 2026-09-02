@@ -2,8 +2,8 @@
 @section('content')
 @php
     $closeDate = request('date', date('Y-m-d'));
-    // Tenant 1 (or unresolved tenant on this shop) = inline Purchi on same page
-    $inlinePurchi = ((int) (current_tenant_id() ?? 1) === 1);
+    // Always show Purchi inline on Admin Close (same page append — never navigate away)
+    $inlinePurchi = true;
 @endphp
 <style>
     body {
@@ -620,12 +620,12 @@
         window.INLINE_PURCHI = {{ $inlinePurchi ? 'true' : 'false' }};
         window.CURRENT_TENANT_ID = {{ (int) (current_tenant_id() ?? 0) }};
     </script>
-    <script src="{{ asset('js/custom/admin-sale-close-date.js') }}?v=4"></script>
-    <script src="{{ asset('js/custom/admin-sale-close-modal.js') }}?v=4"></script>
-    <script src="{{ asset('js/custom/admin-sale-close.js') }}?v=4"></script>
+    <script src="{{ asset('js/custom/admin-sale-close-date.js') }}?v=6"></script>
+    <script src="{{ asset('js/custom/admin-sale-close-modal.js') }}?v=6"></script>
+    <script src="{{ asset('js/custom/admin-sale-close.js') }}?v=6"></script>
     @if($inlinePurchi)
     @include('reports.partials.admin-sale-close-print-scripts')
-    <script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}?v=4"></script>
+    <script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}?v=6"></script>
     <script>
         (function ($) {
             var purchiVisible = false;
