@@ -18,10 +18,10 @@ yarn-error.log
 /.idea
 /.vscode
 
-# Server / host-specific (keep local & hosting copies out of git)
-.htaccess
-**/.htaccess
+# Host-only / server-managed configs (live pe already hain)
 .php.ini
 php.ini
 .user.ini
 **/.user.ini
+.htaccess
+**/.htaccess

@@ -2,8 +2,8 @@
 @section('content')
 @php
     $closeDate = request('date', date('Y-m-d'));
-    // Tenant 1 = show Purchi on this same Admin Close page (no redirect)
-    $inlinePurchi = ((int) (current_tenant_id() ?? 0) === 1);
+    // Tenant 1 (or unresolved tenant on this shop) = inline Purchi on same page
+    $inlinePurchi = ((int) (current_tenant_id() ?? 1) === 1);
 @endphp
 <style>
     body {
@@ -628,24 +628,9 @@
     <script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}?v=4"></script>
     <script>
         (function ($) {
-            var storageKey = 'adminClosePurchiOpen_' + (window.CURRENT_TENANT_ID || 0);
             var purchiVisible = false;
             var $summary = $('#adminCloseSummaryCol');
             var $panel = $('#inlinePurchiPanel');
-
-            function readPurchiPref() {
-                try {
-                    return localStorage.getItem(storageKey) === '1';
-                } catch (e) {
-                    return false;
-                }
-            }
-
-            function writePurchiPref(open) {
-                try {
-                    localStorage.setItem(storageKey, open ? '1' : '0');
-                } catch (e) {}
-            }
 
             function setPurchiLayout(show) {
                 if (show) {
@@ -681,7 +666,6 @@
                     e.stopPropagation();
                 }
                 purchiVisible = !purchiVisible;
-                writePurchiPref(purchiVisible);
                 if (purchiVisible) {
                     setPurchiLayout(true);
                     $('.view-purchi-label').text('Hide Purchi');
@@ -698,17 +682,6 @@
                 if (purchiVisible) {
                     loadInlinePurchi($(this).val());
                 }
-            });
-
-            // Only restore when user had left Purchi OPEN — do not touch layout when closed
-            $(function () {
-                if (!readPurchiPref()) {
-                    return;
-                }
-                purchiVisible = true;
-                setPurchiLayout(true);
-                $('.view-purchi-label').text('Hide Purchi');
-                loadInlinePurchi();
             });
         })(jQuery);
     </script>
