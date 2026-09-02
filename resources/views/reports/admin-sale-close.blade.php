@@ -620,15 +620,18 @@
         window.INLINE_PURCHI = {{ $inlinePurchi ? 'true' : 'false' }};
         window.CURRENT_TENANT_ID = {{ (int) (current_tenant_id() ?? 0) }};
     </script>
-    <script src="{{ asset('js/custom/admin-sale-close-date.js') }}?v=5"></script>
-    <script src="{{ asset('js/custom/admin-sale-close-modal.js') }}?v=5"></script>
-    <script src="{{ asset('js/custom/admin-sale-close.js') }}?v=5"></script>
+    <script src="{{ asset('js/custom/admin-sale-close-date.js') }}?v=4"></script>
+    <script src="{{ asset('js/custom/admin-sale-close-modal.js') }}?v=4"></script>
+    <script src="{{ asset('js/custom/admin-sale-close.js') }}?v=4"></script>
     @if($inlinePurchi)
     @include('reports.partials.admin-sale-close-print-scripts')
-    <script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}?v=5"></script>
+    <script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}?v=4"></script>
     <script>
         (function ($) {
             var storageKey = 'adminClosePurchiOpen_' + (window.CURRENT_TENANT_ID || 0);
+            var purchiVisible = false;
+            var $summary = $('#adminCloseSummaryCol');
+            var $panel = $('#inlinePurchiPanel');
 
             function readPurchiPref() {
                 try {
@@ -644,40 +647,23 @@
                 } catch (e) {}
             }
 
-            var purchiVisible = readPurchiPref();
-
-            function setPurchiLayout(show, instant) {
-                var $summary = $('#adminCloseSummaryCol');
-                var $panel = $('#inlinePurchiPanel');
-                if (!$panel.length) {
-                    return;
-                }
+            function setPurchiLayout(show) {
                 if (show) {
                     $summary.removeClass('col-md-6 col-md-3').addClass('col-md-4');
                     $panel.removeClass('col-md-9').addClass('col-md-8');
-                    $panel.stop(true, true);
-                    if (instant) {
-                        $panel.css('display', 'block').show();
-                    } else {
-                        $panel.css('display', 'block').hide().fadeIn(200);
-                    }
-                    if ($summary.data('mCS')) {
-                        $summary.mCustomScrollbar('update');
-                    }
-                    $('.view-purchi-label').text('Hide Purchi');
+                    $panel.stop(true, true).fadeIn(200, function () {
+                        if ($summary.data('mCS')) {
+                            $summary.mCustomScrollbar('update');
+                        }
+                    });
                 } else {
-                    $panel.stop(true, true);
-                    if (instant) {
-                        $panel.hide();
-                    } else {
-                        $panel.fadeOut(150);
-                    }
-                    $summary.removeClass('col-md-4 col-md-3').addClass('col-md-6');
-                    $panel.removeClass('col-md-9').addClass('col-md-8');
-                    if ($summary.data('mCS')) {
-                        $summary.mCustomScrollbar('update');
-                    }
-                    $('.view-purchi-label').text('View Purchi');
+                    $panel.stop(true, true).fadeOut(150, function () {
+                        $summary.removeClass('col-md-4 col-md-3').addClass('col-md-6');
+                        $panel.removeClass('col-md-9').addClass('col-md-8');
+                        if ($summary.data('mCS')) {
+                            $summary.mCustomScrollbar('update');
+                        }
+                    });
                 }
             }
 
@@ -689,28 +675,20 @@
                 PurchiRecord(date);
             }
 
-            function applyPurchiState(show, loadData, instant) {
-                purchiVisible = !!show;
-                writePurchiPref(purchiVisible);
-                setPurchiLayout(purchiVisible, !!instant);
-                if (purchiVisible && loadData) {
-                    loadInlinePurchi();
-                }
-            }
-
             function toggleInlinePurchi(e) {
                 if (e) {
                     e.preventDefault();
                     e.stopPropagation();
                 }
-                applyPurchiState(!purchiVisible, true, false);
-            }
-
-            function restorePurchiPref() {
-                if (readPurchiPref()) {
-                    applyPurchiState(true, true, true);
+                purchiVisible = !purchiVisible;
+                writePurchiPref(purchiVisible);
+                if (purchiVisible) {
+                    setPurchiLayout(true);
+                    $('.view-purchi-label').text('Hide Purchi');
+                    loadInlinePurchi();
                 } else {
-                    applyPurchiState(false, false, true);
+                    setPurchiLayout(false);
+                    $('.view-purchi-label').text('View Purchi');
                 }
             }
 
@@ -722,12 +700,15 @@
                 }
             });
 
-            // Restore after date/scripts ready (ready + load + short delay)
+            // Only restore when user had left Purchi OPEN — do not touch layout when closed
             $(function () {
-                restorePurchiPref();
-            });
-            $(window).on('load', function () {
-                setTimeout(restorePurchiPref, 50);
+                if (!readPurchiPref()) {
+                    return;
+                }
+                purchiVisible = true;
+                setPurchiLayout(true);
+                $('.view-purchi-label').text('Hide Purchi');
+                loadInlinePurchi();
             });
         })(jQuery);
     </script>
