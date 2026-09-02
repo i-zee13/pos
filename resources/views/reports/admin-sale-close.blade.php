@@ -628,9 +628,25 @@
     <script src="{{ asset('js/custom/admin-sale-close-purchi.js') }}?v=4"></script>
     <script>
         (function ($) {
-            var purchiVisible = false;
+            var storageKey = 'adminClosePurchiOpen_' + (window.CURRENT_TENANT_ID || 0);
             var $summary = $('#adminCloseSummaryCol');
             var $panel = $('#inlinePurchiPanel');
+
+            function readPurchiPref() {
+                try {
+                    return localStorage.getItem(storageKey) === '1';
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function writePurchiPref(open) {
+                try {
+                    localStorage.setItem(storageKey, open ? '1' : '0');
+                } catch (e) {}
+            }
+
+            var purchiVisible = readPurchiPref();
 
             function setPurchiLayout(show) {
                 if (show) {
@@ -641,6 +657,7 @@
                             $summary.mCustomScrollbar('update');
                         }
                     });
+                    $('.view-purchi-label').text('Hide Purchi');
                 } else {
                     $panel.stop(true, true).fadeOut(150, function () {
                         $summary.removeClass('col-md-4 col-md-3').addClass('col-md-6');
@@ -649,6 +666,7 @@
                             $summary.mCustomScrollbar('update');
                         }
                     });
+                    $('.view-purchi-label').text('View Purchi');
                 }
             }
 
@@ -660,20 +678,21 @@
                 PurchiRecord(date);
             }
 
+            function applyPurchiState(show, loadData) {
+                purchiVisible = !!show;
+                writePurchiPref(purchiVisible);
+                setPurchiLayout(purchiVisible);
+                if (purchiVisible && loadData) {
+                    loadInlinePurchi();
+                }
+            }
+
             function toggleInlinePurchi(e) {
                 if (e) {
                     e.preventDefault();
                     e.stopPropagation();
                 }
-                purchiVisible = !purchiVisible;
-                if (purchiVisible) {
-                    setPurchiLayout(true);
-                    $('.view-purchi-label').text('Hide Purchi');
-                    loadInlinePurchi();
-                } else {
-                    setPurchiLayout(false);
-                    $('.view-purchi-label').text('View Purchi');
-                }
+                applyPurchiState(!purchiVisible, true);
             }
 
             $(document).on('click', '#viewPurchiBtn, .view-purchi-inline-btn', toggleInlinePurchi);
@@ -681,6 +700,15 @@
             $('.selected_date').on('change', function () {
                 if (purchiVisible) {
                     loadInlinePurchi($(this).val());
+                }
+            });
+
+            // Restore last preference: open stays open, closed stays collapsed
+            $(function () {
+                if (purchiVisible) {
+                    applyPurchiState(true, true);
+                } else {
+                    applyPurchiState(false, false);
                 }
             });
         })(jQuery);

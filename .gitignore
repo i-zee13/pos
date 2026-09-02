@@ -17,3 +17,11 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Server / host-specific (keep local & hosting copies out of git)
+.htaccess
+**/.htaccess
+.php.ini
+php.ini
+.user.ini
+**/.user.ini
