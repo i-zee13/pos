@@ -132,15 +132,6 @@
                                                         <td colspan="2" class="total_ledger_sum"></td>
                                                     </tr>
                                                 </table>
-                                                <h2 class="_head03 ">To <span>Print</span></h2>
-                                                <div class="row status-sh">
-                                                    <div class="col-12">
-                                                        <div class="custom-control custom-radio">
-                                                            <input class="custom-control-input" type="checkbox" id="print-invoice" value="1" data-id="print-invoice" name="print_invoice" tabindex="7">
-                                                            <label class="custom-control-label font13 he ad-sta" for="print-invoice">Print</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                                 <div class="col-md-12 ml-3" hidden>
                                                     <div class="row">
                                                         <div class="col-auto pl-0">
@@ -169,9 +160,9 @@
         </div>
     </div>
     <div class="_cl-bottom">
-        <!-- <button type="button" id="print-invoice" class="btn btn-primary mr-2" tabindex="4">Print</button> -->
-        <button type="submit" class="btn btn-primary mr-2" id="saveTransaction" tabindex="8">Save</button>
-        <button type="button" class="btn btn-cancel mr-2" id="cancelSubCat" tabindex="9">Cancel</button>
+        <button type="button" class="btn btn-primary mr-2" id="saveTransaction" tabindex="8">Save</button>
+        <button type="button" class="btn btn-primary mr-2" id="print-invoice" tabindex="9">Print</button>
+        <button type="button" class="btn btn-cancel mr-2" id="cancelSubCat" tabindex="10">Cancel</button>
     </div>
 </div>
 @endsection
@@ -222,5 +213,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/vendor_transaction.js')}}"> </script>
+<script src="{{asset('js/custom/vendor_transaction.js')}}?v=8"> </script>
 @endpush

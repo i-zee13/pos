@@ -127,6 +127,11 @@ $(document).ready(function () {
     current_action.text('Save');
     // $('#hidden_btn_to_open_modal').click(); 
   });
+  $("#print-invoice").on('click', function () {
+    var current_action = $(this);
+    saveTransaction(current_action, 'print');
+    current_action.text('Print');
+  });
 
   function saveTransaction(current_action, type) {
     var dirty = true;
@@ -155,8 +160,12 @@ $(document).ready(function () {
       current_action.text('Processing...');
       current_action.attr('disabled', 'disabled');
       $('#saveTransaction').attr('disabled', 'disabled');
+      $('#print-invoice').attr('disabled', 'disabled');
       $('#cancelSubCat').attr('disabled', 'disabled');
-      $('#saveTransaction').text('Processing..');
+      $('#saveTransaction').text(type === 'print' ? 'Save' : 'Processing..');
+      if (type === 'print') {
+        $('#print-invoice').text('Processing..');
+      }
       $('#saveTransactionForm').ajaxSubmit({
         type: "POST",
         url: '/transaction-store',
@@ -166,7 +175,7 @@ $(document).ready(function () {
         },
         success: function success(response) {
           if (response.status == "success") {
-            if ($("#print-invoice").prop("checked")) {
+            if (type === 'print') {
               var zz = 0;
               if (action == operation + '-ledger-jama') {
                 zz = 1;
@@ -174,9 +183,11 @@ $(document).ready(function () {
                 zz = 2;
               }
               var printWindow = window.open("/print-transaction-invoice/" + response.transaction_id + '/' + response.customer_id + '/' + operation + '/' + zz);
-              printWindow.onload = function () {
-                printWindow.print();
-              };
+              if (printWindow) {
+                printWindow.onload = function () {
+                  printWindow.print();
+                };
+              }
             }
             location.reload();
             $('#saveTransactionForm')[0].reset();
@@ -185,6 +196,7 @@ $(document).ready(function () {
             closeSidebar();
             fetchLedgers();
             $('#saveTransaction').removeAttr('disabled').text('Save');
+            $('#print-invoice').removeAttr('disabled').text('Print');
             $('#cancelSubCat').removeAttr('disabled');
             $('#amount').val('');
             var msg = 'Transaction Successfully Updated';
@@ -195,6 +207,7 @@ $(document).ready(function () {
           }
           if (response.status == "failed") {
             $('#saveTransaction').removeAttr('disabled');
+            $('#print-invoice').removeAttr('disabled').text('Print');
             $('#cancelSubCat').removeAttr('disabled');
             $('#saveTransaction').text('Save');
             $('#notifDiv').fadeIn();
@@ -206,6 +219,9 @@ $(document).ready(function () {
           }
         },
         error: function error(err) {
+          $('#saveTransaction').removeAttr('disabled').text('Save');
+          $('#print-invoice').removeAttr('disabled').text('Print');
+          $('#cancelSubCat').removeAttr('disabled');
           if (err.status == 422) {
             $.each(err.responseJSON.errors, function (i, error) {
               var el = $(document).find('[name="' + i + '"]');
