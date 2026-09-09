@@ -22,7 +22,13 @@
 {{--                    <a href="/Tasks"><img src="/images/task-icon.svg" alt="" /> Tasks <span class="badge">{{ sizeof($tasks) }}</span></a>--}}
 {{--                </li>--}}
                 <li>
-                    <a href="/logout"><img src="/images/logout-icon.svg" alt="Employee" /> Logout</a>
+                    <a href="{{ route('logout') }}"
+                       onclick="event.preventDefault(); document.getElementById('logout-form-nav-new').submit();">
+                        <img src="/images/logout-icon.svg" alt="Employee" /> Logout
+                    </a>
+                    <form id="logout-form-nav-new" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
                 </li>
             </ul>
         </div>
@@ -50,7 +56,13 @@
                     <a href="/Tasks"><img src="/images/task-icon.svg" alt="" /> Tasks <span class="badge">{{ sizeof($tasks) }}</span></a>
                 </li>
                 <li>
-                    <a href="/logout"><img src="/images/logout-icon.svg" alt="Employee" /> Logout</a>
+                    <a href="{{ route('logout') }}"
+                       onclick="event.preventDefault(); document.getElementById('logout-form-nav-new').submit();">
+                        <img src="/images/logout-icon.svg" alt="Employee" /> Logout
+                    </a>
+                    <form id="logout-form-nav-new" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
                 </li>
             </ul>
         </div>

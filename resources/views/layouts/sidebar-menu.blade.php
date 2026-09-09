@@ -81,11 +81,18 @@
           </a>
           <a href="/admin-sale-close" class="dropdown-item">Admin Close</a>
           <hr class="dropdown-divider">
-          <a href="{{ route('logout') }}" class="dropdown-item">Logout</a>
+          <a href="{{ route('logout') }}" class="dropdown-item"
+             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            Logout
+          </a>
         </div>
       </div>
 
     </div>
+
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+      @csrf
+    </form>
 
     <!-- Collapse -->
     <div class="collapse navbar-collapse" id="sidebarCollapse">
@@ -500,9 +507,6 @@
                                                      document.getElementById('logout-form').submit();">
               {{ __('Logout') }}
             </a>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-              @csrf
-            </form>
 
           </div>
 

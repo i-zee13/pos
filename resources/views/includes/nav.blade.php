@@ -44,7 +44,13 @@
                 <span class="dropdown-item usernamelab">{{ Auth::user()->name }}</span>
                 <a class="dropdown-item" href="/Profile/{{ Auth::user()->id }}"><i class="fa fa-user"> </i> Profile</a>
                 <a class="dropdown-item" href="#"><i class="fa fa-cogs"> </i> Settings</a>
-                <a class="dropdown-item" href="/logout"><i class="fa fa-power-off"> </i> Logout</a>
+                <a class="dropdown-item" href="{{ route('logout') }}"
+                   onclick="event.preventDefault(); document.getElementById('logout-form-nav').submit();">
+                    <i class="fa fa-power-off"> </i> Logout
+                </a>
+                <form id="logout-form-nav" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
             </div>
         </li>
     </ul>
