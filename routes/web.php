@@ -116,7 +116,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     Route::get('/', [HomeController::class,   'index'])->name('home');
-    Route::get('/home', [HomeController::class,   'index'])->name('home');
+    Route::get('/home', [HomeController::class,   'index'])->name('home.page');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/analytics/summary', [DashboardController::class, 'summary'])->name('analytics.summary');
     Route::get('/backups', [DatabaseBackupController::class, 'index'])->name('backups.index');
@@ -177,8 +177,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/sale-edit/{id}',               [SaleController::class, 'editsale'])->name('sale-edit');
     Route::get('/sale-detail/{id}',             [SaleController::class, 'show'])->name('sale-detail');
     Route::get('/get-sale-products/{id}',       [SaleController::class, 'getSaleProduct'])->name('get-sale-products');
-    Route::get('/get-customer-balance/{id}',    [SaleController::class, 'getCustomerBalance'])->name('get-customer-balance');
-    Route::delete('/delete-product-from-sale',  [SaleController::class, 'deleteProduct'])->name('delete-product');
+    Route::get('/get-customer-balance/{id}',    [SaleController::class, 'getCustomerBalance'])->name('get-sale-customer-balance');
+    Route::delete('/delete-product-from-sale',  [SaleController::class, 'deleteProduct'])->name('delete-sale-product');
     Route::delete('/delete-sale-invoice',       [SaleController::class, 'deleteInvoice'])->name('delete-sale-invoice');
 
 
@@ -192,7 +192,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/open-batches/{product_id}',    [SalesReturnController::class, 'openBatches'])->name('salereturn.open-batches');
     Route::get('/print-salereturn-invoice/{invoice_id}/{customer_id}/{received_amount}', [SalesReturnController::class, 'printInvoice'])->name('print-salereturn-invoice');
     Route::delete('/delete-product-from-sale-return',[SalesReturnController::class, 'deleteProduct'])->name('sale-return-delete-product');
-    Route::delete('/delete-sale-return-invoice',     [SalesReturnController::class, 'deleteInvoice'])->name('delete-purchase-invoice');
+    Route::delete('/delete-sale-return-invoice',     [SalesReturnController::class, 'deleteInvoice'])->name('delete-sale-return-invoice');
 
     // Route::post('/add-purchase-return'   ,[PurchaseReturnController::class, 'addpurchaseReturn'])->name('add-purchase-return');
 
@@ -211,7 +211,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/get-customer-transactions',   [TransactionController::class, 'getCustomerTransactions'])->name('getCustomerTransactions');
     Route::get('/vendor-ledgers',           [TransactionController::class, 'customerLedger'])->name('vendor-ledgers');
     Route::get('/customer-ledgers',         [TransactionController::class, 'customerLedger'])->name('customer-ledgers');
-    Route::get('/print-transaction-invoice/{invoice_id}/{customer_id}/{operation}/{type}', [TransactionController::class, 'printInvoice'])->name('print-salereturn-invoice');
+    Route::get('/print-transaction-invoice/{invoice_id}/{customer_id}/{operation}/{type}', [TransactionController::class, 'printInvoice'])->name('print-transaction-invoice');
     //Multiple Transtaction of Customer
     Route::get('/ledger-purchi',            [TransactionController::class, 'getLedgerPurchi'])->name('ledger-purchi');
     Route::post('/save-tranasctions',       [TransactionController::class, 'saveTransaction'])->name('save-tranasctions');
@@ -233,7 +233,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     //Sale Report
     Route::get('/sale-report',              [ReportsController::class, 'saleReport'])->name('sale-reports');
-    Route::post('/sales-list',              [ReportsController::class, 'saleReportList'])->name('stock-report-list');
+    Route::post('/sales-list',              [ReportsController::class, 'saleReportList'])->name('sale-report-list');
     //Purchase Report
     Route::get('/purchase-report',          [ReportsController::class, 'purchaseReport'])->name('purchase-reports');
     Route::post('/purchase-list',           [ReportsController::class, 'purchaseReportList'])->name('purchase-report-list');
