@@ -29,7 +29,7 @@ window.invoiceBalanceLoading = false;
 window.invoiceBalanceLoadedFor = null;
 
 /** Focus the product ID / barcode box used for scanning on invoice create pages. */
-function focusInvoiceBarcodeInput() {
+window.focusInvoiceBarcodeInput = function focusInvoiceBarcodeInput() {
     var $el = $('#designationsTable input.bar-code:visible, #table-container input.bar-code:visible').first();
     if (!$el.length) {
         $el = $('input.bar-code:visible, input#bar-code.inputSale:visible').first();
@@ -53,7 +53,7 @@ function focusInvoiceBarcodeInput() {
     }, 50);
 }
 
-function toggleInvoiceBalanceLoader(isLoading) {
+window.toggleInvoiceBalanceLoader = function toggleInvoiceBalanceLoader(isLoading) {
     window.invoiceBalanceLoading = !!isLoading;
     if (isLoading) {
         window.invoiceBalanceLoadedFor = null;
@@ -69,7 +69,7 @@ function toggleInvoiceBalanceLoader(isLoading) {
     }
 }
 
-function ensureInvoiceBalanceReady() {
+window.ensureInvoiceBalanceReady = function ensureInvoiceBalanceReady() {
     if (window.invoiceBalanceLoading) {
         $('#notifDiv').fadeIn().css('background', 'red').text('Please wait — customer previous balance is still loading…');
         setTimeout(function () { $('#notifDiv').fadeOut(); }, 3000);

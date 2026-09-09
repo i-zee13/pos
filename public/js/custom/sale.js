@@ -17360,21 +17360,23 @@ var grand_total = '';
 var balanceRequestSeq = 0;
 $(document).ready(function () {
   console.log(segments);
-  if (segments[3] == "sale-add" || segments[3] == 'sale-edit') {
-    toggleInvoiceBalanceLoader(true);
+  if (segments[3] == "sale-add" || segments[3] == 'sale-edit' || segments.indexOf('sale-add') !== -1 || segments.indexOf('sale-edit') !== -1) {
+    if (typeof window.toggleInvoiceBalanceLoader === 'function') {
+      window.toggleInvoiceBalanceLoader(true);
+    }
   } else {
     $('.parent-div').show();
     $('#tblLoader').hide();
   }
   // Counter Sale is selected after getvendors() loads options (avoid race with empty dropdown / val(0))
-  // Early focus often fails while balance loader hides .parent-div; toggleInvoiceBalanceLoader(false) re-focuses.
+  // Early focus often fails while balance loader hides .parent-div; window.toggleInvoiceBalanceLoader(false) re-focuses.
   if (typeof focusInvoiceBarcodeInput === 'function') {
     focusInvoiceBarcodeInput();
   } else {
     $('#designationsTable #bar-code, #bar-code').first().focus();
   }
-  stock_products = JSON.parse($('#stock_products').val());
-  customer_ledger = JSON.parse($('#customer_ledger').val());
+  stock_products = window.STOCK_PRODUCTS || JSON.parse($('#stock_products').val() || '[]');
+  customer_ledger = JSON.parse($('#customer_ledger').val() || 'null');
   getProducts();
   $('.display').show();
   if (segments[3] == 'sale-edit') {
@@ -17614,8 +17616,15 @@ $('.products').change(function () {
   $('.calculate_by_amount_text').html('0');
   if (selected_product > 0) {
     var filter_product = product_list.filter(function (x) {
-      return x.id == selected_product;
+      return String(x.id) === String(selected_product);
     });
+    if (!filter_product.length) {
+      $('#notifDiv').fadeIn().css('background', 'red').text('Product data not loaded. Please refresh the page.');
+      setTimeout(function () {
+        $('#notifDiv').fadeOut();
+      }, 3000);
+      return;
+    }
     $('.retail_price').text(filter_product[0].sale_price);
     $('.calculate_by_amount').attr('data-price', filter_product[0].sale_price);
     if (filter_product[0].new_purchase_price > 0) {
@@ -18163,7 +18172,8 @@ $(document).on('input', '.discount-input', function () {
 function getProducts() {
   $("#products").empty();
   $("#products").append("<option value=\"0\">Select Product</option>");
-  stock_products.forEach(function (data) {
+  product_list = [];
+  (stock_products || []).forEach(function (data) {
     console.log(data);
     $("#products").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.product_name, "\" data-qty=\"").concat(data.qty, "\">").concat(data.id, "-").concat(data.product_name, " Rs-").concat(data.sale_price, "</option>"));
     product_list.push(data);
@@ -18192,7 +18202,7 @@ function getvendors() {
       $("#customer_id").trigger('change');
     },
     error: function error() {
-      toggleInvoiceBalanceLoader(false);
+      window.toggleInvoiceBalanceLoader(false);
       $('#notifDiv').fadeIn().css('background', 'red').text('Failed to load customers. Please refresh.');
       setTimeout(function () {
         $('#notifDiv').fadeOut();
@@ -18227,7 +18237,7 @@ $('#customer_id').change(function () {
         segment: segment
       },
       beforeSend: function beforeSend() {
-        toggleInvoiceBalanceLoader(true);
+        window.toggleInvoiceBalanceLoader(true);
       },
       success: function success(response) {
         if (reqId !== balanceRequestSeq) {
@@ -18254,7 +18264,7 @@ $('#customer_id').change(function () {
         if (reqId !== balanceRequestSeq) {
           return;
         }
-        toggleInvoiceBalanceLoader(false);
+        window.toggleInvoiceBalanceLoader(false);
       },
       error: function error() {
         if (reqId !== balanceRequestSeq) {
@@ -18273,7 +18283,7 @@ $('#customer_id').change(function () {
     // $('#invoice_type').val('2').trigger('change');
   } else {
     window.invoiceBalanceLoadedFor = null;
-    toggleInvoiceBalanceLoader(false);
+    window.toggleInvoiceBalanceLoader(false);
   }
 });
 function grandSum() {

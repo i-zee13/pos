@@ -607,7 +607,11 @@
                 <input type="hidden" name="previous_receivable" id="previous_receivable" value="">
 
                 <input type="hidden" id="" value="1" name="form_status">
-                <input type="hidden" id="stock_products" value="{{json_encode($products)}}">
+                <input type="hidden" id="stock_products" value="">
+                <script>
+                    window.STOCK_PRODUCTS = @json($products);
+                    document.getElementById('stock_products').value = JSON.stringify(window.STOCK_PRODUCTS || []);
+                </script>
                 <div class="col-md-4 left-sidebox ">
                     <div class="sidebox-content text-white" style="background-color: #152e4d">
                         <div class="CT_sec">
@@ -888,7 +892,7 @@
                                                     <select class="inputfileds formselect products" name="product_name" id="products" tabindex="2" >
                                                         <option value="0">Select Product *</option>
                                                         @foreach($products as $product)
-                                                        <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}} - {{$product->retail_price}}</option>
+                                                        <option value="{{$product->id}}">{{$product->id}}-{{$product->product_name}} - {{$product->sale_price}}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -1047,6 +1051,6 @@
 <script>
     var clients = JSON.parse('{!! json_encode($customers)  !!}');
 </script>
-<script src="{{mix('js/custom/sale.js')}}"> </script>
+<script src="{{mix('js/custom/sale.js')}}?v=7"> </script>
 
 @endpush

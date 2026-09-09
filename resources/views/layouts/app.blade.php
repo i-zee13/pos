@@ -411,7 +411,7 @@
     <script src="{{asset('/js/datatables.min.js')}}"></script>
     <script src="{{asset('/js/select2.min.js')}}"></script>
     <script src="{{asset('/js/dropify.min.js')}}"></script>
-    <script src="{{asset('/js/custom.js')}}"></script>
+    <script src="{{asset('/js/custom.js')}}?v=7"></script>
     <script src="{{asset('/js/jquery.form.min.js')}}"></script>
     <script src="{{asset('/js/selectize.min.js')}}"></script>
     <script src="{{asset('/js/bootstrap-datepicker.js?v=1.1')}}"></script>

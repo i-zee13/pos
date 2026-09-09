@@ -62,6 +62,13 @@ class IdentifyTenantDatabase
         $request->attributes->set('tenant_database', $database);
         $request->attributes->set('tenant_host', $host);
 
-        return $next($request);
+        $response = $next($request);
+        if (method_exists($response, 'headers')) {
+            $response->headers->set('X-Tenant-Host', $host);
+            $response->headers->set('X-Tenant-DB', $database);
+            $response->headers->set('X-Tenancy-Mode', (string) config('tenants.mode'));
+        }
+
+        return $response;
     }
 }
