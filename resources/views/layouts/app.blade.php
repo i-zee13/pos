@@ -144,9 +144,13 @@
         nav.navbar.static-top .dropdown-menu {
             z-index: 20001 !important;
         }
-        /* Sidebar user dropdown (bottom avatar) */
-        #sidebarUser .dropdown-menu {
-            z-index: 20001 !important;
+        /* Sidebar user dropdown (bottom avatar + mobile top avatar) */
+        #sidebar {
+            z-index: 1040;
+        }
+        #sidebarUser .dropdown-menu,
+        #sidebar .navbar-user .dropdown-menu {
+            z-index: 20051 !important;
         }
 
         #repDelayBtn:hover,

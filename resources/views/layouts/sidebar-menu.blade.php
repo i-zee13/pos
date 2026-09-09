@@ -4,30 +4,45 @@
     /* Ensure the sidebar uses the full height of the viewport */
     padding-top: 5px;
     padding-bottom: 5px;
+    /* Do NOT overflow the whole sidebar — it clips the profile dropdown on mobile */
+    overflow: visible;
+  }
+
+  /* Scroll only the nav links area, not the brand/avatar row */
+  #sidebar #sidebarCollapse {
+    max-height: calc(100vh - 110px);
     overflow-y: auto;
-    /* Enable vertical scrolling */
   }
 
   /* Custom scrollbar styles */
-  .sidebar-height::-webkit-scrollbar {
+  #sidebar #sidebarCollapse::-webkit-scrollbar {
     width: 5px;
     /* Width of the scrollbar */
   }
 
-  .sidebar-height::-webkit-scrollbar-thumb {
+  #sidebar #sidebarCollapse::-webkit-scrollbar-thumb {
     background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
     opacity: 0.75;
     border-radius: 4px;
   }
 
-  .sidebar-height::-webkit-scrollbar-thumb:hover {
+  #sidebar #sidebarCollapse::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
     /* Color when hovered */
   }
 
-  .sidebar-height::-webkit-scrollbar-track {
+  #sidebar #sidebarCollapse::-webkit-scrollbar-track {
     background: white;
     /* Background color of the scrollbar track */
+  }
+
+  /* Mobile top avatar dropdown above page content */
+  #sidebar .navbar-user {
+    position: relative;
+    z-index: 20050;
+  }
+  #sidebar .navbar-user .dropdown-menu {
+    z-index: 20051 !important;
   }
 </style>
 
@@ -51,7 +66,7 @@
       <div class="dropdown">
 
         <!-- Toggle -->
-        <a href="#" id="sidebarIcon" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a href="#" id="sidebarIcon" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" data-bs-display="static" aria-haspopup="true" aria-expanded="false">
           <div class="avatar avatar-sm avatar-online">
             <img src="{{asset('assets/images/avatar-1.jpg')}}" class="avatar-img rounded-circle" alt="...">
           </div>
