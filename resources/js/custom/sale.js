@@ -481,6 +481,8 @@ import swal from 'sweetalert';
          }, 3000)
          return;
      }
+     // Sync DOM qty → array, clamp to stock, recalc line amount (fixes qty/print mismatch)
+     clampSaleLineQtys();
      let hasEmptyQty = false;
 
      sales_product_array.forEach(data => {
@@ -601,6 +603,7 @@ import swal from 'sweetalert';
      var ser_chargses = $('.service_charges_input').val();
      // var grand_total = $('.grand-total').text();
      var status = $('input[name="radio_status"]:checked').val();
+     clampSaleLineQtys();
      $(this).attr('disabled', 'disabled');
      $(this).text('Processing..');
      $('#form').ajaxSubmit({
@@ -715,22 +718,27 @@ $(document).on('input', '.qty-input', function () {
     sales_product_array.filter(function (data) {
       if (data.product_id == current_product_id) {
         p_price = data.retail_price;
-        data.qty = update_qty;
-        current_product_qty = data.stock_in_hand;
+        current_product_qty = parseFloat(data.stock_in_hand) || 0;
         current_product_price = p_price;
-        if (parseInt(update_qty) > parseInt(current_product_qty)) {
-          // update_qty      = update_qty.replace(update_qty, current_product_qty)
+        var qtyNum = parseFloat(update_qty);
+        if (isNaN(qtyNum) || qtyNum < 0) {
+          qtyNum = 0;
+        }
+        // Clamp to stock BEFORE writing into sales_product_array (footer totals use data.qty)
+        if (qtyNum > current_product_qty) {
           $(".td-input-qty".concat(current_product_id)).val(current_product_qty).css('border-color', 'red').focus();
-          $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less then ' + current_product_qty);
+          $('#notifDiv').fadeIn().css('background', 'red').text('Qty should be less than ' + current_product_qty);
           setTimeout(function () {
             $('#notifDiv').fadeOut();
           }, 3000);
-          new_amount_of_purchase_product = current_product_qty * current_product_price;
+          qtyNum = current_product_qty;
         } else {
-          new_amount_of_purchase_product = update_qty * current_product_price;
+          $(".td-input-qty".concat(current_product_id)).css('border-color', '#dddddd');
         }
-        $(".td-input-qty".concat(current_product_id)).css('border-color', '#dddddd');
-        data.amount = new_amount_of_purchase_product - data.prod_discount;
+        data.qty = qtyNum;
+        $(".td-input-qty".concat(current_product_id)).attr('data-quantity', qtyNum);
+        new_amount_of_purchase_product = qtyNum * current_product_price;
+        data.amount = new_amount_of_purchase_product - (parseFloat(data.prod_discount) || 0);
         var invoice_type = $('#invoice_type').val();
         $(".purchase-product-amount".concat(current_product_id)).text(parseFloat(data.amount).toFixed(2));
         getStockRetail(data.product_id);
@@ -825,16 +833,24 @@ $(document).on('input', '.qty-input', function () {
 
      var retail_price = $(this).val();
      var current_product_id = $(this).attr('data-id');
-     var current_product_qty = $(`#tr-${current_product_id}`).find('.qty-input').val();
+     var current_product_qty = parseFloat($(`#tr-${current_product_id}`).find('.qty-input').val());
      var new_amount_of_sale_product = 0;
 
      $(`.purchase-product-amount${current_product_id}`).empty();
      sales_product_array.filter(function (data) {
          if (data.product_id == current_product_id) {
+             var maxStock = parseFloat(data.stock_in_hand) || 0;
+             if (isNaN(current_product_qty) || current_product_qty < 0) {
+                 current_product_qty = 0;
+             }
+             if (current_product_qty > maxStock) {
+                 current_product_qty = maxStock;
+                 $(`.td-input-qty${current_product_id}`).val(current_product_qty);
+             }
              data.retail_price = retail_price;
-             data.qty = current_product_qty
+             data.qty = current_product_qty;
              new_amount_of_sale_product = current_product_qty * retail_price;
-             data.amount = new_amount_of_sale_product - data.prod_discount;
+             data.amount = new_amount_of_sale_product - (parseFloat(data.prod_discount) || 0);
              getStockRetail(data.product_id)
              $(`.purchase-product-amount${current_product_id}`).text(data.amount)
              grandSum(previous_payable, service_charges);
@@ -845,16 +861,23 @@ $(document).on('input', '.qty-input', function () {
  $(document).on('input', '.discount-input', function () {
      var p_discount = $(this).val();
      var current_product_id = $(this).attr('data-id');
-     var current_product_qty = $(`#tr-${current_product_id}`).find('.qty-input').val();
-     var current_product_qty = $(`#tr-${current_product_id}`).find('.qty-input').val();
+     var current_product_qty = parseFloat($(`#tr-${current_product_id}`).find('.qty-input').val());
      var new_amount_of_sale_product = 0;
      $('.amount_received').val($('.paid_amount').text());
 
      $(`.purchase-product-amount${current_product_id}`).empty();
      sales_product_array.filter(function (data) {
          if (data.product_id == current_product_id) {
+             var maxStock = parseFloat(data.stock_in_hand) || 0;
+             if (isNaN(current_product_qty) || current_product_qty < 0) {
+                 current_product_qty = 0;
+             }
+             if (current_product_qty > maxStock) {
+                 current_product_qty = maxStock;
+                 $(`.td-input-qty${current_product_id}`).val(current_product_qty);
+             }
              data.prod_discount = p_discount;
-             data.qty = current_product_qty
+             data.qty = current_product_qty;
              new_amount_of_sale_product = (current_product_qty * data.retail_price) - p_discount;
              data.amount = new_amount_of_sale_product;
              $(`.purchase-product-amount${current_product_id}`).text(data.amount)
@@ -977,6 +1000,45 @@ $(document).on('input', '.qty-input', function () {
          window.toggleInvoiceBalanceLoader(false);
      }
  })
+
+ /** Keep sales_product_array qty/amount in sync with inputs and stock before save/print. */
+ function clampSaleLineQtys() {
+     var clamped = false;
+     sales_product_array.forEach(function (data) {
+         var maxStock = parseFloat(data.stock_in_hand);
+         if (isNaN(maxStock) || maxStock < 0) {
+             maxStock = 0;
+         }
+         var qtyInput = $(`.td-input-qty${data.product_id}`);
+         var qtyNum = parseFloat(qtyInput.length ? qtyInput.val() : data.qty);
+         if (isNaN(qtyNum) || qtyNum < 0) {
+             qtyNum = 0;
+         }
+         if (qtyNum > maxStock) {
+             qtyNum = maxStock;
+             clamped = true;
+             if (qtyInput.length) {
+                 qtyInput.val(qtyNum).css('border-color', 'red');
+             }
+         }
+         data.qty = qtyNum;
+         if (qtyInput.length) {
+             qtyInput.attr('data-quantity', qtyNum);
+         }
+         var price = parseFloat(data.retail_price) || 0;
+         var disc = parseFloat(data.prod_discount) || 0;
+         data.amount = qtyNum * price - disc;
+         $(`.purchase-product-amount${data.product_id}`).text(parseFloat(data.amount).toFixed(2));
+     });
+     grandSum(previous_payable, service_charges, invoice_discount);
+     if (clamped) {
+         $('#notifDiv').fadeIn().css('background', 'red').text('Qty adjusted to available stock');
+         setTimeout(function () {
+             $('#notifDiv').fadeOut();
+         }, 3000);
+     }
+     return clamped;
+ }
 
   function grandSum(previous_payable = 0, service_charges = 0, discount = 0) {
      var sum = 0;

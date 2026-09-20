@@ -1051,6 +1051,6 @@
 <script>
     var clients = JSON.parse('{!! json_encode($customers)  !!}');
 </script>
-<script src="{{mix('js/custom/sale.js')}}?v=7"> </script>
+<script src="{{mix('js/custom/sale.js')}}?v=9"> </script>
 
 @endpush
