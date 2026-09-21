@@ -524,9 +524,9 @@ table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child, table.
 }
 .page-item.active .page-link {
 	z-index: 1;
-	color: #fff;
-	background: linear-gradient(90deg, #152e4d 0%, #152e4d 100%);
-	border-color: #152e4d;
+	color: #a1aee1;
+	background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
+	border-color: #0038ba;
 }
 .form-control {
 	border: 1px solid #e2e6ea;
@@ -540,7 +540,8 @@ table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child, table.
 	box-shadow: 0 2px 8px 0 rgba(79, 79, 79, .1);
 }
 .dataTable thead, .dataTable tfoot {
-	background: linear-gradient(0deg, #f8f8f8 0%, #ffffff 100%);
+	background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
+	color: #a1aee1;
 }
 .modal-body table th {
 	font-weight: 600
@@ -556,6 +557,8 @@ table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child, table.
 }
 .dataTable thead th {
 	border: none;
+	color: #a1aee1;
+	background: transparent;
 }
 ._Threshhold {
 	display: inline-block;

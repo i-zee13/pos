@@ -890,8 +890,10 @@ input:focus+.slider {
       color:#12ff12;
   }
   .table thead th {
-	 color: white;
-    background-color: #152e4d;
+	 color: #a1aee1;
+    background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
+    background-color: #0038ba;
+    border: none !important;
   }
   
   .topstats{margin-top: 0px; font-size: 13px; margin-bottom: 15px;}

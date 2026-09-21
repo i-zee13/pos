@@ -49,19 +49,19 @@
   #sidebar.navbar-light {
     background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%) !important;
     border-color: #0038ba !important;
-    color: #b7e0ff !important;
+    color: #a1aee1 !important;
   }
   #sidebar.navbar-light .navbar-nav .nav-link,
   #sidebar.navbar-light .navbar-heading,
   #sidebar.navbar-light .navbar-text,
   #sidebar.navbar-light .navbar-toggler {
-    color: #b7e0ff !important;
+    color: #a1aee1 !important;
   }
   #sidebar.navbar-light .navbar-nav .nav-link:hover,
   #sidebar.navbar-light .navbar-nav .nav-link:focus,
   #sidebar.navbar-light .navbar-nav .nav-link.active,
   #sidebar.navbar-light .navbar-nav .show > .nav-link {
-    color: #b7e0ff !important;
+    color: #a1aee1 !important;
     background: rgba(0, 0, 0, 0.18) !important;
   }
 </style>
