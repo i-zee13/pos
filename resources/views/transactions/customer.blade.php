@@ -123,7 +123,7 @@
 
                                                 
                                                 <table class="table">
-                                                    <tr style="background: #0038ba;color: white;">
+                                                    <tr style="background: #00216d;color: white;">
                                                         <td style="font-family:bold">Total:</td>
                                                         <td colspan="2" class="total_ledger_sum"></td>
                                                     </tr>

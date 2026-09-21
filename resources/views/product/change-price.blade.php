@@ -15,11 +15,11 @@
         width: 34px;
         height: 34px;
         margin: 6px;
-        border: 6px solid #0038ba;
+        border: 6px solid #00216d;
         border-radius: 50%;
         animation: lds-ring 1.5s cubic-bezier(.7, .1, .3, .9) infinite;
         border-color: transparent;
-        border-top-color: #0038ba;
+        border-top-color: #00216d;
     }
     .lds-ring :nth-child(1) {
         animation-delay: -0.1s;
@@ -127,7 +127,7 @@
         font-weight: normal !important;
     }
     .card-heading:before {
-        background: #0038ba !important;
+        background: #00216d !important;
         position: absolute !important;
         width: 2px !important;
         height: 18px !important;
@@ -141,7 +141,7 @@
     }
     .total-sale .total-amount {
         font-size: 42px;
-        color: #0038ba;
+        color: #00216d;
         padding: 8px 0 8px 0;
     }
     .total-sale .total-amount span {
@@ -168,7 +168,7 @@
         padding: 14px;
     }
     .total-val span {
-        color: #0038ba;
+        color: #00216d;
         margin-bottom: 5px;
     }
     .key-trend {
@@ -190,7 +190,7 @@
         background-color: #ffffff;
         box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
         text-decoration: none;
-        border-bottom: solid 1px #0038ba;
+        border-bottom: solid 1px #00216d;
         -webkit-transition: all 0.3s;
         -moz-transition: all 0.3s;
         transition: all 0.3s;
@@ -220,7 +220,7 @@
         margin-top: 3px;
     }
     .view-all:hover {
-        color: #0038ba;
+        color: #00216d;
         text-decoration: none
     }
     .mh-100 {
@@ -236,24 +236,24 @@
     .strength .Strength-val {
         display: block;
         font-size: 35px;
-        color: #0038ba;
+        color: #00216d;
     }
     .strength .Strength-lab {
         display: block;
-        background-color: #0038ba;
+        background-color: #00216d;
         color: #fff;
         padding: 4px
     }
     .emp-val-box {
         border: solid 1px #e5e5e5;
-        border-top-color: #0038ba;
+        border-top-color: #00216d;
         padding: 15px 5px 5px 8px;
         font-size: 11px;
     }
     .emp-val-box span {
         display: block;
         font-size: 32px;
-        color: #0038ba;
+        color: #00216d;
         padding: 15px 0px 27px 0px;
         line-height: 1
     }
@@ -285,7 +285,7 @@
         color: #282828;
     }
     .avg-booking .avg-val {
-        color: #0038ba;
+        color: #00216d;
         font-size: 30px;
         margin-bottom: 0;
         letter-spacing: 0;
@@ -323,7 +323,7 @@
         width: 75px;
         height: 75px;
         border-radius: 50%;
-        border: solid 2px #0038ba
+        border: solid 2px #00216d
     }
     .emp-pic .badge-icon {
         position: absolute;
@@ -348,7 +348,7 @@
     }
     .state-01 {
         font-size: 14px;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         position: relative
     }
     .state-01 .col {
@@ -390,7 +390,7 @@
         font-size: 20px;
         margin-top: -2px;
         float: right;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
     }
     .progress {
@@ -439,7 +439,7 @@
         position: relative;
     }
     .product-card:before {
-        background: #0038ba;
+        background: #00216d;
         position: absolute;
         width: 2px;
         height: 32px;
@@ -459,7 +459,7 @@
     }
     .pr-st {
         background-color: #fbfbfb;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         text-align: center;
         line-height: 1;
         margin-top: 5px;
@@ -492,7 +492,7 @@
     .avg-booking-day h2 span {
         font-size: 30px;
         display: block;
-        color: #0038ba;
+        color: #00216d;
         padding-top: 2px;
     }
     .segmentType-value {
@@ -502,7 +502,7 @@
     }
     .segmentType-value span {
         font-size: 32px;
-        color: #0038ba;
+        color: #00216d;
         display: block
     }
     .timechart-div {
@@ -518,7 +518,7 @@
     /* +++++++++  employee page   ++++++++++++ */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap');
     .employeecard {
-        border-top: solid 2px #0038ba;
+        border-top: solid 2px #00216d;
         box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -webkit-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -moz-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
@@ -572,7 +572,7 @@
     .employeecard .emp-pic .pic {
         width: 50px;
         height: 50px;
-        border: solid 1px #0038ba;
+        border: solid 1px #00216d;
     }
     .employeecard .emp-pic .badge-icon {
         position: absolute;
@@ -600,7 +600,7 @@
         line-height: 1
     }
     .empsale span {
-        color: #0038ba;
+        color: #00216d;
     }
     .sale-pu {
         font-size: 12px;
@@ -687,12 +687,12 @@
         font-size: 13px;
         color: #fff;
         margin-top: -2px;
-        background-color: #0038ba;
+        background-color: #00216d;
         line-height: 1;
         padding: 5px 11px
     }
     .back-btn:hover {
-        background-color: #0038ba;
+        background-color: #00216d;
         color: #fff;
         text-decoration: none
     }
@@ -719,7 +719,7 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        border: solid 2px #0038ba
+        border: solid 2px #00216d
     }
     .emp-info .emp-pic .badge-icon {
         position: absolute;
@@ -767,7 +767,7 @@
     }
     .total-bs .total-amount {
         font-size: 28px;
-        color: #0038ba;
+        color: #00216d;
         padding: 4px 0 10px 0;
         border-bottom: solid 1px #e1e1e1;
         line-height: 1;
@@ -825,7 +825,7 @@
     }
     .total-stime .total-time {
         font-size: 24px;
-        color: #0038ba;
+        color: #00216d;
         margin-bottom: 6px;
         line-height: 1
     }
@@ -834,7 +834,7 @@
     }
     .total-stime .time-s {
         border: solid 1px #ececec;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         font-size: 13px;
         line-height: 1;
         text-align: center;
@@ -877,7 +877,7 @@
         float: right;
         font-size: 20px;
         margin-top: 0;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
     }
     .top-pr-list {
@@ -967,7 +967,7 @@
         font-size: 32px;
         font-weight: normal;
         letter-spacing: normal;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
         text-align: center
     }
@@ -981,7 +981,7 @@
         background: linear-gradient(90deg, #fff 0, #fff 100%)!important
     }
     .total-progress .progress-barColor {
-        border-color: #0038ba
+        border-color: #00216d
     }
     .map-section {
         height: 100vh;
@@ -1017,12 +1017,12 @@
         background: linear-gradient(to bottom, rgba(255,255,255,1) 11%, rgba(255,255,255,0) 100%);
     }
     .act-loc {
-        color: #0038ba;
+        color: #00216d;
         font-size: 16px;
         padding-left: 10px;
     }
     .act-loc .fa {
-        color: #0038ba;
+        color: #00216d;
         padding-right: 5px;
     }
     .map-top {
@@ -1059,7 +1059,7 @@
     .map-b-act a:hover, .map-b-act a.active {
         text-decoration: none;
         color: #fff;
-        background-color: #0038ba
+        background-color: #00216d
     }
     .map-b-act a:hover img, .map-b-act a.active img {
         filter: invert(100)
@@ -1073,7 +1073,7 @@
     }
     .shift-overview .FU-history .Act-timeline {
         margin-left: 115px;
-        border-left: 1px solid #0038ba;
+        border-left: 1px solid #00216d;
     }
     .shift-overview .FU-history .Act-timeline li {
         margin-bottom: 15px
@@ -1109,7 +1109,7 @@
 
 
     .productcard {
-        border-top: solid 2px #0038ba;
+        border-top: solid 2px #00216d;
         box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -webkit-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -moz-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
@@ -1260,7 +1260,7 @@
         -moz-border-radius: 0;
         border-radius: 0;
         -khtml-border-radius: 0;
-        background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
+        background: linear-gradient(90deg, #1e54d3 0%, #00216d 100%);
         color: #fff;
         text-align: center;
         margin: 0;
@@ -1285,7 +1285,7 @@
     }
     .total-vals {
         border: solid 1px #e4e4e4;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         text-align: center;
         margin: 0;
         font-size: 14px;
@@ -1298,7 +1298,7 @@
     .total-vals span {
         display: block;
         font-size: 30px;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
         padding-bottom: 10px;
     }
@@ -1312,7 +1312,7 @@
     }
     .keytrend-lr span {
         float: right;
-        color: #0038ba;
+        color: #00216d;
         font-size: 22px;
         line-height: 1;
         margin-top: -1px;
@@ -1394,7 +1394,7 @@
         font-weight: normal !important;
     }
     .card-heading:before {
-        background: #0038ba !important;
+        background: #00216d !important;
         position: absolute !important;
         width: 2px !important;
         height: 18px !important;
@@ -1408,7 +1408,7 @@
     }
     .total-sale .total-amount {
         font-size: 42px;
-        color: #0038ba;
+        color: #00216d;
         padding: 8px 0 8px 0;
     }
     .total-sale .total-amount span {
@@ -1435,7 +1435,7 @@
         padding: 14px;
     }
     .total-val span {
-        color: #0038ba;
+        color: #00216d;
         margin-bottom: 5px;
     }
     .key-trend {
@@ -1457,7 +1457,7 @@
         background-color: #ffffff;
         box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
         text-decoration: none;
-        border-bottom: solid 1px #0038ba;
+        border-bottom: solid 1px #00216d;
         -webkit-transition: all 0.3s;
         -moz-transition: all 0.3s;
         transition: all 0.3s;
@@ -1487,7 +1487,7 @@
         margin-top: 3px;
     }
     .view-all:hover {
-        color: #0038ba;
+        color: #00216d;
         text-decoration: none
     }
     .mh-100 {
@@ -1501,7 +1501,7 @@
         padding: 15px;
     }
     .avg-booking .avg-val {
-        color: #0038ba;
+        color: #00216d;
         font-size: 30px;
         margin-bottom: 0;
         letter-spacing: 0;
@@ -1541,7 +1541,7 @@
         width: 75px;
         height: 75px;
         border-radius: 50%;
-        border: solid 2px #0038ba
+        border: solid 2px #00216d
     }
     .emp-pic .badge-icon {
         position: absolute;
@@ -1566,7 +1566,7 @@
     }
     .state-01 {
         font-size: 14px;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         position: relative
     }
     .state-01 .col {
@@ -1608,7 +1608,7 @@
         font-size: 20px;
         margin-top: -2px;
         float: right;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
     }
     .progress {
@@ -1657,7 +1657,7 @@
         position: relative;
     }
     .product-card:before {
-        background: #0038ba;
+        background: #00216d;
         position: absolute;
         width: 2px;
         height: 32px;
@@ -1677,7 +1677,7 @@
     }
     .pr-st {
         background-color: #fbfbfb;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         text-align: center;
         line-height: 1;
         margin-top: 5px;
@@ -1710,7 +1710,7 @@
     .avg-booking-day h2 span {
         font-size: 30px;
         display: block;
-        color: #0038ba;
+        color: #00216d;
         padding-top: 2px;
     }
     .segmentType-value {
@@ -1720,7 +1720,7 @@
     }
     .segmentType-value span {
         font-size: 32px;
-        color: #0038ba;
+        color: #00216d;
         display: block
     }
     .timechart-div {
@@ -1752,7 +1752,7 @@
     /* +++++++++  employee page   ++++++++++++ */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap');
     .employeecard {
-        border-top: solid 2px #0038ba;
+        border-top: solid 2px #00216d;
         box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -webkit-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -moz-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
@@ -1806,7 +1806,7 @@
     .employeecard .emp-pic .pic {
         width: 50px;
         height: 50px;
-        border: solid 1px #0038ba;
+        border: solid 1px #00216d;
     }
     .employeecard .emp-pic .badge-icon {
         position: absolute;
@@ -1834,7 +1834,7 @@
         line-height: 1
     }
     .empsale span {
-        color: #0038ba;
+        color: #00216d;
     }
     .sale-pu {
         font-size: 12px;
@@ -1926,7 +1926,7 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        border: solid 2px #0038ba
+        border: solid 2px #00216d
     }
     .emp-info .emp-pic .badge-icon {
         position: absolute;
@@ -1974,7 +1974,7 @@
     }
     .total-bs .total-amount {
         font-size: 28px;
-        color: #0038ba;
+        color: #00216d;
         padding: 4px 0 10px 0;
         border-bottom: solid 1px #e1e1e1;
         line-height: 1;
@@ -2032,7 +2032,7 @@
     }
     .total-stime .total-time {
         font-size: 24px;
-        color: #0038ba;
+        color: #00216d;
         margin-bottom: 6px;
         line-height: 1
     }
@@ -2041,7 +2041,7 @@
     }
     .total-stime .time-s {
         border: solid 1px #ececec;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         font-size: 13px;
         line-height: 1;
         text-align: center;
@@ -2084,7 +2084,7 @@
         float: right;
         font-size: 20px;
         margin-top: 0;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
     }
     .top-pr-list {
@@ -2174,7 +2174,7 @@
         font-size: 32px;
         font-weight: normal;
         letter-spacing: normal;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
         text-align: center
     }
@@ -2188,7 +2188,7 @@
         background: linear-gradient(90deg, #fff 0, #fff 100%)!important
     }
     .total-progress .progress-barColor {
-        border-color: #0038ba
+        border-color: #00216d
     }
     .map-section {
         height: 100vh;
@@ -2224,12 +2224,12 @@
         background: linear-gradient(to bottom, rgba(255,255,255,1) 11%, rgba(255,255,255,0) 100%);
     }
     .act-loc {
-        color: #0038ba;
+        color: #00216d;
         font-size: 16px;
         padding-left: 10px;
     }
     .act-loc .fa {
-        color: #0038ba;
+        color: #00216d;
         padding-right: 5px;
     }
     .map-top {
@@ -2267,7 +2267,7 @@
     .map-b-act a:hover, .map-b-act a.active {
         text-decoration: none;
         color: #fff !important;
-        background-color: #0038ba
+        background-color: #00216d
     }
     .map-b-act a:hover img, .map-b-act a.active img {
         filter: invert(100)
@@ -2281,7 +2281,7 @@
     }
     .shift-overview .FU-history .Act-timeline {
         margin-left: 115px;
-        border-left: 1px solid #0038ba;
+        border-left: 1px solid #00216d;
     }
     .shift-overview .FU-history .Act-timeline li {
         margin-bottom: 15px
@@ -2317,7 +2317,7 @@
 
 
     .productcard {
-        border-top: solid 2px #0038ba;
+        border-top: solid 2px #00216d;
         box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -webkit-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -moz-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
@@ -2468,7 +2468,7 @@
         -moz-border-radius: 0;
         border-radius: 0;
         -khtml-border-radius: 0;
-        background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
+        background: linear-gradient(90deg, #1e54d3 0%, #00216d 100%);
         color: #fff;
         text-align: center;
         margin: 0;
@@ -2493,7 +2493,7 @@
     }
     .total-vals {
         border: solid 1px #e4e4e4;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         text-align: center;
         margin: 0;
         font-size: 14px;
@@ -2506,7 +2506,7 @@
     .total-vals span {
         display: block;
         font-size: 30px;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
         padding-bottom: 10px;
     }
@@ -2520,7 +2520,7 @@
     }
     .keytrend-lr span {
         float: right;
-        color: #0038ba;
+        color: #00216d;
         font-size: 22px;
         line-height: 1;
         margin-top: -1px;
@@ -2542,7 +2542,7 @@
     .head-blue {
         line-height: 1;
         font-size: 18px;
-        color: #0038ba;
+        color: #00216d;
     }
     .ex-avg-booking {
         font-size: 14px;
@@ -2563,7 +2563,7 @@
     }
     .divisional-reports .font-digit {
         letter-spacing: normal;
-        color: #0038ba
+        color: #00216d
     }
     .divisional-reports .font-digit b {
         font-size: 13px;
@@ -2596,7 +2596,7 @@
         height: 13px;
         background-color: #fff;
         border-radius: 50%;
-        border: solid 3px #0038ba;
+        border: solid 3px #00216d;
         display: inline-block;
     }
     .divisional-reports h4 .circle-g {
@@ -2608,7 +2608,7 @@
         color: #747674
     }
     .dis-vs-value span {
-        color: #0038ba;
+        color: #00216d;
         font-size: 15px;
     }
     .pr-reverse {
@@ -2620,7 +2620,7 @@
     }
     .shopclose {
         font-size: 13px; cursor: pointer;
-        color: #0038ba!important;
+        color: #00216d!important;
     }
     .shopclose .fa {
         font-size: 15px;
@@ -2640,7 +2640,7 @@
         border-bottom: solid 1px #efefef; font-size: 13px; padding-top: 10px; padding-bottom: 10px;
     }
     .dash-order-list h3{font-size: 16px; margin-bottom:3px; padding-top: 4px; color: #282828}
-    .dash-order-list .dash-ord-price{font-size: 20px; color: #0038ba}
+    .dash-order-list .dash-ord-price{font-size: 20px; color: #00216d}
     .dash-order-list .btn-primary{letter-spacing:1px; padding:2px 18px; font-size: 13px; box-shadow: none; margin-top: 3px;}
     .dash-order-list .ord-d{display: block;}
     .dash-order-list .ord-d strong{padding-right: 15px;}
@@ -2653,7 +2653,7 @@
         font-size: 16px!important; font-family: proximanova-semibold!important;
     }
     .tab-inner-link{cursor: pointer; text-decoration: none !important; display: block; color:#282828}
-    .tab-inner-link:hover{color:#0038ba}
+    .tab-inner-link:hover{color:#00216d}
     .min-h-auto{min-height: auto !important;}
 
     .set-icon-size img{ width: 43px; height: 43px;}
@@ -2862,7 +2862,7 @@
                                             color: white !important;
                                             }
                             </style>
-                            <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#0038ba !important"> Reset</button>
+                            <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#00216d !important"> Reset</button>
                         </div>
                         <div class="col-auto pl-0">
                             <button type="button" style="margin-left:4px; " class="btn btn-primary search-btn"> Search</button>

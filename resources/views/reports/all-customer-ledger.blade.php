@@ -8,7 +8,7 @@
     thead,
     tr {
         border: 0 solid;
-        border-color: #0038ba;
+        border-color: #00216d;
     }
 
     @keyframes lds-ring {
@@ -97,7 +97,7 @@
     }
 
     .card-heading:before {
-        background: #0038ba !important;
+        background: #00216d !important;
         position: absolute !important;
         width: 2px !important;
         height: 18px !important;
@@ -113,7 +113,7 @@
 
     .total-sale .total-amount {
         font-size: 42px;
-        color: #0038ba;
+        color: #00216d;
         padding: 8px 0 8px 0;
     }
 
@@ -147,7 +147,7 @@
     }
 
     .total-val span {
-        color: #0038ba;
+        color: #00216d;
         margin-bottom: 5px;
     }
 
@@ -161,7 +161,7 @@
     }
 
     .view-all:hover {
-        color: #0038ba;
+        color: #00216d;
         text-decoration: none
     }
 
@@ -180,19 +180,19 @@
     .strength .Strength-val {
         display: block;
         font-size: 35px;
-        color: #0038ba;
+        color: #00216d;
     }
 
     .strength .Strength-lab {
         display: block;
-        background-color: #0038ba;
+        background-color: #00216d;
         color: #fff;
         padding: 4px
     }
 
     .emp-val-box {
         border: solid 1px #e5e5e5;
-        border-top-color: #0038ba;
+        border-top-color: #00216d;
         padding: 15px 5px 5px 8px;
         font-size: 11px;
     }
@@ -200,7 +200,7 @@
     .emp-val-box span {
         display: block;
         font-size: 32px;
-        color: #0038ba;
+        color: #00216d;
         padding: 15px 0px 27px 0px;
         line-height: 1
     }
@@ -238,7 +238,7 @@
     }
 
     .avg-booking .avg-val {
-        color: #0038ba;
+        color: #00216d;
         font-size: 30px;
         margin-bottom: 0;
         letter-spacing: 0;
@@ -271,7 +271,7 @@
 
 
     .card-heading:before {
-        background: #0038ba !important;
+        background: #00216d !important;
         position: absolute !important;
         width: 2px !important;
         height: 18px !important;
@@ -287,7 +287,7 @@
 
     .total-sale .total-amount {
         font-size: 42px;
-        color: #0038ba;
+        color: #00216d;
         padding: 8px 0 8px 0;
     }
 
@@ -321,7 +321,7 @@
     }
 
     .total-val span {
-        color: #0038ba;
+        color: #00216d;
         margin-bottom: 5px;
     }
 
@@ -335,7 +335,7 @@
     }
 
     .view-all:hover {
-        color: #0038ba;
+        color: #00216d;
         text-decoration: none
     }
 
@@ -352,7 +352,7 @@
     }
 
     .avg-booking .avg-val {
-        color: #0038ba;
+        color: #00216d;
         font-size: 30px;
         margin-bottom: 0;
         letter-spacing: 0;
@@ -399,7 +399,7 @@
         width: 75px;
         height: 75px;
         border-radius: 50%;
-        border: solid 2px #0038ba
+        border: solid 2px #00216d
     }
 
     .emp-pic .badge-icon {
@@ -429,7 +429,7 @@
 
     .state-01 {
         font-size: 14px;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         position: relative
     }
 
@@ -478,7 +478,7 @@
         font-size: 20px;
         margin-top: -2px;
         float: right;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
     }
 
@@ -533,7 +533,7 @@
     }
 
     .product-card:before {
-        background: #0038ba;
+        background: #00216d;
         position: absolute;
         width: 2px;
         height: 32px;
@@ -556,7 +556,7 @@
 
     .pr-st {
         background-color: #fbfbfb;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         text-align: center;
         line-height: 1;
         margin-top: 5px;
@@ -596,7 +596,7 @@
     .avg-booking-day h2 span {
         font-size: 30px;
         display: block;
-        color: #0038ba;
+        color: #00216d;
         padding-top: 2px;
     }
 
@@ -608,7 +608,7 @@
 
     .segmentType-value span {
         font-size: 32px;
-        color: #0038ba;
+        color: #00216d;
         display: block
     }
 
@@ -713,7 +713,7 @@
         font-size: 32px;
         font-weight: normal;
         letter-spacing: normal;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
         text-align: center
     }
@@ -730,7 +730,7 @@
     }
 
     .total-progress .progress-barColor {
-        border-color: #0038ba
+        border-color: #00216d
     }
 
     .map-section {
@@ -770,13 +770,13 @@
     }
 
     .act-loc {
-        color: #0038ba;
+        color: #00216d;
         font-size: 16px;
         padding-left: 10px;
     }
 
     .act-loc .fa {
-        color: #0038ba;
+        color: #00216d;
         padding-right: 5px;
     }
 
@@ -813,7 +813,7 @@
 
 
     .productcard {
-        border-top: solid 2px #0038ba;
+        border-top: solid 2px #00216d;
         box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -webkit-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
         -moz-box-shadow: 0px 0px 10px 0px rgba(82, 63, 105, 0.2);
@@ -993,7 +993,7 @@
         -moz-border-radius: 0;
         border-radius: 0;
         -khtml-border-radius: 0;
-        background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
+        background: linear-gradient(90deg, #1e54d3 0%, #00216d 100%);
         color: #fff;
         text-align: center;
         margin: 0;
@@ -1023,7 +1023,7 @@
 
     .total-vals {
         border: solid 1px #e4e4e4;
-        border-top: solid 1px #0038ba;
+        border-top: solid 1px #00216d;
         text-align: center;
         margin: 0;
         font-size: 14px;
@@ -1038,7 +1038,7 @@
     .total-vals span {
         display: block;
         font-size: 30px;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1;
         padding-bottom: 10px;
     }
@@ -1055,7 +1055,7 @@
 
     .keytrend-lr span {
         float: right;
-        color: #0038ba;
+        color: #00216d;
         font-size: 22px;
         line-height: 1;
         margin-top: -1px;
@@ -1081,7 +1081,7 @@
     .head-blue {
         line-height: 1;
         font-size: 18px;
-        color: #0038ba;
+        color: #00216d;
     }
 
     .ex-avg-booking {
@@ -1106,7 +1106,7 @@
 
     .divisional-reports .font-digit {
         letter-spacing: normal;
-        color: #0038ba
+        color: #00216d
     }
 
     .divisional-reports .font-digit b {
@@ -1146,7 +1146,7 @@
         height: 13px;
         background-color: #fff;
         border-radius: 50%;
-        border: solid 3px #0038ba;
+        border: solid 3px #00216d;
         display: inline-block;
     }
 
@@ -1161,7 +1161,7 @@
     }
 
     .dis-vs-value span {
-        color: #0038ba;
+        color: #00216d;
         font-size: 15px;
     }
 
@@ -1177,7 +1177,7 @@
     .shopclose {
         font-size: 13px;
         cursor: pointer;
-        color: #0038ba !important;
+        color: #00216d !important;
     }
 
     .shopclose .fa {
@@ -1216,7 +1216,7 @@
 
     .dash-order-list .dash-ord-price {
         font-size: 20px;
-        color: #0038ba
+        color: #00216d
     }
 
     .dash-order-list .btn-primary {
@@ -1258,7 +1258,7 @@
     }
 
     .tab-inner-link:hover {
-        color: #0038ba
+        color: #00216d
     }
 
     .min-h-auto {
@@ -1620,7 +1620,7 @@
         background-color: #ffffff;
         box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
         text-decoration: none;
-        border-bottom: solid 1px #0038ba;
+        border-bottom: solid 1px #00216d;
         -webkit-transition: all 0.3s;
         -moz-transition: all 0.3s;
         transition: all 0.3s;
@@ -1651,7 +1651,7 @@
         font-size: 23px;
         /*font-family: 'Rationale';*/
         font-weight: bolder;
-        color: #0038ba;
+        color: #00216d;
     }
 
     .comment-box {
@@ -1707,7 +1707,7 @@
                 <div class="row justify-content-between d-flex">
                     <div class="col-lg-6 col-md-12 mb-20 ">
                         <div class="card mh-100">
-                            <div class="d-flex justify-content-between" style="border-bottom: 2px solid #0038ba;">
+                            <div class="d-flex justify-content-between" style="border-bottom: 2px solid #00216d;">
                                 <h2 class="card-heading">Receivable</h2> <span class="grand_ttl_in">{{number_format($total_credit, 2)}}</span>
                             </div>
                             <div class="ttl_in"> 
@@ -1725,7 +1725,7 @@
                     </div>
                     <div class="col-lg-6 col-md-12 mb-20 ">
                         <div class="card mh-100">
-                            <div class="d-flex justify-content-between" style="border-bottom: 2px solid #0038ba;">
+                            <div class="d-flex justify-content-between" style="border-bottom: 2px solid #00216d;">
                                 <h2 class="card-heading">Payable </h2> <span class="grand_ttl_out">{{number_format(abs($total_debit), 2)}}</span>
                             </div>
                             <div class="ttl_out">

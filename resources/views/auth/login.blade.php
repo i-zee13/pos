@@ -32,7 +32,7 @@
   <!-- Title -->
   <title>POS</title>
 
-<body class="d-flex align-items-center bg-auth border-top border-top-2 border-primary" style="display: block; background:#0038ba !important; border-top:none !important">
+<body class="d-flex align-items-center bg-auth border-top border-top-2 border-primary" style="display: block; background:#00216d !important; border-top:none !important">
 
   <!-- CONTENT
     ================================================== -->

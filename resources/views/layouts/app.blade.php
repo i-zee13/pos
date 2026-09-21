@@ -58,7 +58,7 @@
   
      .prod-bal-div{
         float: right;   
-        color: #0038ba;
+        color: #00216d;
         font-weight: bolder;
         font-family:'Rationale', sans-serif !important;
         font-size: 18px;
@@ -84,7 +84,7 @@
             font-size: 13px; 
             font-family: monospace;
             padding: 4px 10px;
-            background: #0038ba;
+            background: #00216d;
             border-radius: 5px;
         }
         #notifDiv {

@@ -17435,7 +17435,7 @@ $('#add-product').on('click', function () {
       is_in_array[0].qty++;
     }
     $('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
-    $('#tr-' + data_variable).css('background', '#0038ba').addClass('text-white');
+    $('#tr-' + data_variable).css('background', '#00216d').addClass('text-white');
     var ss = data_variable;
     setTimeout(function () {
       $('#tr-' + ss).css('background', '').removeClass('text-white');
@@ -18362,7 +18362,7 @@ $('#invoice_discount').on('input', function () {
 
 //ADDED BELOW CODE TO MASTER.JS
 // $('#add-product').on('focus', function () {
-//     $(this).css('background', '#0038ba ');
+//     $(this).css('background', '#00216d ');
 // });
 // $('#add-product').on('blur', function () {
 //     $(this).css('background', 'green');

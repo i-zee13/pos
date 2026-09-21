@@ -17,7 +17,7 @@ var data  = {
 			backgroundColor: gradient,
 			pointBackgroundColor: '#fff',
 			borderWidth: 2, 
-			borderColor: '#0038ba',
+			borderColor: '#00216d',
 			data: [100, 400, 600, 300, 500, 100, 200, 400, 50 ]
     }]
 };
@@ -63,7 +63,7 @@ var options = {
 		display: false
 	},
 	point: {
-		backgroundColor: '#0038ba',
+		backgroundColor: '#00216d',
 	},
 
 	

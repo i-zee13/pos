@@ -21,13 +21,13 @@
   }
 
   #sidebar #sidebarCollapse::-webkit-scrollbar-thumb {
-    background: linear-gradient(0deg, #0038ba 0%, #101010 100%);
+    background: linear-gradient(0deg, #00216d 0%, #101010 100%);
     opacity: 0.75;
     border-radius: 4px;
   }
 
   #sidebar #sidebarCollapse::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(0deg, #0038ba 0%, #101010 100%);
+    background: linear-gradient(0deg, #00216d 0%, #101010 100%);
     /* Color when hovered */
   }
 
@@ -47,8 +47,8 @@
 
   /* Sidebar navbar: gradient blue + light font */
   #sidebar.navbar-light {
-    background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%) !important;
-    border-color: #0038ba !important;
+    background: linear-gradient(90deg, #1e54d3 0%, #00216d 100%) !important;
+    border-color: #00216d !important;
     color: #a1aee1 !important;
   }
   #sidebar.navbar-light .navbar-nav .nav-link,

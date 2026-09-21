@@ -129,7 +129,7 @@
                     [0, '#c5d4f5'],
                     [0.35, '#7a9ee0'],
                     [0.7, '#3d63c9'],
-                    [1, '#0038ba']
+                    [1, '#00216d']
                 ],
                 lineWidth: 0,
                 tickWidth: 0,
@@ -144,7 +144,7 @@
                         y: -18,
                         borderWidth: 0,
                         useHTML: true,
-                        format: '<div style="text-align:center"><span style="font-size:22px;font-family:Rationale,sans-serif;color:#0038ba;font-weight:700">{y}%</span></div>'
+                        format: '<div style="text-align:center"><span style="font-size:22px;font-family:Rationale,sans-serif;color:#00216d;font-weight:700">{y}%</span></div>'
                     },
                     innerRadius: '70%',
                     radius: '100%'
@@ -245,14 +245,14 @@
             title: { text: null },
             xAxis: {
                 categories: categories,
-                labels: { style: { fontSize: '11px', color: '#0038ba', fontWeight: '600' } },
+                labels: { style: { fontSize: '11px', color: '#00216d', fontWeight: '600' } },
                 lineColor: '#eef1f5',
                 tickLength: 0
             },
             yAxis: {
                 title: { text: null },
                 gridLineColor: '#eef1f5',
-                labels: { style: { color: '#0038ba' } }
+                labels: { style: { color: '#00216d' } }
             },
             legend: { enabled: false },
             credits: { enabled: false },
@@ -266,14 +266,14 @@
                     borderRadius: 4,
                     pointPadding: 0.15,
                     groupPadding: 0.08,
-                    color: '#0038ba',
+                    color: '#00216d',
                     colorByPoint: false,
                     dataLabels: {
                         enabled: true,
                         crop: false,
                         overflow: 'allow',
                         style: {
-                            color: '#0038ba',
+                            color: '#00216d',
                             fontSize: '11px',
                             fontWeight: '700',
                             textOutline: 'none',
@@ -288,7 +288,7 @@
             series: [{
                 name: 'Amount',
                 data: values,
-                color: '#0038ba'
+                color: '#00216d'
             }]
         });
     }
@@ -303,7 +303,7 @@
                 marker: {
                     enabled: y > 0,
                     radius: 3,
-                    fillColor: '#0038ba'
+                    fillColor: '#00216d'
                 }
             };
         });
@@ -336,14 +336,14 @@
             plotOptions: {
                 areaspline: {
                     fillOpacity: 0.18,
-                    marker: { radius: 3, fillColor: '#0038ba' },
+                    marker: { radius: 3, fillColor: '#00216d' },
                     lineWidth: 2
                 }
             },
             series: [{
                 name: 'Sales',
                 data: values,
-                color: '#0038ba',
+                color: '#00216d',
                 fillColor: {
                     linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                     stops: [
@@ -395,7 +395,7 @@
                 labels: labels.length ? labels : ['No data'],
                 datasets: [{
                     data: values.length ? values : [1],
-                    backgroundColor: ['#0038ba', '#1e54d3', '#3d7ea6', '#5aa6a0', '#c4a35a', '#d64545', '#6b7a90', '#243447'],
+                    backgroundColor: ['#00216d', '#1e54d3', '#3d7ea6', '#5aa6a0', '#c4a35a', '#d64545', '#6b7a90', '#243447'],
                     borderWidth: 0,
                     hoverOffset: 6
                 }]

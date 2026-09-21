@@ -10,14 +10,14 @@
         border-radius: 6px !important; font-weight: 600; min-width: 90px;
     }
     .analytics-modes .btn.active {
-        background: #0038ba; border-color: #0038ba; color: #fff;
+        background: #00216d; border-color: #00216d; color: #fff;
     }
     .analytics-pickers { display: flex; gap: 10px; align-items: center; }
     .analytics-pickers input {
         border: 1px solid #d9dee7; border-radius: 6px; padding: 6px 10px; font-weight: 600; background: #fff;
     }
     .analytics-meta { color: #6b7a90; font-size: 13px; }
-    .analytics-meta strong { color: #0038ba; }
+    .analytics-meta strong { color: #00216d; }
     .an-section {
         background: #fff; border-radius: 12px; padding: 18px 20px; margin-bottom: 16px;
         box-shadow: 0 1px 3px rgba(21,46,77,.06);
@@ -27,10 +27,10 @@
         font-size: 14px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: #3d4a5c;
     }
     .an-section-title:before {
-        content: ''; width: 4px; height: 18px; background: #0038ba; border-radius: 2px; display: inline-block;
+        content: ''; width: 4px; height: 18px; background: #00216d; border-radius: 2px; display: inline-block;
     }
     .hero-sales .hero-amount {
-        font-family: 'Rationale', sans-serif !important; font-size: 42px; color: #0038ba; line-height: 1;
+        font-family: 'Rationale', sans-serif !important; font-size: 42px; color: #00216d; line-height: 1;
         display: inline-block; margin-right: 12px;
     }
     .hero-sales .hero-change {
@@ -54,7 +54,7 @@
     }
     .hero-grid .hg-cell:nth-child(4n) { border-right: none; }
     .hero-grid .hg-value {
-        font-family: 'Rationale', sans-serif !important; font-size: 26px; color: #0038ba; line-height: 1.1;
+        font-family: 'Rationale', sans-serif !important; font-size: 26px; color: #00216d; line-height: 1.1;
     }
     .hero-grid .hg-label { font-size: 12px; color: #8896a8; margin-top: 4px; font-weight: 600; }
     .gauge-row {
@@ -70,13 +70,13 @@
         font-size: 14px; color: #6b7a90; margin: -6px 0 10px;
     }
     .trend-avg strong {
-        font-family: 'Rationale', sans-serif !important; font-size: 28px; color: #0038ba; margin-left: 6px;
+        font-family: 'Rationale', sans-serif !important; font-size: 28px; color: #00216d; margin-left: 6px;
     }
     .mix-bars { margin-top: 8px; }
     .mix-bar-head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #243447; margin-bottom: 5px; }
-    .mix-bar-head .pct { color: #0038ba; }
+    .mix-bar-head .pct { color: #00216d; }
     .mix-bar-track { height: 7px; background: #eef1f5; border-radius: 6px; overflow: hidden; }
-    .mix-bar-fill { height: 100%; background: linear-gradient(90deg, #0038ba, #1e54d3); border-radius: 6px; width: 0; transition: width .5s ease; }
+    .mix-bar-fill { height: 100%; background: linear-gradient(90deg, #00216d, #1e54d3); border-radius: 6px; width: 0; transition: width .5s ease; }
     .mix-bar-meta { display: flex; justify-content: space-between; font-size: 11px; color: #8896a8; margin-top: 4px; }
     .mix-chart-wrap {
         position: relative;
@@ -106,7 +106,7 @@
     .mix-center-value {
         font-family: 'Rationale', sans-serif !important;
         font-size: 18px;
-        color: #0038ba;
+        color: #00216d;
         line-height: 1.15;
         margin-top: 2px;
         word-break: break-word;
@@ -126,12 +126,12 @@
         overflow-x: hidden;
         padding-right: 6px;
         scrollbar-width: thin;
-        scrollbar-color: #0038ba #eef1f5;
+        scrollbar-color: #00216d #eef1f5;
     }
     .product-cards::-webkit-scrollbar { width: 4px; }
     .product-cards::-webkit-scrollbar-track { background: #eef1f5; border-radius: 4px; }
     .product-cards::-webkit-scrollbar-thumb {
-        background: linear-gradient(0deg, #0038ba 0%, #101010 100%);
+        background: linear-gradient(0deg, #00216d 0%, #101010 100%);
         border-radius: 4px;
     }
     .product-card-an {
@@ -150,7 +150,7 @@
     .product-card-an:hover {
         background-color: #ffffff;
         box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
-        border-bottom: solid 1px #0038ba;
+        border-bottom: solid 1px #00216d;
         -webkit-transition: all 0.3s;
         -moz-transition: all 0.3s;
         transition: all 0.3s;
@@ -160,13 +160,13 @@
         z-index: 1;
     }
     .product-card-an:before {
-        content: ''; position: absolute; left: 0; top: 12px; width: 3px; height: 28px; background: #0038ba; border-radius: 0 2px 2px 0;
+        content: ''; position: absolute; left: 0; top: 12px; width: 3px; height: 28px; background: #00216d; border-radius: 0 2px 2px 0;
     }
     .product-card-an .pc-name {
         font-size: 12px; font-weight: 700; color: #243447; height: 32px; overflow: hidden; line-height: 1.25; margin-bottom: 8px;
     }
     .product-card-an .pc-amount {
-        font-family: 'Rationale', sans-serif !important; font-size: 20px; color: #0038ba; line-height: 1;
+        font-family: 'Rationale', sans-serif !important; font-size: 20px; color: #00216d; line-height: 1;
     }
     .product-card-an .pc-qty { font-size: 11px; color: #8896a8; margin-top: 3px; }
     @media (max-width: 767px) {
@@ -187,12 +187,12 @@
     .split-pill:hover {
         background-color: #ffffff;
         box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
-        border-bottom: solid 1px #0038ba;
+        border-bottom: solid 1px #00216d;
         -ms-transform: scale(1.02);
         -webkit-transform: scale(1.02);
         transform: scale(1.02);
     }
-    .split-pill span:last-child { font-family: 'Rationale', sans-serif !important; font-size: 18px; color: #0038ba; }
+    .split-pill span:last-child { font-family: 'Rationale', sans-serif !important; font-size: 18px; color: #00216d; }
     .analytics-table { width: 100%; font-size: 13px; }
     .analytics-table th {
         color: #6b7a90; font-weight: 600; border-bottom: 1px solid #eef1f5; padding: 8px 6px;
@@ -217,9 +217,9 @@
         transform: scale(1.02);
     }
     .analytics-table tbody tr:hover td {
-        border-bottom-color: #0038ba;
+        border-bottom-color: #00216d;
     }
-    .analytics-table td.num, .analytics-table th.num { text-align: right; font-family: 'Rationale', sans-serif !important; font-size: 16px; color: #0038ba; }
+    .analytics-table td.num, .analytics-table th.num { text-align: right; font-family: 'Rationale', sans-serif !important; font-size: 16px; color: #00216d; }
     .mix-bar-row {
         border-bottom: solid 1px #eef1f5;
         padding: 6px 4px 10px;
@@ -236,7 +236,7 @@
     .mix-bar-row:hover {
         background-color: #ffffff;
         box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.25);
-        border-bottom: solid 1px #0038ba;
+        border-bottom: solid 1px #00216d;
         -ms-transform: scale(1.02);
         -webkit-transform: scale(1.02);
         transform: scale(1.02);

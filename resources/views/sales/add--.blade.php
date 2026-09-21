@@ -329,7 +329,7 @@
   } */
 
   .top-border {
-    border-top: solid 2px #0038ba ;
+    border-top: solid 2px #00216d ;
   }
 
   .addBTN-act {

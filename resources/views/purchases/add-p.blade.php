@@ -600,7 +600,7 @@
                   <!-- <input type="hidden" id="stock_products"   value="{{json_encode($products)}}"> -->
                   <div class="CT_sec">
                   </div>
-                  <div class="row  text-white d-flex" style="background-color: #0038ba">
+                  <div class="row  text-white d-flex" style="background-color: #00216d">
                   <h2 class="title pt-0 mb-2 border-bottom">Invoice <span>Details</span></h2>
 
                       <div class="col-md-2 PB-10">
@@ -716,7 +716,7 @@
                           </div>
                           <style>
                               .ProductTable tbody tr:hover td {
-                                  background: #0038ba !important;
+                                  background: #00216d !important;
 
                                   color: white !important;
                               }

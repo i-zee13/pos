@@ -191,15 +191,15 @@
                                         <strong class="digit mop">Loading...</strong>
                                     </div>
                                  
-                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #0038ba;">
+                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #00216d;">
                                         <span> <b> کل آمد : </b> </span>
                                         <strong class="digit ttl_in f-17"></strong>
                                     </div>
-                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #0038ba;">
+                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #00216d;">
                                         <span> <b> کل نکاس : </b> </span>
                                         <strong class="digit ttl_out f-17"></strong>
                                     </div>
-                                    <div class="total_meezan_div purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #0038ba;">
+                                    <div class="total_meezan_div purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #00216d;">
                                         <span> کل میزان : </span>
                                         <strong class="digit total_meezan f-17"></strong>
                                     </div>
@@ -503,7 +503,7 @@
                                         <strong class="digit"></strong> 
                                         <strong class="digit karaya_dokan_banam">Loading...</strong>
                                     </div>
-                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #0038ba;">
+                                    <div class="purchi-footer-row" style="border-bottom: 1px solid #f4f4f4;color: white;background: #00216d;">
                                         <span> کل نکاس : </span>
                                         <strong class="digit ttl_out f-17"></strong>
                                     </div>

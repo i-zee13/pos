@@ -36,7 +36,7 @@
   }
 
   .card-heading:before {
-    background: #0038ba;
+    background: #00216d;
     position: absolute;
     width: 2px;
     height: 18px;
@@ -52,7 +52,7 @@
 
   .total-sale .total-amount {
     font-size: 42px;
-    color: #0038ba;
+    color: #00216d;
     padding: 8px 0 8px 0;
   }
 
@@ -86,7 +86,7 @@
   }
 
   .total-val span {
-    color: #0038ba;
+    color: #00216d;
     margin-bottom: 5px;
   }
 
@@ -99,7 +99,7 @@
 
   .total-vals {
     border: solid 1px #e4e4e4;
-    border-top: solid 1px #0038ba;
+    border-top: solid 1px #00216d;
     text-align: center;
     margin: 0;
     font-size: 14px;
@@ -118,7 +118,7 @@
   .total-vals span {
     display: block;
     font-size: 30px;
-    color: #0038ba;
+    color: #00216d;
     line-height: 1;
     padding-bottom: 10px;
   }
@@ -480,7 +480,7 @@
   }
 
   .seabinReport .card:before {
-    background: #0038ba;
+    background: #00216d;
     position: absolute;
     width: 2px;
     height: 35px;
@@ -744,7 +744,7 @@
   ._user_Pimage {
     width: 38px;
     height: 38px;
-    border: solid 1px #0038ba;
+    border: solid 1px #00216d;
     background-color: #FFF;
     padding: 1px;
     border-radius: 50%;
