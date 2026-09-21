@@ -289,7 +289,8 @@ class DashboardController extends Controller
 
             $map = collect($rows)->keyBy('bucket');
             $points = [];
-            for ($h = 0; $h < 24; $h++) {
+            // Shop hours only: 8 AM (08:00) → 11 PM (23:00)
+            for ($h = 8; $h <= 23; $h++) {
                 $points[] = [
                     'label' => sprintf('%02d:00', $h),
                     'value' => (float) ($map[$h]->amount ?? 0),

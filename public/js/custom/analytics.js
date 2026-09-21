@@ -124,10 +124,12 @@
             yAxis: {
                 min: 0,
                 max: 100,
+                // Same blue family: low % → light, high % → brand blue
                 stops: [
-                    [0.3, '#d64545'],
-                    [0.55, '#c4a35a'],
-                    [0.85, '#0038ba']
+                    [0, '#c5d4f5'],
+                    [0.35, '#7a9ee0'],
+                    [0.7, '#3d63c9'],
+                    [1, '#0038ba']
                 ],
                 lineWidth: 0,
                 tickWidth: 0,
@@ -227,7 +229,6 @@
             Number(kpis.sale_returns) || 0,
             Number(split.vendor_payments) || 0
         ];
-        var colors = ['#0038ba', '#1aa35c', '#c4a35a', '#d64545', '#8896a8', '#5aa6a0'];
 
         if (flowChart) {
             flowChart.destroy();
@@ -236,18 +237,22 @@
         if (!document.getElementById('flowChart')) return;
 
         flowChart = Highcharts.chart('flowChart', {
-            chart: { type: 'column', backgroundColor: 'transparent' },
+            chart: {
+                type: 'column',
+                backgroundColor: 'transparent',
+                marginTop: 36
+            },
             title: { text: null },
             xAxis: {
                 categories: categories,
-                labels: { style: { fontSize: '11px', color: '#6b7a90', fontWeight: '600' } },
+                labels: { style: { fontSize: '11px', color: '#0038ba', fontWeight: '600' } },
                 lineColor: '#eef1f5',
                 tickLength: 0
             },
             yAxis: {
                 title: { text: null },
                 gridLineColor: '#eef1f5',
-                labels: { style: { color: '#8896a8' } }
+                labels: { style: { color: '#0038ba' } }
             },
             legend: { enabled: false },
             credits: { enabled: false },
@@ -261,20 +266,47 @@
                     borderRadius: 4,
                     pointPadding: 0.15,
                     groupPadding: 0.08,
-                    colorByPoint: true,
-                    colors: colors
+                    color: '#0038ba',
+                    colorByPoint: false,
+                    dataLabels: {
+                        enabled: true,
+                        crop: false,
+                        overflow: 'allow',
+                        style: {
+                            color: '#0038ba',
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            textOutline: 'none',
+                            textDecoration: 'underline'
+                        },
+                        formatter: function () {
+                            return 'Rs.' + money(this.y);
+                        }
+                    }
                 }
             },
             series: [{
                 name: 'Amount',
-                data: values
+                data: values,
+                color: '#0038ba'
             }]
         });
     }
 
     function renderTrend(points) {
         var categories = (points || []).map(function (p) { return p.label; });
-        var values = (points || []).map(function (p) { return Number(p.value) || 0; });
+        // Hide markers on zero hours; keep line/area continuous
+        var values = (points || []).map(function (p) {
+            var y = Number(p.value) || 0;
+            return {
+                y: y,
+                marker: {
+                    enabled: y > 0,
+                    radius: 3,
+                    fillColor: '#0038ba'
+                }
+            };
+        });
 
         if (trendChart) {
             trendChart.destroy();

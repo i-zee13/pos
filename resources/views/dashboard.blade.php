@@ -192,7 +192,7 @@
         -webkit-transform: scale(1.02);
         transform: scale(1.02);
     }
-    .split-pill span:last-child { font-family: 'Rationale', sans-serif !important; font-size: 18px; color: #152e4d; }
+    .split-pill span:last-child { font-family: 'Rationale', sans-serif !important; font-size: 18px; color: #0038ba; }
     .analytics-table { width: 100%; font-size: 13px; }
     .analytics-table th {
         color: #6b7a90; font-weight: 600; border-bottom: 1px solid #eef1f5; padding: 8px 6px;
@@ -219,7 +219,7 @@
     .analytics-table tbody tr:hover td {
         border-bottom-color: #0038ba;
     }
-    .analytics-table td.num, .analytics-table th.num { text-align: right; font-family: 'Rationale', sans-serif !important; font-size: 16px; }
+    .analytics-table td.num, .analytics-table th.num { text-align: right; font-family: 'Rationale', sans-serif !important; font-size: 16px; color: #0038ba; }
     .mix-bar-row {
         border-bottom: solid 1px #eef1f5;
         padding: 6px 4px 10px;
