@@ -17,7 +17,7 @@
         border: 1px solid #d9dee7; border-radius: 6px; padding: 6px 10px; font-weight: 600; background: #fff;
     }
     .analytics-meta { color: #6b7a90; font-size: 13px; }
-    .analytics-meta strong { color: #152e4d; }
+    .analytics-meta strong { color: #0038ba; }
     .an-section {
         background: #fff; border-radius: 12px; padding: 18px 20px; margin-bottom: 16px;
         box-shadow: 0 1px 3px rgba(21,46,77,.06);
@@ -126,12 +126,12 @@
         overflow-x: hidden;
         padding-right: 6px;
         scrollbar-width: thin;
-        scrollbar-color: #152e4d #eef1f5;
+        scrollbar-color: #0038ba #eef1f5;
     }
     .product-cards::-webkit-scrollbar { width: 4px; }
     .product-cards::-webkit-scrollbar-track { background: #eef1f5; border-radius: 4px; }
     .product-cards::-webkit-scrollbar-thumb {
-        background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
+        background: linear-gradient(0deg, #0038ba 0%, #101010 100%);
         border-radius: 4px;
     }
     .product-card-an {

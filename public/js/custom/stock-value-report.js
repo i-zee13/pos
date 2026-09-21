@@ -337,7 +337,7 @@ $('.search-btn').on('click', function () {
               </tr>`);
             });
             $('.TeacherAttendanceListTable tbody').append(`
-              <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+              <tr style="background: #0038ba;border: solid 1px #dbdbdb;color: white">
                   <td class="font18" align="right" ></td>
                   <td class="font18" align="center" colspan="4">Grand Total :</td>
                   <td class="totalNo">

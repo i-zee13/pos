@@ -21,13 +21,13 @@
   }
 
   #sidebar #sidebarCollapse::-webkit-scrollbar-thumb {
-    background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
+    background: linear-gradient(0deg, #0038ba 0%, #101010 100%);
     opacity: 0.75;
     border-radius: 4px;
   }
 
   #sidebar #sidebarCollapse::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(0deg, #152e4d 0%, #101010 100%);
+    background: linear-gradient(0deg, #0038ba 0%, #101010 100%);
     /* Color when hovered */
   }
 

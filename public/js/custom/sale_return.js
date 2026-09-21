@@ -18292,7 +18292,7 @@ $('#invoice_discount').on('input', function () {
   grandSum(previous_payable, service_charges, $(this).val());
 });
 $('#add-product').on('focus', function () {
-  $(this).css('background', '#152e4d ');
+  $(this).css('background', '#0038ba ');
 });
 $('#add-product').on('blur', function () {
   $(this).css('background', 'green');

@@ -39,7 +39,7 @@
     }
 
     .cp-stats {
-        border-bottom: solid 0.125rem #152e4d;
+        border-bottom: solid 0.125rem #0038ba;
         background-image: none !important;
         padding: 0.9375rem;
         font-size: 0.8125rem;

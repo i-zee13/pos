@@ -124,7 +124,7 @@ function getStock(CurrentRef = null,is_click = 0){
                     </tr>`);
             });
             $('.TeacherAttendanceListTable tbody').append(`
-            <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+            <tr style="background: #0038ba;border: solid 1px #dbdbdb;color: white">
                 <td class="font18" align="right" colspan="3"></td>
                 <td class="font18" align="center">Grand Total :</td>
                 <td class="totalNo">

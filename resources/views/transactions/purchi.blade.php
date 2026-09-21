@@ -176,7 +176,7 @@
                     <tbody>
                     </tbody>
                     <tfoot> 
-                <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+                <tr style="background: #0038ba;border: solid 1px #dbdbdb;color: white">
                     <td class="font18" align="right" colspan="2"></td>
                     <td class="font18" align="center">Grand Total :</td>
                     <td class="totalNo" >

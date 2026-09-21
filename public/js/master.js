@@ -52,7 +52,7 @@ function openSidebar(element = "#product-cl-sec") {
 }
 
 $('#add-product').on('focus', function () {
-    $(this).css('background', '#152e4d ');
+    $(this).css('background', '#0038ba ');
 });
 $('#add-product').on('blur', function () {
     $(this).css('background', 'green');

@@ -22,7 +22,7 @@
   }
 
   .card-heading:before {
-    background: #152e4d;
+    background: #0038ba;
     position: absolute;
     width: 2px;
     height: 18px;
@@ -38,7 +38,7 @@
 
   .total-sale .total-amount {
     font-size: 42px;
-    color: #152e4d;
+    color: #0038ba;
     padding: 8px 0 8px 0;
   }
 
@@ -67,7 +67,7 @@
   }
 
   .total-val span {
-    color: #152e4d;
+    color: #0038ba;
     margin-bottom: 5px;
   }
 
@@ -80,7 +80,7 @@
 
   .total-vals {
     border: solid 1px #e4e4e4;
-    border-top: solid 1px #152e4d;
+    border-top: solid 1px #0038ba;
     text-align: center;
     margin: 0;
     font-size: 14px;
@@ -99,7 +99,7 @@
   .total-vals span {
     display: block;
     font-size: 30px;
-    color: #152e4d;
+    color: #0038ba;
     line-height: 1;
     padding-bottom: 10px;
   }
@@ -289,7 +289,7 @@
   ._user_Pimage {
     width: 38px;
     height: 38px;
-    border: solid 1px #152e4d;
+    border: solid 1px #0038ba;
     background-color: #FFF;
     padding: 1px;
     border-radius: 50%;

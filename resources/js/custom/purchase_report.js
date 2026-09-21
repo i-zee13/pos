@@ -114,7 +114,7 @@ $('.search-btn').on('click', function () {
             }
             //Grand Total
             $('.TeacherAttendanceListTable tbody').append(`
-            <tr style="background: #152e4d;border: solid 1px #dbdbdb;color: white">
+            <tr style="background: #0038ba;border: solid 1px #dbdbdb;color: white">
                  <td colspan="3"></td> 
                 <td class="font18">Grand Total :</td>
                 <td class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> - </td>
@@ -299,7 +299,7 @@ function reportTable(invoice_no, element) {
 
 function sale_return_total(ttl_quantity, ttl_product_discount, total, flag) {
     $('.TeacherAttendanceListTable tbody').append(`
-    <tr style="background:#eaf1fa ; color:#152e4d" >
+    <tr style="background:#eaf1fa ; color:#0038ba" >
         <th colspan="3"></th>
         <th class="font18" align="center">${flag} Total</th>
         <th class="totalNo"   style="font-family: 'Rationale', sans-serif !important;font-size: 25px;"> - </th>
