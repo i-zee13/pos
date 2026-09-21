@@ -45,9 +45,9 @@
     z-index: 20051 !important;
   }
 
-  /* Sidebar navbar: gradient blue + light font */
+  /* Sidebar navbar: brand fill + light font */
   #sidebar.navbar-light {
-    background: linear-gradient(90deg, #1e54d3 0%, #00216d 100%) !important;
+    background: #00216d !important;
     border-color: #00216d !important;
     color: #a1aee1 !important;
   }

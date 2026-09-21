@@ -76,7 +76,7 @@
     .mix-bar-head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #243447; margin-bottom: 5px; }
     .mix-bar-head .pct { color: #00216d; }
     .mix-bar-track { height: 7px; background: #eef1f5; border-radius: 6px; overflow: hidden; }
-    .mix-bar-fill { height: 100%; background: linear-gradient(90deg, #00216d, #1e54d3); border-radius: 6px; width: 0; transition: width .5s ease; }
+    .mix-bar-fill { height: 100%; background: #00216d; border-radius: 6px; width: 0; transition: width .5s ease; }
     .mix-bar-meta { display: flex; justify-content: space-between; font-size: 11px; color: #8896a8; margin-top: 4px; }
     .mix-chart-wrap {
         position: relative;

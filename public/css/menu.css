@@ -563,7 +563,7 @@ strong,
 
 .add_button {
 	font-size: 13px;
-	background: linear-gradient(90deg, #1e54d3 0%, #00216d 100%);
+	background: #00216d;
 	border: none;
 	-webkit-border-radius: 0;
 	-moz-border-radius: 0;

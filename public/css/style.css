@@ -345,7 +345,7 @@ footer.sticky-footer .copyright {
 	box-shadow: 2px 2px 10px 0 rgba(79, 79, 79, .2);
 	padding: 7px 20px 5px 20px;
 	border: solid 1px #00216d;
-	background: linear-gradient(90deg, #1e54d3 0%, #00216d 100%);
+	background: #00216d;
 }
 .btn-primary, .edit_button {
 	color: #fff !important;
@@ -353,7 +353,7 @@ footer.sticky-footer .copyright {
 .btn-primary:HOVER, .btn-primary:focus, .lgray-btn:HOVER, .btn-outline:HOVER {
 	color: #ffffff;
 	border: solid 1px #00216d !important;
-	background: linear-gradient(90deg, #1e54d3 0%, #00216d 100%);
+	background: #00216d;
 }
 .btn-cancel, .btn-outline {
 	color: #00216d;
@@ -1470,7 +1470,7 @@ table.dataTable.nowrap td {
 	margin: 0;
 	font-weight: 600;
 	color: #fff;
-	background: linear-gradient(90deg, #1e54d3 0%, #00216d 100%);
+	background: #00216d;
 	position: relative;
 	margin-left: 0;
 	width: inherit;

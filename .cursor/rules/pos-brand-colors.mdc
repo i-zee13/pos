@@ -1,0 +1,57 @@
+---
+description: POS UI brand color tokens — update all mapped surfaces when user gives a new color
+alwaysApply: true
+---
+
+# POS Brand Color Tokens
+
+When the user provides a new brand/UI color (and optionally says where to apply it), update **all matching datapoints** below. Do not invent new surfaces unless asked.
+
+## Current tokens
+
+| Token | Hex | Notes |
+|-------|-----|--------|
+| `brand.fill` | `#00216d` | Primary brand blue (solid). Prefer solid over gradients unless user asks for gradient. |
+| `brand.navText` | `#a1aee1` | Sidebar / navbar link text on brand fill |
+| `brand.onFill` | `#ffffff` | Text on brand-filled chrome (table headers, primary buttons) |
+
+## Datapoints to update for `brand.fill`
+
+### Navbar / sidebar
+- `public/assets/css/theme.bundle.css` → `.navbar-light` background + border
+- `resources/views/layouts/sidebar-menu.blade.php` → `#sidebar.navbar-light` overrides
+
+### Buttons
+- `public/css/style.css` → `.btn-primary`, `.edit_button` (+ hover) background/border
+- `public/css/menu.css` → `.add_button` background
+- Keep cancel/outline as bordered (text/border = brand.fill); do not turn cancel red unless asked
+
+### Headers / panels
+- `public/css/style.css` → `.pro-header-text` background
+- Inline `sidebox-content` backgrounds in sale/purchase/report blades → `style="background-color: {brand.fill}"`
+- CSS `.sidebox-content { background-color }` where it is the dark panel (not white panels)
+
+### DataTables
+- `public/css/product.css` → `.table thead th` background (+ white text)
+- `public/css/style.css` → `.dataTable thead` / `.dataTable thead th` background (+ white text)
+- `public/css/style.css` → `.page-item.active .page-link` background/border
+
+### Analytics (optional same brand)
+- `resources/views/dashboard.blade.php` → accent bars / active mode / KPI digit blues that use brand
+- `public/js/custom/analytics.js` → chart series / marker / dataLabel brand blues
+
+## Datapoints for `brand.navText`
+- Navbar/sidebar link, heading, toggler colors in `theme.bundle.css` + `sidebar-menu.blade.php`
+
+## Datapoints for `brand.onFill`
+- Table header text, `.btn-primary` / `.add_button` / `.pro-header-text` text (usually white)
+
+## Workflow when user says e.g. “color #RRGGBB”
+1. Map to token(s): default = `brand.fill` unless they say font/nav text.
+2. Update every datapoint for that token.
+3. Bump cache query on `style.css` / `menu.css` / `product.css` in `resources/views/layouts/app.blade.php` if those files change.
+4. Do **not** mass-replace unrelated historical `#152e4d` / report-only gradients unless the user asks for a full theme sweep.
+
+## Do not
+- Put live tenant DB passwords into rules or commits as part of color work
+- Force-push or rewrite remote history for theme CSS

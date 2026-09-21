@@ -16054,7 +16054,7 @@ button:focus {
 }
 
 .navbar-light {
-    background: linear-gradient(90deg, #1e54d3 0%, #00216d 100%);
+    background: #00216d;
     background-color: #00216d;
     border-color: #00216d;
     color: #a1aee1
