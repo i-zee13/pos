@@ -524,8 +524,8 @@ table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child, table.
 }
 .page-item.active .page-link {
 	z-index: 1;
-	color: #a1aee1;
-	background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
+	color: #fff;
+	background: #0038ba;
 	border-color: #0038ba;
 }
 .form-control {
@@ -540,8 +540,8 @@ table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child, table.
 	box-shadow: 0 2px 8px 0 rgba(79, 79, 79, .1);
 }
 .dataTable thead, .dataTable tfoot {
-	background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
-	color: #a1aee1;
+	background: #0038ba;
+	color: #ffffff;
 }
 .modal-body table th {
 	font-weight: 600
@@ -557,7 +557,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child, table.
 }
 .dataTable thead th {
 	border: none;
-	color: #a1aee1;
+	color: #ffffff;
 	background: transparent;
 }
 ._Threshhold {

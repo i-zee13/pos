@@ -890,8 +890,7 @@ input:focus+.slider {
       color:#12ff12;
   }
   .table thead th {
-	 color: #a1aee1;
-    background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%);
+	 color: #ffffff;
     background-color: #0038ba;
     border: none !important;
   }
