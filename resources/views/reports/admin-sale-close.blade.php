@@ -90,27 +90,44 @@
         font-size: 0.8125rem;
     }
 
-    .c-address-info div {
-        margin-bottom: 8px !important;
+    .c-address-info > div {
+        margin-bottom: 6px !important;
         display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 30px;
+        padding: 6px 12px;
+        box-sizing: border-box;
     }
 
     .c-address-info div span {
         width: 15.625rem;
         display: inline-block;
+        line-height: 1.25;
+        margin: 0 !important;
+        vertical-align: middle;
     }
 
-    .c-address-info svg {
-        width: 1rem;
-        height: 1rem;
-        display: inline-block;
-        margin-right: 0.625rem;
-        margin-top: 0rem;
-        opacity: 0.5;
+    .c-address-info svg,
+    .c-address-info i.fa {
+        width: 16px;
+        height: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 16px;
+        margin: 0;
+        opacity: 0.75;
+        font-size: 14px;
+        line-height: 1;
+        text-align: center;
     }
 
     .c-address-info div strong {
         width: 14.25rem;
+        margin-left: auto;
+        text-align: right;
+        line-height: 1.25;
     }
 
     .digit {
