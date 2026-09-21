@@ -327,12 +327,12 @@
                         <div class="col-md-6 demo-y" id="adminCloseSummaryCol" style="max-height: 430px">
                             <div class="c-address-info">
                                 <div class="net_sale_div" style="display: none;">
-                                    <i class="fa fa-money-bill-wave" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-money" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> Net Sale: </span>
                                     <strong class="digit net_sale">Loading...</strong>
                                 </div>
                                 <div class="credit_sale_div" style="display: none;">
-                                    <i class="fa fa-file-invoice-dollar" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-file-text-o" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> Credit Sale: </span>
                                     <strong class="digit credit_sale">Loading...</strong>
                                 </div>
@@ -342,12 +342,12 @@
                                     <strong class="digit discount">Loading...</strong>
                                 </div>
                                 <div class="service_charges_div" style="border-bottom: 1px solid #f4f4f4;display: none;">
-                                    <i class="fa fa-concierge-bell" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-bell" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> Service Charges: </span>
                                     <strong class="digit service_charges">Loading...</strong>
                                 </div>
                                 <div style="border-bottom: 1px solid #f4f4f4;color: white;background: #00216d">
-                                    <i class="fa fa-chart-line" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-line-chart" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> <b>Total Sale:</b> </span>
                                     <strong class="digit total_sales f-17">Loading...</strong>
                                 </div>
@@ -369,12 +369,12 @@
                                     <strong class="digit return_discount">Loading...</strong>
                                 </div>
                                 <div style="border-bottom: 1px solid #f4f4f4;">
-                                    <i class="fa fa-concierge-bell" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-bell" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> Service Charges: </span>
                                     <strong class="digit return_service_charges">Loading...</strong>
                                 </div>
                                 <div style="border-bottom: 1px solid #f4f4f4;color: white;background: #00216d">
-                                    <i class="fa fa-exchange-alt" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-exchange" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> <b>Total Returns:</b> </span>
                                     <strong class="digit total_returns f-17">Loading...</strong>
                                 </div>
@@ -387,12 +387,12 @@
                                     <strong class="digit openning_balance">Loading...</strong>
                                 </div>
                                 <div class="credit_sale_receivings_div" style="display: none;">
-                                    <i class="fa fa-hand-holding-usd" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-handshake-o" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> Credit Sale Recovery: </span>
                                     <strong class="digit credit_sale_receivings">Loading...</strong>
                                 </div>
                                 <div class="customer_recovery_div" style="display: none;">
-                                    <i class="fa fa-user-check" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-check-circle" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> Customer Recovery: </span>
                                     <strong class="digit customer_recovery">Loading...</strong>
                                 </div>
@@ -402,12 +402,12 @@
                                     <strong class="digit vendor_recovery">Loading...</strong>
                                 </div>
                                 <div style="border-bottom: 1px solid #f4f4f4;color: white;background: #00216d">
-                                    <i class="fa fa-wallet" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-briefcase" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> <b>Total Recovery:</b> </span>
                                     <strong class="digit cash_recovery f-17 ">Loading...</strong>
                                 </div>
                                 <div class="total_pr_invc_amount_div" style="display: none;">
-                                    <i class="fa fa-file-invoice" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-file-text" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> Credit P.Inv Payment: </span>
                                     <strong class="digit total_pr_invc_amount">Loading...</strong>
                                 </div>
@@ -428,12 +428,12 @@
                                     <strong class="digit customer_payments">Loading...</strong>
                                 </div>
                                 <div style="border-bottom: 1px solid #f4f4f4;">
-                                    <i class="fa fa-dolly" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-shopping-cart" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> Vendor Payment: </span>
                                     <strong class="digit vendor_payments">Loading...</strong>
                                 </div>
                                 <div class="expense_div" style="border-bottom: 1px solid #f4f4f4;display:none">
-                                    <i class="fa fa-receipt" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-list-alt" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> Expense : </span>
                                     <strong class="digit expense">Loading...</strong>
                                 </div>
@@ -443,7 +443,7 @@
                                     <strong class="digit total_payments f-17">Loading...</strong>
                                 </div>
                                 <div class="cash_in_hand_div" style="display: none;color: white;background: #00216d">
-                                    <i class="fa fa-coins" style="width:16px;text-align:center;margin-right:4px;"></i>
+                                    <i class="fa fa-usd" style="width:16px;text-align:center;margin-right:4px;"></i>
                                     <span> <b>Cash IN Hand:</b> </span>
                                     <strong class="digit cash_in_hand">Loading...</strong>
                                 </div>
