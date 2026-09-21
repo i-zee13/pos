@@ -47,7 +47,7 @@
   <link href="{{asset('/css/wizard.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('/css/jquery.steps.css')}}" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('/css/selectize.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('/css/style.css?v=7.3')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('/css/style.css?v=7.5')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('/css/menu.css?v=6.5')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('/css/product.css?v=8.3')}}" />
     <link rel="stylesheet" type="text/css" href="{{asset('/css/invoice-responsive.css?v=1.0')}}" />
