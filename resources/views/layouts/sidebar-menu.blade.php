@@ -45,10 +45,10 @@
     z-index: 20051 !important;
   }
 
-  /* Sidebar navbar: brand blue + white text */
+  /* Sidebar navbar: gradient blue + white text */
   #sidebar.navbar-light {
-    background-color: #007bff !important;
-    border-color: #007bff !important;
+    background: linear-gradient(90deg, #1e54d3 0%, #0038ba 100%) !important;
+    border-color: #0038ba !important;
     color: #fff !important;
   }
   #sidebar.navbar-light .navbar-nav .nav-link,
@@ -62,7 +62,7 @@
   #sidebar.navbar-light .navbar-nav .nav-link.active,
   #sidebar.navbar-light .navbar-nav .show > .nav-link {
     color: #fff !important;
-    background: #0062cc !important;
+    background: rgba(0, 0, 0, 0.18) !important;
   }
 </style>
 
