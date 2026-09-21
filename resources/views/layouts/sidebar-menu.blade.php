@@ -44,6 +44,26 @@
   #sidebar .navbar-user .dropdown-menu {
     z-index: 20051 !important;
   }
+
+  /* Sidebar navbar: brand blue + white text */
+  #sidebar.navbar-light {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+    color: #fff !important;
+  }
+  #sidebar.navbar-light .navbar-nav .nav-link,
+  #sidebar.navbar-light .navbar-heading,
+  #sidebar.navbar-light .navbar-text,
+  #sidebar.navbar-light .navbar-toggler {
+    color: #fff !important;
+  }
+  #sidebar.navbar-light .navbar-nav .nav-link:hover,
+  #sidebar.navbar-light .navbar-nav .nav-link:focus,
+  #sidebar.navbar-light .navbar-nav .nav-link.active,
+  #sidebar.navbar-light .navbar-nav .show > .nav-link {
+    color: #fff !important;
+    background: #0062cc !important;
+  }
 </style>
 
 <nav class="navbar navbar-vertical fixed-start navbar-expand-md navbar-light sidebar-height" id="sidebar">

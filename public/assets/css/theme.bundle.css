@@ -5097,46 +5097,46 @@ fieldset:disabled .btn {
 .navbar-light .navbar-brand,
 .navbar-light .navbar-brand:focus,
 .navbar-light .navbar-brand:hover {
-    color: #12263f
+    color: #ffffff
 }
 
 .navbar-light .navbar-nav .nav-link {
-    color: #6e84a3
+    color: #ffffff
 }
 
 .navbar-light .navbar-nav .nav-link:focus,
 .navbar-light .navbar-nav .nav-link:hover {
     /*color: #ffffff;background: #001e35;*/
-    background: #33445b; 
+    background: #0062cc; 
     color: #ffffff;
 }
 
 .navbar-light .navbar-nav .nav-link.disabled {
-    color: rgba(18, 38, 63, .3)
+    color: rgba(255, 255, 255, .45)
 }
 
 .navbar-light .navbar-nav .nav-link.active,
 .navbar-light .navbar-nav .show>.nav-link {
-    color: #12263f
+    color: #ffffff
 }
 
 .navbar-light .navbar-toggler {
     border-color: transparent;
-    color: #6e84a3
+    color: #ffffff
 }
 
 .navbar-light .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%236E84A3' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E")
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23FFFFFF' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E")
 }
 
 .navbar-light .navbar-text {
-    color: #6e84a3
+    color: #ffffff
 }
 
 .navbar-light .navbar-text a,
 .navbar-light .navbar-text a:focus,
 .navbar-light .navbar-text a:hover {
-    color: #12263f
+    color: #ffffff
 }
 
 .navbar-dark .navbar-brand,
@@ -16054,29 +16054,30 @@ button:focus {
 }
 
 .navbar-light {
-    background-color: #152e4d;
-    border-color: #152e4d
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff
 }
 
 .navbar-light .navbar-heading {
-    color: #95aac9
+    color: #ffffff
 }
 
 .navbar-light .navbar-divider {
-    background-color: #e3ebf6
+    background-color: rgba(255, 255, 255, 0.25)
 }
 
 .navbar-light .navbar-user {
-    border-top-color: #e3ebf6
+    border-top-color: rgba(255, 255, 255, 0.25)
 }
 
 .navbar-light .navbar-user-link {
-    color: #6e84a3
+    color: #ffffff
 }
 
 .navbar-light .navbar-user-link:focus,
 .navbar-light .navbar-user-link:hover {
-    color: #12263f
+    color: #ffffff
 }
 
 .navbar-light .navbar-brand {
