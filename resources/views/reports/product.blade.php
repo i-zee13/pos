@@ -3687,9 +3687,17 @@
                         }
                         #search-form .reset-btn {
                             box-shadow: none;
+                            background: #fff !important;
+                            background-image: none !important;
+                            color: #00216d !important;
+                            border: 1px solid #00216d !important;
                         }
-                        #search-form .reset-btn:hover {
-                            color: white !important;
+                        #search-form .reset-btn:hover,
+                        #search-form .reset-btn:focus {
+                            color: #fff !important;
+                            background: #d71919 !important;
+                            background-image: none !important;
+                            border-color: #d71919 !important;
                         }
                     </style>
 
@@ -3706,7 +3714,7 @@
                         </div>
                     </div>
                     <div class="ledger-actions">
-                        <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#00216d !important"> Reset</button>
+                        <button type="button" class="btn btn-line m-0 reset-btn">Reset</button>
                         <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
                     </div>
                 </div>

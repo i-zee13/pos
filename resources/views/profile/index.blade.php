@@ -118,64 +118,54 @@
                         </div>
                     </div>
                     <div class="tab-pane fade show" id="tab02" role="tabpanel" aria-labelledby="tab2">
-                        <div class="form-wrap p-0">
-                            <div class="row">
-                                <form style="display: flex; width:100%" id="saveEditProfileForm">
-                                    @csrf
-                                    <input type="text" hidden name="user_id" value="{{ Auth::user()->id  }}" />
-                                    <div class="" >
-                                        <div class="col-md-12">
-
-                                            <div id="floating-label" class="card p-20 mb-3">
-                                                <h2 class="_head03">Change <span>Password</span></h2>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="control-label mb-10">Current
-                                                                Password*</label>
-                                                            <input style="font-size: 13px" type="password"
-                                                                name="current_password" id="current_password"
-                                                                class="form-control" placeholder="" value="">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <hr>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="control-label mb-10">New
-                                                                Password*</label>
-                                                            <input style="font-size: 13px" type="password"
-                                                                class="form-control" id="new_password" placeholder=""
-                                                                value="">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6 _ch-pass-p">
-                                                        Minimum 6 Characters
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="control-label mb-10">Confirm
-                                                                Password*</label>
-                                                            <input style="font-size: 13px" type="password"
-                                                                class="form-control" name="confirm_password"
-                                                                id="confirm_password" placeholder="" value="">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12 PT-10">
-                                                        <button type="button" class="btn btn-primary mr-2 mb-10"
-                                                            id="update-user-password">Save Changes</button>
-                                                        <button class="btn btn-cancel mr-2 mb-10" type="button"
-                                                            data-toggle="collapse" data-target="#collapseExample"
-                                                            aria-expanded="false"
-                                                            aria-controls="collapseExample">Cancel</button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                        <div class="form-wrap p-0 _user-profile-info">
+                            <form id="saveEditProfileForm">
+                                @csrf
+                                <input type="text" hidden name="user_id" value="{{ Auth::user()->id  }}" />
+                                <div class="row">
+                                    <div class="col-md-12 mb-2">
+                                        <h2 class="_head03 mb-0">Change <span>Password</span></h2>
+                                    </div>
+                                    <div class="col-md-6 p-col-L">
+                                        <div class="form-group">
+                                            <label class="control-label mb-10">Current Password*</label>
+                                            <input style="font-size: 13px" type="password"
+                                                name="current_password" id="current_password"
+                                                class="form-control" placeholder="" value="">
                                         </div>
                                     </div>
-                                </form>
-                            </div>
+                                    <div class="col-md-12">
+                                        <hr>
+                                    </div>
+                                    <div class="col-md-6 p-col-L">
+                                        <div class="form-group">
+                                            <label class="control-label mb-10">New Password*</label>
+                                            <input style="font-size: 13px" type="password"
+                                                class="form-control" id="new_password" placeholder=""
+                                                value="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 p-col-R _ch-pass-p d-flex align-items-center">
+                                        Minimum 6 Characters
+                                    </div>
+                                    <div class="col-md-6 p-col-L">
+                                        <div class="form-group">
+                                            <label class="control-label mb-10">Confirm Password*</label>
+                                            <input style="font-size: 13px" type="password"
+                                                class="form-control" name="confirm_password"
+                                                id="confirm_password" placeholder="" value="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 PT-10">
+                                        <button type="button" class="btn btn-primary mr-2 mb-10"
+                                            id="update-user-password">Save Changes</button>
+                                        <button class="btn btn-cancel mr-2 mb-10" type="button"
+                                            data-toggle="collapse" data-target="#collapseExample"
+                                            aria-expanded="false"
+                                            aria-controls="collapseExample">Cancel</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <div class="tab-pane fade show" id="tab03" role="tabpanel" aria-labelledby="tab3">
