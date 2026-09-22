@@ -25,25 +25,24 @@
     </div>
     <button hidden data-toggle="modal" data-target="#deleteModal" id="hidden_btn_to_open_modal"></button>
 </div>
-{{-- Day histories print modal (list Print button) — isolated from sidebar save/print --}}
-<div class="modal fade" id="dayPrintHistoryModal" tabindex="-1" role="dialog" aria-labelledby="dayPrintHistoryLabel" aria-hidden="true">
+{{-- Day histories print modal (list Print button) — same modal pattern as system --}}
+<div class="modal fade" id="dayPrintHistoryModal" tabindex="-1" role="dialog" aria-labelledby="dayPrintHistoryLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header" style="background:#00216d;color:#fff;">
-                <h5 class="modal-title" id="dayPrintHistoryLabel">Print Day Payments</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+        <div class="modal-content top-borderRed">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dayPrintHistoryLabel">Print Day Payments <span class="day-print-customer-name"></span></h5>
             </div>
             <div class="modal-body">
-                <div class="d-flex justify-content-between mb-2">
-                    <strong class="day-print-customer-name"></strong>
-                    <span class="day-print-customer-balance"></span>
+                <div class="row mb-2">
+                    <div class="col-12 form-div d-flex justify-content-between align-items-center">
+                        <strong class="day-print-customer-name-body"></strong>
+                        <span class="day-print-customer-balance"></span>
+                    </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-bordered mb-0" id="dayPrintHistoryTable" width="100%">
+                    <table class="table table-hover mb-0" id="dayPrintHistoryTable" width="100%">
                         <thead>
-                            <tr style="background:#00216d;color:#fff;">
+                            <tr>
                                 <th style="width:40px;">
                                     <input type="checkbox" id="dayPrintSelectAll" title="Select all">
                                 </th>
@@ -59,9 +58,9 @@
                 </div>
                 <p class="text-muted small mt-2 mb-0" id="dayPrintEmptyMsg" style="display:none;">No payments found for today.</p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer border-0">
                 <button type="button" class="btn btn-primary" id="dayPrintSelectedBtn">Print Selected</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn w-btn btn-cancel day-print-modal-close" data-dismiss="modal" aria-label="Close">Close</button>
             </div>
         </div>
     </div>
@@ -273,5 +272,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/transaction.js')}}?v=9"> </script>
+<script src="{{asset('js/custom/transaction.js')}}?v=10"> </script>
 @endpush

@@ -296,7 +296,7 @@ function fetchLedgers() {
         console.log(action, total_cr_dr);
         voucher = action == 'customer-ledger-jama' ? (_element$crv_no = element.crv_no) !== null && _element$crv_no !== void 0 ? _element$crv_no : '0' : (_element$cpv_no = element.cpv_no) !== null && _element$cpv_no !== void 0 ? _element$cpv_no : '0';
         ledger_balance = element['balance'] >= 0 ? element['balance'] + ' DR' : -element['balance'] + ' CR';
-        $('.subCatsListTable tbody').append("\n                        <tr>\n                         <td> ".concat(voucher, "</td> \n                            <td> ").concat(element['customer_name'], "</td>\n                            <!-- <td class='total_balance'>").concat(ledger_balance, "</td> --!>\n                            <td>").concat(total_cr_dr, "</td>\n                            <td> ").concat((_element$comment = element['comment']) !== null && _element$comment !== void 0 ? _element$comment : 'NA', "</td>\n                            <td> ").concat(moment(element['date']).format('D MMM YYYY'), "</td>\n                            <td>\n                                <button  class=\"btn btn-default btn-line openDataSidebarForEditCustomerLedger ").concat(element.is_editable == 1 ? '' : 'd-none', "\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                            comment=\"").concat(element['comment'], "\"\n                                    >Edit</button>\n                                    <button  class=\"btn btn-default btn-line openDataSidebarForUpdateCustomerLedger\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Add Payment</button>\n                                    <button  class=\"btn btn-default btn-line openDayPrintHistoryModal\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Print</button>\n                            </td>\n                        </tr>"));
+        $('.subCatsListTable tbody').append("\n                        <tr>\n                         <td> ".concat(voucher, "</td> \n                            <td> ").concat(element['customer_name'], "</td>\n                            <!-- <td class='total_balance'>").concat(ledger_balance, "</td> --!>\n                            <td>").concat(total_cr_dr, "</td>\n                            <td> ").concat((_element$comment = element['comment']) !== null && _element$comment !== void 0 ? _element$comment : 'NA', "</td>\n                            <td> ").concat(moment(element['date']).format('D MMM YYYY'), "</td>\n                            <td style=\"white-space:nowrap;\">\n                                <button  class=\"btn btn-default btn-line openDataSidebarForEditCustomerLedger ").concat(element.is_editable == 1 ? '' : 'd-none', "\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                            comment=\"").concat(element['comment'], "\"\n                                    >Edit</button>\n                                    <button  class=\"btn btn-default btn-line openDataSidebarForUpdateCustomerLedger\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Add Payment</button>\n                                    <button  class=\"btn btn-default btn-line openDayPrintHistoryModal\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Print</button>\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();
@@ -353,6 +353,9 @@ $('#saveTransaction').on('blur', function () {
   $(this).css('background', 'linear-gradient(90deg, #00216d 0%, #00216d 100%)');
 });
 $(document).on('click', '.btn-cancel', function () {
+  if ($(this).hasClass('day-print-modal-close') || $(this).closest('#dayPrintHistoryModal').length) {
+    return;
+  }
   if (n > 0) {
     $('#hidden_btn_to_open_modal').click();
   } else {
@@ -370,9 +373,6 @@ $(document).on('focusout', '.amount', function () {
   });
   $('.total_ledger_sum').text(total_amount);
 });
-/******/ })()
-;
-
 // --- Day print history modal (list Print) — does not touch sidebar save/print ---
 var dayPrintCustomerId = null;
 function dayPrintTypeFlag() {
@@ -396,6 +396,7 @@ $(document).on('click', '.openDayPrintHistoryModal', function () {
   var balance = parseFloat(btn.attr('balance')) || 0;
   var balanceLabel = balance >= 0 ? 'Balance : ' + balance + ' DR' : 'Balance : ' + Math.abs(balance) + ' CR';
   $('.day-print-customer-name').text(customerName);
+  $('.day-print-customer-name-body').text(customerName);
   $('.day-print-customer-balance').html('<strong>' + balanceLabel + '</strong>');
   $('#dayPrintHistoryBody').empty();
   $('#dayPrintSelectAll').prop('checked', false);
@@ -460,3 +461,5 @@ $(document).on('click', '#dayPrintSelectedBtn', function () {
   }
   openDayPrintWindow(ids);
 });
+/******/ })()
+;

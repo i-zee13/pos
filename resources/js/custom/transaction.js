@@ -399,7 +399,7 @@ function fetchLedgers(select_date = null) {
                             <td>${total_cr_dr}</td>
                             <td> ${element['comment'] ?? 'NA'}</td>
                             <td> ${moment(element['date']).format('D MMM YYYY')}</td>
-                            <td>
+                            <td style="white-space:nowrap;">
                                 <button  class="btn btn-default btn-line openDataSidebarForEditCustomerLedger ${element.is_editable == 1 ? '' : 'd-none'}"
                                             customer-id="${element['customer_id']}"
                                             customer_name="${element['customer_name']}"
@@ -509,6 +509,9 @@ $('#saveTransaction').on('blur', function () {
     $(this).css('background', 'linear-gradient(90deg, #00216d 0%, #00216d 100%)');
 });
 $(document).on('click', '.btn-cancel', function () {
+    if ($(this).hasClass('day-print-modal-close') || $(this).closest('#dayPrintHistoryModal').length) {
+        return;
+    }
     if (n > 0) {
         $('#hidden_btn_to_open_modal').click();
     } else {
@@ -560,6 +563,7 @@ $(document).on('click', '.openDayPrintHistoryModal', function () {
         : ('Balance : ' + Math.abs(balance) + ' CR');
 
     $('.day-print-customer-name').text(customerName);
+    $('.day-print-customer-name-body').text(customerName);
     $('.day-print-customer-balance').html('<strong>' + balanceLabel + '</strong>');
     $('#dayPrintHistoryBody').empty();
     $('#dayPrintSelectAll').prop('checked', false);
