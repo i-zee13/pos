@@ -220,6 +220,22 @@
         border-bottom-color: #00216d;
     }
     .analytics-table td.num, .analytics-table th.num { text-align: right; font-family: 'Rationale', sans-serif !important; font-size: 16px; color: #00216d; }
+    .analytics-table .recv-eye-btn {
+        border: none;
+        background: transparent;
+        color: #00216d;
+        cursor: pointer;
+        padding: 2px 4px;
+        line-height: 1;
+        font-size: 15px;
+    }
+    .analytics-table .recv-eye-btn:hover { color: #001a55; }
+    .analytics-table .recv-balance-masked {
+        letter-spacing: 1px;
+        color: #6b7a90;
+        font-family: 'Rationale', sans-serif !important;
+        font-size: 16px;
+    }
     .mix-bar-row {
         border-bottom: solid 1px #eef1f5;
         padding: 6px 4px 10px;
@@ -426,8 +442,8 @@
             <div class="an-section">
                 <h3 class="an-section-title">Top Receivables</h3>
                 <table class="analytics-table">
-                    <thead><tr><th>Customer</th><th class="num">Balance</th></tr></thead>
-                    <tbody id="topReceivablesBody"><tr><td colspan="2">Loading…</td></tr></tbody>
+                    <thead><tr><th>Customer</th><th class="num">Balance</th><th class="num" style="width:36px;"></th></tr></thead>
+                    <tbody id="topReceivablesBody"><tr><td colspan="3">Loading…</td></tr></tbody>
                 </table>
                                         </div>
             <div class="an-section">

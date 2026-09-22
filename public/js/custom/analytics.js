@@ -461,6 +461,50 @@
         $body.html(html);
     }
 
+    function renderTopReceivables(rows) {
+        var $body = $('#topReceivablesBody');
+        if (!rows || !rows.length) {
+            $body.html('<tr><td colspan="3">No data</td></tr>');
+            return;
+        }
+        var html = rows.map(function (row) {
+            var name = row.customer_name || '-';
+            var bal = money(row.balance);
+            var id = row.id || '';
+            return '<tr data-customer-id="' + id + '">' +
+                '<td>' + name + '</td>' +
+                '<td class="num">' +
+                    '<span class="recv-balance-masked">---</span>' +
+                    '<span class="recv-balance-value" style="display:none;">' + bal + '</span>' +
+                '</td>' +
+                '<td class="num">' +
+                    '<button type="button" class="recv-eye-btn" title="Show / hide balance" aria-label="Toggle balance">' +
+                        '<i class="fa fa-eye"></i>' +
+                    '</button>' +
+                '</td>' +
+            '</tr>';
+        }).join('');
+        $body.html(html);
+    }
+
+    $(document).on('click', '#topReceivablesBody .recv-eye-btn', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $row = $(this).closest('tr');
+        var $masked = $row.find('.recv-balance-masked');
+        var $value = $row.find('.recv-balance-value');
+        var $icon = $(this).find('i');
+        if ($value.is(':visible')) {
+            $value.hide();
+            $masked.show();
+            $icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        } else {
+            $masked.hide();
+            $value.show();
+            $icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        }
+    });
+
     function loadSummary() {
         if (loading) return;
         showLoader(true);
@@ -486,10 +530,7 @@
                     { key: 'invoices', num: true },
                     { key: 'amount', num: true, money: true }
                 ]);
-                renderTable('#topReceivablesBody', res.top_receivables, [
-                    { key: 'customer_name' },
-                    { key: 'balance', num: true, money: true }
-                ]);
+                renderTopReceivables(res.top_receivables || []);
             },
             error: function () {
                 $('#notifDiv').fadeIn().css('background', 'red').text('Failed to load analytics');

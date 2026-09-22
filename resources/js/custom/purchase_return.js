@@ -607,7 +607,12 @@ $(document).on('input', '.discount-input', function () {
 function getProducts() {
     $("#products").empty();
     $("#products").append(`<option value="0">Select Product</option>`)
-    stock_products.forEach(data => {
+    product_list = [];
+    (stock_products || []).forEach(data => {
+        // Same as sale: only load products with stock > 0
+        if ((parseFloat(data.stock_balance) || 0) <= 0) {
+            return;
+        }
         $("#products").append(`<option value="${data.id}" data-name="${data.product_name}" data-qty="${data.qty}">${data.id}-${data.product_name}</option>`)
         product_list.push(data);
     });

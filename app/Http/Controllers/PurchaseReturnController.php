@@ -322,7 +322,11 @@ class PurchaseReturnController extends Controller
     {
 
         $customers          =     Customer::where('customer_type', 1)->select('id', 'customer_name', 'balance')->get();
-        $products           =     Product::withoutTrashed()->get();
+        // Same as sale / purchase-return create: only products with stock > 0
+        $products           =     Product::withoutTrashed()
+            ->selectRaw('products.*, (SELECT purchase_price FROM products_purchases WHERE product_id = products.id LIMIT 1) as unit_price')
+            ->where('stock_balance', '>', 0)
+            ->get();
         $invoice            =     ReturnInvoice::where('id', $id)->first();
         $parts              =     explode('-', $invoice->invoice_no);
         $invoice_first_part =     $parts[0];

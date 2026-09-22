@@ -679,7 +679,12 @@ $(document).on('input', '.discount-input', function () {
 function getProducts() {
   $("#products").empty();
   $("#products").append("<option value=\"0\">Select Product</option>");
-  stock_products.forEach(function (data) {
+  product_list = [];
+  (stock_products || []).forEach(function (data) {
+    // Same as sale: only load products with stock > 0
+    if ((parseFloat(data.stock_balance) || 0) <= 0) {
+      return;
+    }
     $("#products").append("<option value=\"".concat(data.id, "\" data-name=\"").concat(data.product_name, "\" data-qty=\"").concat(data.qty, "\">").concat(data.id, "-").concat(data.product_name, "</option>"));
     product_list.push(data);
   });
