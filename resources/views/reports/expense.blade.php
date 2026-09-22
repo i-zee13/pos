@@ -3497,8 +3497,99 @@
         text-align: center;
     }
 
-    ._cust_filter {
-        width: 250px !important;
+    /* Expense Report filter bar — one row; scoped to this page only */
+    #search-form .expense-report-bar {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        padding-bottom: 10px;
+    }
+    #search-form .expense-report-bar .CL-Product {
+        width: 150px !important;
+        flex: 0 0 150px;
+        float: none;
+        margin-left: 0 !important;
+        padding-right: 0;
+        padding-top: 0 !important;
+    }
+    #search-form .expense-report-bar .expense-current-date {
+        flex: 0 0 auto;
+        width: auto !important;
+        float: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        position: static;
+    }
+    #search-form .expense-report-bar .expense-current-date .custom-control-input {
+        position: static;
+        opacity: 1;
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        z-index: auto;
+    }
+    #search-form .expense-report-bar .expense-current-date .custom-control-label {
+        margin: 0;
+        padding: 0;
+        font-weight: bolder;
+        white-space: nowrap;
+    }
+    #search-form .expense-report-bar .expense-current-date .custom-control-label::before,
+    #search-form .expense-report-bar .expense-current-date .custom-control-label::after {
+        display: none;
+    }
+    #search-form .expense-report-bar .ledger-actions {
+        display: flex;
+        flex: 0 0 auto;
+        gap: 8px;
+        margin-left: auto;
+        float: none;
+        padding: 0;
+    }
+    #search-form .expense-report-bar .ledger-actions .btn {
+        float: none;
+        margin: 0 !important;
+        white-space: nowrap;
+    }
+    #search-form .expense-report-bar .CL-Product input {
+        height: 31px !important;
+    }
+    #search-form .reset-btn {
+        box-shadow: none;
+    }
+    #search-form .reset-btn:hover,
+    #search-form .reset-btn:focus {
+        color: #fff !important;
+        background: #d71919 !important;
+        background-image: none !important;
+        border-color: #d71919 !important;
+    }
+
+    @media (max-width: 1366px) {
+        #search-form .expense-report-bar .CL-Product {
+            width: 135px !important;
+            flex-basis: 135px;
+        }
+    }
+    @media only screen and (max-width:575px) {
+        #search-form .expense-report-bar {
+            flex-wrap: wrap;
+        }
+        #search-form .expense-report-bar .CL-Product {
+            width: 100% !important;
+            flex: 1 1 100%;
+            margin-top: 10px;
+        }
+        #search-form .expense-report-bar .ledger-actions {
+            margin-left: 0;
+            width: 100%;
+            margin-top: 10px;
+        }
     }
 </style>
 <!-- Body -->
@@ -3528,43 +3619,19 @@
     <div class="col-lg-12">
         <div class="Product-Filter">
             <form id="search-form">
-                <div class="row">
-
-                    <div class="col pr-0">
-                        <style>
-                            .CL-Product input {
-                                height: 31px !important;
-                            }
-                        </style>
+                <div class="expense-report-bar">
+                    <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt" style="top: 8px"></i>
+                        <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
                     </div>
-                </div>
-                <div class="row" style="margin-bottom: 10px;">
-                    <div class="col-auto" style="padding: 0px">
-                        <div class="CL-Product inputmonth" style="width:250px;margin-left:11px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
-                            <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
-                        </div>
-                        <div class="CL-Product inputmonth" style="width:250px;margin-left: 0px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
-                            <input type="date" autocomplete="off" class="form-control end_date" placeholder="End Date" name="end_date">
-                        </div>
-                        <div class="CL-Product inputmonth" style="width:250px;margin-left: 0px;padding-top:0px">
-                            <input type="checkbox" id="current-date" name="is_current_date" heading="Filter by" class="custom-control-input access_rights_headings" value="1">
-                            <label class="custom-control-label" for="current-date" style="font-weight:bolder">Current Date</label>
-                        </div>
+                    <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt" style="top: 8px"></i>
+                        <input type="date" autocomplete="off" class="form-control end_date" placeholder="End Date" name="end_date">
                     </div>
-
-                    <div class="col-auto p-0">
-                        <style>
-                            .reset-btn {
-                                box-shadow: none;
-                            }
-
-                            .reset-btn:hover {
-                                color: white !important;
-                            }
-                        </style>
+                    <div class="CL-Product expense-current-date">
+                        <input type="checkbox" id="current-date" name="is_current_date" heading="Filter by" class="custom-control-input access_rights_headings" value="1">
+                        <label class="custom-control-label" for="current-date">Current Date</label>
+                    </div>
+                    <div class="ledger-actions">
                         <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#00216d !important"> Reset</button>
-                    </div>
-                    <div class="col-auto pl-0">
                         <button type="button" class="btn btn-primary m-0 search-btn"> Fetch</button>
                     </div>
                 </div>
