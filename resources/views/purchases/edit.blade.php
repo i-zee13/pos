@@ -685,6 +685,6 @@
 <script>
   var clients = JSON.parse('{!! json_encode($customers)  !!}');
 </script>
-<script src="{{asset('js/custom/stock.js')}}"> </script>
+<script src="{{asset('js/custom/stock.js')}}?v=2"> </script>
 
 @endpush

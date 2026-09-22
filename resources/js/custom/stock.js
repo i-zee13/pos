@@ -217,14 +217,15 @@ $(document).on('click', '.remove_btn', function () {
 })
 $('#add-product').on('click', function () {
 
-    var is_in_array = purchased_product_array.filter(x => x.product_id == data_variable);
-    if (is_in_array.length > 0) {
-        for (var x = 1; x <= qty; x++) {
-            is_in_array[0].qty++;
-        }
-        $('.td-input-qty' + data_variable).val(is_in_array[0].qty).trigger('input');
-        $('#tr-' + data_variable).css('background', '#00216d').addClass('text-white');
-        var ss = data_variable
+    // Always merge by product_id (not barcode). data_variable may be barcode after scan.
+    var mergeKey = String(product_id || data_variable || '');
+    var is_in_array = purchased_product_array.filter(x => String(x.product_id) == mergeKey);
+    if (is_in_array.length > 0 && mergeKey && mergeKey !== '0') {
+        var addQty = parseFloat(qty) || 1;
+        is_in_array[0].qty = (parseFloat(is_in_array[0].qty) || 0) + addQty;
+        $('.td-input-qty' + mergeKey).val(is_in_array[0].qty).trigger('input');
+        $('#tr-' + mergeKey).css('background', '#00216d').addClass('text-white');
+        var ss = mergeKey;
         setTimeout(function () {
             $('#tr-' + ss).css('background', '').removeClass('text-white');
         }, 1500);
@@ -323,6 +324,8 @@ $(document).on('focusout', '.bar-code', function () {
             return barcodeArray.includes(data_variable) || x.id == data_variable;
         });
         if (filter_product.length > 0) {
+            product_id = filter_product[0].id;
+            data_variable = String(filter_product[0].id);
             $('#products').val(filter_product[0].id).trigger('change');
             if (filter_product[0].new_purchase_price > 0) {
                 $('.purchase_price').val(filter_product[0].new_purchase_price);
@@ -333,7 +336,6 @@ $(document).on('focusout', '.bar-code', function () {
             $('.stock_balance').text(filter_product[0].stock_balance);
             $('.new_sale_price').val(filter_product[0].sale_price)
             p_name = filter_product[0].product_name;
-            product_id = filter_product[0].id;
             retail_price = filter_product[0].sale_price;
         } else {
             $('#products').val('0').trigger('change');
@@ -682,6 +684,7 @@ $('.customer_id').change(function () {
 })
 $('.products').change(function () {
     var selected_product = $(this).val();
+    data_variable = selected_product;
     $('.purchase_price').val('');
     $('#product-name').val('');
     $('#new_purchase_price').val('');
@@ -701,6 +704,7 @@ $('.products').change(function () {
         $('.stock_balance').text(filter_product[0].stock_balance);
         p_name = filter_product[0].product_name;
         product_id = filter_product[0].id;
+        data_variable = String(filter_product[0].id);
         stock_in_hand = filter_product[0].stock_balance;
         sale_price = filter_product[0].sale_price;
 
