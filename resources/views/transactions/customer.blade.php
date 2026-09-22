@@ -30,7 +30,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content top-borderRed">
             <div class="modal-header">
-                <h5 class="modal-title" id="dayPrintHistoryLabel">Print Day Payments <span class="day-print-customer-name"></span></h5>
+                <h5 class="modal-title" id="dayPrintHistoryLabel">Transaction Print</h5>
             </div>
             <div class="modal-body">
                 <div class="row mb-2">
@@ -60,11 +60,35 @@
             </div>
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-primary" id="dayPrintSelectedBtn">Print Selected</button>
-                <button type="button" class="btn w-btn btn-cancel day-print-modal-close" data-dismiss="modal" aria-label="Close">Close</button>
+                <button type="button" class="btn w-btn day-print-modal-close" id="dayPrintModalCloseBtn">Close</button>
             </div>
         </div>
     </div>
 </div>
+<style>
+    #dayPrintHistoryModal .day-print-single-btn {
+        background: #fff !important;
+        color: #00216d !important;
+        border: solid 1px #00216d !important;
+    }
+    #dayPrintHistoryModal .day-print-single-btn:hover,
+    #dayPrintHistoryModal .day-print-single-btn:focus {
+        background: #00216d !important;
+        color: #fff !important;
+        border-color: #00216d !important;
+    }
+    #dayPrintHistoryModal .day-print-modal-close {
+        color: #00216d;
+        border: solid 1px #00216d;
+        background: #fff;
+    }
+    #dayPrintHistoryModal .day-print-modal-close:hover,
+    #dayPrintHistoryModal .day-print-modal-close:focus {
+        color: #fff;
+        background: #00216d;
+        border-color: #00216d;
+    }
+</style>
 <div id="product-cl-sec">
     <a href="#" id="pl-close" class="close-btn-pl"></a>
     <div class="pro-header-text">Cash <span>{{request()->segment(1) == 'customer-ledger-jama' ? 'Received' : 'Payment' }}</span></div>
@@ -272,5 +296,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/transaction.js')}}?v=10"> </script>
+<script src="{{asset('js/custom/transaction.js')}}?v=11"> </script>
 @endpush

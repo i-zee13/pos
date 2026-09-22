@@ -509,7 +509,7 @@ $('#saveTransaction').on('blur', function () {
     $(this).css('background', 'linear-gradient(90deg, #00216d 0%, #00216d 100%)');
 });
 $(document).on('click', '.btn-cancel', function () {
-    if ($(this).hasClass('day-print-modal-close') || $(this).closest('#dayPrintHistoryModal').length) {
+    if ($(this).closest('#dayPrintHistoryModal').length) {
         return;
     }
     if (n > 0) {
@@ -518,6 +518,12 @@ $(document).on('click', '.btn-cancel', function () {
         closeSidebar();
     }
 })
+
+$(document).on('click', '#dayPrintModalCloseBtn, .day-print-modal-close', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $('#dayPrintHistoryModal').modal('hide');
+});
 $(document).on('click', '.confirm_btn', function () {
     closeSidebar();
 });
@@ -562,7 +568,6 @@ $(document).on('click', '.openDayPrintHistoryModal', function () {
         ? ('Balance : ' + balance + ' DR')
         : ('Balance : ' + Math.abs(balance) + ' CR');
 
-    $('.day-print-customer-name').text(customerName);
     $('.day-print-customer-name-body').text(customerName);
     $('.day-print-customer-balance').html('<strong>' + balanceLabel + '</strong>');
     $('#dayPrintHistoryBody').empty();
