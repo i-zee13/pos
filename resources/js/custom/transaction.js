@@ -99,7 +99,7 @@ $(document).ready(function () {
                             </div>
                         </div>
                         <div class="col-md-1 PB-10" style="margin-top: 21px;">
-                            <a type="button" id="" data-customer_id="${id}" class="btn smBTN red-bg remove remove_btn_${id}" data-index="" data-quantity="">Remove</a>
+                            <a type="button" id="" data-customer_id="${id}" class="btn smBTN red-bg remove remove_btn_${id}" data-index="" data-quantity="" tabindex="-1">Remove</a>
                         </div>
                     </div>
                 `);
@@ -170,7 +170,7 @@ $(document).ready(function () {
                         </div>
                     </div>
                     <div class="col-md-1 PB-10" style="margin-top: 21px;">
-                        <a type="button" id="" data-customer_id="${id}" class="btn smBTN red-bg remove remove_btn_${id}" data-index="" data-quantity="">Remove</a>
+                        <a type="button" id="" data-customer_id="${id}" class="btn smBTN red-bg remove remove_btn_${id}" data-index="" data-quantity="" tabindex="-1">Remove</a>
                     </div>
                 </div>
             `);
@@ -434,9 +434,10 @@ $('.customer_id').on('change', function () {
     if (customer_val > 0) {
         n++
         $('.customer_balnce').val(cust_bal)
-         $('#print-invoice').attr('tabindex', customer_val * 2 + 3);
-        $('#saveTransaction').attr('tabindex', customer_val * 2 + 4);
-        $('#cancelSubCat').attr('tabindex', customer_val * 2 + 5);
+        // After Remarks: Save → Print → Cancel
+        $('#saveTransaction').attr('tabindex', n * 2 + 4);
+        $('#print-invoice').attr('tabindex', n * 2 + 5);
+        $('#cancelSubCat').attr('tabindex', n * 2 + 6);
         $('.add-more').append(`
         <div class="row  remove_div" >
             <div class="row _head03">
@@ -453,17 +454,17 @@ $('.customer_id').on('change', function () {
                         <label class="control-label mb-10">Add Amount *</label>
                         <input type="hidden" name="hidden_cust_balance[]" value="${cust_bal}">
                         <input type="hidden" name="hidden_cust_id[]" value="${customer_val}">
-                        <input type="number" name="amount[]" class="form-control field-required amount nnnn" id="amount_${customer_val}" required tabindex="${customer_val * 2 + 2}" data-customer_id="${customer_val}">
+                        <input type="number" name="amount[]" class="form-control field-required amount nnnn" id="amount_${customer_val}" required tabindex="${n * 2 + 2}" data-customer_id="${customer_val}">
                     </div>
                 </div>
                 <div class="col-md-6 PB-10">
                     <div class="form-group focused">
                         <label class="control-label mb-10">Remarks </label>
-                        <textarea name="comment[]" class="form-control remarks_${customer_val}" rows="6"tabindex="${customer_val * 2 + 3}"></textarea>
+                        <textarea name="comment[]" class="form-control remarks_${customer_val}" rows="6" tabindex="${n * 2 + 3}"></textarea>
                     </div>
                 </div>
                 <div class="col-md-1 PB-10" style="margin-top: 21px;">
-                    <a type="button" id="" data-customer_id="${customer_val}" class="btn smBTN red-bg remove remove_btn_${customer_val}" data-index="" data-quantity="">Remove</a>
+                    <a type="button" id="" data-customer_id="${customer_val}" class="btn smBTN red-bg remove remove_btn_${customer_val}" data-index="" data-quantity="" tabindex="-1">Remove</a>
                 </div>
             </div>
         `);

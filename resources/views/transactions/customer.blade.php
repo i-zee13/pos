@@ -156,9 +156,9 @@
         </div>
     </div>
     <div class="_cl-bottom">
-        <button type="button" class="btn btn-primary mr-2" id="saveTransaction" tabindex="8">Save</button>
-        <button type="button" class="btn btn-primary mr-2" id="print-invoice" tabindex="9">Print</button>
-        <button type="button" class="btn btn-cancel mr-2" id="cancelSubCat" tabindex="10">Cancel</button>
+        <button type="button" class="btn btn-primary mr-2" id="saveTransaction" tabindex="4">Save</button>
+        <button type="button" class="btn btn-primary mr-2" id="print-invoice" tabindex="5">Print</button>
+        <button type="button" class="btn btn-cancel mr-2" id="cancelSubCat" tabindex="6">Cancel</button>
     </div>
 </div>
 @endsection
