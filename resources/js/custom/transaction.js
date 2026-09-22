@@ -400,7 +400,7 @@ function fetchLedgers(select_date = null) {
                             <td> ${element['comment'] ?? 'NA'}</td>
                             <td> ${moment(element['date']).format('D MMM YYYY')}</td>
                             <td style="white-space:nowrap;">
-                                <button  class="btn btn-default btn-line openDataSidebarForEditCustomerLedger ${element.is_editable == 1 ? '' : 'd-none'}"
+                                <button  class="btn btn-default openDataSidebarForEditCustomerLedger ${element.is_editable == 1 ? '' : 'd-none'}"
                                             customer-id="${element['customer_id']}"
                                             customer_name="${element['customer_name']}"
                                             cr="${element['cr']}"
@@ -415,7 +415,7 @@ function fetchLedgers(select_date = null) {
                                             dr="${element['dr']}"
                                             balance="${element['customer_balance']}"
                                     >Add Payment</button>
-                                    <button  class="btn btn-default btn-line openDayPrintHistoryModal"
+                                    <button  class="btn btn-default openDayPrintHistoryModal"
                                             customer-id="${element['customer_id']}"
                                             customer_name="${element['customer_name']}"
                                             balance="${element['customer_balance']}"

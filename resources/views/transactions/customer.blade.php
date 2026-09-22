@@ -296,5 +296,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/transaction.js')}}?v=11"> </script>
+<script src="{{asset('js/custom/transaction.js')}}?v=12"> </script>
 @endpush

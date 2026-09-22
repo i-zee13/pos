@@ -117,7 +117,21 @@
 
         #invoice-POS .bot-3-table .body-description-tr .tableitem {
             text-transform: uppercase;
-            width: 30mm;
+        }
+
+        #invoice-POS .bot-3-table .col-voucher {
+            width: 14mm;
+            white-space: nowrap;
+        }
+
+        #invoice-POS .bot-3-table .col-amount {
+            width: 16mm;
+            white-space: nowrap;
+        }
+
+        #invoice-POS .bot-3-table .col-remarks {
+            width: auto;
+            word-break: break-word;
         }
 
         #invoice-POS #bot .bot-3-table .body-description-tr .other-des-td {
@@ -220,10 +234,9 @@
             </table>
             <table class="bot-3-table">
                 <tr class="tabletitle">
-                    <th></th>
-                    <th>Voucher #</th>
-                    <th>{{$isReceived ? 'CR' : 'DR'}}</th>
-                    <th>Remarks</th>
+                    <th class="col-voucher">Voucher #</th>
+                    <th class="col-amount">{{$isReceived ? 'CR' : 'DR'}}</th>
+                    <th class="col-remarks">Remarks</th>
                 </tr>
                 @foreach ($invoices as $key => $row)
                     @php
@@ -233,10 +246,9 @@
                         $amount = $isReceived ? ($row->cr ?? 0) : ($row->dr ?? 0);
                     @endphp
                     <tr class="body-description-tr">
-                        <td class="other-des-td">{{$key + 1}}</td>
-                        <td class="tableitem">{{$voucherNo}}</td>
-                        <td class="other-des-td">{{number_format($amount)}}</td>
-                        <td class="other-des-td">{{$row->comment ? $row->comment : 'NA'}}</td>
+                        <td class="tableitem col-voucher">{{$voucherNo}}</td>
+                        <td class="other-des-td col-amount">{{number_format($amount)}}</td>
+                        <td class="other-des-td col-remarks">{{$row->comment ? $row->comment : 'NA'}}</td>
                     </tr>
                 @endforeach
             </table>
