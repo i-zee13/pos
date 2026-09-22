@@ -212,6 +212,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/vendor-ledgers',           [TransactionController::class, 'customerLedger'])->name('vendor-ledgers');
     Route::get('/customer-ledgers',         [TransactionController::class, 'customerLedger'])->name('customer-ledgers');
     Route::get('/print-transaction-invoice/{invoice_id}/{customer_id}/{operation}/{type}', [TransactionController::class, 'printInvoice'])->name('print-transaction-invoice');
+    Route::get('/print-day-transactions/{ids}/{customer_id}/{operation}/{type}', [TransactionController::class, 'printDayTransactions'])->name('print-day-transactions');
     //Multiple Transtaction of Customer
     Route::get('/ledger-purchi',            [TransactionController::class, 'getLedgerPurchi'])->name('ledger-purchi');
     Route::post('/save-tranasctions',       [TransactionController::class, 'saveTransaction'])->name('save-tranasctions');

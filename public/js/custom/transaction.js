@@ -296,7 +296,7 @@ function fetchLedgers() {
         console.log(action, total_cr_dr);
         voucher = action == 'customer-ledger-jama' ? (_element$crv_no = element.crv_no) !== null && _element$crv_no !== void 0 ? _element$crv_no : '0' : (_element$cpv_no = element.cpv_no) !== null && _element$cpv_no !== void 0 ? _element$cpv_no : '0';
         ledger_balance = element['balance'] >= 0 ? element['balance'] + ' DR' : -element['balance'] + ' CR';
-        $('.subCatsListTable tbody').append("\n                        <tr>\n                         <td> ".concat(voucher, "</td> \n                            <td> ").concat(element['customer_name'], "</td>\n                            <!-- <td class='total_balance'>").concat(ledger_balance, "</td> --!>\n                            <td>").concat(total_cr_dr, "</td>\n                            <td> ").concat((_element$comment = element['comment']) !== null && _element$comment !== void 0 ? _element$comment : 'NA', "</td>\n                            <td> ").concat(moment(element['date']).format('D MMM YYYY'), "</td>\n                            <td>\n                                <button  class=\"btn btn-default btn-line openDataSidebarForEditCustomerLedger ").concat(element.is_editable == 1 ? '' : 'd-none', "\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                            comment=\"").concat(element['comment'], "\"\n                                    >Edit</button>\n                                    <button  class=\"btn btn-default btn-line openDataSidebarForUpdateCustomerLedger\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Add Payment</button>\n                            </td>\n                        </tr>"));
+        $('.subCatsListTable tbody').append("\n                        <tr>\n                         <td> ".concat(voucher, "</td> \n                            <td> ").concat(element['customer_name'], "</td>\n                            <!-- <td class='total_balance'>").concat(ledger_balance, "</td> --!>\n                            <td>").concat(total_cr_dr, "</td>\n                            <td> ").concat((_element$comment = element['comment']) !== null && _element$comment !== void 0 ? _element$comment : 'NA', "</td>\n                            <td> ").concat(moment(element['date']).format('D MMM YYYY'), "</td>\n                            <td>\n                                <button  class=\"btn btn-default btn-line openDataSidebarForEditCustomerLedger ").concat(element.is_editable == 1 ? '' : 'd-none', "\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                            comment=\"").concat(element['comment'], "\"\n                                    >Edit</button>\n                                    <button  class=\"btn btn-default btn-line openDataSidebarForUpdateCustomerLedger\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            cr=\"").concat(element['cr'], "\"\n                                            dr=\"").concat(element['dr'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Add Payment</button>\n                                    <button  class=\"btn btn-default btn-line openDayPrintHistoryModal\"\n                                            customer-id=\"").concat(element['customer_id'], "\"\n                                            customer_name=\"").concat(element['customer_name'], "\"\n                                            balance=\"").concat(element['customer_balance'], "\"\n                                    >Print</button>\n                            </td>\n                        </tr>"));
       });
       $('#tblLoader').hide();
       $('.body').fadeIn();
@@ -372,3 +372,91 @@ $(document).on('focusout', '.amount', function () {
 });
 /******/ })()
 ;
+
+// --- Day print history modal (list Print) — does not touch sidebar save/print ---
+var dayPrintCustomerId = null;
+function dayPrintTypeFlag() {
+  return action == operation + '-ledger-jama' ? 1 : 2;
+}
+function openDayPrintWindow(ids) {
+  if (!ids || !ids.length || !dayPrintCustomerId) {
+    return;
+  }
+  var printWindow = window.open('/print-day-transactions/' + ids.join(',') + '/' + dayPrintCustomerId + '/' + operation + '/' + dayPrintTypeFlag());
+  if (printWindow) {
+    printWindow.onload = function () {
+      printWindow.print();
+    };
+  }
+}
+$(document).on('click', '.openDayPrintHistoryModal', function () {
+  var btn = $(this);
+  dayPrintCustomerId = btn.attr('customer-id');
+  var customerName = btn.attr('customer_name') || '';
+  var balance = parseFloat(btn.attr('balance')) || 0;
+  var balanceLabel = balance >= 0 ? 'Balance : ' + balance + ' DR' : 'Balance : ' + Math.abs(balance) + ' CR';
+  $('.day-print-customer-name').text(customerName);
+  $('.day-print-customer-balance').html('<strong>' + balanceLabel + '</strong>');
+  $('#dayPrintHistoryBody').empty();
+  $('#dayPrintSelectAll').prop('checked', false);
+  $('#dayPrintEmptyMsg').hide();
+  $('#dayPrintSelectedBtn').prop('disabled', true);
+  $('#dayPrintHistoryModal').modal('show');
+  $.ajax({
+    url: '/get-customer-transactions',
+    type: 'post',
+    data: {
+      _token: $('meta[name="csrf_token"]').attr('content'),
+      current_url: action,
+      id: dayPrintCustomerId,
+      operation: operation
+    },
+    success: function (response) {
+      var rows = '';
+      var count = 0;
+      (response.transactions || []).forEach(function (data) {
+        var isJama = action == operation + '-ledger-jama' && data.cr > 0;
+        var isBanam = action == operation + '-ledger-banam' && data.dr > 0;
+        if (!isJama && !isBanam) {
+          return;
+        }
+        count++;
+        var voucher = isJama ? data.crv_no || '' : data.cpv_no || '';
+        var amount = isJama ? data.cr : data.dr;
+        rows += '<tr>' + '<td><input type="checkbox" class="day-print-row-check" value="' + data.id + '"></td>' + '<td>' + voucher + '</td>' + '<td>' + amount + '</td>' + '<td>' + (data.comment ? data.comment : 'NA') + '</td>' + '<td><button type="button" class="btn btn-default btn-line day-print-single-btn" data-id="' + data.id + '">Print</button></td>' + '</tr>';
+      });
+      if (count === 0) {
+        $('#dayPrintEmptyMsg').show();
+        $('#dayPrintSelectedBtn').prop('disabled', true);
+      } else {
+        $('#dayPrintHistoryBody').html(rows);
+        $('#dayPrintSelectedBtn').prop('disabled', false);
+      }
+    }
+  });
+});
+$(document).on('change', '#dayPrintSelectAll', function () {
+  $('.day-print-row-check').prop('checked', $(this).is(':checked'));
+});
+$(document).on('change', '.day-print-row-check', function () {
+  var total = $('.day-print-row-check').length;
+  var checked = $('.day-print-row-check:checked').length;
+  $('#dayPrintSelectAll').prop('checked', total > 0 && total === checked);
+});
+$(document).on('click', '.day-print-single-btn', function () {
+  openDayPrintWindow([$(this).data('id')]);
+});
+$(document).on('click', '#dayPrintSelectedBtn', function () {
+  var ids = [];
+  $('.day-print-row-check:checked').each(function () {
+    ids.push($(this).val());
+  });
+  if (!ids.length) {
+    $('#notifDiv').fadeIn().css('background', 'red').text('Please select at least one entry.');
+    setTimeout(function () {
+      $('#notifDiv').fadeOut();
+    }, 3000);
+    return;
+  }
+  openDayPrintWindow(ids);
+});

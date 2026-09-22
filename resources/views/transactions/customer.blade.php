@@ -25,6 +25,47 @@
     </div>
     <button hidden data-toggle="modal" data-target="#deleteModal" id="hidden_btn_to_open_modal"></button>
 </div>
+{{-- Day histories print modal (list Print button) — isolated from sidebar save/print --}}
+<div class="modal fade" id="dayPrintHistoryModal" tabindex="-1" role="dialog" aria-labelledby="dayPrintHistoryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#00216d;color:#fff;">
+                <h5 class="modal-title" id="dayPrintHistoryLabel">Print Day Payments</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <strong class="day-print-customer-name"></strong>
+                    <span class="day-print-customer-balance"></span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0" id="dayPrintHistoryTable" width="100%">
+                        <thead>
+                            <tr style="background:#00216d;color:#fff;">
+                                <th style="width:40px;">
+                                    <input type="checkbox" id="dayPrintSelectAll" title="Select all">
+                                </th>
+                                <th>Voucher #</th>
+                                <th>{{request()->segment(1) == 'customer-ledger-jama' ? 'CR' : 'DR'}}</th>
+                                <th>Remarks</th>
+                                <th style="width:90px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dayPrintHistoryBody">
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-muted small mt-2 mb-0" id="dayPrintEmptyMsg" style="display:none;">No payments found for today.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="dayPrintSelectedBtn">Print Selected</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="product-cl-sec">
     <a href="#" id="pl-close" class="close-btn-pl"></a>
     <div class="pro-header-text">Cash <span>{{request()->segment(1) == 'customer-ledger-jama' ? 'Received' : 'Payment' }}</span></div>
@@ -232,5 +273,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/transaction.js')}}?v=8"> </script>
+<script src="{{asset('js/custom/transaction.js')}}?v=9"> </script>
 @endpush

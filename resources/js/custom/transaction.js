@@ -415,6 +415,11 @@ function fetchLedgers(select_date = null) {
                                             dr="${element['dr']}"
                                             balance="${element['customer_balance']}"
                                     >Add Payment</button>
+                                    <button  class="btn btn-default btn-line openDayPrintHistoryModal"
+                                            customer-id="${element['customer_id']}"
+                                            customer_name="${element['customer_name']}"
+                                            balance="${element['customer_balance']}"
+                                    >Print</button>
                             </td>
                         </tr>`);
             });
@@ -523,3 +528,109 @@ $(document).on('focusout', '.amount', function () {
     $('.total_ledger_sum').text(total_amount);
 
 })
+
+// --- Day print history modal (list Print) — does not touch sidebar save/print ---
+var dayPrintCustomerId = null;
+
+function dayPrintTypeFlag() {
+    return action == operation + '-ledger-jama' ? 1 : 2;
+}
+
+function openDayPrintWindow(ids) {
+    if (!ids || !ids.length || !dayPrintCustomerId) {
+        return;
+    }
+    var printWindow = window.open(
+        '/print-day-transactions/' + ids.join(',') + '/' + dayPrintCustomerId + '/' + operation + '/' + dayPrintTypeFlag()
+    );
+    if (printWindow) {
+        printWindow.onload = function () {
+            printWindow.print();
+        };
+    }
+}
+
+$(document).on('click', '.openDayPrintHistoryModal', function () {
+    var btn = $(this);
+    dayPrintCustomerId = btn.attr('customer-id');
+    var customerName = btn.attr('customer_name') || '';
+    var balance = parseFloat(btn.attr('balance')) || 0;
+    var balanceLabel = balance >= 0
+        ? ('Balance : ' + balance + ' DR')
+        : ('Balance : ' + Math.abs(balance) + ' CR');
+
+    $('.day-print-customer-name').text(customerName);
+    $('.day-print-customer-balance').html('<strong>' + balanceLabel + '</strong>');
+    $('#dayPrintHistoryBody').empty();
+    $('#dayPrintSelectAll').prop('checked', false);
+    $('#dayPrintEmptyMsg').hide();
+    $('#dayPrintSelectedBtn').prop('disabled', true);
+
+    $('#dayPrintHistoryModal').modal('show');
+
+    $.ajax({
+        url: '/get-customer-transactions',
+        type: 'post',
+        data: {
+            _token: $('meta[name="csrf_token"]').attr('content'),
+            current_url: action,
+            id: dayPrintCustomerId,
+            operation: operation
+        },
+        success: function (response) {
+            var rows = '';
+            var count = 0;
+            (response.transactions || []).forEach(function (data) {
+                var isJama = action == operation + '-ledger-jama' && data.cr > 0;
+                var isBanam = action == operation + '-ledger-banam' && data.dr > 0;
+                if (!isJama && !isBanam) {
+                    return;
+                }
+                count++;
+                var voucher = isJama ? (data.crv_no || '') : (data.cpv_no || '');
+                var amount = isJama ? data.cr : data.dr;
+                rows += '<tr>' +
+                    '<td><input type="checkbox" class="day-print-row-check" value="' + data.id + '"></td>' +
+                    '<td>' + voucher + '</td>' +
+                    '<td>' + amount + '</td>' +
+                    '<td>' + (data.comment ? data.comment : 'NA') + '</td>' +
+                    '<td><button type="button" class="btn btn-default btn-line day-print-single-btn" data-id="' + data.id + '">Print</button></td>' +
+                    '</tr>';
+            });
+            if (count === 0) {
+                $('#dayPrintEmptyMsg').show();
+                $('#dayPrintSelectedBtn').prop('disabled', true);
+            } else {
+                $('#dayPrintHistoryBody').html(rows);
+                $('#dayPrintSelectedBtn').prop('disabled', false);
+            }
+        }
+    });
+});
+
+$(document).on('change', '#dayPrintSelectAll', function () {
+    $('.day-print-row-check').prop('checked', $(this).is(':checked'));
+});
+
+$(document).on('change', '.day-print-row-check', function () {
+    var total = $('.day-print-row-check').length;
+    var checked = $('.day-print-row-check:checked').length;
+    $('#dayPrintSelectAll').prop('checked', total > 0 && total === checked);
+});
+
+$(document).on('click', '.day-print-single-btn', function () {
+    openDayPrintWindow([$(this).data('id')]);
+});
+
+$(document).on('click', '#dayPrintSelectedBtn', function () {
+    var ids = [];
+    $('.day-print-row-check:checked').each(function () {
+        ids.push($(this).val());
+    });
+    if (!ids.length) {
+        $('#notifDiv').fadeIn().css('background', 'red').text('Please select at least one entry.');
+        setTimeout(function () { $('#notifDiv').fadeOut(); }, 3000);
+        return;
+    }
+    openDayPrintWindow(ids);
+});

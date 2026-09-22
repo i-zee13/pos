@@ -246,6 +246,43 @@ class TransactionController extends Controller
          return view('transactions.print', compact('invoice', 'type'));
       }
    }
+
+   /**
+    * Print one or more same-day cash ledger entries (list Print popup).
+    * Does not alter store/printInvoice flows — single id reuses printInvoice.
+    */
+   public function printDayTransactions($ids, $customer_id, $operation, $type)
+   {
+      $idList = array_values(array_filter(array_map('intval', explode(',', (string) $ids))));
+      if (empty($idList)) {
+         abort(404);
+      }
+
+      if (count($idList) === 1) {
+         return $this->printInvoice($idList[0], $customer_id, $operation, $type);
+      }
+
+      if ($operation == 'vendor') {
+         $invoices = VendorLedger::selectRaw('vendor_ledger.*,
+                                                (SELECT customer_name FROM customers WHERE id = vendor_ledger.customer_id) as customer_name')
+            ->where('customer_id', $customer_id)
+            ->whereIn('id', $idList)
+            ->orderBy('vendor_ledger.id', 'ASC')
+            ->get();
+         return view('transactions.day-print', compact('invoices', 'type'))
+            ->with('printView', 'vendor');
+      }
+
+      $invoices = CustomerLedger::selectRaw('customer_ledger.*,
+                                                (SELECT customer_name FROM customers WHERE id = customer_ledger.customer_id) as customer_name')
+         ->where('customer_id', $customer_id)
+         ->whereIn('id', $idList)
+         ->orderBy('customer_ledger.id', 'ASC')
+         ->get();
+
+      return view('transactions.day-print', compact('invoices', 'type'))
+         ->with('printView', 'customer');
+   }
    public function printPurchi(Request $request,$customers)
    {
          $customers      = json_decode($customers,true);
