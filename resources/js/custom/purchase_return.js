@@ -175,14 +175,15 @@ $('.close').on('click', function () {
     $('#new_residence_status').val(0).trigger('change');
 })
 $(document).on('click', '.remove_btn', function () {
-    alert(34);
     deleteRef = $(this);
     var product_id = $(this).attr('id');
     var q = $(this).attr('data-quantity');
     var return_invoice_id = $(this).attr('data-invoice-id');
     var product_invoice_id = $(this).attr('data-product-invoice');
-    console.log(return_invoice_id)
-    if (segments[3] == 'purchase-return-edit' && return_invoice_id != undefined) {
+    // Only hit backend for rows that already exist in DB (products_returns id).
+    // Newly added products on edit have data-product-invoice="0" / empty — remove from JS array only.
+    var isSavedDbRow = product_invoice_id && product_invoice_id !== '0' && product_invoice_id !== 'undefined';
+    if (segments[3] == 'purchase-return-edit' && isSavedDbRow) {
         swal({
                 title: "Are you sure?",
                 icon: "warning",
@@ -213,14 +214,16 @@ $(document).on('click', '.remove_btn', function () {
                                 setTimeout(() => {
                                     $('#notifDiv').fadeOut();
                                 }, 3000);
-                                $("#tr-" + product_id).remove();
+                                $(".tr-" + product_id).remove();
                                 returns_product_array = returns_product_array.filter(x => x.product_id != product_id);
                                 grandSum(previous_payable, service_charges);
                                 var filter_product = product_list.filter(x => x.id == product_id);
-                                filter_product[0].stock_balance = response.updated_stock;
+                                if (filter_product.length) {
+                                    filter_product[0].stock_balance = response.updated_stock;
+                                }
                             } else {
                                 deleteRef.removeAttr('disabled');
-                                deleteRef.text('Delete');
+                                deleteRef.text('Remove');
                                 $('#notifDiv').fadeIn();
                                 $('#notifDiv').css('background', 'red');
                                 $('#notifDiv').text('Unable to delete at the moment');
@@ -236,10 +239,6 @@ $(document).on('click', '.remove_btn', function () {
 
         $(".tr-" + product_id).remove();
         returns_product_array = returns_product_array.filter(x => x.product_id != product_id);
-        // $('.products').children('option[value="' + product_id + '"]').attr('disabled', false);
-        // $(".products").val('0');
-
-        // $(".products").select2();
         $('.amount_received').val($('.paid_amount').text());
         setTimeout(() => {
             $('.amount_received').trigger('input');
