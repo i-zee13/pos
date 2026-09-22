@@ -3545,43 +3545,87 @@
         text-align: center;
     }
 
-    ._cust_filter {
-        width: 218px !important;
+    /* Product Ledger filter bar — one row; scoped to this page only */
+    #search-form .product-ledger-bar {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        padding-bottom: 10px;
+    }
+    #search-form .product-ledger-bar ._cust_filter {
+        width: auto !important;
+        min-width: 160px;
+        max-width: 220px;
+        flex: 1 1 180px;
+        float: none;
+        margin-bottom: 0;
+        padding-right: 0;
+    }
+    #search-form .product-ledger-bar .CL-Product {
+        width: 150px !important;
+        flex: 0 0 150px;
+        float: none;
+        margin-left: 0 !important;
+        padding-right: 0;
+        padding-top: 0 !important;
+    }
+    #search-form .product-ledger-bar .ledger-current-date {
+        flex: 0 0 auto;
+        width: auto !important;
+        max-width: none;
+        float: none;
+        margin-bottom: 0;
+        padding-right: 0;
+    }
+    #search-form .product-ledger-bar .ledger-current-date .custom-control {
+        margin: 0;
+        padding: 0;
+        min-height: 0;
+    }
+    #search-form .product-ledger-bar .ledger-actions {
+        display: flex;
+        flex: 0 0 auto;
+        gap: 8px;
+        margin-left: auto;
+        float: none;
+        padding: 0;
+    }
+    #search-form .product-ledger-bar .ledger-actions .btn {
+        float: none;
+        margin: 0 !important;
+        white-space: nowrap;
     }
 
     @media (max-width: 1366px) {
-        ._cust_filter {
-            width: 159px;
+        #search-form .product-ledger-bar ._cust_filter {
+            min-width: 140px;
+            max-width: 180px;
+        }
+        #search-form .product-ledger-bar .CL-Product {
+            width: 135px !important;
+            flex-basis: 135px;
         }
     }
     @media only screen and (max-width:575px) {
-        .Product-Filter .col-auto {
-            width: 100% !important;
+        #search-form .product-ledger-bar {
+            flex-wrap: wrap;
         }
-
-        ._cust_filter {
-            margin-bottom: 0px;
+        #search-form .product-ledger-bar ._cust_filter,
+        #search-form .product-ledger-bar .CL-Product {
+            width: 100% !important;
+            max-width: none;
+            flex: 1 1 100%;
             margin-top: 10px;
-            width: 100% !important;
-            padding: 0 !important;
         }
-
-        .CL-Product {
-            width: 100% !important;
-            padding-right: 2px !important;
-            margin: 0 !important;
+        #search-form .product-ledger-bar .ledger-actions {
+            margin-left: 0;
+            width: 100%;
+            margin-top: 10px;
         }
-
-        .col-auto {
-            padding: 0 12px 0px !important;
-        }
-
-        .col-auto .CL-Product.inputmonth.focused {
-            margin-top: 10px !important;
-        }
-
         .Product-Filter .btn-primary {
-            margin-top: 10px !important;
+            margin-top: 0 !important;
         }
     }
      .btn-outline-primary:hover {
@@ -3625,67 +3669,46 @@
     <div class="col-lg-12">
         <div class="Product-Filter">
             <form id="search-form">
-                <div class="row">
-
-                    <div class="col-auto pr-0">
-
-
-                        <div class="_cust_filter">
-                            <div class="form-s2">
-                                <select class="form-control formselect product_id" name="product_id">
-                                    <option value="">Select Product</option>
-                                    @foreach($products as $company)
-                                    <option value="{{$company->id}}" data-stock="{{$company->stock_balance}}" >{{$company->id}}-{{$company->product_name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                <div class="product-ledger-bar">
+                    <div class="_cust_filter">
+                        <div class="form-s2">
+                            <select class="form-control formselect product_id" name="product_id">
+                                <option value="">Select Product</option>
+                                @foreach($products as $company)
+                                <option value="{{$company->id}}" data-stock="{{$company->stock_balance}}" >{{$company->id}}-{{$company->product_name}}</option>
+                                @endforeach
+                            </select>
                         </div>
+                    </div>
 
-                        <style>
-                            .CL-Product input {
-                                height: 31px !important;
-                            }
-                        </style>
-                       
-                        <div class="CL-Product inputmonth" style="width:250px;margin-left:11px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
-                            <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
-                        </div>
-                        <div class="CL-Product inputmonth" style="width:250px;margin-left: 0px;padding-top:0px"><i class="fa fa-calendar-alt" style="top: 8px"></i>
-                            <input type="date" autocomplete="off" class="form-control end_date" placeholder="End Date" name="end_date">
-                        </div>
-                        <div class="_cust_filter">
-                            <div class="custom-control custom-checkbox mr-sm-2">
-                                <input type="checkbox" id="current-date" class="btn-check"   autocomplete="off" name="is_current_date" value="1">
-                                <label class="btn btn-outline-primary" for="current-date">Current Date</label><br>
-                            </div>
-                            
-                        </div>
-                        <div class="col-auto p-0" style="float:right;">
-                        <style>
-                            .reset-btn {
-                                box-shadow: none;
-                            }
+                    <style>
+                        #search-form .CL-Product input {
+                            height: 31px !important;
+                        }
+                        #search-form .reset-btn {
+                            box-shadow: none;
+                        }
+                        #search-form .reset-btn:hover {
+                            color: white !important;
+                        }
+                    </style>
 
-                            .reset-btn:hover {
-                                color: white !important;
-                            }
-
-                            .Product-Filter .btn-primary {
-                                float: none;
-                            }
-                        </style>
+                    <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt" style="top: 8px"></i>
+                        <input type="date" autocomplete="off" class="form-control start_date" placeholder="Start Date" name="start_date">
+                    </div>
+                    <div class="CL-Product inputmonth"><i class="fa fa-calendar-alt" style="top: 8px"></i>
+                        <input type="date" autocomplete="off" class="form-control end_date" placeholder="End Date" name="end_date">
+                    </div>
+                    <div class="_cust_filter ledger-current-date">
+                        <div class="custom-control custom-checkbox mr-sm-2">
+                            <input type="checkbox" id="current-date" class="btn-check" autocomplete="off" name="is_current_date" value="1">
+                            <label class="btn btn-outline-primary" for="current-date">Current Date</label>
+                        </div>
+                    </div>
+                    <div class="ledger-actions">
                         <button type="button" class="btn btn-primary btn-line m-0 reset-btn" style="color:#00216d !important"> Reset</button>
                         <button type="button" class="btn btn-primary m-0 search-btn"> Search</button>
                     </div>
-                    </div>
-
-                </div>
-                <div class="row" style="margin-bottom: 10px;">
-
-                   
-
-                   
-                    
                 </div>
             </form>
             <div class="clearfix"></div>
