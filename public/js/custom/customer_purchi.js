@@ -58,8 +58,8 @@
                     <td>${ledger_balance}</td>
                     <td>
                         <input type="number" value="0" balance="${balance}" cust-id="${id}" class="inputSale amount-input add-stock-input td-input-amount${id}"   min="0" tabindex="${tabIndexCounter}">
-                        <div class="row-amount-words"></div>
                     </td>
+                    <td><div class="row-amount-words"></div></td>
                     <td class="action-btn-client">
                         <button id="${id}" class="btn smBTN red-bg remove_btn" >Remove</button>
                     </td>
@@ -75,7 +75,7 @@
      });
      $(document).on('input', '.amount-input', function() {
         var amount = parseFloat($(this).val()) || 0;
-        var $words = $(this).siblings('.row-amount-words');
+        var $words = $(this).closest('tr').find('.row-amount-words');
         if (amount > 0) {
             $words.text(numberToWordsPK(amount) + ' Only').show();
         } else {

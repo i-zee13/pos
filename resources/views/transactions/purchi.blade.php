@@ -47,13 +47,12 @@
 
     .row-amount-words {
         display: none;
-        margin-top: 3px;
         color: #5F5F5F;
         font-family: system-ui, -apple-system, sans-serif !important;
         font-size: 11px;
         font-weight: 700;
         line-height: 1.3;
-        white-space: nowrap;
+        white-space: normal;
     }
 
     .grand-amount-words {
@@ -63,43 +62,47 @@
         font-size: 13px;
         font-weight: 700;
         line-height: 1.35;
-        white-space: nowrap;
+        white-space: normal;
         text-align: left;
     }
 
     .TeacherAttendanceListTable th:nth-child(1),
     .TeacherAttendanceListTable td:nth-child(1) {
-        width: 50px !important;
-        max-width: 50px;
+        width: 55px !important;
+        max-width: 55px;
     }
     .TeacherAttendanceListTable th:nth-child(2),
     .TeacherAttendanceListTable td:nth-child(2) {
-        width: 22% !important;
-        max-width: 220px;
+        width: 18% !important;
+        max-width: 200px;
     }
     .TeacherAttendanceListTable th:nth-child(3),
     .TeacherAttendanceListTable td:nth-child(3) {
-        width: 100px !important;
-        max-width: 110px;
+        width: 90px !important;
+        max-width: 100px;
         white-space: nowrap;
     }
     .TeacherAttendanceListTable th:nth-child(4),
     .TeacherAttendanceListTable td:nth-child(4) {
-        width: 28% !important;
-        min-width: 180px;
+        width: 110px !important;
+        max-width: 120px;
+        white-space: nowrap;
     }
     .TeacherAttendanceListTable th:nth-child(5),
     .TeacherAttendanceListTable td:nth-child(5) {
-        width: 32% !important;
-        min-width: 220px;
+        width: auto !important;
+        min-width: 200px;
+    }
+    .TeacherAttendanceListTable th:nth-child(6),
+    .TeacherAttendanceListTable td:nth-child(6) {
+        width: 90px !important;
+        max-width: 100px;
+        white-space: nowrap;
+        text-align: center;
     }
 
     .TeacherAttendanceListTable tfoot td {
         vertical-align: middle;
-    }
-    .TeacherAttendanceListTable tfoot td:last-child {
-        padding-left: 12px;
-        padding-right: 16px;
     }
 
     @media (max-width: 1366px) {
@@ -227,12 +230,13 @@
                             <th>Name</th>
                             <th>Balance</th>
                             <th>Recived</th>
+                            <th>In Words</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                     </tbody>
-                    <tfoot> 
+                    <tfoot>
                 <tr style="background: #00216d;border: solid 1px #dbdbdb;color: white">
                     <td class="font18" align="right" colspan="2"></td>
                     <td class="font18" align="center">Grand Total :</td>
@@ -242,6 +246,7 @@
                     <td class="font18" align="left">
                         <div class="grand-amount-words"></div>
                     </td>
+                    <td></td>
                 </tr>
              </tfoot>
                 </table>
@@ -258,5 +263,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/customer_purchi.js') }}?v=4"></script>
+<script src="{{asset('js/custom/customer_purchi.js') }}?v=5"></script>
 @endpush
