@@ -5,7 +5,40 @@
  let report_segments = location.href.split('/');
  let current_url = report_segments[3].replace(/[#?]+$/, '');
  let trx_inv = false;
- let tabIndexCounter = 1;  
+ let tabIndexCounter = 1;
+
+ function numberToWordsPK(num) {
+     num = Math.floor(Math.abs(Number(num) || 0));
+     if (num === 0) return 'Zero';
+
+     var ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+         'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+         'Seventeen', 'Eighteen', 'Nineteen'];
+     var tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+     function twoDigits(n) {
+         if (n < 20) return ones[n];
+         return tens[Math.floor(n / 10)] + (n % 10 ? ' ' + ones[n % 10] : '');
+     }
+     function threeDigits(n) {
+         if (n < 100) return twoDigits(n);
+         return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' ' + twoDigits(n % 100) : '');
+     }
+
+     var parts = [];
+     var crore = Math.floor(num / 10000000);
+     num %= 10000000;
+     var lac = Math.floor(num / 100000);
+     num %= 100000;
+     var thousand = Math.floor(num / 1000);
+     num %= 1000;
+
+     if (crore) parts.push(threeDigits(crore) + ' Crore');
+     if (lac) parts.push(twoDigits(lac) + ' Lac');
+     if (thousand) parts.push(twoDigits(thousand) + ' Thousand');
+     if (num) parts.push(threeDigits(num));
+     return parts.join(' ');
+ }
 
  $(document).ready(function () {
 
@@ -23,7 +56,10 @@
                     <td>${id}</td>
                     <td>${name}</td>
                     <td>${ledger_balance}</td>
-                    <td><input type="number" value="0" balance="${balance}" cust-id="${id}" class="inputSale amount-input add-stock-input td-input-amount${id}"   min="0" tabindex="${tabIndexCounter}"></td>
+                    <td>
+                        <input type="number" value="0" balance="${balance}" cust-id="${id}" class="inputSale amount-input add-stock-input td-input-amount${id}"   min="0" tabindex="${tabIndexCounter}">
+                        <div class="row-amount-words"></div>
+                    </td>
                     <td class="action-btn-client">
                         <button id="${id}" class="btn smBTN red-bg remove_btn" >Remove</button>
                     </td>
@@ -38,6 +74,13 @@
          
      });
      $(document).on('input', '.amount-input', function() {
+        var amount = parseFloat($(this).val()) || 0;
+        var $words = $(this).siblings('.row-amount-words');
+        if (amount > 0) {
+            $words.text(numberToWordsPK(amount) + ' Only').show();
+        } else {
+            $words.text('').hide();
+        }
         calculateTotal();
     });
     function calculateTotal() {
@@ -46,7 +89,13 @@
             const amount = parseFloat($(this).val()) || 0;
             total += amount;
         });
-        $('.total-purchi').text(total.toFixed(2)); // Adjust the location as needed
+        $('.total-purchi').text(total.toFixed(2));
+        var $grandWords = $('.grand-amount-words');
+        if (total > 0) {
+            $grandWords.text(numberToWordsPK(total) + ' Only').show();
+        } else {
+            $grandWords.text('').hide();
+        }
     }
      $(document).on('click', '.remove_btn', function () {
          var id = $(this).attr('id');
@@ -123,5 +172,6 @@
      $('.TeacherAttendanceListTable tbody').empty();
      $('.customer_id option').prop('disabled', false);
      $(".customer_id").select2();
-
+     $('.total-purchi').text('0.00');
+     $('.grand-amount-words').text('').hide();
  });
