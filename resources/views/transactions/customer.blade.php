@@ -186,6 +186,12 @@
                                                 </div> -->
 
                                                 
+                                                <div class="col-md-12 px-0 amount-in-words-wrap" style="display:none;margin-bottom:8px;">
+                                                    <div class="amount-in-words-box" style="background:#eef2fb;border:1px solid #00216d;border-radius:4px;padding:8px 12px;color:#00216d;">
+                                                        <div style="font-size:11px;font-weight:600;letter-spacing:.02em;opacity:.85;margin-bottom:2px;">In Words</div>
+                                                        <div class="amount-in-words-text" style="font-size:13px;font-weight:600;line-height:1.35;"></div>
+                                                    </div>
+                                                </div>
                                                 <table class="table">
                                                     <tr style="background: #00216d;color: white;">
                                                         <td style="font-family:bold">Total:</td>
@@ -296,5 +302,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/transaction.js')}}?v=12"> </script>
+<script src="{{asset('js/custom/transaction.js')}}?v=13"> </script>
 @endpush

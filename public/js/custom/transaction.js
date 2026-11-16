@@ -11,6 +11,48 @@ var customer_transaction_array = [];
 var ledger_type = '';
 var operation = '';
 var total_amount = 0;
+function numberToWordsPK(num) {
+  num = Math.floor(Math.abs(Number(num) || 0));
+  if (num === 0) return 'Zero';
+  var ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  var tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  function twoDigits(n) {
+    if (n < 20) return ones[n];
+    return tens[Math.floor(n / 10)] + (n % 10 ? ' ' + ones[n % 10] : '');
+  }
+  function threeDigits(n) {
+    if (n < 100) return twoDigits(n);
+    return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' ' + twoDigits(n % 100) : '');
+  }
+  var parts = [];
+  var crore = Math.floor(num / 10000000);
+  num %= 10000000;
+  var lac = Math.floor(num / 100000);
+  num %= 100000;
+  var thousand = Math.floor(num / 1000);
+  num %= 1000;
+  if (crore) parts.push(threeDigits(crore) + ' Crore');
+  if (lac) parts.push(twoDigits(lac) + ' Lac');
+  if (thousand) parts.push(twoDigits(thousand) + ' Thousand');
+  if (num) parts.push(threeDigits(num));
+  return parts.join(' ');
+}
+function updateLedgerAmountTotal() {
+  total_amount = 0;
+  $('.amount').each(function () {
+    var inputValue = parseFloat($(this).val());
+    if (!isNaN(inputValue)) total_amount += inputValue;
+  });
+  $('.total_ledger_sum').text(total_amount);
+  var $wrap = $('.amount-in-words-wrap');
+  if (total_amount > 0) {
+    $wrap.find('.amount-in-words-text').text(numberToWordsPK(total_amount) + ' Only');
+    $wrap.show();
+  } else {
+    $wrap.find('.amount-in-words-text').text('');
+    $wrap.hide();
+  }
+}
 $(document).ready(function () {
   var segments = location.href.split('/');
   action = segments[3].replace(/[#?]+$/, '');
@@ -22,6 +64,7 @@ $(document).ready(function () {
     $('select option').removeAttr('disabled');
     $('.customer_id').select2();
     $('.add-more').empty();
+    updateLedgerAmountTotal();
     $('#saveTransactionForm')[0].reset();
     $('textarea[name="comment"]').val('');
     $('.customers').hide();
@@ -86,6 +129,7 @@ $(document).ready(function () {
     $('select option').removeAttr('disabled');
     $('.customer_id').select2();
     $('.add-more').empty();
+    updateLedgerAmountTotal();
     $('#saveTransactionForm')[0].reset();
     $('textarea[name="comment"]').val('');
     $('.customers').hide();
@@ -109,6 +153,7 @@ $(document).ready(function () {
     console.log(comment);
     $('.add-more').append("\n                <div class=\"row  remove_div\" >\n                    <div class=\"col-md-5 PB-10\">\n                        <div class=\"form-group focused\">\n                            <label class=\"control-label mb-10\">Add Amount *</label>\n                            <input type=\"hidden\" name=\"hidden_cust_balance[]\" value=\"".concat(balance, "\">\n                            <input type=\"hidden\" name=\"hidden_cust_id[]\" value=\"").concat(id, "\">\n                            <input type=\"number\" name=\"amount[]\" class=\"form-control field-required amount\" id=\"amount_").concat(id, "\" required tabindex=\"2\" data-customer_id=\"").concat(id, "\" value=\"").concat(cr_dr, "\">\n                        </div>\n                    </div>\n                    <div class=\"col-md-6 PB-10\">\n                        <div class=\"form-group focused\">\n                            <label class=\"control-label mb-10\">Remarks </label>\n                            <textarea name=\"comment[]\" class=\"form-control remarks_").concat(id, "\" rows=\"6\" tabindex=\"3\">").concat(comment == null ? '' : comment, "</textarea>\n                        </div>\n                    </div>\n                    <div class=\"col-md-1 PB-10\" style=\"margin-top: 21px;\">\n                        <a type=\"button\" id=\"\" data-customer_id=\"").concat(id, "\" class=\"btn smBTN red-bg remove remove_btn_").concat(id, "\" data-index=\"\" data-quantity=\"\" tabindex=\"-1\">Remove</a>\n                    </div>\n                </div>\n            "));
     n++;
+    updateLedgerAmountTotal();
     $('input[id="action"]').val('edit');
     lastOp = 'update';
     $('#dataSidebarLoader').show();
@@ -190,6 +235,7 @@ $(document).ready(function () {
                   printWindow.print();
                 };
               }
+              location.reload();
             }
             $('#saveTransactionForm')[0].reset();
             console.log($('.voucher_no').val());
@@ -240,6 +286,7 @@ $(document).ready(function () {
     $('.customer_id').select2();
     $('#saveTransactionForm')[0].reset();
     $('.add-more').empty();
+    updateLedgerAmountTotal();
     $('.ProductTable').hide();
     $('.customers').show();
     $('#transactionTable tbody').empty();
@@ -318,7 +365,7 @@ $('.customer_id').on('change', function () {
     $('#saveTransaction').attr('tabindex', n * 2 + 4);
     $('#print-invoice').attr('tabindex', n * 2 + 5);
     $('#cancelSubCat').attr('tabindex', n * 2 + 6);
-    $('.add-more').append("\n        <div class=\"row  remove_div\" >\n            <div class=\"row _head03\">\n                <div class=\"col-6\"> \n                    <h5 class=\"\">".concat(cus_name, "</h5>\n                </div>\n                <div class=\"col-6\" style=\"text-align:right;\"> \n                     <span> <strong>Balance</strong> : ").concat(cust_bal > 0 ? cust_bal + '<strong> DR</strong>' : cust_bal + ' <strong>CR</strong>', "</span>\n                </div>\n            </div> \n\n                <div class=\"col-md-5 PB-10\">\n                    <div class=\"form-group focused\">\n                        <label class=\"control-label mb-10\">Add Amount *</label>\n                        <input type=\"hidden\" name=\"hidden_cust_balance[]\" value=\"").concat(cust_bal, "\">\n                        <input type=\"hidden\" name=\"hidden_cust_id[]\" value=\"").concat(customer_val, "\">\n                        <input type=\"number\" name=\"amount[]\" class=\"form-control field-required amount nnnn\" id=\"amount_").concat(customer_val, "\" required tabindex=\"").concat(n * 2 + 2, "\" data-customer_id=\"").concat(customer_val, "\">\n                    </div>\n                </div>\n                <div class=\"col-md-6 PB-10\">\n                    <div class=\"form-group focused\">\n                        <label class=\"control-label mb-10\">Remarks </label>\n                        <textarea name=\"comment[]\" class=\"form-control remarks_").concat(customer_val, "\" rows=\"6\"tabindex=\"").concat(n * 2 + 3, "\"></textarea>\n                    </div>\n                </div>\n                <div class=\"col-md-1 PB-10\" style=\"margin-top: 21px;\">\n                    <a type=\"button\" id=\"\" data-customer_id=\"").concat(customer_val, "\" class=\"btn smBTN red-bg remove remove_btn_").concat(customer_val, "\" data-index=\"\" data-quantity=\"\" tabindex=\"-1\">Remove</a>\n                </div>\n            </div>\n        "));
+    $('.add-more').append("\n        <div class=\"row  remove_div\" >\n            <div class=\"row _head03\">\n                <div class=\"col-6\"> \n                    <h5 class=\"\">".concat(cus_name, "</h5>\n                </div>\n                <div class=\"col-6\" style=\"text-align:right;\"> \n                     <span> <strong>Balance</strong> : ").concat(cust_bal > 0 ? cust_bal + '<strong> DR</strong>' : cust_bal + ' <strong>CR</strong>', "</span>\n                </div>\n            </div> \n\n                <div class=\"col-md-5 PB-10\">\n                    <div class=\"form-group focused\">\n                        <label class=\"control-label mb-10\">Add Amount *</label>\n                        <input type=\"hidden\" name=\"hidden_cust_balance[]\" value=\"").concat(cust_bal, "\">\n                        <input type=\"hidden\" name=\"hidden_cust_id[]\" value=\"").concat(customer_val, "\">\n                        <input type=\"number\" name=\"amount[]\" class=\"form-control field-required amount nnnn\" id=\"amount_").concat(customer_val, "\" required tabindex=\"").concat(n * 2 + 2, "\" data-customer_id=\"").concat(customer_val, "\">\n                    </div>\n                </div>\n                <div class=\"col-md-6 PB-10\">\n                    <div class=\"form-group focused\">\n                        <label class=\"control-label mb-10\">Remarks </label>\n                        <textarea name=\"comment[]\" class=\"form-control remarks_").concat(customer_val, "\" rows=\"6\" tabindex=\"").concat(n * 2 + 3, "\"></textarea>\n                    </div>\n                </div>\n                <div class=\"col-md-1 PB-10\" style=\"margin-top: 21px;\">\n                    <a type=\"button\" id=\"\" data-customer_id=\"").concat(customer_val, "\" class=\"btn smBTN red-bg remove remove_btn_").concat(customer_val, "\" data-index=\"\" data-quantity=\"\" tabindex=\"-1\">Remove</a>\n                </div>\n            </div>\n        "));
     $('.customer_id').children("option[value=\"".concat(customer_val, "\"]")).attr('disabled', true);
     setTimeout(function () {
       $('.customer_id').val('0');
@@ -336,12 +383,7 @@ $(document).on('click', ".remove", function () {
   $('.customer_id').children('option[value="' + cus_id + '"]').attr('disabled', false);
   $(".customer_id").val('0');
   $(".customer_id").select2();
-  var total_amount = 0;
-  $('.amount').each(function () {
-    var inputValue = parseFloat($(this).val());
-    total_amount += inputValue;
-  });
-  $('.total_ledger_sum').text(total_amount);
+  updateLedgerAmountTotal();
 });
 $('.close').on('click', function () {
   $(this).remove();
@@ -370,14 +412,10 @@ $(document).on('click', '#dayPrintModalCloseBtn, .day-print-modal-close', functi
 $(document).on('click', '.confirm_btn', function () {
   closeSidebar();
 });
-$(document).on('focusout', '.amount', function () {
-  var total_amount = 0;
-  $('.amount').each(function () {
-    var inputValue = parseFloat($(this).val());
-    total_amount += inputValue;
-  });
-  $('.total_ledger_sum').text(total_amount);
+$(document).on('input focusout', '.amount', function () {
+  updateLedgerAmountTotal();
 });
+
 // --- Day print history modal (list Print) — does not touch sidebar save/print ---
 var dayPrintCustomerId = null;
 function dayPrintTypeFlag() {
@@ -416,7 +454,7 @@ $(document).on('click', '.openDayPrintHistoryModal', function () {
       id: dayPrintCustomerId,
       operation: operation
     },
-    success: function (response) {
+    success: function success(response) {
       var rows = '';
       var count = 0;
       (response.transactions || []).forEach(function (data) {

@@ -5,6 +5,57 @@ let n = 0;
 let customer_transaction_array = [];
 let ledger_type = '';
 let operation = '';
+
+function numberToWordsPK(num) {
+    num = Math.floor(Math.abs(Number(num) || 0));
+    if (num === 0) return 'Zero';
+
+    var ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+        'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+        'Seventeen', 'Eighteen', 'Nineteen'];
+    var tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+    function twoDigits(n) {
+        if (n < 20) return ones[n];
+        return tens[Math.floor(n / 10)] + (n % 10 ? ' ' + ones[n % 10] : '');
+    }
+    function threeDigits(n) {
+        if (n < 100) return twoDigits(n);
+        return ones[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' ' + twoDigits(n % 100) : '');
+    }
+
+    var parts = [];
+    var crore = Math.floor(num / 10000000);
+    num %= 10000000;
+    var lac = Math.floor(num / 100000);
+    num %= 100000;
+    var thousand = Math.floor(num / 1000);
+    num %= 1000;
+
+    if (crore) parts.push(threeDigits(crore) + ' Crore');
+    if (lac) parts.push(twoDigits(lac) + ' Lac');
+    if (thousand) parts.push(twoDigits(thousand) + ' Thousand');
+    if (num) parts.push(threeDigits(num));
+    return parts.join(' ');
+}
+
+function updateLedgerAmountTotal() {
+    var total_amount = 0;
+    $('.amount').each(function () {
+        var inputValue = parseFloat($(this).val());
+        if (!isNaN(inputValue)) total_amount += inputValue;
+    });
+    $('.total_ledger_sum').text(total_amount);
+    var $wrap = $('.amount-in-words-wrap');
+    if (total_amount > 0) {
+        $wrap.find('.amount-in-words-text').text(numberToWordsPK(total_amount) + ' Only');
+        $wrap.show();
+    } else {
+        $wrap.find('.amount-in-words-text').text('');
+        $wrap.hide();
+    }
+}
+
 $(document).ready(function () {
     var segments = location.href.split('/');
     action = segments[3].replace(/[#?]+$/, '');
@@ -17,6 +68,7 @@ $(document).ready(function () {
         $('select option').removeAttr('disabled');
         $('.customer_id').select2();
         $('.add-more').empty();
+        updateLedgerAmountTotal();
         $('#saveTransactionForm')[0].reset();
         $('textarea[name="comment"]').val('');
         $('.customers').hide();
@@ -134,6 +186,7 @@ $(document).ready(function () {
         $('select option').removeAttr('disabled');
         $('.customer_id').select2();
         $('.add-more').empty();
+        updateLedgerAmountTotal();
         $('#saveTransactionForm')[0].reset();
         $('textarea[name="comment"]').val('');
         $('.customers').hide();
@@ -175,6 +228,7 @@ $(document).ready(function () {
                 </div>
             `);
            n++;
+        updateLedgerAmountTotal();
         $('input[id="action"]').val('edit');
         lastOp = 'update';
         $('#dataSidebarLoader').show();
@@ -314,6 +368,7 @@ $(document).ready(function () {
         $('.customer_id').select2();
         $('#saveTransactionForm')[0].reset();
         $('.add-more').empty();
+        updateLedgerAmountTotal();
         $('.ProductTable').hide();
         $('.customers').show();
         $('#transactionTable tbody').empty();
@@ -480,13 +535,7 @@ $(document).on('click', `.remove`, function () {
     $('.customer_id').children('option[value="' + cus_id + '"]').attr('disabled', false);
     $(".customer_id").val('0');
     $(".customer_id").select2();
-    var total_amount = 0;
-    $('.amount').each(function () {
-        var inputValue = parseFloat($(this).val());
-        total_amount += inputValue;
-    });
-
-    $('.total_ledger_sum').text(total_amount);
+    updateLedgerAmountTotal();
 })
 $('.close').on('click', function () {
     $(this).remove();
@@ -506,12 +555,6 @@ $(document).on('click', '.confirm_btn', function () {
     closeSidebar();
 });
 
-$(document).on('focusout', '.amount', function () {
-    var total_amount = 0;
-    $('.amount').each(function () {
-        var inputValue = parseFloat($(this).val());
-        total_amount += inputValue;
-    });
-    $('.total_ledger_sum').text(total_amount);
-
-})   
+$(document).on('input focusout', '.amount', function () {
+    updateLedgerAmountTotal();
+})
