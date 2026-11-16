@@ -51,24 +51,55 @@
         color: #5F5F5F;
         font-family: system-ui, -apple-system, sans-serif !important;
         font-size: 11px;
-        font-weight: 400;
+        font-weight: 700;
         line-height: 1.3;
-        white-space: normal;
+        white-space: nowrap;
     }
 
     .grand-amount-words {
         display: none;
         color: #fff !important;
         font-family: system-ui, -apple-system, sans-serif !important;
-        font-size: 12px;
-        font-weight: 400;
+        font-size: 13px;
+        font-weight: 700;
         line-height: 1.35;
-        white-space: normal;
+        white-space: nowrap;
         text-align: left;
+    }
+
+    .TeacherAttendanceListTable th:nth-child(1),
+    .TeacherAttendanceListTable td:nth-child(1) {
+        width: 50px !important;
+        max-width: 50px;
+    }
+    .TeacherAttendanceListTable th:nth-child(2),
+    .TeacherAttendanceListTable td:nth-child(2) {
+        width: 22% !important;
+        max-width: 220px;
+    }
+    .TeacherAttendanceListTable th:nth-child(3),
+    .TeacherAttendanceListTable td:nth-child(3) {
+        width: 100px !important;
+        max-width: 110px;
+        white-space: nowrap;
+    }
+    .TeacherAttendanceListTable th:nth-child(4),
+    .TeacherAttendanceListTable td:nth-child(4) {
+        width: 28% !important;
+        min-width: 180px;
+    }
+    .TeacherAttendanceListTable th:nth-child(5),
+    .TeacherAttendanceListTable td:nth-child(5) {
+        width: 32% !important;
+        min-width: 220px;
     }
 
     .TeacherAttendanceListTable tfoot td {
         vertical-align: middle;
+    }
+    .TeacherAttendanceListTable tfoot td:last-child {
+        padding-left: 12px;
+        padding-right: 16px;
     }
 
     @media (max-width: 1366px) {
@@ -227,5 +258,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/customer_purchi.js') }}?v=3"></script>
+<script src="{{asset('js/custom/customer_purchi.js') }}?v=4"></script>
 @endpush
