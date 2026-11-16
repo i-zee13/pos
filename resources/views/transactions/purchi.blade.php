@@ -263,5 +263,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/customer_purchi.js') }}?v=5"></script>
+<script src="{{asset('js/custom/customer_purchi.js') }}?v=6"></script>
 @endpush

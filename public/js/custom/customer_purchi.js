@@ -77,7 +77,7 @@
         var amount = parseFloat($(this).val()) || 0;
         var $words = $(this).closest('tr').find('.row-amount-words');
         if (amount > 0) {
-            $words.text(numberToWordsPK(amount) + ' Only').show();
+            $words.text(numberToWordsPK(amount)).show();
         } else {
             $words.text('').hide();
         }
