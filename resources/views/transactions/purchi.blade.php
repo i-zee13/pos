@@ -47,29 +47,28 @@
 
     .row-amount-words {
         display: none;
-        margin-top: 4px;
-        background: #eef2fb;
-        border: 1px solid #00216d;
-        border-radius: 3px;
-        padding: 3px 6px;
-        color: #00216d;
-        font-size: 10px;
-        font-weight: 600;
+        margin-top: 3px;
+        color: #5F5F5F;
+        font-family: system-ui, -apple-system, sans-serif !important;
+        font-size: 11px;
+        font-weight: 400;
         line-height: 1.3;
-        max-width: 220px;
+        white-space: normal;
     }
 
     .grand-amount-words {
         display: none;
-        margin-top: 6px;
-        background: #eef2fb;
-        border: 1px solid #fff;
-        border-radius: 3px;
-        padding: 4px 8px;
-        color: #00216d;
+        color: #fff !important;
+        font-family: system-ui, -apple-system, sans-serif !important;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 400;
         line-height: 1.35;
+        white-space: normal;
+        text-align: left;
+    }
+
+    .TeacherAttendanceListTable tfoot td {
+        vertical-align: middle;
     }
 
     @media (max-width: 1366px) {
@@ -206,11 +205,12 @@
                 <tr style="background: #00216d;border: solid 1px #dbdbdb;color: white">
                     <td class="font18" align="right" colspan="2"></td>
                     <td class="font18" align="center">Grand Total :</td>
-                    <td class="totalNo" >
+                    <td class="totalNo">
                         <span class="total-purchi" style="font-family: 'Rationale', sans-serif !important;font-size: 25px;">0.00</span>
+                    </td>
+                    <td class="font18" align="left">
                         <div class="grand-amount-words"></div>
                     </td>
-                    <td class="font18" align="right" colspan="1"></td>
                 </tr>
              </tfoot>
                 </table>
@@ -227,5 +227,5 @@
 </div>
 @endsection
 @push('js')
-<script src="{{asset('js/custom/customer_purchi.js') }}?v=2"></script>
+<script src="{{asset('js/custom/customer_purchi.js') }}?v=3"></script>
 @endpush
